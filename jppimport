@@ -3,11 +3,13 @@
 use Getopt::Long;
 my ($jpprpm,$altrpm);
 my $verbose;
+my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
+		      "srpmdir=s"   => \$srpmdir,
 		      "verbose"  => \$verbose);  
 my ($alt,$jpp);
-$jpp=RPM::ImportTool->new(RPM => $jpprpm);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SRPMDIR=> $srpmdir);
 
 &alt_generic_fix($jpp);
 &jpp_specific_fix($jpp);
@@ -20,26 +22,38 @@ if ($altrpm) {
     $alt->cleanup();
 }
 
-print @{$jpp->_get_speclist()};
+print $jpp->get_spec();
+$jpp->write_rpm();
 $jpp->cleanup();
 
 my $TODO=qq~
-%define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
-%define native  %{?_with_native:1}%{!?_without_native:0}
 %if %{native} %if ! %{gcj_support}
 BuildRequires:  %{_bindir}/gcj, %{__perl}, 
 Requires(postun): %{_sbindir}/update-alternatives
-Release:        1jpp
 ~;
 
 
 sub jpp_specific_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
+    $secptr->[0]->unshift_body('%def_without gcj_support'."\n");
+    $secptr->[0]->unshift_body("BuildRequires: jpackage-utils\n");
+    $secptr->[0]->unshift_body("BuildRequires: /proc\n");
+# jdepend; should be detected by peering in SOURCEDIR
+    $secptr->[0]->unshift_body("BuildRequires: unzip\n");
+# antlr
+#    $secptr->[0]->unshift_body("BuildRequires: gcc-c++\n");
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
 	    &jpp_specific_cleanup_headers($sec);
+	    $sec->subst(
+		qr'\%define gcj_support \%{\?_with_gcj_support:1}\%{!\?_with_gcj_support:\%{\?_without_gcj_support:0}\%{!\?_without_gcj_support:\%{\?_gcj_support:\%{_gcj_support}}\%{!\?_gcj_support:0}}}', '%define gcj_support 0');
+
+# antlr
+#	    $sec->subst(
+#		qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 0');
+
 	} elsif ($t eq 'files') {
 	    &jpp_specific_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
@@ -52,19 +66,19 @@ sub jpp_specific_fix {
     }
 }
 
-#%{_sbindir}/update-alternatives --install %{_bindir}/antlr \
-#  %{name} %{_bindir}/antlr-java 10
-
 sub jpp_specific_cleanup_files {
     my $section=shift;
     my @out;
     foreach (@{$section->get_body()}) {
-	if (/^\s*\%ghost\s*\%doc\s*%{_javadocdir}/ or
-		 /^\s*\%ghost\s*%{_javadocdir}/) {
+#	if (/^\s*\%ghost\s*\%doc\s*\%{_javadocdir}/ or
+#	    /^\s*\%ghost\s*(\%dir\s*)?\%{_javadocdir}/) {
 	    # we will make a usual symlink there...
-	    s,^\s*\%ghost\s*,,g;
-	    push @out, $_;
-	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
+#	    s,^\s*\%ghost\s*,,g;
+#	    push @out, $_;
+#	} elsif (/^\s*\%ghost\s*\%dir\s*\%{_javadocdir}/) {
+	    # throw away -- seems dangerous
+#	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
+	if (/^\s*\%ghost\s*/) {
 	    # alternatives ?
 	    push @out, "#".$_;
 	} else {
@@ -79,7 +93,9 @@ sub jpp_specific_cleanup_headers {
     my @out;
     foreach (@{$section->get_body()}) {
 	if (/^Group:(\s*)(.+)\s*$/) {
-	    if ($2 eq "Development/Code Generators") {
+	    if ($2 eq "Development/Code Generators"
+		or $2 eq "Development/Libraries/Java"
+) {
 		push @out, "Group:${1}Development/Java\n";
 	    } elsif ($2 eq "Text Editors") {
 		push @out, "Group:${1}Editors\n";
@@ -108,7 +124,8 @@ our %DEPSKIP = map {$_ => 1} qw!
 java-javadoc
 !;
 our %DEPSUBST = (
-'%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12'
+'%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
+'mono-core','mono',
 );
 
 }
@@ -165,7 +182,10 @@ sub alt_generic_cleanup_files {
     my @out;
     foreach (@{$section->get_body()}) {
 	s/^\s*\%attr\(-,root,root\)\s*//;
-	if (/^\s*\%defattr\(0644,root,root,0755\)\s*$/) {
+	#if (/^\s*\%defattr\(0644,root,root,0755\)\s*$/
+	if (/^\s*\%defattr\((?:0644|-),root,root,(?:0755|-)\)\s*$/
+	    or /^\s*\%defattr\((?:0644|-),root,root\)\s*$/
+	    ) {
 	    # throw away
 	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
 	    push @out, "#".$_;
@@ -211,6 +231,11 @@ sub set_body {
     my $ptr=shift;
     die "not an array pointer!" if ref $ptr ne 'ARRAY';
     $self->{BODY}=$ptr;
+}
+
+sub unshift_body {
+    my $self=shift;
+    unshift @{$self->{BODY}}, @_;
 }
 
 sub empty {
@@ -289,8 +314,7 @@ sub new {
     };
     bless $self, $class;
     if ($self->{RPM}) {
-	my @path= split(/\//,$self->{RPM});
-	my $dirname=pop @path;
+	my $dirname=&basename($self->{RPM});
 	$dirname=~s/.src.rpm//;
 	$self->{TMPDIR}="$dirname.$$";
 	$self->rpm_custom("-i", $self->{RPM});
@@ -301,6 +325,16 @@ sub new {
     }
     $self->_set_speclist(load_file($self->{SPECFILE}));
     return $self;
+}
+
+sub write_rpm {
+    my $self=shift;
+    my $newdir="$self->{TMPDIR}/NEW";
+    mkdir $newdir;
+    my $newspec="$newdir/".basename($self->{SPECFILE});
+    &write_file($newspec, $self->get_spec());
+    run("add_changelog -e '- converted from JPackage by jppimport script' $newspec");
+    $self->rpm_custom('-bs --nodeps', $newspec);
 }
 
 BEGIN {
@@ -325,7 +359,7 @@ triggerpostun
 
 sub _parse_speclist {
     my $rpm=shift;
-    my $specptr=$rpm->{SPEC};
+    my $specptr=shift;
     my @outpart;
     my $out=[];
     my $TYPE='package';
@@ -347,7 +381,6 @@ sub _parse_speclist {
 
 sub _get_speclist {
     my $self=shift;
-    #return $self->{SPEC};
     my @out;
     foreach (@{$self->{SPECSECTIONS}}) {
 	push @out, @{$_->get_body()};
@@ -359,8 +392,12 @@ sub _set_speclist {
     my $self=shift;
     my $ptr=shift;
     die "not an array pointer!" if ! ref $ptr eq 'ARRAY';
-    $self->{SPEC}=$ptr;
-    $self->_parse_speclist();
+    $self->_parse_speclist($ptr);
+}
+
+sub get_spec {
+    my $self=shift;
+    return join('',@{$self->_get_speclist()})
 }
 
 sub get_section {
@@ -387,6 +424,7 @@ sub rpm_custom {
     my $SOURCEDIR="$pwd/$tmpdir/SOURCES";
     my $SPECDIR="$pwd/$tmpdir/SPECS";
     my $SRPMDIR="$pwd/$tmpdir/SRPMS";
+    $SRPMDIR=$self->{SRPMDIR} if $self->{SRPMDIR};
     my $cmd =qq{rpm --define "_specdir $SPECDIR" --define "_sourcedir $SOURCEDIR" --define "_srcrpmdir $SRPMDIR" @_};
     &run($cmd);
 }
@@ -397,10 +435,15 @@ sub cleanup {
     run("rm -rf $tmpdir") if $tmpdir;
 }
 
+sub basename {
+    my @path= split(/\//,$_[0]);
+    return pop @path;
+}
+
 sub run {
     my $cmd=shift;
     #print $cmd,"\n";
-    print `$cmd`;
+    system($cmd) && die "$cmd failed: $?";
 }
 
 sub load_file {
@@ -410,3 +453,19 @@ sub load_file {
     close FN, $name || die "can't open $name: $!";
     return \@result;
 }
+
+sub write_array_to_file {
+    my ($name, $ptr)=@_;
+    open FN, '>', $name || die "can't open $name: $!";
+    print FN @$ptr;
+    close FN, $name || die "can't open $name: $!";
+}
+
+sub write_file {
+    my ($name, $str)=@_;
+    open FN, '>', $name || die "can't open $name: $!";
+    print FN $str;
+    close FN, $name || die "can't open $name: $!";
+}
+
+1;
