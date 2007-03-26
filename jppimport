@@ -1,10 +1,5 @@
 #!/usr/bin/perl -w
 
-#remove %ghost %javadoc
-
-#Group:
-#Text Processing/Markup/XML System/Libraries?
-
 use Getopt::Long;
 my ($jpprpm,$altrpm);
 my $verbose;
@@ -16,18 +11,16 @@ $jpp=RPM::ImportTool->new(RPM => $jpprpm);
 
 &alt_generic_fix($jpp);
 &jpp_specific_fix($jpp);
-&cut_changelog($jpp);
 
 if ($altrpm) {
-    print "AAA:",$altrpm,"\n";
     $alt=RPM::ImportTool->new(RPM => $altrpm);
-    $jpp->set_speclist([@{$jpp->get_speclist()}, @{&get_changelog($alt)}]);
-    my $newrel = $alt->get_tag('Release')."_".$jpp->get_tag('Release')."1.7";
-    $jpp->set_tag('Release',$newrel);
+    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
+    my $newrel = $alt->get_section('package')->get_tag('Release')."_".$jpp->get_section('package')->get_tag('Release')."1.7";
+    $jpp->get_section('package')->set_tag('Release',$newrel);
     $alt->cleanup();
 }
 
-print @{$jpp->get_speclist()};
+print @{$jpp->_get_speclist()};
 $jpp->cleanup();
 
 my $TODO=qq~
@@ -39,11 +32,52 @@ Requires(postun): %{_sbindir}/update-alternatives
 Release:        1jpp
 ~;
 
+
 sub jpp_specific_fix {
     my $rpm=shift;
-    my $specptr=$rpm->get_speclist();
+    my $secptr=$rpm->get_sections();
+    foreach my $sec (@$secptr) {
+	my $t = $sec->get_type();
+	if ($t eq 'package') {
+	    &jpp_specific_cleanup_headers($sec);
+	} elsif ($t eq 'files') {
+	    &jpp_specific_cleanup_files($sec);
+	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
+	} elsif ($t eq 'post') {
+	    $sec->subst('\%{_sbindir}/update-alternatives --install', '%register_alternatives');
+	} elsif ($t eq 'postun') {
+	    $sec->subst('\%{_sbindir}/update-alternatives --remove', '%unregister_alternatives');
+	} elsif ($t eq 'changelog') {
+	}
+    }
+}
+
+#%{_sbindir}/update-alternatives --install %{_bindir}/antlr \
+#  %{name} %{_bindir}/antlr-java 10
+
+sub jpp_specific_cleanup_files {
+    my $section=shift;
     my @out;
-    foreach (@$specptr) {
+    foreach (@{$section->get_body()}) {
+	if (/^\s*\%ghost\s*\%doc\s*%{_javadocdir}/ or
+		 /^\s*\%ghost\s*%{_javadocdir}/) {
+	    # we will make a usual symlink there...
+	    s,^\s*\%ghost\s*,,g;
+	    push @out, $_;
+	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
+	    # alternatives ?
+	    push @out, "#".$_;
+	} else {
+	    push @out, $_;
+	}
+    }
+    $section->set_body(\@out);
+}
+
+sub jpp_specific_cleanup_headers {
+    my $section=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
 	if (/^Group:(\s*)(.+)\s*$/) {
 	    if ($2 eq "Development/Code Generators") {
 		push @out, "Group:${1}Development/Java\n";
@@ -56,34 +90,27 @@ sub jpp_specific_fix {
 	    }
 	} elsif (/^\s*\%define\s+section\s+free\s*$/) {
 	    # throw away
-	} elsif (/^\s*\%ghost\s*\%doc\s*%{_javadocdir}/ or
-		 /^\s*\%ghost\s*%{_javadocdir}/) {
-	    # we will make a usual symlink there...
-	    s,^\s*\%ghost\s*,,g;
-	    push @out, $_;
-	} elsif (/^\s*\%ghost\s*%{_bindir}/
-		 ) {
-	    # alternatives ?
-	    push @out, "#".$_;
-	} elsif (/^\s*((?:BuildRequires|Requires|Conflicts)(?:\(\w+\))?):\s*(.+)\s*$/) {
+	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)(?:\(\w+\))?):\s*(.+)\s*$/) {
 	    my $Tag=$1;
 	    my $filtered = &filter_pkg_list($2);
 	    push @out, "$Tag: $filtered\n" if ($filtered);
-	} elsif (/^\s*\%clean\s*$/) {
-	    push @out, "#\%clean\n";
 	} else {
 	    push @out, $_;
 	}
     }
-    $rpm->set_speclist(\@out);
+    $section->set_body(\@out);
 }
 
 BEGIN {
-our %depskip = map {$_ => 1} qw!
+our %DEPSKIP = map {$_ => 1} qw!
 %{__make}
 /bin/rm /bin/ln
 java-javadoc
 !;
+our %DEPSUBST = (
+'%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12'
+);
+
 }
 
 sub filter_pkg_list {
@@ -91,11 +118,14 @@ sub filter_pkg_list {
     my @out;
     while (@in) {
 	$_ = shift @in;
-	if ($depskip{$_}) {
+	if ($DEPSKIP{$_}) {
 	    &read_version(\@in);
 	    next;
+	} elsif ($DEPSUBST{$_}) {
+	    push @out, $DEPSUBST{$_};
+	} else {
+	    push @out, $_;
 	}
-	push @out, $_;
     }
     return join(" ",@out)
 }
@@ -111,52 +141,144 @@ sub read_version {
 
 sub alt_generic_fix {
     my $rpm=shift;
-    my $specptr=$rpm->get_speclist();
+    my $secptr=$rpm->get_sections();
+    my $cleanroot_pattern='^\s*rm -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$';
+    foreach my $sec (@$secptr) {
+	my $t = $sec->get_type();
+	if ($t eq 'package') {
+	    $sec->exclude('^(Packager|Vendor|Distribution|BuildRoot):');
+	} elsif ($t eq 'files') {
+	    &alt_generic_cleanup_files($sec);
+	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
+	    $sec->exclude($cleanroot_pattern);
+	} elsif ($t eq 'clean') {
+	    $sec->exclude($cleanroot_pattern);
+	    $sec->delete() if ($sec->is_empty());
+	} elsif ($t eq 'changelog') {
+	    $sec->empty();
+	}
+    }
+}
+
+sub alt_generic_cleanup_files {
+    my $section=shift;
     my @out;
-    foreach (@$specptr) {
+    foreach (@{$section->get_body()}) {
 	s/^\s*\%attr\(-,root,root\)\s*//;
-	if (/^(Vendor|Distribution|BuildRoot):/) {
-	} elsif (/^\s*rm -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$/) {
-	} elsif (/^\s*\%defattr\(0644,root,root,0755\)\s*$/) {
+	if (/^\s*\%defattr\(0644,root,root,0755\)\s*$/) {
 	    # throw away
 	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
 	    push @out, "#".$_;
-	} elsif (/^\s*\%clean\s*$/) {
-	    push @out, "#".$_;
 	} else {
 	    push @out, $_;
 	}
     }
-    $rpm->set_speclist(\@out);
+    $section->set_body(\@out);
 }
 
-sub cut_changelog {
-    my $rpm=shift;
-    my $specptr=$rpm->get_speclist();
+
+package RPM::SpecSection;
+
+sub new {
+    my $class = shift;
+    my $self= {
+	TYPE=> 'package',
+	BODY=>[],
+	@_
+    };
+    die "Oops! section" if ref $self->{BODY} ne 'ARRAY';
+    bless $self, $class;
+#    return $self;
+}
+
+sub describe {
+    my $self=shift;
+    print "SpecSection: type=$self->{TYPE}; body:".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
+}
+
+sub get_type {
+    my $self=shift;
+    return $self->{TYPE};
+}
+
+sub get_body {
+    my $self=shift;
+    return $self->{BODY};
+}
+
+sub set_body {
+    my $self=shift;
+    my $ptr=shift;
+    die "not an array pointer!" if ref $ptr ne 'ARRAY';
+    $self->{BODY}=$ptr;
+}
+
+sub empty {
+    my $self=shift;
+    $#{$self->{BODY}}=0 if ($#{$self->{BODY}}>0);
+}
+
+sub delete {
+    my $self=shift;
+    $self->{BODY}=[];
+}
+
+sub is_empty {
+    my $self=shift;
+    return 1 if $#{$self->{BODY}}<1;
+    foreach (@{$self->{BODY}}[1..$#{$self->{BODY}}]){
+	return 0 if ! /^\s*(#.*)?$/;
+    }
+    return 1;
+}
+
+sub exclude {
+    my $section=shift;
+    my $pattern=shift;
     my @out;
-    foreach (@$specptr) {
-	if (/^\%changelog/) {
-	    push @out, $_;
-	    $rpm->set_speclist(\@out);
-	    return;
-	} else {
+    foreach (@{$section->get_body()}) {
+	unless (/$pattern/) {
 	    push @out, $_;
 	}
     }
+    $section->set_body(\@out);
 }
 
-sub get_changelog {
-    my $rpm=shift;
-    my $specptr=$rpm->get_speclist();
-    my @spec=@$specptr;
-    while (@spec) {
-	$_ = shift @spec;
-	if (/^\%changelog/) {
-	    return [ @spec ];
+sub subst {
+    my $section=shift;
+    my $pattern=shift;
+    my $replace=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	s/$pattern/$replace/g;
+	push @out, $_;
+    }
+    $section->set_body(\@out);
+}
+
+sub get_tag {
+    my $section=shift;
+    my $tag=shift;
+    foreach (@{$section->get_body()}) {
+	if (/^$tag:\s*(.+)\s*$/) {
+	    return $1;
 	}
     }
-    return [];
+    return;
 }
+
+sub set_tag {
+    my ($section, $tag, $val)=@_;
+    my $specptr=$section->get_body();
+    for (my $i=0; $i<=$#{$specptr}; $i++) {
+	if ($specptr->[$i]=~/^$tag:(\s*)/) {
+	    $specptr->[$i]="$tag:$1$val\n";
+	    last;
+	}
+    }
+    return $section;
+}
+
 
 package RPM::ImportTool;
 
@@ -177,46 +299,84 @@ sub new {
     } else {
 	die "$class: new: either RPM or SPECFILE is required."
     }
-    $self->{SPEC}=load_file($self->{SPECFILE});
+    $self->_set_speclist(load_file($self->{SPECFILE}));
     return $self;
 }
 
-sub get_speclist {
-    my $self=shift;
-    return $self->{SPEC};
+BEGIN {
+    our %SECTION=map {$_=>1} qw!
+package
+description
+prep
+build
+install
+clean
+files
+changelog
+pre
+post
+preun
+postun
+triggerin
+triggerun
+triggerpostun
+!
 }
 
-sub set_speclist {
+sub _parse_speclist {
+    my $rpm=shift;
+    my $specptr=$rpm->{SPEC};
+    my @outpart;
+    my $out=[];
+    my $TYPE='package';
+    foreach (@$specptr) {
+	if (/^\s*\%(\w+)/ && $SECTION{$1}) {
+	    my $NEWTYPE=$1;
+	    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE=>$TYPE);
+	    $out=[];
+	    $TYPE=$NEWTYPE;
+	}
+	push @$out, $_;
+    }
+    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE => $TYPE);
+    $rpm->{SPECSECTIONS}=\@outpart;
+#    foreach (@{$rpm->{SPECSECTIONS}}) {
+#	$_->describe();
+#    }
+}
+
+sub _get_speclist {
+    my $self=shift;
+    #return $self->{SPEC};
+    my @out;
+    foreach (@{$self->{SPECSECTIONS}}) {
+	push @out, @{$_->get_body()};
+    }
+    return \@out;
+}
+
+sub _set_speclist {
     my $self=shift;
     my $ptr=shift;
     die "not an array pointer!" if ! ref $ptr eq 'ARRAY';
     $self->{SPEC}=$ptr;
+    $self->_parse_speclist();
 }
 
-sub get_tag {
-    my $rpm=shift;
-    my $tag=shift;
-    my $specptr=$rpm->get_speclist();
-    foreach (@$specptr) {
-	if (/^$tag:\s*(.+)\s*$/) {
-	    return $1;
-	}
+sub get_section {
+    my $self=shift;
+    my $type=shift;
+    foreach my $section (@{$self->{SPECSECTIONS}}) {
+	return $section if $section->get_type() eq $type;
     }
     return;
 }
 
-sub set_tag {
-    my ($rpm, $tag, $val)=@_;
-    my $specptr=$rpm->get_speclist();
-    for (my $i=0; $i<=$#{$specptr}; $i++) {
-	if ($specptr->[$i]=~/^$tag:(\s*)/) {
-	    $specptr->[$i]="$tag:$1$val\n";
-	    last;
-	}
-    }
-    return $rpm;
+sub get_sections {
+    my $self=shift;
+    #return @{$self->{SPECSECTIONS}};
+    return $self->{SPECSECTIONS};
 }
-
 
 sub rpm_custom {
     my $self=shift;
@@ -239,7 +399,7 @@ sub cleanup {
 
 sub run {
     my $cmd=shift;
-    print $cmd,"\n";
+    #print $cmd,"\n";
     print `$cmd`;
 }
 
