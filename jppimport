@@ -11,26 +11,24 @@ my $verbose;
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
 		      "verbose"  => \$verbose);  
-my $altdir="$$.alt";
-my $jppdir="$$.jpp";
 my ($alt,$jpp);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm);
 
-rpm_custom($jppdir, "-i", $jpprpm);
-$jpp=load_file(glob "$jppdir/SPECS/*");
+&alt_generic_fix($jpp);
+&jpp_specific_fix($jpp);
+&cut_changelog($jpp);
 
 if ($altrpm) {
-    rpm_custom($altdir, "-i", $altrpm);
-    $alt=load_file(glob "$altdir/SPECS/*");
+    print "AAA:",$altrpm,"\n";
+    $alt=RPM::ImportTool->new(RPM => $altrpm);
+    $jpp->set_speclist([@{$jpp->get_speclist()}, @{&get_changelog($alt)}]);
+    my $newrel = $alt->get_tag('Release')."_".$jpp->get_tag('Release')."1.7";
+    $jpp->set_tag('Release',$newrel);
+    $alt->cleanup();
 }
 
-$jpp=&alt_generic_fix($jpp);
-$jpp=&jpp_specific_fix($jpp);
-$jpp=&cut_changelog($jpp);
-push @$jpp, @{&get_changelog($alt)};
-
-print "REL: ",&get_release($alt)."_".&get_release($jpp)."1.7","\n";
-
-print @$jpp;
+print @{$jpp->get_speclist()};
+$jpp->cleanup();
 
 my $TODO=qq~
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
@@ -41,14 +39,9 @@ Requires(postun): %{_sbindir}/update-alternatives
 Release:        1jpp
 ~;
 
-run("rm -rf $jppdir");
-
-if ($altrpm) {
-    &run("rm -rf $altdir");
-}
-
 sub jpp_specific_fix {
-    my $specptr=shift;
+    my $rpm=shift;
+    my $specptr=$rpm->get_speclist();
     my @out;
     foreach (@$specptr) {
 	if (/^Group:(\s*)(.+)\s*$/) {
@@ -82,7 +75,7 @@ sub jpp_specific_fix {
 	    push @out, $_;
 	}
     }
-    return \@out;
+    $rpm->set_speclist(\@out);
 }
 
 BEGIN {
@@ -117,7 +110,8 @@ sub read_version {
 }
 
 sub alt_generic_fix {
-    my $specptr=shift;
+    my $rpm=shift;
+    my $specptr=$rpm->get_speclist();
     my @out;
     foreach (@$specptr) {
 	s/^\s*\%attr\(-,root,root\)\s*//;
@@ -133,25 +127,28 @@ sub alt_generic_fix {
 	    push @out, $_;
 	}
     }
-    return \@out;
+    $rpm->set_speclist(\@out);
 }
 
 sub cut_changelog {
-    my $specptr=shift;
+    my $rpm=shift;
+    my $specptr=$rpm->get_speclist();
     my @out;
     foreach (@$specptr) {
 	if (/^\%changelog/) {
 	    push @out, $_;
-	    return \@out;
+	    $rpm->set_speclist(\@out);
+	    return;
 	} else {
 	    push @out, $_;
 	}
     }
-    return \@out;
 }
 
 sub get_changelog {
-    my @spec=@{shift()};
+    my $rpm=shift;
+    my $specptr=$rpm->get_speclist();
+    my @spec=@$specptr;
     while (@spec) {
 	$_ = shift @spec;
 	if (/^\%changelog/) {
@@ -161,37 +158,89 @@ sub get_changelog {
     return [];
 }
 
-sub get_version {
-    my @spec=@{shift()};
-    while (@spec) {
-	$_ = shift @spec;
-	if (/^Version:\s*(.+)\s*$/) {
-	    return $1;
-	}
+package RPM::ImportTool;
+
+sub new {
+    my $class = shift;
+    my $self = {
+	@_
+    };
+    bless $self, $class;
+    if ($self->{RPM}) {
+	my @path= split(/\//,$self->{RPM});
+	my $dirname=pop @path;
+	$dirname=~s/.src.rpm//;
+	$self->{TMPDIR}="$dirname.$$";
+	$self->rpm_custom("-i", $self->{RPM});
+	$self->{SPECFILE}=(glob "$self->{TMPDIR}/SPECS/*")[0];
+    } elsif ($self->{SPECFILE}) {
+    } else {
+	die "$class: new: either RPM or SPECFILE is required."
     }
-    return 0;
+    $self->{SPEC}=load_file($self->{SPECFILE});
+    return $self;
 }
 
-sub get_release {
-    my @spec=@{shift()};
-    while (@spec) {
-	$_ = shift @spec;
-	if (/^Release:\s*(.+)\s*$/) {
+sub get_speclist {
+    my $self=shift;
+    return $self->{SPEC};
+}
+
+sub set_speclist {
+    my $self=shift;
+    my $ptr=shift;
+    die "not an array pointer!" if ! ref $ptr eq 'ARRAY';
+    $self->{SPEC}=$ptr;
+}
+
+sub get_tag {
+    my $rpm=shift;
+    my $tag=shift;
+    my $specptr=$rpm->get_speclist();
+    foreach (@$specptr) {
+	if (/^$tag:\s*(.+)\s*$/) {
 	    return $1;
 	}
     }
-    return 0;
+    return;
 }
+
+sub set_tag {
+    my ($rpm, $tag, $val)=@_;
+    my $specptr=$rpm->get_speclist();
+    for (my $i=0; $i<=$#{$specptr}; $i++) {
+	if ($specptr->[$i]=~/^$tag:(\s*)/) {
+	    $specptr->[$i]="$tag:$1$val\n";
+	    last;
+	}
+    }
+    return $rpm;
+}
+
 
 sub rpm_custom {
-    my $reldir=shift;
+    my $self=shift;
+    my $tmpdir=$self->{TMPDIR};
+    die "Oops! rpm_custom" unless $tmpdir;
     my $pwd= `pwd`;
     chomp $pwd;
-    my $SOURCEDIR="$pwd/$reldir/SOURCES";
-    my $SPECDIR="$pwd/$reldir/SPECS";
-    my $SRPMDIR="$pwd/$reldir/SRPMS";
+    my $SOURCEDIR="$pwd/$tmpdir/SOURCES";
+    my $SPECDIR="$pwd/$tmpdir/SPECS";
+    my $SRPMDIR="$pwd/$tmpdir/SRPMS";
     my $cmd =qq{rpm --define "_specdir $SPECDIR" --define "_sourcedir $SOURCEDIR" --define "_srcrpmdir $SRPMDIR" @_};
     &run($cmd);
+}
+
+sub cleanup {
+    my $self=shift;
+    my $tmpdir=$self->{TMPDIR};
+    run("rm -rf $tmpdir") if $tmpdir;
+}
+
+sub run {
+    my $cmd=shift;
+    print $cmd,"\n";
+    print `$cmd`;
 }
 
 sub load_file {
@@ -200,10 +249,4 @@ sub load_file {
     my @result = <FN>;
     close FN, $name || die "can't open $name: $!";
     return \@result;
-}
-
-sub run {
-    my $cmd=shift;
-    print $cmd,"\n";
-    print `$cmd`;
 }
