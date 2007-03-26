@@ -1,0 +1,209 @@
+#!/usr/bin/perl -w
+
+#remove %ghost %javadoc
+
+#Group:
+#Text Processing/Markup/XML System/Libraries?
+
+use Getopt::Long;
+my ($jpprpm,$altrpm);
+my $verbose;
+my $result = GetOptions ("jpp=s" => \$jpprpm,
+		      "alt=s"   => \$altrpm,
+		      "verbose"  => \$verbose);  
+my $altdir="$$.alt";
+my $jppdir="$$.jpp";
+my ($alt,$jpp);
+
+rpm_custom($jppdir, "-i", $jpprpm);
+$jpp=load_file(glob "$jppdir/SPECS/*");
+
+if ($altrpm) {
+    rpm_custom($altdir, "-i", $altrpm);
+    $alt=load_file(glob "$altdir/SPECS/*");
+}
+
+$jpp=&alt_generic_fix($jpp);
+$jpp=&jpp_specific_fix($jpp);
+$jpp=&cut_changelog($jpp);
+push @$jpp, @{&get_changelog($alt)};
+
+print "REL: ",&get_release($alt)."_".&get_release($jpp)."1.7","\n";
+
+print @$jpp;
+
+my $TODO=qq~
+%define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
+%define native  %{?_with_native:1}%{!?_without_native:0}
+%if %{native} %if ! %{gcj_support}
+BuildRequires:  %{_bindir}/gcj, %{__perl}, 
+Requires(postun): %{_sbindir}/update-alternatives
+Release:        1jpp
+~;
+
+run("rm -rf $jppdir");
+
+if ($altrpm) {
+    &run("rm -rf $altdir");
+}
+
+sub jpp_specific_fix {
+    my $specptr=shift;
+    my @out;
+    foreach (@$specptr) {
+	if (/^Group:(\s*)(.+)\s*$/) {
+	    if ($2 eq "Development/Code Generators") {
+		push @out, "Group:${1}Development/Java\n";
+	    } elsif ($2 eq "Text Editors") {
+		push @out, "Group:${1}Editors\n";
+	    } elsif ($2 eq "Development/Documentation") {
+		push @out, $_;
+	    } else {
+		die "unknown conversion for Group: $2";
+	    }
+	} elsif (/^\s*\%define\s+section\s+free\s*$/) {
+	    # throw away
+	} elsif (/^\s*\%ghost\s*\%doc\s*%{_javadocdir}/ or
+		 /^\s*\%ghost\s*%{_javadocdir}/) {
+	    # we will make a usual symlink there...
+	    s,^\s*\%ghost\s*,,g;
+	    push @out, $_;
+	} elsif (/^\s*\%ghost\s*%{_bindir}/
+		 ) {
+	    # alternatives ?
+	    push @out, "#".$_;
+	} elsif (/^\s*((?:BuildRequires|Requires|Conflicts)(?:\(\w+\))?):\s*(.+)\s*$/) {
+	    my $Tag=$1;
+	    my $filtered = &filter_pkg_list($2);
+	    push @out, "$Tag: $filtered\n" if ($filtered);
+	} elsif (/^\s*\%clean\s*$/) {
+	    push @out, "#\%clean\n";
+	} else {
+	    push @out, $_;
+	}
+    }
+    return \@out;
+}
+
+BEGIN {
+our %depskip = map {$_ => 1} qw!
+%{__make}
+/bin/rm /bin/ln
+java-javadoc
+!;
+}
+
+sub filter_pkg_list {
+    my @in = split /[\s,]+/, $_[0];
+    my @out;
+    while (@in) {
+	$_ = shift @in;
+	if ($depskip{$_}) {
+	    &read_version(\@in);
+	    next;
+	}
+	push @out, $_;
+    }
+    return join(" ",@out)
+}
+
+sub read_version {
+    my $ptr=shift;
+    return if ($#{$ptr}<1);
+    if ($ptr->[0] =~/^(?:<|>|=|!=|>=|<=)$/) {
+	return (shift @$ptr, shift @$ptr);
+    }
+    return;
+}
+
+sub alt_generic_fix {
+    my $specptr=shift;
+    my @out;
+    foreach (@$specptr) {
+	s/^\s*\%attr\(-,root,root\)\s*//;
+	if (/^(Vendor|Distribution|BuildRoot):/) {
+	} elsif (/^\s*rm -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$/) {
+	} elsif (/^\s*\%defattr\(0644,root,root,0755\)\s*$/) {
+	    # throw away
+	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
+	    push @out, "#".$_;
+	} elsif (/^\s*\%clean\s*$/) {
+	    push @out, "#".$_;
+	} else {
+	    push @out, $_;
+	}
+    }
+    return \@out;
+}
+
+sub cut_changelog {
+    my $specptr=shift;
+    my @out;
+    foreach (@$specptr) {
+	if (/^\%changelog/) {
+	    push @out, $_;
+	    return \@out;
+	} else {
+	    push @out, $_;
+	}
+    }
+    return \@out;
+}
+
+sub get_changelog {
+    my @spec=@{shift()};
+    while (@spec) {
+	$_ = shift @spec;
+	if (/^\%changelog/) {
+	    return [ @spec ];
+	}
+    }
+    return [];
+}
+
+sub get_version {
+    my @spec=@{shift()};
+    while (@spec) {
+	$_ = shift @spec;
+	if (/^Version:\s*(.+)\s*$/) {
+	    return $1;
+	}
+    }
+    return 0;
+}
+
+sub get_release {
+    my @spec=@{shift()};
+    while (@spec) {
+	$_ = shift @spec;
+	if (/^Release:\s*(.+)\s*$/) {
+	    return $1;
+	}
+    }
+    return 0;
+}
+
+sub rpm_custom {
+    my $reldir=shift;
+    my $pwd= `pwd`;
+    chomp $pwd;
+    my $SOURCEDIR="$pwd/$reldir/SOURCES";
+    my $SPECDIR="$pwd/$reldir/SPECS";
+    my $SRPMDIR="$pwd/$reldir/SRPMS";
+    my $cmd =qq{rpm --define "_specdir $SPECDIR" --define "_sourcedir $SOURCEDIR" --define "_srcrpmdir $SRPMDIR" @_};
+    &run($cmd);
+}
+
+sub load_file {
+    my ($name)=@_;
+    open FN, $name || die "can't open $name: $!";
+    my @result = <FN>;
+    close FN, $name || die "can't open $name: $!";
+    return \@result;
+}
+
+sub run {
+    my $cmd=shift;
+    print $cmd,"\n";
+    print `$cmd`;
+}
