@@ -1,35 +1,59 @@
 #!/usr/bin/perl -w
 
 use Getopt::Long;
-my ($jpprpm,$altrpm);
+my ($jpprpm,$altrpm,$jppspec,$altspec);
 my $verbose;
 my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
+		      "jppspec=s" => \$jppspec,
+		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
-		      "verbose"  => \$verbose);  
+		      "verbose"  => \$verbose);
 my ($alt,$jpp);
+
+if (! $jpprpm && ! $jppspec) {
+    print "ERROR: one of --jpp | --jppspec is required!\n";
+    print "options:
+--jpp /path/to/jpackage.src.rpm
+--alt /path/to/altlinux.src.rpm
+--jppspec /path/to/jpackage.spec
+--altspec /path/to/altlinux.spec
+--srpmdir /path/to/output_dir
+
+usage examples:
+* convert srpm:
+jppimport --alt Sisyphus/antlr-2.7.6-alt1.src.rpm --jpp jpackage/1.7/generic/free/SRPMS/antlr-2.7.7-1jpp.src.rpm
+* convert srpm without history:
+jppimport --jpp jpackage/1.7/generic/free/SRPMS/antlr-2.7.7-1jpp.src.rpm --srpmdir ~/OUT
+* convert spec:
+jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.spec
+";
+    exit (64);
+}
+
 $jpp=RPM::ImportTool->new(RPM => $jpprpm, SRPMDIR=> $srpmdir);
 
 &alt_generic_fix($jpp);
 &jpp_specific_fix($jpp);
 
-if ($altrpm) {
-    $alt=RPM::ImportTool->new(RPM => $altrpm);
+if ($altrpm || $altspec) {
+    $alt=RPM::ImportTool->new(RPM => $altrpm, SPEC => $altspec);
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    my $newrel = $alt->get_section('package')->get_tag('Release')."_".$jpp->get_section('package')->get_tag('Release')."1.7";
+    my $altrel = $alt->get_section('package')->get_tag('Release');
+    $altrel = $1 if ($altrel=~/^alt([^_]+)_(.+)jpp(\d.\d)$/);
+    my $newrel = $altrel."_".$jpp->get_section('package')->get_tag('Release')."1.7";
     $jpp->get_section('package')->set_tag('Release',$newrel);
     $alt->cleanup();
 }
 
 print $jpp->get_spec();
-$jpp->write_rpm();
+$jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
 my $TODO=qq~
 %if %{native} %if ! %{gcj_support}
 BuildRequires:  %{_bindir}/gcj, %{__perl}, 
-Requires(postun): %{_sbindir}/update-alternatives
 ~;
 
 
@@ -256,7 +280,7 @@ sub create_alternatives {
 
 sub get_alternatives_file_name {
     my ($rpm,$section,$name)=@_;
-    return '%{name}-%{version}-'.$name;
+    return $name.'_'.$section->get_package_expanded();
 }
 
 sub read_multiline {
@@ -319,6 +343,14 @@ sub get_type {
 sub get_package {
     my $self=shift;
     return $self->{PACKAGE};
+}
+
+sub get_package_expanded {
+    my $self=shift;
+    my $pkg= $self->{PACKAGE};
+    return '%{name}' unless $pkg;
+    return $pkg if $pkg=~s/-n\s*//;
+    return '%{name}-'.$pkg; 
 }
 
 sub get_body {
