@@ -58,9 +58,9 @@ sub jpp_specific_fix {
 	    &jpp_specific_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
 	} elsif ($t eq 'post') {
-	    $sec->subst('\%{_sbindir}/update-alternatives --install', '%register_alternatives');
+	    #$sec->subst('(?:\%{_sbindir}|/usr/sbin)/update-alternatives --install', '%register_alternatives');
 	} elsif ($t eq 'postun') {
-	    $sec->subst('\%{_sbindir}/update-alternatives --remove', '%unregister_alternatives');
+	    #$sec->subst('(?:\%{_sbindir}|/usr/sbin)/update-alternatives --remove', '%unregister_alternatives');
 	} elsif ($t eq 'changelog') {
 	}
     }
@@ -95,6 +95,7 @@ sub jpp_specific_cleanup_headers {
 	if (/^Group:(\s*)(.+)\s*$/) {
 	    if ($2 eq "Development/Code Generators"
 		or $2 eq "Development/Libraries/Java"
+		or $2 eq "Text Processing/Markup/XML"
 ) {
 		push @out, "Group:${1}Development/Java\n";
 	    } elsif ($2 eq "Text Editors") {
@@ -173,6 +174,10 @@ sub alt_generic_fix {
 	    $sec->delete() if ($sec->is_empty());
 	} elsif ($t eq 'changelog') {
 	    $sec->empty();
+	} elsif ($t eq 'post') {
+	    &alt_generic_convert_alternatives($rpm,$sec);
+	} elsif ($t eq 'postun') {
+	    &alt_generic_convert_alternatives($rpm,$sec);
 	}
     }
 }
@@ -196,6 +201,86 @@ sub alt_generic_cleanup_files {
     $section->set_body(\@out);
 }
 
+sub alt_generic_convert_alternatives {
+    my $rpm=shift;
+    my $section=shift;
+    my @out;
+    my $ptr = $section->get_body();
+    while (@$ptr>0) {
+	my $line = shift @$ptr;
+	if ($line!~/\s*#/ && $line=~s,^(\s*)(?:\%{_sbindir}|/usr/sbin)/update-alternatives --(\w+),,) {
+	    my $preline=$1;
+	    my $updcmd=$2;
+	    $line=&read_multiline($line, $ptr);
+	    # the end is abandoned :(
+	    if ($updcmd eq "remove") {
+		my $name=&read_shell_token(\$line);
+		push @out, $preline.'%unregister_alternatives '.&get_alternatives_file_name($rpm,$section,$name)."\n";
+	    } elsif ($updcmd eq "install") {
+		my $link=&read_shell_token(\$line);
+		my $name=&read_shell_token(\$line);
+		my $path=&read_shell_token(\$line);
+		my $priority=&read_shell_token(\$line);
+		my @alternatives=($link,$path,$priority);
+		&read_space(\$line);
+		while ($line=~/--slave/) {
+		    &read_shell_token(\$line);
+		    my $slink=&read_shell_token(\$line);
+		    my $sname=&read_shell_token(\$line);
+		    my $spath=&read_shell_token(\$line);
+		    push @alternatives, ($slink,$spath,$path);
+		}
+		&create_alternatives($rpm,$section, &get_alternatives_file_name($rpm,$section,$name),\@alternatives);
+		push @out, $preline.'%register_alternatives '.&get_alternatives_file_name($rpm,$section,$name)."\n";
+	    } else {
+		push @out, $preline."# unknown update-alternatives --$updcmd\n";
+	    }
+	} else {
+	    push @out, $line;
+	}
+    }
+    $section->set_body(\@out);
+}
+
+sub create_alternatives {
+    my ($rpm, $section, $alternatives_file_name,$alternativesptr) = @_;
+    my @text=('install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/'.$alternatives_file_name.'<<EOF
+');
+    while (@$alternativesptr>0) {
+	push @text, shift(@$alternativesptr)."\t".shift(@$alternativesptr)."\t".shift(@$alternativesptr)."\n";
+    }
+    push @text, "EOF\n";
+    $rpm->get_section('install')->push_body(@text);
+    $rpm->get_section('files',$section->get_package())->unshift_body('%_altdir/'.$alternatives_file_name."\n");
+}
+
+sub get_alternatives_file_name {
+    my ($rpm,$section,$name)=@_;
+    return '%{name}-%{version}-'.$name;
+}
+
+sub read_multiline {
+    my ($line, $ptr) =@_;
+    while (@$ptr>0 && $line=~s/\\[\r\n]+?$//) {
+	chomp $line;
+#	print "MULTILINE:$line\n";
+	$line.=shift(@$ptr);
+    }
+    return $line;
+}
+
+sub read_shell_token {
+    my ($lineptr) =@_;
+    if ($$lineptr=~s/^\s*(\S+)//) {
+	return $1;
+    }
+    return "";
+}
+
+sub read_space {
+    my ($lineptr) =@_;
+    $$lineptr=~s/^\s*//;
+}
 
 package RPM::SpecSection;
 
@@ -203,9 +288,19 @@ sub new {
     my $class = shift;
     my $self= {
 	TYPE=> 'package',
+	PACKAGE=> '',
 	BODY=>[],
 	@_
     };
+    my $TYPE='package';
+    my $PACKAGE='';
+    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(\S+))?\s*$/) {
+	$TYPE=$1;
+	$PACKAGE=$2;
+	$self->{TYPE}=$TYPE;
+	$self->{PACKAGE}=$PACKAGE;
+    }
+    $self->{PACKAGE}='' unless defined $self->{PACKAGE};
     die "Oops! section" if ref $self->{BODY} ne 'ARRAY';
     bless $self, $class;
 #    return $self;
@@ -213,12 +308,17 @@ sub new {
 
 sub describe {
     my $self=shift;
-    print "SpecSection: type=$self->{TYPE}; body:".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
+    print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body:".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
 }
 
 sub get_type {
     my $self=shift;
     return $self->{TYPE};
+}
+
+sub get_package {
+    my $self=shift;
+    return $self->{PACKAGE};
 }
 
 sub get_body {
@@ -235,7 +335,17 @@ sub set_body {
 
 sub unshift_body {
     my $self=shift;
-    unshift @{$self->{BODY}}, @_;
+    if ($self->is_head_section()) {
+	unshift @{$self->{BODY}}, @_;
+    } else {
+	my $head = shift @{$self->{BODY}};
+	unshift @{$self->{BODY}}, $head, @_;
+    }
+}
+
+sub push_body {
+    my $self=shift;
+    push @{$self->{BODY}}, @_;
 }
 
 sub empty {
@@ -255,6 +365,12 @@ sub is_empty {
 	return 0 if ! /^\s*(#.*)?$/;
     }
     return 1;
+}
+
+sub is_head_section {
+    my $self=shift;
+    return 1 if $self->{TYPE} eq 'package' && $self->{PACKAGE} eq '';
+    return 0;
 }
 
 sub exclude {
@@ -364,19 +480,18 @@ sub _parse_speclist {
     my $out=[];
     my $TYPE='package';
     foreach (@$specptr) {
-	if (/^\s*\%(\w+)/ && $SECTION{$1}) {
-	    my $NEWTYPE=$1;
-	    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE=>$TYPE);
+	if (/^\s*\%(\w+)(?:\s+(\S+))?\s*$/ && $SECTION{$1}) {
+	    #my $NEWTYPE=$1;
+	    #my $NEWPACKAGE=$2;
+	    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out);#, TYPE=>$TYPE, PACKAGE=>$PACKAGE);
 	    $out=[];
-	    $TYPE=$NEWTYPE;
+	    #$TYPE=$NEWTYPE;
 	}
 	push @$out, $_;
     }
     push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE => $TYPE);
     $rpm->{SPECSECTIONS}=\@outpart;
-#    foreach (@{$rpm->{SPECSECTIONS}}) {
-#	$_->describe();
-#    }
+    #foreach (@{$rpm->{SPECSECTIONS}}) {	$_->describe() }
 }
 
 sub _get_speclist {
@@ -403,9 +518,17 @@ sub get_spec {
 sub get_section {
     my $self=shift;
     my $type=shift;
-    foreach my $section (@{$self->{SPECSECTIONS}}) {
-	return $section if $section->get_type() eq $type;
+    my $pkg=shift;
+    if (defined $pkg) {
+	foreach my $section (@{$self->{SPECSECTIONS}}) {
+	    return $section if $section->get_type() eq $type and $section->get_package() eq $pkg;
+	}
+    } else {
+	foreach my $section (@{$self->{SPECSECTIONS}}) {
+	    return $section if $section->get_type() eq $type;
+	}
     }
+    warn "section $type $pkg not found!";
     return;
 }
 
