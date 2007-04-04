@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 
+use Carp;
 use Getopt::Long;
-my ($jpprpm,$altrpm,$jppspec,$altspec);
+
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook);
 my $verbose;
 my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
@@ -9,6 +11,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
+		      "hook=s"   => \$hook,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -19,6 +22,7 @@ if (! $jpprpm && ! $jppspec) {
 --alt /path/to/altlinux.src.rpm
 --jppspec /path/to/jpackage.spec
 --altspec /path/to/altlinux.spec
+--hook /path/to/hook to be called on resulting spec file
 --srpmdir /path/to/output_dir
 
 usage examples:
@@ -32,22 +36,35 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SRPMDIR=> $srpmdir);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir);
 
 &alt_generic_fix($jpp);
 &jpp_specific_fix($jpp);
 
 if ($altrpm || $altspec) {
-    $alt=RPM::ImportTool->new(RPM => $altrpm, SPEC => $altspec);
+    $alt=RPM::ImportTool->new(RPM => $altrpm, SPECFILE => $altspec);
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    my $altrel = $alt->get_section('package')->get_tag('Release');
+    my $altrel = $alt->get_section('package','')->get_tag('Release');
     $altrel = $1 if ($altrel=~/^alt([^_]+)_(.+)jpp(\d.\d)$/);
-    my $newrel = $altrel."_".$jpp->get_section('package')->get_tag('Release')."1.7";
-    $jpp->get_section('package')->set_tag('Release',$newrel);
+    # hack -- cleanup (undefined in jpp) macro in alt release:
+    $altrel=~s/.?\%\w+//g;
+    $altrel=~s/.?\%\{\w+\}+//g;
+    my $newrel = $altrel."_".$jpp->get_section('package','')->get_tag('Release')."1.7";
+    $jpp->get_section('package','')->set_tag('Release',$newrel);
     $alt->cleanup();
 }
 
-print $jpp->get_spec();
+if ($hook) {
+    our $spechook;
+    require $hook;
+    if ($spechook) {
+	&$spechook($jpp,$alt);
+    } else {
+	die "script $hook does not have a valid hook!\n";
+    }
+}
+
+print $jpp->get_spec() if $jppspec or $verbose;
 $jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
@@ -94,15 +111,14 @@ sub jpp_specific_cleanup_files {
     my $section=shift;
     my @out;
     foreach (@{$section->get_body()}) {
-#	if (/^\s*\%ghost\s*\%doc\s*\%{_javadocdir}/ or
-#	    /^\s*\%ghost\s*(\%dir\s*)?\%{_javadocdir}/) {
-	    # we will make a usual symlink there...
+	if (/^\s*\%ghost\s*((?:\%dir|\%doc)\s*)*\%{_javadocdir}/) {
+	    # we will leave ghost there... a usual symlink will not upgrade from directory
 #	    s,^\s*\%ghost\s*,,g;
-#	    push @out, $_;
+	    push @out, $_;
 #	} elsif (/^\s*\%ghost\s*\%dir\s*\%{_javadocdir}/) {
 	    # throw away -- seems dangerous
 #	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
-	if (/^\s*\%ghost\s*/) {
+	} elsif (/^\s*\%ghost\s*/) {
 	    # alternatives ?
 	    push @out, "#".$_;
 	} else {
@@ -112,18 +128,58 @@ sub jpp_specific_cleanup_files {
     $section->set_body(\@out);
 }
 
+BEGIN { our %JPP_GROUP_MAP = (
+"Text Editors", "Editors",
+"Utilities", "Utilities",
+"Multimedia/Graphics", "Graphics", # batik
+"Database", "Databases", # derby
+"Applications/Databases", "Databases",
+"Networking/Instant messaging", "Networking/Instant messaging", # jext ??? horrible :(
+"Internet/Log Analysis", "Monitoring",
+"System/Servers", "System/Servers",
+" ", " ",
+	    ); 
+}
+
 sub jpp_specific_cleanup_headers {
     my $section=shift;
     my @out;
     foreach (@{$section->get_body()}) {
 	if (/^Group:(\s*)(.+)\s*$/) {
-	    if ($2 eq "Development/Code Generators"
+	    #if ($2) eq "System/Libraries" and ht2html
+	    if (
+		$2 eq "Development/Build Tools"
+		or $2 eq "Development/Code Generators"
+		or $2 eq "Development/Compilers"
+		or $2 eq "Development/Framework"
+		or $2 eq "Development/Java"
+		or $2 eq "Development/Languages" # ecj
+		or $2 eq "Development/Libraries"
+		or $2 eq "Development/Libraries/Application Frameworks"
+		or $2 eq "Development/LIbraries/Java" # jgroups (bug!)
 		or $2 eq "Development/Libraries/Java"
+		or $2 eq "Development/Test/Java"
+		or $2 eq "Development/Testing"
+		or $2 eq "Development/Tools"
+		or $2 eq "Internet/WWW/Dynamic Content" #tomcat
+		or $2 eq "Internet/WWW/Servers" #jboss
+		or $2 eq "Internet/WWW/Indexing/Search" # lucene
+		or $2 eq "Applications/Internet" # apacheds
+		or $2 eq "System/Logging" # log4j
+		or $2 eq "System/Networking" # mina
+		or $2 eq "System Environment/Applications" #tomcat
+		or $2 eq "System Environment/Libraries"
+		or $2 eq "Security/Cryptography"
+		or $2 eq "Software Development/Quality Assurance"
+		or $2 eq "Networking/Daemons" # jacarta-common-daemons
+		or $2 eq "System/Boot"
 		or $2 eq "Text Processing/Markup/XML"
+		or $2 eq "Text Processing/Markup/HTML"
+		or $2 eq "Documentation" # jacorb
 ) {
 		push @out, "Group:${1}Development/Java\n";
-	    } elsif ($2 eq "Text Editors") {
-		push @out, "Group:${1}Editors\n";
+	    } elsif ($JPP_GROUP_MAP{$2}) {
+		push @out, "Group:${1}$JPP_GROUP_MAP{$2}\n";
 	    } elsif ($2 eq "Development/Documentation") {
 		push @out, $_;
 	    } else {
@@ -318,7 +374,7 @@ sub new {
     };
     my $TYPE='package';
     my $PACKAGE='';
-    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(\S+))?\s*$/) {
+    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(\S+))?\s*$/ && $RPM::ImportTool::SECTION{$1}) {
 	$TYPE=$1;
 	$PACKAGE=$2;
 	$self->{TYPE}=$TYPE;
@@ -332,7 +388,7 @@ sub new {
 
 sub describe {
     my $self=shift;
-    print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body:".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
+    print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body: ==>\n".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
 }
 
 sub get_type {
@@ -462,6 +518,9 @@ sub new {
     };
     bless $self, $class;
     if ($self->{RPM}) {
+	if ($self->{RPM}!~/.src.rpm$/ && `file $self->{RPM}`!~/RPM/) {
+	    die "$self->{RPM}: not a rpm file!\n";
+	}
 	my $dirname=&basename($self->{RPM});
 	$dirname=~s/.src.rpm//;
 	$self->{TMPDIR}="$dirname.$$";
@@ -560,7 +619,7 @@ sub get_section {
 	    return $section if $section->get_type() eq $type;
 	}
     }
-    warn "section $type $pkg not found!";
+    Carp::carp "section $type $pkg not found!";
     return;
 }
 
@@ -591,14 +650,14 @@ sub cleanup {
 }
 
 sub basename {
-    my @path= split(/\//,$_[0]);
+    my @path= split('/',$_[0]);
     return pop @path;
 }
 
 sub run {
     my $cmd=shift;
     #print $cmd,"\n";
-    system($cmd) && die "$cmd failed: $?";
+    system($cmd) && Carp::confess ("$cmd failed: $?");
 }
 
 sub load_file {

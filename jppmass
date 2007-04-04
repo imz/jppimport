@@ -1,0 +1,675 @@
+#!/usr/bin/perl -w
+
+use Carp;
+use Getopt::Long;
+
+my $verbose;
+my $ALTPATH='Sisyphus';
+my $JPPPATH='/home/archive/ALT/jpackage/1.7/generic/free/SRPMS';
+my $OUTDIR="./OUT";
+
+my $result = GetOptions ("jpp=s" => \$JPPPATH,
+		      "alt=s"   => \$ALTPATH,
+		      "out=s" => \$OUTDIR,
+		      "verbose"  => \$verbose);
+my ($alt,$jpp);
+
+if (! -d $ALTPATH || ! -d $JPPPATH) {
+    print "options:
+--jpp /path/to/jpackage/src/RPMS
+--alt /path/to/altlinux/src/RPMS
+--out /path/to/output_dir (default is $OUTDIR)
+
+usage examples:
+jppmass --alt /var/ftp/pub/Sisyphus/files/SRPMS --jpp /var/ftp/pub/jpackage/1.7/generic/free/SRPMS
+";
+    exit (64);
+}
+
+my $jpptoolsdir=&dirname($0);
+my $jppimport="$jpptoolsdir/jppimport";
+
+mkdir $OUTDIR unless -e $OUTDIR;
+
+foreach my $altfile (@ALTPKG) {
+    next if $ALTSKIP{$altfile};
+    my $altrpm="$ALTPATH/$altfile";
+    my $name=&get_rpm_name($altrpm);
+    next if $ALTSKIP{$name};
+    $name=$ALT2JPPMAP{$name} if $ALT2JPPMAP{$name};
+    my $jpprpm = &find_rpm($JPPPATH, $name);
+    unless ($jpprpm) {
+	print STDERR "jpp RPM $name not found.\n";
+	next;
+    }
+#    print STDERR "found RPM $jpprpm for $name.\n";
+    my $importcmd="$jppimport --alt $altrpm --jpp $jpprpm --srpmdir $OUTDIR";
+    my $hook="$jpptoolsdir/hooks/$name.pl";
+    $importcmd.=" --hook $hook" if (-e $hook);
+    print "$importcmd\n";
+    print `$importcmd`,"---*---\n";
+}
+
+sub get_rpm_name {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{NAME}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub find_rpm {
+    my ($path, $name)=@_;
+    for my $rpm (glob "$path/$name-*.src.rpm") {
+#	print STDERR "trying $rpm for $name\n";
+	return $rpm if ($name eq &get_rpm_name($rpm));
+    }
+    return;
+}
+
+sub dirname {
+    my @path= split('/',$_[0]);
+    pop @path;
+    return join('/',@path);
+}
+
+
+BEGIN {
+our %ALT2JPPMAP=qw/
+asm asm2
+jakarta-commons-beanutils-16 jakarta-commons-beanutils16
+jakarta-commons-cli-1 jakarta-commons-cli
+jakarta-regexp regexp
+jakarta-servletapi4 servletapi4
+owanttask objectweb-anttask
+stylebook xml-stylebook
+xalan-j xalan-j2
+excalibur-logkit excalibur-avalon-logkit
+wagon maven-wagon
+/;
+
+our @ALTSKIPDEPR=qw/tomcat4/;
+
+our @ALTSKIPMULTISRPMS=qw/
+xml-commons-external xml-commons-resolver
+/;
+#xml-commons xml-commons #xml-commons-external #xml-commons-resolver
+##epoch+1
+#xmldb-api
+#isorelax
+
+our @ALTSKIPNOJPP=qw/
+drawswf-1.2.7-alt1.src.rpm
+eclipse-build-utils-0.1.0-alt1.src.rpm
+eclipse-cdt-3.0.2-alt1.src.rpm
+eclipse-gef-3.1.1-alt1.src.rpm
+jdbc-stdext-2.0-alt2.src.rpm
+je-1.7.1-alt1.src.rpm
+jed-0.99.18-alt1.src.rpm
+jikes-1.22-alt1.1.src.rpm
+jms-1.1-alt1.src.rpm
+jmx-1.2.1-alt2.src.rpm
+jndi-1.2.1-alt2.src.rpm
+sax-2.0.2-alt1.src.rpm
+servletapi5-5.0.28-alt2.src.rpm
+trang-0.1.20030619-alt1.src.rpm
+xsdlib-2.2-alt0.2.src.rpm
+jaf-1.0.2-alt2.src.rpm
+javamail-1.3.1-alt2.src.rpm
+stax-bea-1.0-alt1.src.rpm
+/;
+#jaf classpathx-jaf ?
+#javamail-1.3.1-alt2.src.rpm classpathx-mail?
+#stax-bea stax-utils?
+
+our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
+
+# alt nobody packages
+our @ALTPKG=qw/
+antlr-2.7.6-alt1.src.rpm
+asm-2.0-alt0.RC1.src.rpm
+bcel-5.1-alt2.src.rpm
+checkstyle-4.1-alt2.src.rpm
+classworlds-1.1-alt0.1.alpha2.src.rpm
+drawswf-1.2.7-alt1.src.rpm
+eclipse-build-utils-0.1.0-alt1.src.rpm
+eclipse-cdt-3.0.2-alt1.src.rpm
+eclipse-gef-3.1.1-alt1.src.rpm
+excalibur-logkit-2.1-alt1.src.rpm
+forehead-1.0-alt0.1.src.rpm
+geronimo-specs-1.0-alt0.M5.1.src.rpm
+isorelax-20041111-alt2.src.rpm
+jaf-1.0.2-alt2.src.rpm
+jakarta-commons-beanutils-16-1.6.1-alt1.src.rpm
+jakarta-commons-beanutils-1.7.1-alt0.2.src.rpm
+jakarta-commons-betwixt-1.0-alt0.1.alpha1.src.rpm
+jakarta-commons-cli-1-1.0-alt1.src.rpm
+jakarta-commons-cli-2.0-alt0.1.src.rpm
+jakarta-commons-codec-1.3-alt2.src.rpm
+jakarta-commons-collections-3.2-alt0.2.src.rpm
+jakarta-commons-daemon-1.0.1-alt2.src.rpm
+jakarta-commons-dbcp-1.2.2-alt0.1.src.rpm
+jakarta-commons-digester-1.7-alt1.src.rpm
+jakarta-commons-discovery-0.2-alt3.src.rpm
+jakarta-commons-el-1.1-alt0.1.src.rpm
+jakarta-commons-fileupload-1.0-alt2.src.rpm
+jakarta-commons-grant-1.0-alt0.1.src.rpm
+jakarta-commons-graph-0.8.1-alt0.1.src.rpm
+jakarta-commons-httpclient-3.0-alt1.src.rpm
+jakarta-commons-io-1.1-alt0.1.src.rpm
+jakarta-commons-jexl-1.0-alt2.src.rpm
+jakarta-commons-lang-2.1-alt1.src.rpm
+jakarta-commons-launcher-1.1-alt3.src.rpm
+jakarta-commons-logging-1.0.4-alt3.src.rpm
+jakarta-commons-modeler-1.2-alt0.1.src.rpm
+jakarta-commons-net-1.4.0-alt1.src.rpm
+jakarta-commons-pool-1.3-alt0.1.src.rpm
+jakarta-commons-validator-1.2.0-alt1.src.rpm
+jakarta-oro-2.0.8-alt1.src.rpm
+jakarta-regexp-1.4-alt1.src.rpm
+jakarta-servletapi4-4.0.0-alt0.3.20040901.src.rpm
+jakarta-taglibs-standard-1.1.1-alt2.src.rpm
+javacc-4.0-alt1.src.rpm
+javamail-1.3.1-alt2.src.rpm
+javassist-3.0-alt1.src.rpm
+jaxen-1.1-alt0.3beta2.src.rpm
+jdbc-stdext-2.0-alt2.src.rpm
+jdepend-2.8.2-alt1.src.rpm
+jdom-1.0-alt1.src.rpm
+je-1.7.1-alt1.src.rpm
+jed-0.99.18-alt1.src.rpm
+jikes-1.22-alt1.1.src.rpm
+jline-0.9.1-alt1.src.rpm
+jms-1.1-alt1.src.rpm
+jmx-1.2.1-alt2.src.rpm
+jndi-1.2.1-alt2.src.rpm
+joesnmp-0.3.3-alt1.src.rpm
+jsch-0.1.25-alt1.src.rpm
+jtidy-1.0-alt0.3.src.rpm
+junitperf-1.9.1-alt1.src.rpm
+msv-1.2-alt0.1.src.rpm
+mx4j-3.0.1-alt2.src.rpm
+owanttask-1.2-alt2.src.rpm
+relaxngDatatype-1.0-alt1.src.rpm
+sax-2.0.2-alt1.src.rpm
+servletapi5-5.0.28-alt2.src.rpm
+snmptrapappender-1.2.9-alt1.src.rpm
+stax-bea-1.0-alt1.src.rpm
+struts-1.2.6-alt3.src.rpm
+stylebook-1.0-alt0.2.b3.src.rpm
+tomcat4-4.1.31-alt4.src.rpm
+tomcat5-5.5.16-alt1.src.rpm
+trang-0.1.20030619-alt1.src.rpm
+wagon-1.0-alt0.2.alpha5.src.rpm
+werken-xpath-0.9.4-alt0.2beta.src.rpm
+wsdl4j-1.5-alt1.src.rpm
+ws-jaxme-0.3.1-alt1.src.rpm
+xalan-j-2.7.0-alt3.src.rpm
+xml-commons-1.0-alt0.4.b3.src.rpm
+xml-commons-external-1.3.03-alt1.src.rpm
+xml-commons-resolver-1.1-alt2.src.rpm
+xmldb-api-20011111-alt2.src.rpm
+xmlunit-1.0-alt2.src.rpm
+xpp2-2.1.10-alt2.src.rpm
+xpp3-1.1.3.4-alt2m.src.rpm
+xsdlib-2.2-alt0.2.src.rpm
+/;
+}
+
+__END__
+# jpp 1.7/generic/free packages
+####################
+####################
+activecluster-1.1-1jpp.src.rpm
+activeio-2.0-1jpp.src.rpm
+activemq3-3.2.5-0.r1125.2jpp.src.rpm
+activesoap-1.0-1jpp.src.rpm
+adaptx-0.9.13-3jpp.src.rpm
+aelfred-1.2-0.a.8jpp.src.rpm
+annogen-0.1.1-2jpp.src.rpm
+ant-1.6.5-4jpp.src.rpm
+ant-contrib-1.0-0.b2.1jpp.src.rpm
+antlr-2.7.7-1jpp.src.rpm
+anttex-0.2-4jpp.src.rpm
+aopalliance-1.0-2jpp.src.rpm
+apache-axiom-1.0-1jpp.src.rpm
+apacheds-1.0.0-2jpp.src.rpm
+apacheds-daemon-1.0.0-2jpp.src.rpm
+apacheds-shared-0.9.5.3-2jpp.src.rpm
+apache-jdo-2.0-1jpp.src.rpm
+apache-portlet-1.0-api-1.0-5jpp.src.rpm
+aptconvert-050713-1jpp.src.rpm
+asm-1.5.3-2jpp.src.rpm
+asm2-2.1-2jpp.src.rpm
+asn1-0.3.3-1jpp.src.rpm
+aspectj-1.2.1-4jpp.src.rpm
+aspectwerkz-2.0-2jpp.src.rpm
+attrib4j-0.9.0-4jpp.src.rpm
+autojar-1.3.1-1jpp.src.rpm
+avalon-excalibur-4.1-8jpp.src.rpm
+axion-1.0-0.M3.2jpp.src.rpm
+axis-1.4-2jpp.src.rpm
+axis2-1.0-1jpp.src.rpm
+backport-util-concurrent-2.1-1jpp.src.rpm
+batik-1.6-3jpp.src.rpm
+bcel-5.1-10jpp.src.rpm
+bea-stax-1.2.0-0.rc1.2jpp.src.rpm
+berkeleydb-2.0.90-1jpp.src.rpm
+berkeleydb-native-4.3.29-2jpp.src.rpm
+bsf-2.3.0-11jpp.src.rpm
+bsh-1.3.0-10jpp.src.rpm
+bsh2-2.0-0.b1.9jpp.src.rpm
+burlap-3.0.8-1jpp.src.rpm
+burlap3-3.0.8-2jpp.src.rpm
+c3p0-0.9.0-2jpp.src.rpm
+cargo-0.8-2jpp.src.rpm
+carol-2.2.7-1jpp.src.rpm
+carol-cmi-1.2.7-1jpp.src.rpm
+carol-irmi-1.0.1-1jpp.src.rpm
+castor-0.9.9.1-2jpp.src.rpm
+caucho-services-3.0.8-1jpp.src.rpm
+ccl-util-32.69-2jpp.src.rpm
+cglib1-1.0-5jpp.src.rpm
+cglib-2.1.3-2jpp.src.rpm
+checkstyle-4.1-3jpp.src.rpm
+classpathx-jaf-1.0-10jpp.src.rpm
+classpathx-jaxp-1.0-0.1.beta1.10jpp.src.rpm
+classpathx-mail-1.1.1-4jpp.src.rpm
+classworlds-1.1-0.a2.2jpp.src.rpm
+clirr-0.6-1jpp.src.rpm
+cobertura-1.7-1jpp.src.rpm
+colt-1.2.0-3jpp.src.rpm
+concurrent-1.3.4-6jpp.src.rpm
+cpptasks-1.0-0.b4.1jpp.src.rpm
+crimson-1.1.3-15jpp.src.rpm
+cryptix-3.2.0-9jpp.src.rpm
+cryptix-asn1-0.1.12-0.1.cvs20011119.1jpp.src.rpm
+daytrader-1.1-1jpp.src.rpm
+db-ddlutils-1.0-0.070308.1jpp.src.rpm
+db-ojb-1.0.4-3jpp.src.rpm
+db-torque-3.1.1-7jpp.src.rpm
+dbunit-2.1-4jpp.src.rpm
+derby-10.1.1.0-1jpp.src.rpm
+d-haven-event-1.1.0-2jpp.src.rpm
+d-haven-mpool-1.0-2jpp.src.rpm
+docbook-xsl-java-1.67.0-2jpp.src.rpm
+dom2-core-tests-0.0.1-0.20040405.1jpp.src.rpm
+dom4j-1.6.1-4jpp.src.rpm
+dtdparser-1.21-3jpp.src.rpm
+dumbster-1.6-1jpp.src.rpm
+dwr-1.1.3-1jpp.src.rpm
+dynaop-1.0-0.beta.1jpp.src.rpm
+easymock-1.2-1jpp.src.rpm
+easymockclassextension-1.2-1jpp.src.rpm
+easymock-classextension-1.2-2jpp.src.rpm
+ecj-3.2.2-3jpp.src.rpm
+ehcache-1.1-4jpp.src.rpm
+emma-2.0-0.5312.1jpp.src.rpm
+emma-maven-plugin-0.6-1jpp.src.rpm
+excalibur-avalon-framework-4.3-7jpp.src.rpm
+excalibur-avalon-logkit-2.1-10jpp.src.rpm
+excalibur-component-2.1-3jpp.src.rpm
+excalibur-component-examples-2.1-2jpp.src.rpm
+excalibur-component-tests-2.1-2jpp.src.rpm
+excalibur-configuration-1.1-1jpp.src.rpm
+excalibur-cornerstone-connection-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-connection-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-datasources-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-datasources-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-scheduler-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-scheduler-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-sockets-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-sockets-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-store-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-store-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-threads-api-2.1-2jpp.src.rpm
+excalibur-cornerstone-threads-impl-2.1-2jpp.src.rpm
+excalibur-cornerstone-threads-tutorial-2.1-2jpp.src.rpm
+excalibur-datasource-2.1-2jpp.src.rpm
+excalibur-event-api-2.1-2jpp.src.rpm
+excalibur-event-impl-2.1-2jpp.src.rpm
+excalibur-fortress-container-api-1.2-2jpp.src.rpm
+excalibur-fortress-meta-1.2-2jpp.src.rpm
+excalibur-instrument-api-2.1-2jpp.src.rpm
+excalibur-instrument-client-2.1-3jpp.src.rpm
+excalibur-instrument-mgr-api-2.1-2jpp.src.rpm
+excalibur-instrument-mgr-http-2.1-2jpp.src.rpm
+excalibur-instrument-mgr-impl-2.1-2jpp.src.rpm
+excalibur-io-1.1-2jpp.src.rpm
+excalibur-lifecycle-api-2.1-2jpp.src.rpm
+excalibur-lifecycle-impl-2.1-2jpp.src.rpm
+excalibur-logger-2.1-3jpp.src.rpm
+excalibur-pool-api-2.1-2jpp.src.rpm
+excalibur-pool-impl-2.1-2jpp.src.rpm
+excalibur-pool-instrumented-2.1-2jpp.src.rpm
+excalibur-testcase-2.1-2jpp.src.rpm
+excalibur-thread-api-2.1-2jpp.src.rpm
+excalibur-thread-impl-2.1-2jpp.src.rpm
+excalibur-thread-instrumented-2.1-2jpp.src.rpm
+fit-1.1-1jpp.src.rpm
+fop-0.20.5-10jpp.src.rpm
+forehead-1.0-0.b4.1jpp.src.rpm
+freemarker-2.3.6-2jpp.src.rpm
+ganymed-ssh2-210-1jpp.src.rpm
+geronimo11-1.1-2jpp.src.rpm
+geronimo-jcache-1.0-api-1.0-1jpp.src.rpm
+geronimo-specs-1.1-3jpp.src.rpm
+gif89encoder-0.90-0.b.2jpp.src.rpm
+gjt-jpl-pattern-0.2-3jpp.src.rpm
+gjt-jpl-util-0.6-3jpp.src.rpm
+gnu-crypto-2.1.0-2jpp.src.rpm
+gnu-getopt-1.0.12-3jpp.src.rpm
+gnu-regexp-1.1.4-10jpp.src.rpm
+gnu.trove-1.0.2-4jpp.src.rpm
+gnu-trove-1.0.2-5jpp.src.rpm
+groovy-1.0-0.b10.2jpp.src.rpm
+groovy-jsr-1.0-0.jsr04.1jpp.src.rpm
+groovy-module-gram-1.2-1jpp.src.rpm
+hessian-3.0.20-1jpp.src.rpm
+hessian3-3.0.8-1jpp.src.rpm
+hibernate3-3.1.3-1jpp.src.rpm
+howl-logger-0.1.11-1jpp.src.rpm
+hsqldb-1.8.0.7-2jpp.src.rpm
+ht2html-2.0-2jpp.src.rpm
+httpunit-1.6.2-1jpp.src.rpm
+ibatis1-1.3.1-3jpp.src.rpm
+ibatis-2.1.7-3jpp.src.rpm
+icu4j-3.4.5-1jpp.src.rpm
+isorelax-0.1-0.20041111.2jpp.src.rpm
+it-could-webdav-0.4-1jpp.src.rpm
+itext-1.3-2jpp.src.rpm
+ivy-1.3.1-1jpp.src.rpm
+izpack-3.8.1-1jpp.src.rpm
+jacorb-2.2.4-3jpp.src.rpm
+jacorb-jboss4-2.2-5jpp.src.rpm
+jakarta-cactus-1.7.1-2jpp.src.rpm
+jakarta-commons-attributes-2.1-6jpp.src.rpm
+jakarta-commons-beanutils16-1.6.1-7jpp.src.rpm
+jakarta-commons-beanutils-1.7.0-5jpp.src.rpm
+jakarta-commons-betwixt0-0.8-1jpp.src.rpm
+jakarta-commons-betwixt-1.0-0.alpha1.6jpp.src.rpm
+jakarta-commons-chain-1.0-2jpp.src.rpm
+jakarta-commons-cli-1.0-8jpp.src.rpm
+jakarta-commons-codec-1.3-7jpp.src.rpm
+jakarta-commons-collections-3.1-9jpp.src.rpm
+jakarta-commons-compress-0.1-2jpp.src.rpm
+jakarta-commons-configuration-1.2-2jpp.src.rpm
+jakarta-commons-daemon-1.0.1-6jpp.src.rpm
+jakarta-commons-dbcp-1.2.1-10jpp.src.rpm
+jakarta-commons-dbutils-1.0-3jpp.src.rpm
+jakarta-commons-digester-1.7-6jpp.src.rpm
+jakarta-commons-discovery-0.4-2jpp.src.rpm
+jakarta-commons-el-1.0-7jpp.src.rpm
+jakarta-commons-fileupload-1.1.1-3jpp.src.rpm
+jakarta-commons-grant-1.0-0.b5.cvs20040118.2jpp.src.rpm
+jakarta-commons-graph-0.8.1-0.cvs20040118.2jpp.src.rpm
+jakarta-commons-httpclient-3.0.1-1jpp.src.rpm
+jakarta-commons-io-1.2-3jpp.src.rpm
+jakarta-commons-jelly-1.0-5jpp.src.rpm
+jakarta-commons-jexl-1.0-6jpp.src.rpm
+jakarta-commons-jxpath-1.2-2jpp.src.rpm
+jakarta-commons-lang-2.1-6jpp.src.rpm
+jakarta-commons-launcher-1.1-1jpp.src.rpm
+jakarta-commons-logging-1.1-2jpp.src.rpm
+jakarta-commons-messenger-1.0.d10-5jpp.src.rpm
+jakarta-commons-modeler-2.0-2jpp.src.rpm
+jakarta-commons-net-1.4.1-2jpp.src.rpm
+jakarta-commons-pool-1.3-8jpp.src.rpm
+jakarta-commons-primitives-1.0-3jpp.src.rpm
+jakarta-commons-test-0.1-1jpp.src.rpm
+jakarta-commons-transaction-1.1-5jpp.src.rpm
+jakarta-commons-validator-1.1.4-5jpp.src.rpm
+jakarta-commons-vfs-1.0-0.rc7.1jpp.src.rpm
+jakarta-jcs-1.2.7.0-5jpp.src.rpm
+jakarta-oro-2.0.8-3jpp.src.rpm
+jakarta-poi-2.5.1-2jpp.src.rpm
+jakarta-slide-webdavclient-2.1-4jpp.src.rpm
+jakarta-taglibs-standard-1.1.1-7jpp.src.rpm
+jalopy-1.0-0.b11.1jpp.src.rpm
+jamonapi-1.0-2jpp.src.rpm
+jarjar-0.6-2jpp.src.rpm
+jasperreports-1.0.3-3jpp.src.rpm
+javacc3-3.2-2jpp.src.rpm
+javacc-4.0-3jpp.src.rpm
+java_cup-0.10-0.k.6jpp.src.rpm
+javancss-27.48-1jpp.src.rpm
+javassist-3.5-0.cr1.2jpp.src.rpm
+jaxen-1.1-2jpp.src.rpm
+jaxen-bootstrap-1.1-1jpp.src.rpm
+jboss4-4.0.3.1-4jpp.src.rpm
+jboss4-buildmagic-tasks-2.0-4jpp.src.rpm
+jboss-aop-1.3.6-1jpp.src.rpm
+jboss-aspects-1.3-1jpp.src.rpm
+jboss-cache-1.3.0.2-1jpp.src.rpm
+jboss-container-0.0-0.JBossMC_1_0_1.1jpp.src.rpm
+jboss-dependency-0.0-0.JBossMC_1_0_1.1jpp.src.rpm
+jboss-j2se-0.0-0.JBossMC_1_0_1.1jpp.src.rpm
+jboss-jrunit-1.0-0.dev.3jpp.src.rpm
+jboss-microcontainer-1.0.1-1jpp.src.rpm
+jboss-remoting-1.4.1-3jpp.src.rpm
+jboss-serialization-1.0.0-0.rc2.3jpp.src.rpm
+jboss-test-0.0-0.JBossMC_1_0_1.1jpp.src.rpm
+jcifs-1.2.9-1jpp.src.rpm
+jcommon0-0.9.7-3jpp.src.rpm
+jcommon-1.0.6-1jpp.src.rpm
+jcoverage-1.0.5-3jpp.src.rpm
+jdbm-0.20-2jpp.src.rpm
+jdepend22-2.2-4jpp.src.rpm
+jdepend-2.9.1-1jpp.src.rpm
+jdiff-1.0.10-2jpp.src.rpm
+jdom-1.0-5jpp.src.rpm
+jetty5-5.1.12-1jpp.src.rpm
+jexcelapi-2.4.3-4jpp.src.rpm
+jext-3.2-0.pre4.3jpp.src.rpm
+jflex-1.3.5-2jpp.src.rpm
+jfreechart0-0.9.21-4jpp.src.rpm
+jfreechart-0.9.21-3jpp.src.rpm
+jgraph-5.8.2.1-2jpp.src.rpm
+jgroups-2.2.9.2-3jpp.src.rpm
+jibx-1.1-0.b3.1jpp.src.rpm
+jing-0.1-0.20030619.8jpp.src.rpm
+jisp2-2.5.1-4jpp.src.rpm
+jlex-1.2.6-5jpp.src.rpm
+jline-0.9.9-2jpp.src.rpm
+jmdns-1.0-1jpp.src.rpm
+jmock-1.0.1-4jpp.src.rpm
+joda-time-1.2.1-1jpp.src.rpm
+joesnmp-0.3.4-1jpp.src.rpm
+jonathan-core-4.1-2jpp.src.rpm
+jonathan-jeremie-4.2.2-1jpp.src.rpm
+jorm-2.8-1jpp.src.rpm
+jorm-rdb-adapter-3.1-1jpp.src.rpm
+jotm-2.0.11-1jpp.src.rpm
+jpackage-utils-1.7.3-1jpp.src.rpm
+jpox-1.1.1-1jpp.src.rpm
+jrefactory-2.8.9-6jpp.src.rpm
+jrexx-1.1.1-3jpp.src.rpm
+jrms-1.1-2jpp.src.rpm
+jsch-0.1.28-1jpp.src.rpm
+jtidy-1.0-0.20000804r7dev.8jpp.src.rpm
+juddi-0.9-0.rc4.2jpp.src.rpm
+junit-3.8.2-4jpp.src.rpm
+junit-addons-1.4-2jpp.src.rpm
+junitdoclet-jdk14-1.0.2-5jpp.src.rpm
+junitejb-1.0-0.b2.2jpp.src.rpm
+junitperf-1.9.1-2jpp.src.rpm
+jxta-2.3.2-2jpp.src.rpm
+jython-2.2-0.a0.4jpp.src.rpm
+jzlib-1.0.7-4jpp.src.rpm
+kilim1-1.1.3-3jpp.src.rpm
+ldapsdk-4.17-3jpp.src.rpm
+libreadline-java-0.8.0-11jpp.src.rpm
+log4j-1.2.14-1jpp.src.rpm
+lucene-1.9.1-1jpp.src.rpm
+marquee-xmlrpc-1.3-1jpp.src.rpm
+maven-1.1-0.beta2.5jpp.src.rpm
+maven2-2.0.4-10jpp.src.rpm
+maven2-classic-skin-1.0-1jpp.src.rpm
+maven2-common-poms-1.0-3jpp.src.rpm
+maven2-default-skin-1.0-1jpp.src.rpm
+maven2-stylus-skin-1.0-1jpp.src.rpm
+maven-doxia-1.0-0.a7.3jpp.src.rpm
+maven-jxr-1.0-2jpp.src.rpm
+maven-model-3.0.1-1jpp.src.rpm
+maven-plugin-itest-1.0-0.20060129.1jpp.src.rpm
+maven-scm-1.0-0.b3.2jpp.src.rpm
+maven-shared-1.0-4jpp.src.rpm
+maven-surefire-1.5.3-2jpp.src.rpm
+maven-wagon-1.0-0.b2.1jpp.src.rpm
+medor-1.6.1-1jpp.src.rpm
+medor-expression-1.6.1-1jpp.src.rpm
+mina-1.0.0-3jpp.src.rpm
+mina-jdk14-0.8.0-1jpp.src.rpm
+mockmaker-1.12.0-2jpp.src.rpm
+mockobjects-0.09-16jpp.src.rpm
+mockobjects010-0.10dev-0.20060313.1jpp.src.rpm
+modello-1.0-0.a8.4jpp.src.rpm
+mod_jk-1.2.20-3jpp.src.rpm
+mojo-maven2-plugins-1.0-5jpp.src.rpm
+monolog-2.0-2jpp.src.rpm
+msv-1.2-0.20050722.3jpp.src.rpm
+mx4j-3.0.1-7jpp.src.rpm
+myfaces-1.1.0-3jpp.src.rpm
+mysql-connector-java-5.0.4-2jpp.src.rpm
+nanocontainer-1.0-1jpp.src.rpm
+nanocontainer-nanowar-1.0-1jpp.src.rpm
+nanodist-maven-plugin-1.0.1-1jpp.src.rpm
+nanoxml-2.2.3-4jpp.src.rpm
+neethi-1.0.1-1jpp.src.rpm
+nekodtd-0.1.11-2jpp.src.rpm
+nekohtml-0.9.5-4jpp.src.rpm
+nlog4j-1.2.21-1jpp.src.rpm
+objectweb-anttask-1.3.2-3jpp.src.rpm
+odmg-3.0-3jpp.src.rpm
+ognl-2.6.9-1jpp.src.rpm
+oldcastor-0.9.6-1jpp.src.rpm
+openejb2-2.1-1jpp.src.rpm
+openorb-1.4.0-2jpp.src.rpm
+openorb-ots-1.4.0-1jpp.src.rpm
+opensaml-1.1b-1jpp.src.rpm
+oscache-2.2-2jpp.src.rpm
+oscore-2.2.5-1jpp.src.rpm
+p2psockets-1.1.4-2jpp.src.rpm
+p6spy-1.3-3jpp.src.rpm
+pell-multipart-1.30-0.rc1.3jpp.src.rpm
+perseus-cache-1.5.3-1jpp.src.rpm
+perseus-concurrency-1.5.1-1jpp.src.rpm
+perseus-persistence-1.5.1-1jpp.src.rpm
+perseus-pool-1.4.3-1jpp.src.rpm
+piccolo-1.04-2jpp.src.rpm
+picocontainer-1.2-2jpp.src.rpm
+plexus-action-1.0-0.a6.2jpp.src.rpm
+plexus-ant-factory-1.0-0.a1.2jpp.src.rpm
+plexus-appserver-1.0-0.a5.4jpp.src.rpm
+plexus-archiver-1.0-0.a6.2jpp.src.rpm
+plexus-avalon-personality-0.13-3jpp.src.rpm
+plexus-bsh-factory-1.0-0.a7s.2jpp.src.rpm
+plexus-cdc-1.0-0.a4.3jpp.src.rpm
+plexus-command-line-1.0-0.a2.2jpp.src.rpm
+plexus-compiler-1.5.2-5jpp.src.rpm
+plexus-container-artifact-1.0-0.a4.2jpp.src.rpm
+plexus-container-default-1.0-0.a8.3jpp.src.rpm
+plexus-ftpd-1.0-0.a1.3jpp.src.rpm
+plexus-i18n-1.0-0.b6.4jpp.src.rpm
+plexus-interactivity-1.0-0.a5.4jpp.src.rpm
+plexus-jetty-httpd-1.0-0.b2.4jpp.src.rpm
+plexus-mail-sender-1.0-0.a2.2jpp.src.rpm
+plexus-maven-plugin-1.2-2jpp.src.rpm
+plexus-notification-1.0-0.a5.1jpp.src.rpm
+plexus-quartz-1.0-0.a3.1jpp.src.rpm
+plexus-resources-1.0-0.a3.1jpp.src.rpm
+plexus-rmi-1.0-0.a1.1jpp.src.rpm
+plexus-runtime-builder-1.0-0.a9.3jpp.src.rpm
+plexus-security-1.0-0.a2.1jpp.src.rpm
+plexus-service-jetty-1.0-0.a3.1jpp.src.rpm
+plexus-servlet-1.0-0.b4.2jpp.src.rpm
+plexus-summit-1.0-0.b8.2jpp.src.rpm
+plexus-taskqueue-1.0-0.a6.1jpp.src.rpm
+plexus-utils-1.2-2jpp.src.rpm
+plexus-velocity-1.1.2-3jpp.src.rpm
+plexus-xmlrpc-1.0-0.b4.4jpp.src.rpm
+pmd-3.6-1jpp.src.rpm
+png-sixlegs-1.3.0-2jpp.src.rpm
+portals-pluto-1.0.1-1jpp.src.rpm
+postgresql-jdbc-8.1.407-2jpp.src.rpm
+proxool-0.8.3-10jpp.src.rpm
+proxytoys-0.2.1-1jpp.src.rpm
+puretls-0.9-0.b5.4jpp.src.rpm
+qdox-1.5-3jpp.src.rpm
+quartz-1.5.2-1jpp.src.rpm
+radeox-0.9-0.beta.2jpp.src.rpm
+regexp-1.4-3jpp.src.rpm
+relaxngcc-1.12-1jpp.src.rpm
+relaxngDatatype-1.0-3jpp.src.rpm
+rhino15-1.5-0.R3.6jpp.src.rpm
+rhino-1.6-0.r2.2jpp.src.rpm
+rife-continuations-0.1-1jpp.src.rpm
+saxon-6.5.3-5jpp.src.rpm
+saxon8-B.8.7-1jpp.src.rpm
+servletapi4-4.0.4-4jpp.src.rpm
+sf-maven-plugins-1.0-0.20050908.5jpp.src.rpm
+sitemesh-2.2.1-1jpp.src.rpm
+slf4j-1.0-0.rc5.1jpp.src.rpm
+smack-1.5.0-1jpp.src.rpm
+snmptrapappender-1.2.8-5jpp.src.rpm
+spice-1.0-2jpp.src.rpm
+spice-cop-1.0-4jpp.src.rpm
+spring-1.2.7-1jpp.src.rpm
+stax-utils-0.0-0.20050302.1jpp.src.rpm
+struts-1.2.9-5jpp.src.rpm
+swarmcache-1.0-0.cvs040225.7jpp.src.rpm
+swixml-1.5-0.b144.1jpp.src.rpm
+tagsoup-1.0.1-1jpp.src.rpm
+tanukiwrapper-3.2.3-1jpp.src.rpm
+tjdo-2.1-2jpp.src.rpm
+tlddoc-1.2-2jpp.src.rpm
+tl-netty2-1.9.2-1jpp.src.rpm
+tomcat5-5.5.23-5jpp.src.rpm
+tranql-1.3-1jpp.src.rpm
+tranql-connector-1.2-1jpp.src.rpm
+tranql-connector-derby-1.2-1jpp.src.rpm
+uddi4j-2.0.4-1jpp.src.rpm
+vdoclet-0.2-0.20030717.6jpp.src.rpm
+velocity-1.4-6jpp.src.rpm
+velocity-dvsl-0.45-7jpp.src.rpm
+velocity-tools-1.2-1jpp.src.rpm
+village-1.5.3-4jpp.src.rpm
+wadi-2.0-0.M1.1jpp.src.rpm
+webwork-2.1.7-2jpp.src.rpm
+werken-xpath-0.9.4-0.beta.12jpp.src.rpm
+werkz-1.0-0.b10.6jpp.src.rpm
+ws-commons-axiom-1.0-1jpp.src.rpm
+ws-commons-policy-1.0-0.20060119.1jpp.src.rpm
+ws-commons-XmlSchema-1.0.2-2jpp.src.rpm
+wsdl4j-1.5.2-4jpp.src.rpm
+ws-fx-addressing-1.0-2jpp.src.rpm
+ws-jaxme-0.5.1-1jpp.src.rpm
+wss4j-1.5.0-1jpp.src.rpm
+ws-scout-1.0-4jpp.src.rpm
+ws-soap-2.3.1-5jpp.src.rpm
+wstx-2.9.3-1jpp.src.rpm
+ws-wsif-2.1.0-0.rc1.1jpp.src.rpm
+xalan-j2-2.7.0-7jpp.src.rpm
+xapool-1.5.0-1jpp.src.rpm
+xbean-2.3-1jpp.src.rpm
+xdoclet-1.2.3-8jpp.src.rpm
+xdoclet-jboss4-1.2.2-3jpp.src.rpm
+xerces-j2-2.7.1-9jpp.src.rpm
+xercesjarv-0.1-0.20030530.6jpp.src.rpm
+xfire-1.0-1jpp.src.rpm
+xjavadoc-1.1-4jpp.src.rpm
+xmlbeans-2.1.0-4jpp.src.rpm
+xml-commons-1.3.03-7jpp.src.rpm
+xmldb-api-0.1-0.20041010.3jpp.src.rpm
+xmlgraphics-commons-1.0-1jpp.src.rpm
+xml-im-exporter-1.1-2jpp.src.rpm
+xmlpull-api-1.1.4-1jpp.src.rpm
+xmlrpc-2.0.1-3jpp.src.rpm
+xml-security-1.3.0-1jpp.src.rpm
+xml-stylebook-1.0-0.b3_xalan2.2jpp.src.rpm
+xmlunit-1.0-4jpp.src.rpm
+xom-1.0-4jpp.src.rpm
+xpp2-2.1.10-6jpp.src.rpm
+xpp3-1.1.3.8-1jpp.src.rpm
+xstream-1.1.3-1jpp.src.rpm
+xwork-1.2.1-1jpp.src.rpm
+
