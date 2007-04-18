@@ -1,0 +1,10 @@
+--- java_cup-0.10/build.xml	2007-04-18 13:56:34 +0300
++++ SOURCES/build.xml	2007-04-18 13:55:51 +0300
+@@ -41,6 +41,7 @@
+ 		windowtitle="java_cup API">
+ 
+ 		<fileset dir="src" defaultexcludes="yes">
++		<exclude name="**/*.cup" />
+ 		</fileset>
+ 		</javadoc>
+ 

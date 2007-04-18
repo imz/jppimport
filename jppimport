@@ -41,18 +41,24 @@ $jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdi
 &alt_generic_fix($jpp);
 &jpp_specific_fix($jpp);
 
+my $altrel="alt1";
+my $jpprel = $jpp->get_section('package','')->get_tag('Release');
 if ($altrpm || $altspec) {
     $alt=RPM::ImportTool->new(RPM => $altrpm, SPECFILE => $altspec);
+    $altrel = $alt->get_section('package','')->get_tag('Release');
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    my $altrel = $alt->get_section('package','')->get_tag('Release');
-    $altrel = $1 if ($altrel=~/^alt([^_]+)_(.+)jpp(\d.\d)$/);
     # hack -- cleanup (undefined in jpp) macro in alt release:
     $altrel=~s/.?\%\w+//g;
     $altrel=~s/.?\%\{\w+\}+//g;
-    my $newrel = $altrel."_".$jpp->get_section('package','')->get_tag('Release')."1.7";
-    $jpp->get_section('package','')->set_tag('Release',$newrel);
+    if ($altrel=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+	$rel = $1;
+	$rel=$rel+1 if ($2 eq $jpprel);
+	$altrel='alt'.$rel;
+    }
     $alt->cleanup();
 }
+my $newrel = $altrel."_".$jpprel."1.7";
+$jpp->get_section('package','')->set_tag('Release',$newrel);
 
 if ($hook) {
     our $spechook;
@@ -77,13 +83,13 @@ BuildRequires:  %{_bindir}/gcj, %{__perl},
 sub jpp_specific_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
-    $secptr->[0]->unshift_body('%def_without gcj_support'."\n");
-    $secptr->[0]->unshift_body("BuildRequires: jpackage-utils\n");
-    $secptr->[0]->unshift_body("BuildRequires: /proc\n");
-# jdepend; should be detected by peering in SOURCEDIR
-    $secptr->[0]->unshift_body("BuildRequires: unzip\n");
+    if (not $secptr->[0]->match(qr'BuildRequires: jpackage-1.4-compat')) {
+#    $secptr->[0]->unshift_body("BuildRequires: jpackage-utils\n");
+	$secptr->[0]->unshift_body("BuildRequires: jpackage-1.4-compat\n");
+	$secptr->[0]->unshift_body("BuildRequires: /proc\n");
 # antlr
 #    $secptr->[0]->unshift_body("BuildRequires: gcc-c++\n");
+    }
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
@@ -206,6 +212,7 @@ java-javadoc
 !;
 our %DEPSUBST = (
 '%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
+'/usr/sbin/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
 'mono-core','mono',
 );
 
@@ -256,7 +263,7 @@ sub alt_generic_fix {
 	    $sec->empty();
 	} elsif ($t eq 'post') {
 	    &alt_generic_convert_alternatives($rpm,$sec);
-	} elsif ($t eq 'postun') {
+	} elsif (($t eq 'postun') or ($t eq 'preun')) {
 	    &alt_generic_convert_alternatives($rpm,$sec);
 	}
     }
@@ -288,7 +295,7 @@ sub alt_generic_convert_alternatives {
     my $ptr = $section->get_body();
     while (@$ptr>0) {
 	my $line = shift @$ptr;
-	if ($line!~/\s*#/ && $line=~s,^(\s*)(?:\%{_sbindir}|/usr/sbin)/update-alternatives --(\w+),,) {
+	if ($line!~/\s*#/ && $line=~s,^(\s*)(?:(?:\%{_sbindir}|/usr/sbin)/)?update-alternatives --(\w+),,) {
 	    my $preline=$1;
 	    my $updcmd=$2;
 	    $line=&read_multiline($line, $ptr);
@@ -483,6 +490,15 @@ sub subst {
 	push @out, $_;
     }
     $section->set_body(\@out);
+}
+
+sub match {
+    my $section=shift;
+    my $pattern=shift;
+    foreach (@{$section->get_body()}) {
+	return 1 if /$pattern/;
+    }
+    return 0;
 }
 
 sub get_tag {
