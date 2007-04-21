@@ -84,7 +84,6 @@ sub jpp_specific_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
     if (not $secptr->[0]->match(qr'BuildRequires: jpackage-1.4-compat')) {
-#    $secptr->[0]->unshift_body("BuildRequires: jpackage-utils\n");
 	$secptr->[0]->unshift_body("BuildRequires: jpackage-1.4-compat\n");
 	$secptr->[0]->unshift_body("BuildRequires: /proc\n");
 # antlr
@@ -440,7 +439,15 @@ sub unshift_body {
 
 sub push_body {
     my $self=shift;
-    push @{$self->{BODY}}, @_;
+    my $bodyptr=$self->{BODY};
+    # move pushed item(s) before %if* block of next section
+    my @tail;
+    my $i=$#{$bodyptr};
+    while ($i>=0 and $bodyptr->[$i]=~/^\s*\%if/) {
+	unshift @tail, pop @{$bodyptr};
+	$i--;
+    }
+    push @{$bodyptr}, @_, @tail;
 }
 
 sub empty {
@@ -530,6 +537,7 @@ package RPM::ImportTool;
 sub new {
     my $class = shift;
     my $self = {
+	CHANGELOG=>'- converted from JPackage by jppimport script',
 	@_
     };
     bless $self, $class;
@@ -556,7 +564,7 @@ sub write_rpm {
     mkdir $newdir;
     my $newspec="$newdir/".basename($self->{SPECFILE});
     &write_file($newspec, $self->get_spec());
-    run("add_changelog -e '- converted from JPackage by jppimport script' $newspec");
+    run("add_changelog -e '$self->{CHANGELOG}' $newspec");
     $self->rpm_custom('-bs --nodeps', $newspec);
 }
 
@@ -643,6 +651,11 @@ sub get_sections {
     my $self=shift;
     #return @{$self->{SPECSECTIONS}};
     return $self->{SPECSECTIONS};
+}
+
+sub set_changelog {
+    my $self=shift;
+    return $self->{CHANGELOG}=shift();
 }
 
 sub rpm_custom {
