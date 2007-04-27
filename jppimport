@@ -3,7 +3,7 @@
 use Carp;
 use Getopt::Long;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog);
 my $verbose;
 my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
@@ -12,6 +12,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
 		      "hook=s"   => \$hook,
+		      "changelog=s"   => \$changelog,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -24,6 +25,7 @@ if (! $jpprpm && ! $jppspec) {
 --altspec /path/to/altlinux.spec
 --hook /path/to/hook to be called on resulting spec file
 --srpmdir /path/to/output_dir
+--changelog '- message'
 
 usage examples:
 * convert srpm:
@@ -68,6 +70,10 @@ if ($hook) {
     } else {
 	die "script $hook does not have a valid hook!\n";
     }
+}
+
+if ($changelog) {
+    $jpp->set_changelog($changelog);
 }
 
 print $jpp->get_spec() if $jppspec or $verbose;

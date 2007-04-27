@@ -119,7 +119,7 @@ stax-bea-1.0-alt1.src.rpm
 /;
 #jaf classpathx-jaf ?
 #javamail-1.3.1-alt2.src.rpm classpathx-mail?
-#stax-bea stax-utils?
+#stax-bea bea-stax
 
 our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
 
