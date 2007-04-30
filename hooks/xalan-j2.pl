@@ -31,5 +31,5 @@ $spechook = sub {
     # hack around broken deps
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s*java-devel','##BuildRequires: java-devel');
     # 1.5 hack
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jpackage-1.4-compat','BuildRequires: jpackage-1.5-compat');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jpackage-1.4-compat','BuildRequires: jpackage-1.5-compat');
 }

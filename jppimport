@@ -57,6 +57,7 @@ if ($altrpm || $altspec) {
 	$rel=$rel+1 if ($2 eq $jpprel);
 	$altrel='alt'.$rel;
     }
+    $altrel='alt1' if $altrel=~/^alt0\./;
     $alt->cleanup();
 }
 my $newrel = $altrel."_".$jpprel."1.7";
