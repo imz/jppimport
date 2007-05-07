@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+#use strict;
+use warnings;
 use Carp;
 use Getopt::Long;
 
@@ -50,19 +52,33 @@ if ($altrpm || $altspec) {
     $altrel = $alt->get_section('package','')->get_tag('Release');
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
     # hack -- cleanup (undefined in jpp) macro in alt release:
-    $altrel=~s/.?\%\w+//g;
-    $altrel=~s/.?\%\{\w+\}+//g;
     if ($altrel=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
-	$rel = $1;
+	my $rel = $1;
+	$rel=~s/.?\%\w+//g;
+	$rel=~s/.?\%\{\w+\}+//g;
+	$rel='1' if $rel=~/^0\./;
 	$rel=$rel+1 if ($2 eq $jpprel);
 	$altrel='alt'.$rel;
+    } else {
+	$altrel=~s/.?\%\w+//g;
+	$altrel=~s/.?\%\{\w+\}+//g;
+	$altrel='alt1' if $altrel=~/^alt0\./;
     }
-    $altrel='alt1' if $altrel=~/^alt0\./;
     $alt->cleanup();
 }
 my $newrel = $altrel."_".$jpprel."1.7";
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
+my $jpptoolsdir=&RPM::ImportTool::dirname($0);
+# for cross-references in hooks
+push @INC, $jpptoolsdir."/hooks";
+
+if (not $hook) {
+    # looking for default hook
+    my $name = $jpp->get_section('package','')->get_tag('Name');
+    my $defhook="$jpptoolsdir/hooks/$name.pl";
+    $hook = $defhook if (-e $defhook);
+}
 if ($hook) {
     our $spechook;
     require $hook;
@@ -93,8 +109,6 @@ sub jpp_specific_fix {
     if (not $secptr->[0]->match(qr'BuildRequires: jpackage-1.4-compat')) {
 	$secptr->[0]->unshift_body("BuildRequires: jpackage-1.4-compat\n");
 	$secptr->[0]->unshift_body("BuildRequires: /proc\n");
-# antlr
-#    $secptr->[0]->unshift_body("BuildRequires: gcc-c++\n");
     }
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
@@ -102,18 +116,11 @@ sub jpp_specific_fix {
 	    &jpp_specific_cleanup_headers($sec);
 	    $sec->subst(
 		qr'\%define gcj_support \%{\?_with_gcj_support:1}\%{!\?_with_gcj_support:\%{\?_without_gcj_support:0}\%{!\?_without_gcj_support:\%{\?_gcj_support:\%{_gcj_support}}\%{!\?_gcj_support:0}}}', '%define gcj_support 0');
-
-# antlr
-#	    $sec->subst(
-#		qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 0');
-
 	} elsif ($t eq 'files') {
 	    &jpp_specific_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
 	} elsif ($t eq 'post') {
-	    #$sec->subst('(?:\%{_sbindir}|/usr/sbin)/update-alternatives --install', '%register_alternatives');
 	} elsif ($t eq 'postun') {
-	    #$sec->subst('(?:\%{_sbindir}|/usr/sbin)/update-alternatives --remove', '%unregister_alternatives');
 	} elsif ($t eq 'changelog') {
 	}
     }
@@ -688,6 +695,12 @@ sub cleanup {
 sub basename {
     my @path= split('/',$_[0]);
     return pop @path;
+}
+
+sub dirname {
+    my @path= split('/',$_[0]);
+    pop @path;
+    return join('/',@path);
 }
 
 sub run {
