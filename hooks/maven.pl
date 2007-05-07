@@ -15,7 +15,7 @@ __END__
 BuildRequires: ant-apache-resolver >= 0:1.6.2
 BuildRequires: ant-nodeps
 #BuildRequires: dom4j >= 0:1.5-1jpp
-BuildRequires: forehead >= 0:1.0.b4-4jpp
+#BuildRequires: forehead >= 0:1.0.b4-4jpp
 #BuildRequires: jakarta-commons-beanutils16 >= 0:1.6.1
 #BuildRequires: jakarta-commons-betwixt >= 0:1.0-0.alpha1.4jpp
 BuildRequires: jakarta-commons-cli >= 1.0
@@ -39,9 +39,9 @@ BuildRequires: jakarta-commons-jelly-tags-xml >= 0:1.0-0.b4.6jpp
 BuildRequires: log4j >= 0:1.2.8
 BuildRequires: maven-model >= 3.0.1
 BuildRequires: maven-wagon >= 1.0
-BuildRequires: plexus-container-default >= 0:1.0
-BuildRequires: plexus-utils >= 1.0.4
-BuildRequires: plexus-velocity >= 0:1.1.2
+#BuildRequires: plexus-container-default >= 0:1.0
+#BuildRequires: plexus-utils >= 1.0.4
+#BuildRequires: plexus-velocity >= 0:1.1.2
 BuildRequires: werkz >= 1.0-0.b10.5jpp
 #BuildRequires: xerces-j2 >= 0:2.6.2
 #Requires: xml-commons-apis

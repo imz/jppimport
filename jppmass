@@ -162,7 +162,7 @@ our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
 #log4j
 #struts-1.2.6-alt3.src.rpm
 
-# alt nobody packages
+# alt imported packages (todo: refresh)
 our @ALTPKG=qw/
 antlr
 asm
