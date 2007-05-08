@@ -69,7 +69,8 @@ if ($altrpm || $altspec) {
 my $newrel = $altrel."_".$jpprel."1.7";
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
-my $jpptoolsdir=&RPM::ImportTool::dirname($0);
+# our -- hack ?
+our $jpptoolsdir=&RPM::ImportTool::dirname($0);
 # for cross-references in hooks
 push @INC, $jpptoolsdir."/hooks";
 
@@ -328,7 +329,7 @@ sub alt_generic_convert_alternatives {
 		    my $slink=&read_shell_token(\$line);
 		    my $sname=&read_shell_token(\$line);
 		    my $spath=&read_shell_token(\$line);
-		    push @alternatives, ($slink,$spath,$path);
+		    push @alternatives, ($spath,$slink,$path);
 		}
 		&create_alternatives($rpm,$section, &get_alternatives_file_name($rpm,$section,$name),\@alternatives);
 		push @out, $preline.'%register_alternatives '.&get_alternatives_file_name($rpm,$section,$name)."\n";
@@ -347,7 +348,10 @@ sub create_alternatives {
     my @text=('install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/'.$alternatives_file_name.'<<EOF
 ');
     while (@$alternativesptr>0) {
-	push @text, shift(@$alternativesptr)."\t".shift(@$alternativesptr)."\t".shift(@$alternativesptr)."\n";
+	my $provided=shift(@$alternativesptr);
+	my $alternative=shift(@$alternativesptr);
+	my $weight=shift(@$alternativesptr);
+	push @text, $provided."\t".$alternative."\t".$weight."\n";
     }
     push @text, "EOF\n";
     $rpm->get_section('install')->push_body(@text);

@@ -7,10 +7,12 @@ my $verbose;
 my $ALTPATH='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
 my $JPPPATH='/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 my $OUTDIR="./OUT";
+my $changelog;
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
 		      "alt=s"   => \$ALTPATH,
 		      "out=s" => \$OUTDIR,
+		      "changelog=s"   => \$changelog,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -49,6 +51,7 @@ foreach my $name (@packages) {
     my $jpprpm = &find_rpm($name, $JPPPATH);
 #    print STDERR "found RPM $jpprpm for $name.\n";
     my $importcmd="$jppimport --srpmdir $OUTDIR";
+    $importcmd.=" --changelog '$changelog'" if ($changelog);
     if ($altrpm) {
 	$importcmd.=" --alt $altrpm";
     } else {
