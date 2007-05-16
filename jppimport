@@ -78,6 +78,8 @@ if (not $hook) {
     # looking for default hook
     my $name = $jpp->get_section('package','')->get_tag('Name');
     my $defhook="$jpptoolsdir/hooks/$name.pl";
+    # macro_expansion should be here
+    #print "looking for default hook $defhook\n";
     $hook = $defhook if (-e $defhook);
 }
 if ($hook) {
@@ -565,7 +567,12 @@ sub new {
 	}
 	my $dirname=&basename($self->{RPM});
 	$dirname=~s/.src.rpm//;
-	$self->{TMPDIR}="$dirname.$$";
+	$self->{TMPDIR}||="$dirname.$$";
+	my $pwd= `pwd`;
+	chomp $pwd;
+	$self->{SOURCEDIR}||="$pwd/$self->{TMPDIR}/SOURCES";
+	$self->{SPECDIR}||="$pwd/$self->{TMPDIR}/SPECS";
+	$self->{SRPMDIR}||="$pwd/$self->{TMPDIR}/SRPMS";
 	$self->rpm_custom("-i", $self->{RPM});
 	$self->{SPECFILE}=(glob "$self->{TMPDIR}/SPECS/*")[0];
     } elsif ($self->{SPECFILE}) {
@@ -678,15 +685,7 @@ sub set_changelog {
 
 sub rpm_custom {
     my $self=shift;
-    my $tmpdir=$self->{TMPDIR};
-    die "Oops! rpm_custom" unless $tmpdir;
-    my $pwd= `pwd`;
-    chomp $pwd;
-    my $SOURCEDIR="$pwd/$tmpdir/SOURCES";
-    my $SPECDIR="$pwd/$tmpdir/SPECS";
-    my $SRPMDIR="$pwd/$tmpdir/SRPMS";
-    $SRPMDIR=$self->{SRPMDIR} if $self->{SRPMDIR};
-    my $cmd =qq{rpm --define "_specdir $SPECDIR" --define "_sourcedir $SOURCEDIR" --define "_srcrpmdir $SRPMDIR" @_};
+    my $cmd =qq{rpm --define "_specdir $self->{SPECDIR}" --define "_sourcedir $self->{SOURCEDIR}" --define "_srcrpmdir $self->{SRPMDIR}" @_};
     &run($cmd);
 }
 
@@ -694,6 +693,13 @@ sub cleanup {
     my $self=shift;
     my $tmpdir=$self->{TMPDIR};
     run("rm -rf $tmpdir") if $tmpdir;
+}
+
+sub copy_to_sources {
+    my $self=shift;
+    foreach my $file (@_) {
+	run ("cp -f $file $self->{SOURCEDIR}/");
+    }
 }
 
 sub basename {

@@ -7,5 +7,5 @@ $spechook = sub {
     $jpp->get_section('prep')->push_body('%patch -p1'."\n");
     $jpp->get_section('package','')->push_body('Patch: java_cup-alt-javadoc.patch'."\n");
     # hack!! to implement in clean way
-    $jpp->copy_to_sources($jpptoolsdir.'patches/java_cup-alt-javadoc.patch');
+    $jpp->copy_to_sources($jpptoolsdir.'/'.'patches/java_cup-alt-javadoc.patch');
 }
