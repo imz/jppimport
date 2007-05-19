@@ -13,6 +13,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
+		      "out=s"   => \$srpmdir,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
 		      "verbose"  => \$verbose);
@@ -27,6 +28,7 @@ if (! $jpprpm && ! $jppspec) {
 --altspec /path/to/altlinux.spec
 --hook /path/to/hook to be called on resulting spec file
 --srpmdir /path/to/output_dir
+--out  is the same as --srpmdir
 --changelog '- message'
 
 usage examples:
@@ -292,6 +294,7 @@ sub alt_generic_cleanup_files {
 	s/^\s*\%attr\(-,root,root\)\s*//;
 	#if (/^\s*\%defattr\(0644,root,root,0755\)\s*$/
 	if (/^\s*\%defattr\((?:0644|-),root,root,(?:0755|-)\)\s*$/
+	    or /^\s*\%defattr\((?:0664|-),root,root,(?:0755|-)\)\s*$/
 	    or /^\s*\%defattr\((?:0644|-),root,root\)\s*$/
 	    ) {
 	    # throw away
@@ -669,6 +672,16 @@ sub get_section {
 	}
     }
     Carp::carp "section $type $pkg not found!";
+    return;
+}
+
+sub raw_rename_section {
+    my $self=shift;
+    my $oldname=shift;
+    my $newname=shift;
+    foreach my $section (@{$self->{SPECSECTIONS}}) {
+	${$section->get_body()}->[0]=~s/(\s*\%\w+\s+)($oldname)\s*/$1$newname/;
+    }
     return;
 }
 

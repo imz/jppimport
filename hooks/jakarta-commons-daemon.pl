@@ -4,9 +4,13 @@ require 'remove_java_devel.pl';
 $spechook = sub {
     my ($jpp, $alt) = @_;
     &remove_java_devel($jpp, $alt);
-#    $jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
-    $jpp->get_section('package','')->unshift_body("\%define _with_native 1\n");
-
+    # hack around splitting on 2 packages
+    if ($alt->get_tag('Name') eq 'jsvc') {
+	$jpp->get_section('package','')->unshift_body("\%define _with_native 1\n");
+	$jpp->raw_rename_section('jsvc','-n jakarta-commons-daemon-jsvc');
+	$jpp->get_section('package','')->subst(qr'%{name}-crosslink.patch','jakarta-commons-daemon-crosslink.patch');
+    }
+    
     $jpp->get_section('prep')->push_body('%patch1 -p1'."\n");
     $jpp->get_section('package','')->push_body('Patch1: jakarta-commons-daemon-1.0.1-libs.patch'."\n");
     # hack!! to implement in clean way

@@ -2,13 +2,15 @@
 
 PREFIX=/var/ftp/pub/Linux/ALT/Sisyphus
 
-[ -n "$1" ] && PREFIX="$1"
+[ -n "$1" ] && PREFIX="$1" && shift;
+
+DEST=`pwd`
 
 pushd $PREFIX/files/noarch/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > ./java-alt-packages.noarch.src
+for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > $DEST/java-alt-packages.noarch.src
 popd
 pushd $PREFIX/files/i586/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | sort -u > ./java-alt-packages.i586.src
+for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | sort -u > $DEST/java-alt-packages.i586.src
 popd
-for i in `sort -u ./java-alt-packages.i586.src ./java-alt-packages.noarch.src`; do grep "^$i" $PREFIX/files/list/list.src.classic ; done | sort -u > ./java-alt-packages.owners
+for i in `sort -u ./java-alt-packages.i586.src ./java-alt-packages.noarch.src`; do grep "^$i" $PREFIX/files/list/list.src.classic ; done | sort -u > $DEST/java-alt-packages.owners
 

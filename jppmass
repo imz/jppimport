@@ -106,18 +106,19 @@ sub dirname {
 
 
 BEGIN {
+#asm asm2
+#jakarta-commons-beanutils-16 jakarta-commons-beanutils16
+#jakarta-regexp regexp
+#owanttask objectweb-anttask
+#stylebook xml-stylebook
+#xalan-j xalan-j2
+#excalibur-logkit excalibur-avalon-logkit
+#stax-bea bea-stax
 our %ALT2JPPMAP=qw/
-asm asm2
-jakarta-commons-beanutils-16 jakarta-commons-beanutils16
 jakarta-commons-cli-1 jakarta-commons-cli
-jakarta-regexp regexp
 jakarta-servletapi4 servletapi4
-owanttask objectweb-anttask
-stylebook xml-stylebook
-xalan-j xalan-j2
-excalibur-logkit excalibur-avalon-logkit
 wagon maven-wagon
-stax-bea bea-stax
+jsvc jakarta-commons-daemon
 /;
 
 our @ALTSKIPDEPR=qw/tomcat4/;
