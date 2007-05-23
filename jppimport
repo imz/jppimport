@@ -129,6 +129,32 @@ sub jpp_specific_fix {
 	} elsif ($t eq 'changelog') {
 	}
     }
+
+    # hack... it looks like it should be moved to RPM::ImportTool
+    # zip -> bz2 due to alt buggy rpm (/usr/bin/unzip -qL) :(
+    $main_sec=$jpp->get_section('package','');
+    if ($main_sec->match(qr'^\s*Source\d*:.+.zip\s*$')) {
+	for (my $i=0;$i<@{$rpm->{SOURCES}}; $i++) {
+	    my $source=$rpm->{SOURCES}->[$i];
+	    if ($source=~/\.zip$/) {
+		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::ImportTool::basename($source);
+		if (! -e $sourcefile) {
+		    warn "Internal error: source $source not found!";
+		} else {
+		    my $convertdir= $rpm->{TMPDIR}.'/CONVERT'.$i;
+		    mkdir $convertdir;
+		    &RPM::ImportTool::run ("pushd $convertdir; unzip -q $sourcefile; popd");
+		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
+		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
+		    $sourcefile=~s/\.zip$/.tar.bz2/;
+		    &RPM::ImportTool::run ("tar cjf $sourcefile -C $convertdir @files @hidden_files");
+		    my $source2=$source;
+		    $source2=~s/\.zip$/.tar.bz2/;
+		    $main_sec->subst(qr"$source",$source2);
+		}
+	    }
+	}
+    }
 }
 
 sub jpp_specific_cleanup_files {
@@ -534,9 +560,16 @@ sub match {
 sub get_tag {
     my $section=shift;
     my $tag=shift;
+    my %options = (
+	RAW=>0,
+	@_);
     foreach (@{$section->get_body()}) {
 	if (/^$tag:\s*(.+)\s*$/) {
-	    return $1;
+	    my $val=$1;
+	    if (!$options{RAW}) {
+		&RPM::ImportTool::macro_subst($section->{RPM}->{MACRO},\$val);
+	    }
+	    return $val;
 	}
     }
     return;
@@ -570,12 +603,12 @@ sub new {
 	}
 	my $dirname=&basename($self->{RPM});
 	$dirname=~s/.src.rpm//;
-	$self->{TMPDIR}||="$dirname.$$";
 	my $pwd= `pwd`;
 	chomp $pwd;
-	$self->{SOURCEDIR}||="$pwd/$self->{TMPDIR}/SOURCES";
-	$self->{SPECDIR}||="$pwd/$self->{TMPDIR}/SPECS";
-	$self->{SRPMDIR}||="$pwd/$self->{TMPDIR}/SRPMS";
+	$self->{TMPDIR}||="$pwd/$dirname.$$";
+	$self->{SOURCEDIR}||="$self->{TMPDIR}/SOURCES";
+	$self->{SPECDIR}||="$self->{TMPDIR}/SPECS";
+	$self->{SRPMDIR}||="$self->{TMPDIR}/SRPMS";
 	$self->rpm_custom("-i", $self->{RPM});
 	$self->{SPECFILE}=(glob "$self->{TMPDIR}/SPECS/*")[0];
     } elsif ($self->{SPECFILE}) {
@@ -583,6 +616,7 @@ sub new {
 	die "$class: new: either RPM or SPECFILE is required."
     }
     $self->_set_speclist(load_file($self->{SPECFILE}));
+    $self->load_macro();
     return $self;
 }
 
@@ -752,6 +786,83 @@ sub write_file {
     open FN, '>', $name || die "can't open $name: $!";
     print FN $str;
     close FN, $name || die "can't open $name: $!";
+}
+
+sub load_macro {
+    my $self=shift;
+    my $specfile = $self->{SPECFILE};
+    my %macro;
+    $macro{'nil'}='';
+    $macro{'homedir'}=$ENV{'HOME'};
+    $macro{'_topsrcdir'}='%_topdir';
+    $macro{'_sourcedir'}="%_topsrcdir/SOURCES";
+    $macro{'_specdir'}="%_topsrcdir/SPECS";
+    $macro{'_srcrpmdir'}="%_topdir/SRPMS";
+    if (-e $ENV{'HOME'}.'/.rpmmacros') {
+	open (RPMMACROS, $ENV{'HOME'}.'/.rpmmacros') || die "can't open .rpmmacros:$!";
+	while (<RPMMACROS>) {
+	    if (/^[%]([\w_\/.\d]+)\s+(.+)\s*$/) {
+		$macro{$1}=$2 ;
+		&macro_subst(\%macro,\$macro{$1});
+	    }
+	}
+	close (RPMMACROS);
+    }
+    $macro{'_topdir'}||="$ENV{'HOME'}/RPM";
+    
+    my @source;
+    my @patch;
+    my @setup_n;
+    my @is_setup;
+    
+    open (SPECFILE, $specfile) || die "can't open spec $specfile: $!";
+    while (<SPECFILE>) {
+	chomp;
+	$macro{'name'}=$1 if /^Name:\s*(.+)$/;
+	$macro{'version'}=$1 if /^Version:\s*(.+)$/ and not $macro{'version'};
+	$macro{'release'}=$1 if /^Release:\s*(.+)$/ and not $macro{'release'};
+	#$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+([\%\{\}\w_\d.-]+)\s*$/;
+	$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+(\S+)\s*$/;
+	# not needed there
+	$source[$1 ? $1 : 0]=$3 if /^Source(\d*):\s*(.+\/)?([^\/]+)$/;
+	$patch[$1 ? $1 : 0]=$3 if /^Patch(\d*):\s*(.+\/)?([^\/]+)$/;
+	$setup_n[$1 ? $1 : 0] =$3 if /^[%]setup(\d*)\s*(.+)?-n\s+(\S+)/;
+	$is_setup[$1 ? $1 : 0] =1 if /^[%]setup(\d*)/;
+    }
+    close (SPECFILE);
+
+    foreach my $dep (grep {$_} @source, @patch) {
+	&macro_subst(\%macro,\$dep);
+    }
+    #print join("\n",@require),"\n";
+    #print join("\n",keys %macro),"\n";
+
+    foreach my $key  
+	(qw/
+     _sourcedir
+     _specdir
+     _srcrpmdir
+     name
+     version
+     release
+     /) {
+	    &macro_subst(\%macro,\$macro{$key});
+    }
+    $self->{MACRO}=\%macro;
+    $self->{SOURCES}=\@source;
+    $self->{PATCHES}=\@patch;
+    $self->{SETUP_N}=\@setup_n;
+    $self->{IS_SETUP}=\@is_setup;
+}
+
+sub macro_subst {
+    my $macroptr=shift;
+    my $argptr=shift;
+    #print STDERR "subst: $$argptr\n";
+    Carp::cluck "undef" unless defined $$argptr;
+    while ($$argptr=~/\%\{?([\w_\d]+)\}?/ and defined $macroptr->{$1}) {
+	$$argptr=~s/\%\{?([\w_\d]+)\}?/$macroptr->{$1}/;
+    }
 }
 
 1;
