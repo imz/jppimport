@@ -111,10 +111,18 @@ BuildRequires:  %{_bindir}/gcj, %{__perl},
 sub jpp_specific_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
-    if (not $secptr->[0]->match(qr'BuildRequires: jpackage-1.4-compat')) {
-	$secptr->[0]->unshift_body("BuildRequires: jpackage-1.4-compat\n");
-	$secptr->[0]->unshift_body("BuildRequires: /proc\n");
+    my $main_sec=$jpp->get_section('package','');
+
+    if (not $main_sec->match(qr'BuildRequires: jpackage-1.4-compat')) {
+	$main_sec->unshift_body("BuildRequires: jpackage-1.4-compat\n");
+	$main_sec->unshift_body("BuildRequires: /proc\n");
     }
+
+    # remove_java_devel 
+    # hack around conflicts in jpackage-1.x-compat
+    $main_sec->subst(qr'BuildRequires:\s*java-devel','##BuildRequires: java-devel');
+    $main_sec->subst(qr'BuildRequires:\s*ant\s*java-devel','BuildRequires: ant ');
+
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
@@ -484,6 +492,11 @@ sub unshift_body {
 	my $head = shift @{$self->{BODY}};
 	unshift @{$self->{BODY}}, $head, @_;
     }
+}
+
+sub unshift_body_before_section {
+    my $self=shift;
+    unshift @{$self->{BODY}}, @_;
 }
 
 sub push_body {

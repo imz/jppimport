@@ -10,6 +10,24 @@ $spechook = sub {
 #    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-log4j','BuildRequires: ant-log4j');
 #    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-bcel','BuildRequires: ant-bcel');
 #    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-resolver','BuildRequires: ant-xml-resolver');
+
+    # quite bugs
+    $jpp->get_section('prep')->subst(qr'%{SOURCE1}','%%{SOURCE1}');
+
+    # bug:
+    # disabled in bootstrap
+#%files plugin-latka
+#%dir %{_datadir}/%{name}
+#%dir %{_datadir}/%{name}/plugins
+#%{_datadir}/%{name}/plugins/maven-latka-plugin*.jar
+#%{_javadir}/%{name}-plugins/maven-latka-plugin.jar
+    my $latkasec=$jpp->get_section('files','plugin-latka');
+    $latkasec->unshift_body_before_section('%if %{RHEL4}==0'."\n");
+    $latkasec->push_body('%endif'."\n");
+
+    # bootstrap :)
+    $jpp->get_section('package','')->subst(qr'define RHEL4 0','define RHEL4 1');
+
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jakarta-commons-cli','BuildRequires: jakarta-commons-cli-1');
 }
 __END__
@@ -27,23 +45,23 @@ __END__
 #BuildRequires: jakarta-commons-graph >= 0:0.8.1
 #BuildRequires: jakarta-commons-httpclient >= 2.0
 #BuildRequires: jakarta-commons-io >= 1.1
-BuildRequires: jakarta-commons-jelly >= 0:1.0-0.b4.6jpp
-BuildRequires: jakarta-commons-jelly-tags-ant >= 0:1.0-0.b4.6jpp
-BuildRequires: jakarta-commons-jelly-tags-define >= 0:1.0-0.b4.6jpp
-BuildRequires: jakarta-commons-jelly-tags-util >= 0:1.0-0.b4.6jpp
-BuildRequires: jakarta-commons-jelly-tags-xml >= 0:1.0-0.b4.6jpp
+-BuildRequires: jakarta-commons-jelly >= 0:1.0-0.b4.6jpp
+-BuildRequires: jakarta-commons-jelly-tags-ant >= 0:1.0-0.b4.6jpp
+-BuildRequires: jakarta-commons-jelly-tags-define >= 0:1.0-0.b4.6jpp
+-BuildRequires: jakarta-commons-jelly-tags-util >= 0:1.0-0.b4.6jpp
+-BuildRequires: jakarta-commons-jelly-tags-xml >= 0:1.0-0.b4.6jpp
 #BuildRequires: jakarta-commons-jexl >= 0:1.0
 #BuildRequires: jakarta-commons-logging >= 0:1.0.3
 #BuildRequires: jline >= 0.8.1
 #BuildRequires: jaxen >= 0:1.1
 #BuildRequires: junit >= 0:3.8.1
-BuildRequires: log4j >= 0:1.2.8
+-BuildRequires: log4j >= 0:1.2.8
 #BuildRequires: maven-model >= 3.0.1
 -BuildRequires: maven-wagon >= 1.0
 #BuildRequires: plexus-container-default >= 0:1.0
 #BuildRequires: plexus-utils >= 1.0.4
 #BuildRequires: plexus-velocity >= 0:1.1.2
-BuildRequires: werkz >= 1.0-0.b10.5jpp
+#BuildRequires: werkz >= 1.0-0.b10.5jpp
 #BuildRequires: xerces-j2 >= 0:2.6.2
 #Requires: xml-commons-apis
 #Requires: xml-commons-which
