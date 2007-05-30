@@ -5,6 +5,7 @@ rhino: xmlbeans: dom2-core-tests (ant-contrib)
 plexus-compiler: aspectj: eclipse-platform
 maven2-common-poms: saxon-scripts : fop: batik
 maven-wagon: excalibur-cornerstone-connection-api: maven
+maven: hivemind: groovy-jsr: maven
 
 jpp geronimo-specs: maven2
 xom(nobootstrap): saxon
