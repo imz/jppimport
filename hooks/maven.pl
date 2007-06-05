@@ -65,5 +65,3 @@ __END__
 #BuildRequires: xerces-j2 >= 0:2.6.2
 #Requires: xml-commons-apis
 #Requires: xml-commons-which
-
-
