@@ -8,12 +8,14 @@ my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/re
 my $JPPPATH='/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 my $OUTDIR="./OUT";
 my $changelog;
+my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
-		      "alt=s"   => \$ALTPATH,
-		      "out=s" => \$OUTDIR,
-		      "changelog=s"   => \$changelog,
-		      "verbose"  => \$verbose);
+			 "alt=s"   => \$ALTPATH,
+			 "out=s" => \$OUTDIR,
+			 "changelog=s"   => \$changelog,
+			 "strategy=s" => \$strategy,
+			 "verbose"  => \$verbose);
 my ($alt,$jpp);
 
 if (! &is_valid_pathspec($ALTPATH) || ! &is_valid_pathspec($JPPPATH)) {
@@ -22,6 +24,8 @@ options:
 --jpp /path/to/jpackage/src/RPMS:/other/path
 --alt /path/to/altlinux/src/RPMS:/other/path1:/other/path2
 --out /path/to/output_dir (default is $OUTDIR)
+--changelog '- changelog entry'
+--strategy 'strategy' of mass operations (default is $strategy)
 
 usage examples:
 upgrade all alt java packages using jpackage
@@ -43,7 +47,7 @@ my @packages = @ARGV;
 
 # hangs ... why?
 my %JPPSKIP=map {$_ => 1} 
-qw/easymockclassextension gnu-trove ht2html postgresql-jdbc jboss4-buildmagic-tasks/
+qw/easymockclassextension gnu-trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc jboss4-buildmagic-tasks ant-contrib/
 ;
 
 &alt2jpp();

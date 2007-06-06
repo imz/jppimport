@@ -88,10 +88,12 @@ if (not $hook) {
     $hook = $defhook if (-e $defhook);
 }
 if ($hook) {
+    our @SPECHOOKS;
     our $spechook;
     require $hook;
-    if ($spechook) {
-	&$spechook($jpp,$alt);
+    if ($spechook or @SPECHOOKS) {
+	map {&$_($jpp,$alt)} @SPECHOOKS;
+	&$spechook($jpp,$alt) if $spechook;
     } else {
 	die "script $hook does not have a valid hook!\n";
     }
@@ -509,7 +511,9 @@ sub push_body {
     # move pushed item(s) before %if* block of next section
     my @tail;
     my $i=$#{$bodyptr};
-    while ($i>=0 and $bodyptr->[$i]=~/^\s*\%if/) {
+    while ($i>=0 and
+	       $bodyptr->[$i]=~/^\s*(?:$|\%if)/ # empty line or condition for the next section 
+	) {
 	unshift @tail, pop @{$bodyptr};
 	$i--;
     }
@@ -564,6 +568,20 @@ sub subst {
     }
     $section->set_body(\@out);
 }
+
+sub replace_line {
+    my $section=shift;
+    my $stringwhat=shift;
+    my $stringreplace=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	$_ = $stringreplace if $_ eq $stringwhat;
+	push @out, $_;
+    }
+    $section->set_body(\@out);
+}
+
+
 
 sub match {
     my $section=shift;
@@ -724,6 +742,43 @@ sub get_section {
 	}
     }
     Carp::carp "section $type $pkg not found!";
+    return;
+}
+
+sub are_package_names_equal {
+    my ($self, $name1, $name2)=@_;
+    $name1=~s/^\s*//;
+    $name2=~s/^\s*//;
+    $name1=~s/\s*$//;
+    $name2=~s/\s*$//;
+    # TODO: -n handler
+    return $name1 eq $name2;
+}
+
+sub disable_package {
+    my $self=shift;
+    my $name=shift;
+    $name=~s/^\s*//;
+    $name=~s/\s*$//;
+    my $keyname=$name;
+    $keyname=~s/^.+\s+//;
+    unless ($keyname) {
+	$keyname='strange_package';
+	warn "disable_package: strange name $name";
+    }
+    
+    unless ($name) {
+	Carp::carp "main package can't be disabled!\n";
+	return;
+    }
+    $self->{SPECSECTIONS}->[0]->unshift_body('%def_without '.$keyname."\n");
+    for (my $i=0; $i<@{$self->{SPECSECTIONS}}; $i++) {
+	my $section = $self->{SPECSECTIONS}->[$i];
+	if ($self->are_package_names_equal($section->get_package(), $name)) {
+	    $section->unshift_body_before_section('%if_with '.$keyname."\n");
+	    $section->push_body('%endif #'.$keyname."\n");
+	}
+    }
     return;
 }
 

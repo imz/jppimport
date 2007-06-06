@@ -14,8 +14,11 @@ cglib(w_hook): aspectwerkz
 
 jakarta-commons-modeler: mx4j(jmxri): xdoclet
 
+maven: alt maven-wagon should be built with jsch
+
 Dups:
 maven-wagon wagon 
+jakarta-regexp regexp
 #xml-stylebook stylebook
 ----------
 
