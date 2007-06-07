@@ -6,7 +6,7 @@ use Carp;
 use Getopt::Long;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog);
-my $verbose;
+my $verbose=0;
 my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
@@ -42,15 +42,18 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, VERBOSE=> $verbose);
 
+print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
+print STDERR "done alt_generic_fixes\n" if $verbose;
 &jpp_specific_fix($jpp);
+print STDERR "done jpp_specific_fixes\n" if $verbose;
 
 my $altrel="alt1";
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
 if ($altrpm || $altspec) {
-    $alt=RPM::ImportTool->new(RPM => $altrpm, SPECFILE => $altspec);
+    $alt=RPM::ImportTool->new(RPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     $altrel = $alt->get_section('package','')->get_tag('Release');
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
     # hack -- cleanup (undefined in jpp) macro in alt release:
@@ -85,10 +88,12 @@ if (not $hook) {
     $hook = $defhook if (-e $defhook);
 }
 if ($hook) {
+    our @SPECHOOKS;
     our $spechook;
     require $hook;
-    if ($spechook) {
-	&$spechook($jpp,$alt);
+    if ($spechook or @SPECHOOKS) {
+	map {&$_($jpp,$alt)} @SPECHOOKS;
+	&$spechook($jpp,$alt) if $spechook;
     } else {
 	die "script $hook does not have a valid hook!\n";
     }
@@ -195,6 +200,7 @@ BEGIN { our %JPP_GROUP_MAP = (
 "Networking/Instant messaging", "Networking/Instant messaging", # jext ??? horrible :(
 "Internet/Log Analysis", "Monitoring",
 "System/Servers", "System/Servers",
+"System/Libraries", "System/Libraries", # ht2html
 " ", " ",
 	    ); 
 }
@@ -505,7 +511,9 @@ sub push_body {
     # move pushed item(s) before %if* block of next section
     my @tail;
     my $i=$#{$bodyptr};
-    while ($i>=0 and $bodyptr->[$i]=~/^\s*\%if/) {
+    while ($i>=0 and
+	       $bodyptr->[$i]=~/^\s*(?:$|\%if)/ # empty line or condition for the next section 
+	) {
 	unshift @tail, pop @{$bodyptr};
 	$i--;
     }
@@ -561,6 +569,20 @@ sub subst {
     $section->set_body(\@out);
 }
 
+sub replace_line {
+    my $section=shift;
+    my $stringwhat=shift;
+    my $stringreplace=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	$_ = $stringreplace if $_ eq $stringwhat;
+	push @out, $_;
+    }
+    $section->set_body(\@out);
+}
+
+
+
 sub match {
     my $section=shift;
     my $pattern=shift;
@@ -580,7 +602,7 @@ sub get_tag {
 	if (/^$tag:\s*(.+)\s*$/) {
 	    my $val=$1;
 	    if (!$options{RAW}) {
-		&RPM::ImportTool::macro_subst($section->{RPM}->{MACRO},\$val);
+		&RPM::ImportTool::macro_subst_inplace($section->{RPM}->{MACRO},\$val);
 	    }
 	    return $val;
 	}
@@ -630,6 +652,7 @@ sub new {
     }
     $self->_set_speclist(load_file($self->{SPECFILE}));
     $self->load_macro();
+    #print STDERR "done load_macro\n" if $self->{VERBOSE};
     return $self;
 }
 
@@ -722,6 +745,43 @@ sub get_section {
     return;
 }
 
+sub are_package_names_equal {
+    my ($self, $name1, $name2)=@_;
+    $name1=~s/^\s*//;
+    $name2=~s/^\s*//;
+    $name1=~s/\s*$//;
+    $name2=~s/\s*$//;
+    # TODO: -n handler
+    return $name1 eq $name2;
+}
+
+sub disable_package {
+    my $self=shift;
+    my $name=shift;
+    $name=~s/^\s*//;
+    $name=~s/\s*$//;
+    my $keyname=$name;
+    $keyname=~s/^.+\s+//;
+    unless ($keyname) {
+	$keyname='strange_package';
+	warn "disable_package: strange name $name";
+    }
+    
+    unless ($name) {
+	Carp::carp "main package can't be disabled!\n";
+	return;
+    }
+    $self->{SPECSECTIONS}->[0]->unshift_body('%def_without '.$keyname."\n");
+    for (my $i=0; $i<@{$self->{SPECSECTIONS}}; $i++) {
+	my $section = $self->{SPECSECTIONS}->[$i];
+	if ($self->are_package_names_equal($section->get_package(), $name)) {
+	    $section->unshift_body_before_section('%if_with '.$keyname."\n");
+	    $section->push_body('%endif #'.$keyname."\n");
+	}
+    }
+    return;
+}
+
 sub raw_rename_section {
     my $self=shift;
     my $oldname=shift;
@@ -803,6 +863,7 @@ sub write_file {
 
 sub load_macro {
     my $self=shift;
+    print STDERR "entering load_macro\n" if $self->{VERBOSE};
     my $specfile = $self->{SPECFILE};
     my %macro;
     $macro{'nil'}='';
@@ -816,7 +877,7 @@ sub load_macro {
 	while (<RPMMACROS>) {
 	    if (/^[%]([\w_\/.\d]+)\s+(.+)\s*$/) {
 		$macro{$1}=$2 ;
-		&macro_subst(\%macro,\$macro{$1});
+		&macro_subst_inplace(\%macro,\$macro{$1});
 	    }
 	}
 	close (RPMMACROS);
@@ -831,10 +892,11 @@ sub load_macro {
     open (SPECFILE, $specfile) || die "can't open spec $specfile: $!";
     while (<SPECFILE>) {
 	chomp;
-	$macro{'name'}=$1 if /^Name:\s*(.+)$/;
-	$macro{'version'}=$1 if /^Version:\s*(.+)$/ and not $macro{'version'};
-	$macro{'release'}=$1 if /^Release:\s*(.+)$/ and not $macro{'release'};
-	#$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+([\%\{\}\w_\d.-]+)\s*$/;
+	# to avoid recursion Name: %name; old hack is && not $macro{'version'};
+	$macro{'name'}=&macro_subst(\%macro, $1) if /^Name:\s*(.+)$/;
+	$macro{'version'}=&macro_subst(\%macro, $1) if /^Version:\s*(.+)$/;
+	$macro{'release'}=&macro_subst(\%macro, $1) if /^Release:\s*(.+)$/;
+
 	$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+(\S+)\s*$/;
 	# not needed there
 	$source[$1 ? $1 : 0]=$3 if /^Source(\d*):\s*(.+\/)?([^\/]+)$/;
@@ -845,7 +907,8 @@ sub load_macro {
     close (SPECFILE);
 
     foreach my $dep (grep {$_} @source, @patch) {
-	&macro_subst(\%macro,\$dep);
+	print STDERR "loop3 $dep\n" if $self->{VERBOSE};
+	&macro_subst_inplace(\%macro,\$dep);
     }
     #print join("\n",@require),"\n";
     #print join("\n",keys %macro),"\n";
@@ -859,7 +922,7 @@ sub load_macro {
      version
      release
      /) {
-	    &macro_subst(\%macro,\$macro{$key});
+	    &macro_subst_inplace(\%macro,\$macro{$key});
     }
     $self->{MACRO}=\%macro;
     $self->{SOURCES}=\@source;
@@ -870,11 +933,26 @@ sub load_macro {
 
 sub macro_subst {
     my $macroptr=shift;
+    my $arg=shift;
+    &macro_subst_inplace($macroptr, \$arg);
+    #print STDERR "macro subst: $arg\n";
+    return $arg;
+}
+
+
+sub macro_subst_inplace {
+    my $macroptr=shift;
     my $argptr=shift;
     #print STDERR "subst: $$argptr\n";
     Carp::cluck "undef" unless defined $$argptr;
     while ($$argptr=~/\%\{?([\w_\d]+)\}?/ and defined $macroptr->{$1}) {
+	#print STDERR ":: $$argptr\n";
+	my $oldval=$$argptr;
 	$$argptr=~s/\%\{?([\w_\d]+)\}?/$macroptr->{$1}/;
+	if ($oldval eq $$argptr) {
+	    warn "macro substitution recursion for ".$oldval."\n";
+	    last;
+	}
     }
 }
 

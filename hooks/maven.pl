@@ -29,6 +29,16 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'define RHEL4 0','define RHEL4 1');
 
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jakarta-commons-cli','BuildRequires: jakarta-commons-cli-1');
+
+    $jpp->disable_package('plugin-genapp');    # hivemind
+    $jpp->disable_package('plugin-html2xdoc'); # jakarta-commons-jelly-tags-html2xdoc
+    $jpp->disable_package('plugin-jcoverage'); # plugin-jcoverage
+    $jpp->disable_package('plugin-junitdoclet'); # junitdoclet-jdk14
+    $jpp->disable_package('plugin-scm'); # maven-scm
+    $jpp->disable_package('plugin-wizard'); # jakarta-commons-jelly-tags-swing
+    $jpp->disable_package('plugin-xdoc'); # jakarta-commons-jelly-tags-fmt
+
+    $jpp->get_section('build')->replace_line('echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**" >> project.properties'."\n", 'echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**,genapp/**,html2xdoc/**,scm/**,xdoc/**,jcoverage/**,junitdoclet/**,wizard/**" >> project.properties'."\n");
 }
 __END__
 #BuildRequires: ant-apache-resolver >= 0:1.6.2
@@ -65,5 +75,3 @@ __END__
 #BuildRequires: xerces-j2 >= 0:2.6.2
 #Requires: xml-commons-apis
 #Requires: xml-commons-which
-
-
