@@ -116,7 +116,7 @@ BuildRequires:  %{_bindir}/gcj, %{__perl},
 sub jpp_specific_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
-    my $main_sec=$jpp->get_section('package','');
+    my $main_sec=$rpm->get_section('package','');
 
     if (not $main_sec->match(qr'BuildRequires: jpackage-1.4-compat')) {
 	$main_sec->unshift_body("BuildRequires: jpackage-1.4-compat\n");
@@ -125,8 +125,10 @@ sub jpp_specific_fix {
 
     # remove_java_devel 
     # hack around conflicts in jpackage-1.x-compat
-    $main_sec->subst(qr'BuildRequires:\s*java-devel','##BuildRequires: java-devel');
-    $main_sec->subst(qr'BuildRequires:\s*ant\s*java-devel','BuildRequires: ant ');
+#    $main_sec->subst(qr'BuildRequires:\s*java-devel','##BuildRequires: java-devel');
+#    $main_sec->subst(qr'BuildRequires:\s*ant\s*java-devel','BuildRequires: ant ');
+#    $main_sec->subst(qr'BuildRequires:\s*ant\s*ant-junit\s*java-devel','BuildRequires: ant ant-junit ');
+    $main_sec->subst_if('\s+java-devel(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*BuildRequires:\s*');
 
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
@@ -145,11 +147,16 @@ sub jpp_specific_fix {
 
     # hack... it looks like it should be moved to RPM::ImportTool
     # zip -> bz2 due to alt buggy rpm (/usr/bin/unzip -qL) :(
-    $main_sec=$jpp->get_section('package','');
-    if ($main_sec->match(qr'^\s*Source\d*:.+.zip\s*$')) {
-	for (my $i=0;$i<@{$rpm->{SOURCES}}; $i++) {
+    $main_sec=$rpm->get_section('package','');
+    if ($main_sec->match(qr'^\s*Source\d*:.+\.(zip|jar)\s*$') 
+	) {
+        # source0 only!! others should be not %setup'ed, or we need explicit check
+	#for (my $i=0;$i<@{$rpm->{SOURCES}}; $i++) {
+	for (my $i=0;$i<1; $i++) {
 	    my $source=$rpm->{SOURCES}->[$i];
-	    if ($source=~/\.zip$/) {
+	    $source=~s/\s*$//;
+	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}')) {
+		print STDERR "try to bzip2 zip source [$source]\n";
 		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::ImportTool::basename($source);
 		if (! -e $sourcefile) {
 		    warn "Internal error: source $source not found!";
@@ -159,11 +166,12 @@ sub jpp_specific_fix {
 		    &RPM::ImportTool::run ("pushd $convertdir; unzip -q $sourcefile; popd");
 		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
 		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
-		    $sourcefile=~s/\.zip$/.tar.bz2/;
+		    $sourcefile=~s/\.(zip|jar)$/.tar.bz2/;
 		    &RPM::ImportTool::run ("tar cjf $sourcefile -C $convertdir @files @hidden_files");
-		    my $source2=$source;
-		    $source2=~s/\.zip$/.tar.bz2/;
-		    $main_sec->subst(qr"$source",$source2);
+		    my $rawsource=$rpm->{RAWSOURCES}->[$i];
+		    my $newsource=$rawsource;
+		    $newsource=~s/\.(zip|jar)$/.tar.bz2/;
+		    $main_sec->subst(qr"$rawsource",$newsource);
 		}
 	    }
 	}
@@ -201,6 +209,7 @@ BEGIN { our %JPP_GROUP_MAP = (
 "Internet/Log Analysis", "Monitoring",
 "System/Servers", "System/Servers",
 "System/Libraries", "System/Libraries", # ht2html
+"Text Editors/Integrated Development Environments (IDE)", "Editors",
 " ", " ",
 	    ); 
 }
@@ -340,6 +349,8 @@ sub alt_generic_cleanup_files {
 	    # throw away
 	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
 	    push @out, "#".$_;
+	} elsif (/^\s*\%doc\s*\%\{_docdir\}\s*$/) {
+	    push @out, '%doc %{_docdir}/*'."\n";
 	} else {
 	    push @out, $_;
 	}
@@ -564,6 +575,19 @@ sub subst {
     my @out;
     foreach (@{$section->get_body()}) {
 	s/$pattern/$replace/g;
+	push @out, $_;
+    }
+    $section->set_body(\@out);
+}
+
+sub subst_if {
+    my $section=shift;
+    my $pattern=shift;
+    my $replace=shift;
+    my $ifpattern=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	s/$pattern/$replace/g if /$ifpattern/;
 	push @out, $_;
     }
     $section->set_body(\@out);
@@ -906,6 +930,8 @@ sub load_macro {
     }
     close (SPECFILE);
 
+    my @rawsource=@source;
+    my @rawpatch=@patch;
     foreach my $dep (grep {$_} @source, @patch) {
 	print STDERR "loop3 $dep\n" if $self->{VERBOSE};
 	&macro_subst_inplace(\%macro,\$dep);
@@ -927,6 +953,8 @@ sub load_macro {
     $self->{MACRO}=\%macro;
     $self->{SOURCES}=\@source;
     $self->{PATCHES}=\@patch;
+    $self->{RAWSOURCES}=\@rawsource;
+    $self->{RAWPATCHES}=\@rawpatch;
     $self->{SETUP_N}=\@setup_n;
     $self->{IS_SETUP}=\@is_setup;
 }

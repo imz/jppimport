@@ -4,7 +4,7 @@ use Carp;
 use Getopt::Long;
 
 my $verbose;
-my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/Sisyphus/files/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned';
+my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned';
 my $JPPPATH='/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 my $OUTDIR="./OUT";
 my $changelog;
@@ -50,8 +50,11 @@ my %JPPSKIP=map {$_ => 1}
 qw/easymockclassextension gnu-trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc jboss4-buildmagic-tasks ant-contrib/
 ;
 
-&alt2jpp();
-#&jppskipalt();
+if ($strategy eq 'alt2jpp') {
+    &alt2jpp();
+} else {
+    &jppskipalt();
+}
 
 sub alt2jpp {
     foreach my $name (@packages) {
@@ -90,9 +93,11 @@ sub jppskipalt {
     foreach my $name (@packages) {
 	next if $JPPSKIP{$name};
 	next if $JPP2ALTMAP{$name};
-	my $altrpm = &find_rpm($name, &path_to_array($ALTPATH));
+	my $altrpm = &find_rpm($name, @ALTPATH);
+#	print STDERR "alt RPM not found [@ALTPATH] for $name.\n" if !$altrpm;
+	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
 	next if $altrpm;
-	my $jpprpm = &find_rpm($name, &path_to_array($JPPPATH));
+	my $jpprpm = &find_rpm($name, @JPPPATH);
 #    print STDERR "found RPM $jpprpm for $name.\n";
 	my $importcmd="$jppimport --srpmdir $OUTDIR";
 	$importcmd.=" --changelog '$changelog'" if ($changelog);
@@ -177,6 +182,7 @@ jakarta-commons-cli-1 jakarta-commons-cli
 jakarta-servletapi4 servletapi4
 wagon maven-wagon
 jsvc jakarta-commons-daemon
+beanshell bsh2
 /;
 
 our %JPP2ALTMAP= reverse (%ALT2JPPMAP);
@@ -228,88 +234,6 @@ our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
 
 # alt imported packages (todo: refresh)
 our @ALTPKG=qw/
-antlr
-asm
-bcel
-checkstyle
-classworlds
-drawswf
-dom4j
-eclipse-build-utils
-eclipse-cdt
-eclipse-gef
-excalibur-logkit
-forehead
-geronimo-specs
-isorelax
-jaf
-jakarta-commons-beanutils-16
-jakarta-commons-beanutils
-jakarta-commons-betwixt
-jakarta-commons-cli
-jakarta-commons-codec
-jakarta-commons-collections
-jakarta-commons-daemon
-jakarta-commons-digester
-jakarta-commons-discovery
-jakarta-commons-el
-jakarta-commons-fileupload
-jakarta-commons-grant
-jakarta-commons-graph
-jakarta-commons-httpclient
-jakarta-commons-io
-jakarta-commons-jelly
-jakarta-commons-jexl
-jakarta-commons-lang
-jakarta-commons-launcher
-jakarta-commons-logging
-jakarta-commons-modeler
-jakarta-commons-net
-jakarta-commons-pool
-jakarta-commons-validator
-jakarta-oro
-jakarta-regexp
-jakarta-servletapi4
-jakarta-taglibs-standard
-javacc
-javamail
-javassist
-jaxen
-jdbc-stdext
-jdepend
-jdom
-je
-jed
-jikes
-jline
-jms
-jmx
-jndi
-joesnmp
-jsch
-jtidy
-junitperf
-msv
-mx4j
-owanttask
-relaxngDatatype
-sax
-snmptrapappender
-stax-bea
-stylebook
-tomcat4
-tomcat5
-trang
-wagon
-werken-xpath
-wsdl4j
-ws-jaxme
-xalan
-xml-commons
-xmldb-api
-xmlunit
-xpp2
-xpp3
 xsdlib
 /;
 }

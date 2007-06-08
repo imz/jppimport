@@ -1,0 +1,11 @@
+--- SOURCES/wagon-1.0-ssh-external-provider-build.xml	2007-06-07 22:22:46 +0300
++++ SOURCES/wagon-1.0-ssh-external-provider-build.xml	2007-06-07 22:23:06 +0300
+@@ -32,7 +32,7 @@
+       <fileset dir="src/main/resources"/>
+     </copy>
+   </target>
+-  <target name="jar" depends="compile,test" description="Clean the JAR">
++  <target name="jar" depends="compile" description="Clean the JAR">
+     <jar jarfile="${maven.build.directory}/${maven.build.final.name}.jar" basedir="${maven.build.output}" excludes="**/package.html"/>
+   </target>
+   <target name="compile-tests" depends="junit-present, compile" description="Compile the test code" if="junit.present">

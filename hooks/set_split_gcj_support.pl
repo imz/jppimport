@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook = \&set_split_gcj_support;
+push @SPECHOOKS, \&set_split_gcj_support;
 
 sub set_split_gcj_support {
     my ($jpp, $alt) = @_;

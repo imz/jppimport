@@ -1,0 +1,10 @@
+--- fop-0.20.5/build.xml	2007-06-08 11:06:08 +0400
++++ fop-0.20.5/build.xml	2007-06-08 11:06:27 +0400
+@@ -685,7 +685,6 @@
+           <include name="ant*.jar"/>
+         </fileset>
+       </classpath>
+-      <link href="${j2se.javadoc}" />
+       <link href="${batik.javadoc}" />
+     </javadoc>
+   </target>

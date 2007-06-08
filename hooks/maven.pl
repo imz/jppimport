@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_fix_jakarta_commons_cli.pl';
+
 $spechook = sub {
     my ($jpp, $alt) = @_;
     # ALT Compat provides
@@ -28,12 +30,13 @@ $spechook = sub {
     # bootstrap :)
     $jpp->get_section('package','')->subst(qr'define RHEL4 0','define RHEL4 1');
 
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jakarta-commons-cli','BuildRequires: jakarta-commons-cli-1');
+# require :)
+#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*jakarta-commons-cli','BuildRequires: jakarta-commons-cli-1');
 
     $jpp->disable_package('plugin-genapp');    # hivemind
     $jpp->disable_package('plugin-html2xdoc'); # jakarta-commons-jelly-tags-html2xdoc
     $jpp->disable_package('plugin-jcoverage'); # plugin-jcoverage
-    $jpp->disable_package('plugin-junitdoclet'); # junitdoclet-jdk14
+    $jpp->disable_package('plugin-junitdoclet'); # junitdoclet-jdk14: done
     $jpp->disable_package('plugin-scm'); # maven-scm
     $jpp->disable_package('plugin-wizard'); # jakarta-commons-jelly-tags-swing
     $jpp->disable_package('plugin-xdoc'); # jakarta-commons-jelly-tags-fmt
