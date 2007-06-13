@@ -52,22 +52,29 @@ print STDERR "done jpp_specific_fixes\n" if $verbose;
 
 my $altrel="alt1";
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
+my $jppver = $jpp->get_section('package','')->get_tag('Version');
 if ($altrpm || $altspec) {
     $alt=RPM::ImportTool->new(RPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     $altrel = $alt->get_section('package','')->get_tag('Release');
+    $altver = $alt->get_section('package','')->get_tag('Version');
+    my $vercmp = `rpmvercmp $altver $jppver`;
+    chomp $vercmp;
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    # hack -- cleanup (undefined in jpp) macro in alt release:
     if ($altrel=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
 	my $rel = $1;
+	# hack -- cleanup (undefined in jpp) macro in alt release:
 	$rel=~s/.?\%\w+//g;
 	$rel=~s/.?\%\{\w+\}+//g;
-	$rel='1' if $rel=~/^0\./;
-	$rel=$rel+1 if ($2 eq $jpprel);
+	if ($rel=~/^0\./ or $vercmp != 0) {
+	    $rel=1;
+	} elsif ($2 eq $jpprel) {
+	    $rel=$rel+1;
+	}
 	$altrel='alt'.$rel;
     } else {
 	$altrel=~s/.?\%\w+//g;
 	$altrel=~s/.?\%\{\w+\}+//g;
-	$altrel='alt1' if $altrel=~/^alt0\./;
+	$altrel='alt1' if $altrel=~/^alt0\./ or $vercmp != 0;
     }
     $alt->cleanup();
 }
@@ -756,14 +763,9 @@ sub get_section {
     my $self=shift;
     my $type=shift;
     my $pkg=shift;
-    if (defined $pkg) {
-	foreach my $section (@{$self->{SPECSECTIONS}}) {
-	    return $section if $section->get_type() eq $type and $section->get_package() eq $pkg;
-	}
-    } else {
-	foreach my $section (@{$self->{SPECSECTIONS}}) {
-	    return $section if $section->get_type() eq $type;
-	}
+    $pkg='' if (!defined $pkg);
+    foreach my $section (@{$self->{SPECSECTIONS}}) {
+	return $section if $section->get_type() eq $type and $section->get_package() eq $pkg;
     }
     Carp::carp "section $type $pkg not found!";
     return;

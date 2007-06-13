@@ -2,6 +2,7 @@
 
 use Carp;
 use Getopt::Long;
+use strict;
 
 my $verbose;
 my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned';
@@ -43,132 +44,19 @@ my $jppimport="$jpptoolsdir/jppimport";
 mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
-@packages = @ALTPKG if @packages == 0;
 
-# hangs ... why?
-my %JPPSKIP=map {$_ => 1} 
-qw/easymockclassextension gnu-trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc jboss4-buildmagic-tasks ant-contrib/
+my %JPPSKIP=map {$_ => 1} qw/easymockclassextension gnu-trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc jboss4-buildmagic-tasks ant-contrib/
 ;
 
 if ($strategy eq 'alt2jpp') {
     &alt2jpp();
+} elsif ($strategy eq 'altup') {
+    &altup();
 } else {
     &jppskipalt();
 }
 
-sub alt2jpp {
-    foreach my $name (@packages) {
-	next if $ALTSKIP{$name};
-	my $altrpm="$ALTPATH/$name";
-	if ($name=~/.src.rpm$/) {
-	    $name=&get_rpm_name($altrpm);
-	    next if $ALTSKIP{$name};
-	} else {
-	    $altrpm = &find_rpm($name, @ALTPATH);
-	}
-	$name=$ALT2JPPMAP{$name} if $ALT2JPPMAP{$name};
-	my $jpprpm = &find_rpm($name, @JPPPATH);
-#    print STDERR "found RPM $jpprpm for $name.\n";
-	my $importcmd="$jppimport --srpmdir $OUTDIR";
-	$importcmd.=" --changelog '$changelog'" if ($changelog);
-	if ($altrpm) {
-	    $importcmd.=" --alt $altrpm";
-	} else {
-	    print STDERR "WARNING: alt RPM $name not found.\n";
-	}
-	if ($jpprpm) {
-	    $importcmd.=" --jpp $jpprpm";
-	} else {
-	    print STDERR "FATAL: jpp RPM $name not found.\n";
-	    next;
-	}
-	my $hook="$jpptoolsdir/hooks/$name.pl";
-	$importcmd.=" --hook $hook" if (-e $hook);
-	print "$importcmd\n";
-	print `$importcmd`,"---*---\n";
-    }
-}
-
-sub jppskipalt {
-    foreach my $name (@packages) {
-	next if $JPPSKIP{$name};
-	next if $JPP2ALTMAP{$name};
-	my $altrpm = &find_rpm($name, @ALTPATH);
-#	print STDERR "alt RPM not found [@ALTPATH] for $name.\n" if !$altrpm;
-	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
-	next if $altrpm;
-	my $jpprpm = &find_rpm($name, @JPPPATH);
-#    print STDERR "found RPM $jpprpm for $name.\n";
-	my $importcmd="$jppimport --srpmdir $OUTDIR";
-	$importcmd.=" --changelog '$changelog'" if ($changelog);
-	if ($jpprpm) {
-	    $importcmd.=" --jpp $jpprpm";
-	} else {
-	    print STDERR "FATAL: jpp RPM $name not found.\n";
-	    next;
-	}
-	my $hook="$jpptoolsdir/hooks/$name.pl";
-	$importcmd.=" --hook $hook" if (-e $hook);
-	print "$importcmd\n";
-	print `$importcmd`,"---*---\n";
-    }
-}
-
-sub path_to_array {
-    my $paths=shift;
-    my @path;
-    foreach (split(':',$paths)) {
-	if ($_ eq '') {
-	    $_ = '.';
-	} elsif (/^~/) {
-	    s/^~/$ENV{HOME}/;
-	}
-	push @path, $_ if -d $_;
-    }
-    return @path;
-}
-
-sub is_valid_pathspec {
-    return scalar &path_to_array(shift());
-}
-
-sub get_rpm_name {
-    my $rpm=shift;
-    my $name=`rpmquery --queryformat '\%{NAME}' -p $rpm`;
-    chomp $name;
-    return $name;
-}
-
-sub get_rpm_version {
-    my $rpm=shift;
-    my $name=`rpmquery --queryformat '\%{VERSION}' -p $rpm`;
-    chomp $name;
-    return $name;
-}
-
-sub rpmvercmp {
-    return system ('rpmvercmp', shift(), shift());
-}
-
-sub find_rpm {
-    my $name=shift;
-    for my $path (@_) {
-	for my $rpm (glob "$path/$name-*.src.rpm") {
-#	print STDERR "trying $rpm for $name\n";
-	    return $rpm if ($name eq &get_rpm_name($rpm));
-	}
-    }
-    return;
-}
-
-sub dirname {
-    my @path= split('/',$_[0]);
-    pop @path;
-    return join('/',@path);
-}
-
-
-BEGIN {
+#BEGIN {
 #asm asm2
 #jakarta-commons-beanutils-16 jakarta-commons-beanutils16
 #jakarta-regexp regexp
@@ -187,7 +75,7 @@ beanshell bsh2
 
 our %JPP2ALTMAP= reverse (%ALT2JPPMAP);
 
-our @ALTSKIPDEPR=qw/tomcat4/;
+our @ALTSKIPDEPR=qw/tomcat4 junit/;
 
 our @ALTSKIPMULTISRPMS=qw/
 xml-commons-external xml-commons-resolver
@@ -231,10 +119,157 @@ our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
 #jakarta-commons-dbcp-1.2.2-alt0.1.src.rpm
 #log4j
 #struts-1.2.6-alt3.src.rpm
+#}
 
-# alt imported packages (todo: refresh)
-our @ALTPKG=qw/
-xsdlib
-/;
+sub alt2jpp {
+    foreach my $name (@packages) {
+	next if $ALTSKIP{$name};
+	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
+	print STDERR "WARNING: alt RPM $altname not found.\n" unless $altrpm;
+	$name=$ALT2JPPMAP{$altname} if $ALT2JPPMAP{$altname};
+	my $jpprpm = &find_rpm($name, @JPPPATH);
+#	print STDERR "found RPM $jpprpm for $name.\n";
+	&run_jppimport($name,$jpprpm,$altrpm);
+    }
 }
+
+sub altup {
+    foreach my $name (@packages) {
+	next if $ALTSKIP{$name};
+	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
+	print STDERR "WARNING: alt RPM $altname not found.\n" unless $altrpm;
+	next unless $altrpm;
+	$name=$ALT2JPPMAP{$altname} if $ALT2JPPMAP{$altname};
+	my $jpprpm = &find_rpm($name, @JPPPATH);
+#	print STDERR "found RPM $jpprpm for $name.\n";
+	&run_jppimport($name,$jpprpm,$altrpm) if &alt_jpp_rpmvercmp($altrpm, $jpprpm) <0;
+    }
+}
+
+sub jppskipalt {
+    foreach my $name (@packages) {
+	next if $JPPSKIP{$name};
+	next if $JPP2ALTMAP{$name};
+	my $altrpm = &find_rpm($name, @ALTPATH);
+	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
+	next if $altrpm;
+	my $jpprpm = &find_rpm($name, @JPPPATH);
+#	print STDERR "found RPM $jpprpm for $name.\n";
+	&run_jppimport($name,$jpprpm,$altrpm);
+    }
+}
+
+sub get_name_and_rpm {
+    my $name=shift;
+    my $PATHPtr=shift;
+    my $rpm=$name;
+    if ($name=~/.src.rpm$/) {
+	$name=&get_rpm_name($rpm);
+    } else {
+	$rpm = &find_rpm($name, @$PATHPtr);
+    }
+    return $name, $rpm;
+}
+
+sub run_jppimport {
+    my ($name, $jpprpm, $altrpm)=@_;
+    my $importcmd="$jppimport --srpmdir $OUTDIR";
+    $importcmd.=" --changelog '$changelog'" if ($changelog);
+    $importcmd.=" --alt $altrpm" if ($altrpm);
+    if ($jpprpm) {
+	$importcmd.=" --jpp $jpprpm";
+    } else {
+	print STDERR "FATAL: jpp RPM $name not found.\n";
+	return;
+    }
+
+    my $hook="$jpptoolsdir/hooks/$name.pl";
+    $importcmd.=" --hook $hook" if (-e $hook);
+    print "$importcmd\n";
+    print `$importcmd`,"---*---\n";
+}
+
+sub path_to_array {
+    my $paths=shift;
+    my @path;
+    foreach (split(':',$paths)) {
+	if ($_ eq '') {
+	    $_ = '.';
+	} elsif (/^~/) {
+	    s/^~/$ENV{HOME}/;
+	}
+	push @path, $_ if -d $_;
+    }
+    return @path;
+}
+
+sub is_valid_pathspec {
+    return scalar &path_to_array(shift());
+}
+
+sub get_rpm_name {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{NAME}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub alt_jpp_rpmvercmp {
+    my ($altrpm, $jpprpm) =@_;
+    return -1 unless $altrpm;
+    return 1 unless $jpprpm;
+    my $altversion=&get_rpm_version($altrpm);
+    my $altrelease=&get_rpm_release($altrpm);
+    my $jppversion=&get_rpm_version($jpprpm);
+    my $jpprelease=&get_rpm_release($jpprpm);
+    my $cmp = $altversion cmp $jppversion;
+    print STDERR "0:cmp = $cmp\n";
+    $cmp=&rpmvercmp($altversion, $jppversion) if $cmp!=0;
+    print STDERR "1:cmp = $cmp\n";
+    return $cmp if $cmp !=0;
+    if ($altrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+	$cmp =$2 cmp $jpprelease;
+	print STDERR "2:cmp = $cmp\n";
+	return $2 cmp $jpprelease;
+    }
+    return -1;
+}
+
+sub get_rpm_version {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{VERSION}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub get_rpm_release {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{RELEASE}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub rpmvercmp {
+    my $cmp = `rpmvercmp $_[0] $_[1]`;
+    chomp $cmp;
+    return $cmp;
+}
+
+sub find_rpm {
+    my $name=shift;
+    for my $path (@_) {
+	for my $rpm (reverse(glob "$path/$name-*.src.rpm")) {
+#	print STDERR "trying $rpm for $name\n";
+	    return $rpm if ($name eq &get_rpm_name($rpm));
+	}
+    }
+    return;
+}
+
+sub dirname {
+    my @path= split('/',$_[0]);
+    pop @path;
+    return join('/',@path);
+}
+
 
