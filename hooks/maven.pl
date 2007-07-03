@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
 require 'set_fix_jakarta_commons_cli.pl';
+#require 'set_target_14.pl';
+
+# added aspectj
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
@@ -42,7 +45,19 @@ $spechook = sub {
     $jpp->disable_package('plugin-xdoc'); # jakarta-commons-jelly-tags-fmt
 
     $jpp->get_section('build')->replace_line('echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**" >> project.properties'."\n", 'echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**,genapp/**,html2xdoc/**,scm/**,xdoc/**,jcoverage/**,junitdoclet/**,wizard/**" >> project.properties'."\n");
+
+    $jpp->get_section('build')->unshift_body(qq{
+subst 's,-classpath "${MAVEN_HOME}/lib/\[forehead\].jar",-classpath "${MAVEN_HOME}/lib/[forehead].jar":"${MAVEN_HOME}/lib/forehead.jar",' ../maven/src/bin/maven
+subst 's,\]\.jar,.jar,' ../maven/src/bin/forehead.conf
+subst 's,lib/\[,lib/,' ../maven/src/bin/forehead.conf
+subst 's,ant\]/\[,,' ../maven/src/bin/forehead.conf
+});
+
+
 }
+
+
+
 __END__
 #BuildRequires: ant-apache-resolver >= 0:1.6.2
 #BuildRequires: ant-nodeps

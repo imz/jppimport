@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook = \&set_bootstrap;
+push @SPECHOOKS, \&set_bootstrap;
 
 sub set_bootstrap {
     my ($jpp, $alt) = @_;

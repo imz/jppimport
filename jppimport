@@ -321,7 +321,7 @@ sub read_version {
 sub alt_generic_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
-    my $cleanroot_pattern='^\s*rm -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$';
+    my $cleanroot_pattern='^\s*(rm|%{__rm}) -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$';
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
@@ -552,6 +552,7 @@ sub is_empty {
     my $self=shift;
     return 1 if $#{$self->{BODY}}<1;
     foreach (@{$self->{BODY}}[1..$#{$self->{BODY}}]){
+	#print "is_empty: [$_]" if ! /^\s*(#.*)?$/;
 	return 0 if ! /^\s*(#.*)?$/;
     }
     return 1;
@@ -813,7 +814,7 @@ sub raw_rename_section {
     my $oldname=shift;
     my $newname=shift;
     foreach my $section (@{$self->{SPECSECTIONS}}) {
-	${$section->get_body()}->[0]=~s/(\s*\%\w+\s+)($oldname)\s*/$1$newname/;
+	$section->{PACKAGE}=$newname if ($section->get_body()->[0]=~s/(\s*\%\w+\s+)($oldname)\s*/$1$newname\n/);
     }
     return;
 }
