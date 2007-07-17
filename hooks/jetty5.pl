@@ -17,8 +17,6 @@ Requires: tomcat5-jsp-2.0-api
 
     map {$_->subst(qr'%{_sysconfdir}/init.d','%{_initdir}')} @{$jpp->get_sections()};
 
-    $jpp->get_section('description')->subst(qr'100%','100%%');
-
 # # TODO: subst in jelly.init
 
 #    daemon --user $JETTY_USER $JETTY_SCRIPT start

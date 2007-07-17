@@ -326,6 +326,8 @@ sub alt_generic_fix {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
 	    $sec->exclude('^(Packager|Vendor|Distribution|BuildRoot):');
+	} elsif ($t eq 'description') {
+	    &alt_generic_fix_desc($sec);
 	} elsif ($t eq 'files') {
 	    &alt_generic_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
@@ -341,6 +343,20 @@ sub alt_generic_fix {
 	    &alt_generic_convert_alternatives($rpm,$sec);
 	}
     }
+}
+
+sub alt_generic_fix_desc {
+    my $section=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	    push @out, $_;
+# some distro use iso in description. alt use ascii only.
+	    #tr/é/e/;
+	    tr/éöóêåíãøùçõúôûâàïðîëäæýÿñìèòüáþÉÖÓÊÅÍÃØÙÇÕÚÔÛÂÀÏÐÎËÄÆÝßÑÌÈÒÜÁÞ/eooeaiaoucououaaidieaayvnieouabEOOEAIAOUCOUOUAAIDIEAAYVNIEOUAB/;
+	    # % in description
+	    s,%(\s|$),%% ,g;
+    }
+    $section->set_body(\@out);
 }
 
 sub alt_generic_cleanup_files {
