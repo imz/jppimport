@@ -1,0 +1,71 @@
+--- build.xml.orig	2004-07-23 14:06:58.589683000 +0200
++++ build.xml	2004-07-23 14:14:27.000000000 +0200
+@@ -33,7 +33,7 @@
+   <property name="src.dir" value="${basedir}/src"/>
+   <property name="test.unit.dir" value="${basedir}/test/unit"/>
+ 
+-  <target name="main" depends="clean,init,compile,test,javadoc,jar,doc,dist" description="full build cycle, producing a distribution"/>
++  <target name="main" depends="clean,init,compile,javadoc,jar" description="full build cycle, producing a distribution"/>
+ 
+   <patternset id="third.party.shipping.dependencies">
+     <include name="bcel/${bcel.version}/*.jar"/>
+@@ -98,11 +98,13 @@
+       <classpath location="${build.classes.dir}"/>
+       <classpath refid="base.path"/>
+     </javac>
++<!--
+     <javac fork="yes" srcdir="${test.unit.dir}" destdir="${build.test.classes.dir}" failonerror="yes" debug="yes">
+       <classpath location="${build.classes.dir}"/>
+       <classpath location="${build.test.classes.dir}"/>
+       <classpath refid="base.path"/>
+     </javac>
++-->
+   </target>
+ 
+   <target name="instrument" depends="compile" description="instrument jcoverage">
+@@ -278,11 +280,6 @@
+       <not><isset property="label"/></not>
+     </condition>
+ 
+-    <exec dir="${build.dir}" executable="bk" output="${build.dir}/CHANGELOG">
+-      <arg value="changes"/>
+-      <arg value="-e"/>
+-    </exec>
+-
+     <zip destfile="${dist.dir}/${ant.project.name}-${product.version}-bin.zip" update="yes">
+       <zipfileset prefix="${ant.project.name}-${product.version}/lib" dir="${lib.dir}">
+         <patternset refid="third.party.shipping.dependencies"/>
+@@ -311,11 +308,6 @@
+       </zipfileset>
+     </zip>
+ 
+-    <exec executable="bk">
+-      <arg value="export"/>
+-      <arg value="${build.dir}/export"/>
+-    </exec>
+-
+     <zip destfile="${dist.dir}/${ant.project.name}-${product.version}-src.zip" update="yes">
+       <zipfileset prefix="${ant.project.name}-${product.version}" dir="${build.dir}/export">
+         <exclude name="samples/"/>
+--- build.properties.orig	2004-07-23 14:18:43.660813000 +0200
++++ build.properties	2004-07-23 14:18:56.760946000 +0200
+@@ -1,4 +1,4 @@
+-product.version=1.0.4
++product.version=1.0.5
+ 
+ docbook2pdf.location=/usr/bin/docbook2pdf
+ 
+--- build.xml.old	2007-07-18 14:14:12 +0400
++++ build.xml	2007-07-18 14:20:46 +0400
+@@ -257,6 +257,11 @@
+   <target name="javadoc" description="generate jcoverage javadoc">
+     <javadoc destdir="${build.javadoc.dir}" access="package" serialwarn="false" windowtitle="jcoverage api" failonerror="yes" additionalparam="-quiet -linksource">
+       <fileset dir="${src.dir}">
++	      <exclude name="**/*.html" />
++	      <exclude name="**/*.gif" />
++	      <exclude name="**/*.css" />
++	      <exclude name="**/*.jpg" />
++	      <exclude name="**/*.j" />
+       </fileset>
+       <classpath location="${ant.home}/lib/ant.jar"/>
+       <classpath location="${build.test.classes.dir}"/>

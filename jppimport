@@ -136,6 +136,10 @@ sub jpp_specific_fix {
 #    $main_sec->subst(qr'BuildRequires:\s*ant\s*java-devel','BuildRequires: ant ');
 #    $main_sec->subst(qr'BuildRequires:\s*ant\s*ant-junit\s*java-devel','BuildRequires: ant ant-junit ');
     $main_sec->subst_if('\s+java-devel(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*BuildRequires:\s*');
+    # jce && jsse is provided by jvm
+    $main_sec->subst_if('\s+(jce|jsse)(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*BuildRequires:\s*');
+    # remove them from requires too due to the conflict w/jpackage-1.4-compat?
+    #$main_sec->subst_if('\s+(jce|jsse)(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*Requires:\s*');
 
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
@@ -238,6 +242,7 @@ sub jpp_specific_cleanup_headers {
 		or $2 eq "Development/Libraries/Application Frameworks"
 		or $2 eq "Development/LIbraries/Java" # jgroups (bug!)
 		or $2 eq "Development/Libraries/Java"
+		or $2 eq "Development/libraries/java" # axis2 (bug!)
 		or $2 eq "Development/Test/Java"
 		or $2 eq "Development/Testing"
 		or $2 eq "Development/Tools"
@@ -322,6 +327,7 @@ sub alt_generic_fix {
     my $rpm=shift;
     my $secptr=$rpm->get_sections();
     my $cleanroot_pattern='^\s*(rm|%{__rm}) -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$';
+    &alt_generic_check_ahead($secptr->[0]);
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
@@ -345,16 +351,38 @@ sub alt_generic_fix {
     }
 }
 
+# is macro %name used in spec before Name:,Version: tags
+# it is not allowed in alt
+sub alt_generic_check_ahead {
+    my $section=shift;
+    my @out;
+    my $is_name_passed=0;
+    my $is_name_ahead=0;
+    foreach (@{$section->get_body()}) {
+	m/^\s*Name:/ and $is_name_passed=1; #and print STDERR "passed $_\n";
+	$is_name_ahead=1 if m/\%\{name\}/ and $is_name_passed==0;
+#print STDERR "AHEAD $_\n";
+	$is_name_ahead=1 if m/\%name(?:[^\w\d_]|$)/ and $is_name_passed==0;
+#print STDERR "ahead $_\n";
+    }
+    if ($is_name_ahead) {
+	$section->unshift_body('%define name '.$jpp->get_section('package','')->get_tag('Name')."\n");
+	$section->unshift_body('%define version '.$jpp->get_section('package','')->get_tag('Version')."\n");
+	print STDERR "fixed ahead!!!\n";
+    }
+}
+
+
 sub alt_generic_fix_desc {
     my $section=shift;
     my @out;
     foreach (@{$section->get_body()}) {
-	    push @out, $_;
 # some distro use iso in description. alt use ascii only.
 	    #tr/é/e/;
 	    tr/éöóêåíãøùçõúôûâàïðîëäæýÿñìèòüáþÉÖÓÊÅÍÃØÙÇÕÚÔÛÂÀÏÐÎËÄÆÝßÑÌÈÒÜÁÞ/eooeaiaoucououaaidieaayvnieouabEOOEAIAOUCOUOUAAIDIEAAYVNIEOUAB/;
 	    # % in description
 	    s,%(\s|$),%% ,g;
+	    push @out, $_;
     }
     $section->set_body(\@out);
 }
