@@ -53,6 +53,31 @@ rm -r ../maven-plugins-sandbox/wizard
 
 
 __END__
+./build-maven-library
+# handmade fix! should be just after ./build-maven-library! merge in 1 line?
+build-jar-repository home/lib commons-jelly-tags-jsl
+
+at %build begin
+## forehead.conf hack: #######
+cp ../maven/src/bin/forehead.conf ../maven/src/bin/forehead.conf.untouched
+### end forehead.conf hack ###
+
+at %install end
+## forehead.conf hack: #######
+#cat ../maven/src/bin/forehead.conf.untouched > $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/forehead.conf
+### end forehead.conf hack ###
+# new hack ###################
+cp $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library.orig
+grep -v 'exit 0' $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library.orig > $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library
+cat >> $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library <<EOF
+ln -s /usr/share/java/ant.jar lib/
+ln -s /usr/share/java/ant-launcher.jar lib/
+ln -s /usr/share/java/ant/ant-junit.jar lib/
+ln -s /usr/share/java/commons-logging.jar lib/
+ln -s /usr/share/java/log4j.jar lib/
+EOF
+# end new hack ###############
+
 
 AutoReq: nosh
 Следующие пакеты имеют неудовлетворенные зависимости:

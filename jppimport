@@ -141,6 +141,10 @@ sub jpp_specific_fix {
     # remove them from requires too due to the conflict w/jpackage-1.4-compat?
     #$main_sec->subst_if('\s+(jce|jsse)(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*Requires:\s*');
 
+    # maven hack
+    $main_sec->subst_if(qr'\s+maven(\s|$)',' maven-plugins ', qr'^\s*BuildRequires:\s*');
+
+
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {

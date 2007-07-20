@@ -38,3 +38,60 @@ BuildRequires:  plexus-compiler >= 1.5.1
 -BuildRequires:  jakarta-commons-cli >= 1.0
 -BuildRequires:  jtidy >= 1.0
 -BuildRequires:  xerces-j2 >= 2.7.1
+
+== deps ==
+activecluster: activemq3-core
+activeio: geronimo11-base
+activemq3: sf-cobertura-maven-plugin
+activesoap: axis
+annogen: findbugs
+apacheds-shared axis2 cewolf daytrader excalibur: maven2
+asn1: jakarta-commons-test
+burlap3: caucho-services
+cargo: jetty4
+clirr: clirr
+db-ojb: jakarta-jcs
+db-torque: jakarta-commons-configuration
+dbunit: jakarta-poi
+d-haven-mpool: d-haven-event
+dwr: hibernate3
+ehcache: hibernate3
+excalibur-component: excalibur-instrument-api
+excalibur-component-examples: excalibur-component
+excalibur-component-tests: excalibur-component
+
+avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
+
+axion+ javacc saxon
+caucho-services+ servletapi4
+cobertura+ oro
+colt+ corejava-format concurrent
+dumbster+ jaf
+
+apache-axiom+
+/usr/bin/build-jar-repository: error: Could not find commons-betwixt Java extension for this JVM
+/usr/bin/build-jar-repository: error: Could not find commons-digester Java extension for this JVM
+/usr/bin/build-jar-repository: error: Could not find xml-commons-which Java extension for this JVM
+
+emma-maven-plugin+ maven-plugin-xdoc
+excalibur-configuration+
+d-haven-event+
+excalibur-* +
+maven-hack1:==
+/usr/bin/build-jar-repository: error: Could not find commons-betwixt Java extension for this JVM
+/usr/bin/build-jar-repository: error: Could not find commons-digester Java extension for this JVM
+/usr/bin/build-jar-repository: error: Could not find commons-jelly-tags-interaction Java extension for this JVM
+/usr/bin/build-jar-repository: error: Could not find xml-commons-which Java extension for this JVM
+
+
+
+classpathx-mail-
+Следующие пакеты имеют неудовлетворенные зависимости:
+  jpackage-1.4-compat: Конфликтует: java (> 1.4.99)
+
+dynaop-
+Следующие пакеты имеют неудовлетворенные зависимости:
+  jetty5: Требует: tomcat5-jsp-2.0-api но пакет не будет установлен
+          Требует: tomcat5-jasper но пакет не будет установлен
+          Требует: tomcat5-servlet-2.4-api но пакет не будет установлен
+
