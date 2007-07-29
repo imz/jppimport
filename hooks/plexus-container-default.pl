@@ -1,1 +1,1 @@
-set_wo_mavan_w_ant-junit.pl
+set_without_maven2.pl

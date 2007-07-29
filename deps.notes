@@ -28,8 +28,10 @@ jakarta-bsf bsf
 #xml-stylebook stylebook
 ----------
 
+TODO: add saxon dependency to maven-plugins
+
 ==Bootstrapped maven2 dependencies:==
-BuildRequires:  plexus-compiler >= 1.5.1
+#BuildRequires:  plexus-compiler >= 1.5.1
 #BuildRequires:  rhino >= 1.5
 #BuildRequires:  httpunit >= 1.6
 *satisfied, but not native.
@@ -68,22 +70,11 @@ cobertura+ oro
 colt+ corejava-format concurrent
 dumbster+ jaf
 
-apache-axiom+
-/usr/bin/build-jar-repository: error: Could not find commons-betwixt Java extension for this JVM
-/usr/bin/build-jar-repository: error: Could not find commons-digester Java extension for this JVM
-/usr/bin/build-jar-repository: error: Could not find xml-commons-which Java extension for this JVM
 
 emma-maven-plugin+ maven-plugin-xdoc
 excalibur-configuration+
 d-haven-event+
 excalibur-* +
-maven-hack1:==
-/usr/bin/build-jar-repository: error: Could not find commons-betwixt Java extension for this JVM
-/usr/bin/build-jar-repository: error: Could not find commons-digester Java extension for this JVM
-/usr/bin/build-jar-repository: error: Could not find commons-jelly-tags-interaction Java extension for this JVM
-/usr/bin/build-jar-repository: error: Could not find xml-commons-which Java extension for this JVM
-
-
 
 classpathx-mail-
 Следующие пакеты имеют неудовлетворенные зависимости:

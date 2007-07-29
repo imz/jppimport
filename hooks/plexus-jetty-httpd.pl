@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-require 'set_without_maven.pl';
+require 'set_without_maven2.pl';
 
 # hack until servletapi5 will be obsolete
 

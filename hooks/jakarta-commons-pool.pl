@@ -1,1 +1,0 @@
-set_wo_mavan_w_ant-junit.pl
