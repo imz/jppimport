@@ -4,18 +4,16 @@
 ==Curerent unmet dependencies:==
 werkz: jakarta-commons-jelly: 
 plexus-compiler: aspectj: 
-maven-wagon: excalibur-cornerstone-connection-api: maven
 aspectj: eclipse-*
-eclipse*: lucene-demo
 maven: maven-scm: maven2
 
 ==Dependencies for complete builds:==
-maven(nobootstrap): hivemind: groovy-jsr: maven
-batik(nobootstrap): rhino jython
+maven(nobootstrap): hivemind: groovy-jsr: 
+batik(nobootstrap): jython
 jetty5(nobootstrap): howl-logger
 xdoclet(w_mockobjects): 
 mx4j(nobootstrap): jython
-struts(jpp): aspectj
+struts(jpp): aspectj jakarta-cactus
 jpp geronimo-specs: maven2
 
 ==care==
@@ -23,23 +21,13 @@ jpp geronimo-specs: maven2
 
 ==duplicate rpms to remove:==
 maven-wagon wagon 
-jakarta-regexp regexp
-jakarta-bsf bsf
+regexp jakarta-regexp
+bsf jakarta-bsf
 #xml-stylebook stylebook
 ----------
 
 TODO: add saxon dependency to maven-plugins
 
-==Bootstrapped maven2 dependencies:==
-#BuildRequires:  plexus-compiler >= 1.5.1
-#BuildRequires:  rhino >= 1.5
-#BuildRequires:  httpunit >= 1.6
-*satisfied, but not native.
--BuildRequires:  antlr >= 2.7.4
--BuildRequires:  geronimo-servlet-2.4-api >= 1.0
--BuildRequires:  jakarta-commons-cli >= 1.0
--BuildRequires:  jtidy >= 1.0
--BuildRequires:  xerces-j2 >= 2.7.1
 
 == deps ==
 activecluster: activemq3-core
@@ -51,16 +39,11 @@ apacheds-shared axis2 cewolf daytrader excalibur: maven2
 asn1: jakarta-commons-test
 burlap3: caucho-services
 cargo: jetty4
-clirr: clirr
 db-ojb: jakarta-jcs
 db-torque: jakarta-commons-configuration
 dbunit: jakarta-poi
-d-haven-mpool: d-haven-event
 dwr: hibernate3
 ehcache: hibernate3
-excalibur-component: excalibur-instrument-api
-excalibur-component-examples: excalibur-component
-excalibur-component-tests: excalibur-component
 
 avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
 
@@ -70,19 +53,7 @@ cobertura+ oro
 colt+ corejava-format concurrent
 dumbster+ jaf
 
-
-emma-maven-plugin+ maven-plugin-xdoc
-excalibur-configuration+
-d-haven-event+
-excalibur-* +
-
 classpathx-mail-
 Следующие пакеты имеют неудовлетворенные зависимости:
   jpackage-1.4-compat: Конфликтует: java (> 1.4.99)
-
-dynaop-
-Следующие пакеты имеют неудовлетворенные зависимости:
-  jetty5: Требует: tomcat5-jsp-2.0-api но пакет не будет установлен
-          Требует: tomcat5-jasper но пакет не будет установлен
-          Требует: tomcat5-servlet-2.4-api но пакет не будет установлен
 

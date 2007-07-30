@@ -2,6 +2,10 @@
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
+
+    # for servletapi 5
+    #$jpp->get_section('package','servlet-2.4-api')->push_body('Provides: servletapi5 = 0:%{version}'."\n");
+
     # BUG to report
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');
 

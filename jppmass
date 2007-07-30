@@ -45,7 +45,7 @@ mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/easymockclassextension gnu-trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc jboss4-buildmagic-tasks ant-contrib/
+my %JPPSKIP=map {$_ => 1} qw/gnu.trove ht2html xerces-j2 mysql-connector-java postgresql-jdbc/
 ;
 
 if ($strategy eq 'alt2jpp') {
@@ -102,7 +102,6 @@ jms
 jmx
 jndi
 sax
-servletapi5
 trang
 xsdlib
 jaf
@@ -116,9 +115,7 @@ our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPDEPR;
 # done by damir
 # hsqldb
 #jakarta-commons-cli-2.0-alt0.1.src.rpm
-#jakarta-commons-dbcp-1.2.2-alt0.1.src.rpm
 #log4j
-#struts-1.2.6-alt3.src.rpm
 #}
 
 sub alt2jpp {
