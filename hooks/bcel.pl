@@ -3,6 +3,6 @@
 $spechook = sub {
     my ($jpp, $alt) = @_;
     # bug to report
-    $jpp->get_section('package','')->subst(qr'obsfuscators','obfuscators');
+    $jpp->get_section('description','')->subst(qr'obsfuscators','obfuscators');
 };
 

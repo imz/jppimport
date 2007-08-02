@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release);
 my $verbose=0;
 my $srpmdir='.';
 my $result = GetOptions ("jpp=s" => \$jpprpm,
@@ -16,6 +16,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "out=s"   => \$srpmdir,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
+		      "release=s"   => \$release,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -30,6 +31,7 @@ if (! $jpprpm && ! $jppspec) {
 --srpmdir /path/to/output_dir
 --out  is the same as --srpmdir
 --changelog '- message'
+--release 'release' - if we need to adjust the package's release
 
 usage examples:
 * convert srpm:
@@ -79,6 +81,7 @@ if ($altrpm || $altspec) {
     $alt->cleanup();
 }
 my $newrel = $altrel."_".$jpprel."1.7";
+$newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
 # our -- hack ?
@@ -130,17 +133,6 @@ sub jpp_specific_fix {
 	$main_sec->unshift_body("BuildRequires: /proc\n");
     }
 
-    # remove_java_devel 
-    # hack around conflicts in jpackage-1.x-compat
-#    $main_sec->subst(qr'BuildRequires:\s*java-devel','##BuildRequires: java-devel');
-#    $main_sec->subst(qr'BuildRequires:\s*ant\s*java-devel','BuildRequires: ant ');
-#    $main_sec->subst(qr'BuildRequires:\s*ant\s*ant-junit\s*java-devel','BuildRequires: ant ant-junit ');
-    $main_sec->subst_if('\s+java-devel(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*BuildRequires:\s*');
-    # jce && jsse is provided by jvm
-    $main_sec->subst_if('\s+(jce|jsse)(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*BuildRequires:\s*');
-    # remove them from requires too due to the conflict w/jpackage-1.4-compat?
-    #$main_sec->subst_if('\s+(jce|jsse)(?:\s+[<>=]+\s*[\d\w:.]+)?\s+',' ', qr'^\s*Requires:\s*');
-
     # maven hack
     $main_sec->subst_if(qr'\s+maven(\s|$)',' maven-plugins ', qr'^\s*BuildRequires:\s*');
 
@@ -171,7 +163,7 @@ sub jpp_specific_fix {
 	    my $source=$rpm->{SOURCES}->[$i];
 	    $source=~s/\s*$//;
 	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}')) {
-		print STDERR "try to bzip2 zip source [$source]\n";
+		print STDERR "note: try to bzip2 zip source [$source]\n";
 		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::ImportTool::basename($source);
 		if (! -e $sourcefile) {
 		    warn "Internal error: source $source not found!";
@@ -233,7 +225,7 @@ sub jpp_specific_cleanup_headers {
     my $section=shift;
     my @out;
     foreach (@{$section->get_body()}) {
-	if (/^Group:(\s*)(.+)\s*$/) {
+	if (/^Group:(\s*)(.+\S)\s*$/) {
 	    #if ($2) eq "System/Libraries" and ht2html
 	    if (
 		$2 eq "Development/Build Tools"
@@ -276,7 +268,7 @@ sub jpp_specific_cleanup_headers {
 	    }
 	} elsif (/^\s*\%define\s+section\s+free\s*$/) {
 	    # throw away
-	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)(?:\(\w+\))?):\s*(.+)\s*$/) {
+	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)(?:\(\w+\))?):\s*(.*\S)\s*$/) {
 	    my $Tag=$1;
 	    my $filtered = &filter_pkg_list($2);
 	    push @out, "$Tag: $filtered\n" if ($filtered);
@@ -291,8 +283,11 @@ BEGIN {
 our %DEPSKIP = map {$_ => 1} qw!
 %{__make}
 /bin/rm /bin/ln
-java-javadoc
+java-devel jce jsse
 !;
+# java-devel jce jsse ...  are hack around Conflicts: in jpackage-1.x-compat
+
+
 our %DEPSUBST = (
 '%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
 '/usr/sbin/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
@@ -679,7 +674,8 @@ sub get_tag {
 	RAW=>0,
 	@_);
     foreach (@{$section->get_body()}) {
-	if (/^$tag:\s*(.+)\s*$/) {
+	if (/^$tag\s*:\s*(\S+)\s*$/) {
+	    #warn "tag=$tag raw =$1";
 	    my $val=$1;
 	    if (!$options{RAW}) {
 		&RPM::ImportTool::macro_subst_inplace($section->{RPM}->{MACRO},\$val);
@@ -950,7 +946,7 @@ sub load_macro {
     if (-e $ENV{'HOME'}.'/.rpmmacros') {
 	open (RPMMACROS, $ENV{'HOME'}.'/.rpmmacros') || die "can't open .rpmmacros:$!";
 	while (<RPMMACROS>) {
-	    if (/^[%]([\w_\/.\d]+)\s+(.+)\s*$/) {
+	    if (/^[%]([\w_\/.\d]+)\s+(.*\S)\s*$/) {
 		$macro{$1}=$2 ;
 		&macro_subst_inplace(\%macro,\$macro{$1});
 	    }
@@ -968,14 +964,14 @@ sub load_macro {
     while (<SPECFILE>) {
 	chomp;
 	# to avoid recursion Name: %name; old hack is && not $macro{'version'};
-	$macro{'name'}=&macro_subst(\%macro, $1) if /^Name:\s*(.+)$/;
-	$macro{'version'}=&macro_subst(\%macro, $1) if /^Version:\s*(.+)$/;
-	$macro{'release'}=&macro_subst(\%macro, $1) if /^Release:\s*(.+)$/;
+	$macro{'name'}=&macro_subst(\%macro, $1) if /^Name\s*:\s*(.*\S)\s*$/;
+	$macro{'version'}=&macro_subst(\%macro, $1) if /^Version\s*:\s*(.*\S)\s*$/;
+	$macro{'release'}=&macro_subst(\%macro, $1) if /^Release\s*:\s*(.*\S)\s*$/;
 
 	$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+(\S+)\s*$/;
 	# not needed there
-	$source[$1 ? $1 : 0]=$3 if /^Source(\d*):\s*(.+\/)?([^\/]+)$/;
-	$patch[$1 ? $1 : 0]=$3 if /^Patch(\d*):\s*(.+\/)?([^\/]+)$/;
+	$source[$1 ? $1 : 0]=$3 if /^Source(\d*)\s*:\s*(.+\/)?([^\/]+)\s*$/;
+	$patch[$1 ? $1 : 0]=$3 if /^Patch(\d*)\s*:\s*(.+\/)?([^\/]+)\s*$/;
 	$setup_n[$1 ? $1 : 0] =$3 if /^[%]setup(\d*)\s*(.+)?-n\s+(\S+)/;
 	$is_setup[$1 ? $1 : 0] =1 if /^[%]setup(\d*)/;
     }
@@ -999,6 +995,9 @@ sub load_macro {
      version
      release
      /) {
+	    if (!$macro{$key}) {
+		print STDERR "WARNING: undefined $key!\n";
+	    }
 	    &macro_subst_inplace(\%macro,\$macro{$key});
     }
     $self->{MACRO}=\%macro;

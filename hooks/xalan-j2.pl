@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
-require 'remove_java_devel.pl';
 require 'set_target_14.pl';
+require 'set_manual_no_dereference.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
-# bugfix; to be commited in bugzilla
-    $jpp->get_section('files','manual')->subst(qr'\%doc build/docs/\*','%doc --no-dereference build/docs/*');
+#require 'set_manual_no_dereference.pl';
+#    $jpp->get_section('files','manual')->subst(qr'\%doc build/docs/\*','%doc --no-dereference build/docs/*');
 
     # 2 changelogs (jppbug, to be commited in bugzilla
     my $count_changelogs=0;
@@ -35,10 +35,7 @@ $spechook = sub {
     }
     $jpp->set_changelog('- rebuild on x86_64; added explicit source and target 1.4
 - obsoletes: xalan-j');
-    #$jpp->get_section('package','')->set_tag('Release',"alt5_7jpp1.7");
 
-    # hack around broken deps
-    &remove_java_devel($jpp, $alt);
     # 1.5 hack
     &set_target_14($jpp, $alt);
 }

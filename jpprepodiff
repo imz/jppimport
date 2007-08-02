@@ -1,0 +1,166 @@
+#!/usr/bin/perl -w
+
+use Carp;
+use Getopt::Long;
+use strict;
+
+my ($verbose,$full);
+my $PATH1='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
+my $PATH2='/var/ftp/pub/Linux/ALT/4.0/branch/files/SRPMS';
+
+my $result = GetOptions (
+			 "full" => \$full,
+			 "verbose"  => \$verbose);
+my ($alt,$jpp);
+
+if (0) {
+    print "usage [ options ] [ list of rpms/names ]
+options:
+-- /path/to/altlinux/src/RPMS
+
+";
+    exit (64);
+}
+
+my @newer;
+my @deprecated;
+for my $name (@ARGV) {
+    my $rpm1=&find_rpm($name, $PATH1);
+    my $rpm2=&find_rpm($name, $PATH2);
+    unless ($rpm2 || $rpm1) {
+	print "oops: not found $name \n";
+	next;
+    }
+    unless ($rpm2) {
+#	print "info: new $rpm1 \n";
+	push @newer, $rpm1;
+	next;
+    }
+    unless ($rpm1) {
+#	print "info: depr $rpm2 \n";
+	push @deprecated, $rpm2;
+	next;
+    }
+    my $cmp = &rpmevrcmp(&get_rpm_evr($rpm1), &get_rpm_evr($rpm2));
+    if ($cmp >0) {
+#	print "oops:cmp=$cmp for $rpm1 $rpm2 \n";
+	push @newer, $rpm1;
+    }
+}
+
+print "\nthe following packages are newer:\n";
+for my $rpm1 (@newer) {
+#    my $nvr=&get_rpm_nvr($rpm1);
+#    print "".$nvr."\n";
+    print &get_rpm_nvr($rpm1)."\n";
+}
+
+print "\nthe following packages are deprecated:\n";
+for my $rpm2 (@deprecated) {
+    print &get_rpm_nvr($rpm2)."\n";
+}
+
+#-------------------------------------------------------
+# stolen from jppmass #
+# should be in separate module
+
+sub get_name_and_rpm {
+    my $name=shift;
+    my $PATHPtr=shift;
+    my $rpm=$name;
+    if ($name=~/.src.rpm$/) {
+	$name=&get_rpm_name($rpm);
+    } else {
+	$rpm = &find_rpm($name, @$PATHPtr);
+    }
+    return $name, $rpm;
+}
+
+sub get_rpm_name {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{NAME}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub alt_jpp_rpmvercmp {
+    my ($altrpm, $jpprpm) =@_;
+    return -1 unless $altrpm;
+    return 1 unless $jpprpm;
+    my $altversion=&get_rpm_version($altrpm);
+    my $altrelease=&get_rpm_release($altrpm);
+    my $jppversion=&get_rpm_version($jpprpm);
+    my $jpprelease=&get_rpm_release($jpprpm);
+    my $cmp = $altversion cmp $jppversion;
+    if ($cmp!=0) {
+	$cmp=&rpmvercmp($altversion, $jppversion);
+	print STDERR "$altversion rpmcmp $jppversion = $cmp\n" if $verbose;
+    }
+    return $cmp if $cmp !=0;
+    if ($altrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+	$cmp =$2 cmp $jpprelease;
+	print STDERR "$2 cmp $jpprelease = $cmp\n" if $verbose;
+	return $2 cmp $jpprelease;
+    }
+    return -1;
+}
+
+sub get_rpm_version {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{VERSION}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub get_rpm_release {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{RELEASE}' -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub get_rpm_evr {
+    my $rpm=shift;
+    my $name=`rpmquery --queryformat '\%{EPOCH}:\%{VERSION}-\%{RELEASE}' -p $rpm`;
+    $name=~s/\(none\)/0/;
+    chomp $name;
+    return $name;
+}
+
+sub get_rpm_nvr {
+    my $rpm=shift;
+    my $name=`rpmquery -p $rpm`;
+    chomp $name;
+    return $name;
+}
+
+sub rpmvercmp {
+    my $cmp = `rpmvercmp $_[0] $_[1]`;
+    chomp $cmp;
+    return $cmp;
+}
+
+sub rpmevrcmp {
+    my $cmp = `rpmevrcmp $_[0] $_[1]`;
+    chomp $cmp;
+    return $cmp;
+}
+
+sub find_rpm {
+    my $name=shift;
+    for my $path (@_) {
+	for my $rpm (reverse(glob "$path/$name-*.src.rpm")) {
+#	print STDERR "trying $rpm for $name\n";
+	    return $rpm if ($name eq &get_rpm_name($rpm));
+	}
+    }
+    return;
+}
+
+sub dirname {
+    my @path= split('/',$_[0]);
+    pop @path;
+    return join('/',@path);
+}
+
+
