@@ -8,6 +8,8 @@ use Getopt::Long;
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release);
 my $verbose=0;
 my $srpmdir='.';
+my $patchdir=&RPM::ImportTool::dirname($0)."/patches";
+
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
 		      "jppspec=s" => \$jppspec,
@@ -44,7 +46,7 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, VERBOSE=> $verbose);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose);
 
 print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
@@ -150,6 +152,9 @@ sub jpp_specific_fix {
 	} elsif ($t eq 'postun') {
 	} elsif ($t eq 'changelog') {
 	}
+	# general hacks here
+	# altlinux vs redhat incompatibility (found in hsqldb)
+	$sec->subst(qr'%{_localstatedir}/lib', '%{_var}/lib');
     }
 
     # hack... it looks like it should be moved to RPM::ImportTool
@@ -268,7 +273,7 @@ sub jpp_specific_cleanup_headers {
 	    }
 	} elsif (/^\s*\%define\s+section\s+free\s*$/) {
 	    # throw away
-	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)(?:\(\w+\))?):\s*(.*\S)\s*$/) {
+	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)\s*(?:\(\w+\))?)\s*:\s*(.*\S)\s*$/) {
 	    my $Tag=$1;
 	    my $filtered = &filter_pkg_list($2);
 	    push @out, "$Tag: $filtered\n" if ($filtered);
@@ -283,9 +288,11 @@ BEGIN {
 our %DEPSKIP = map {$_ => 1} qw!
 %{__make}
 /bin/rm /bin/ln
-java-devel jce jsse
+java-devel java
+jce jsse 
 !;
 # java-devel jce jsse ...  are hack around Conflicts: in jpackage-1.x-compat
+#jce jsse 
 
 
 our %DEPSUBST = (
@@ -705,6 +712,7 @@ sub new {
     my $class = shift;
     my $self = {
 	CHANGELOG=>'- converted from JPackage by jppimport script',
+	PATCHDIR=> '.',
 	@_
     };
     bless $self, $class;
@@ -891,6 +899,25 @@ sub copy_to_sources {
     foreach my $file (@_) {
 	run ("cp -f $file $self->{SOURCEDIR}/");
     }
+}
+
+sub add_patch {
+    my $self=shift;
+    my $name=shift;
+    my %param = (
+	NAME=> $name,
+	STRIP => 1,
+	NUMBER => 33,
+	@_
+	);
+    # find first unused patch position
+    while ($self->{PATCHES}->[$param{NUMBER}]) {$param{NUMBER}++;}
+    # register patch
+    $self->{PATCHES}->[$param{NUMBER}]=$param{NAME};
+    # add patch to spec
+    $jpp->get_section('prep')->push_body('%patch'.$param{NUMBER}.' -p'.$param{STRIP}."\n");
+    $jpp->get_section('package','')->push_body('Patch'.$param{NUMBER}.': '.$param{NAME}."\n");
+    $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
 }
 
 sub basename {

@@ -1,15 +1,11 @@
 #!/usr/bin/perl -w
 
 require 'set_without_extra.pl';
+require 'set_add_jspapi_dep.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
     # hack around non-jpp mx4j
-    $jpp->get_section('package')->push_body('
-BuildRequires: tomcat5-jsp-2.0-api
-Requires: tomcat5-jsp-2.0-api
-');
-
     $jpp->get_section('build')->unshift_body('rm -f ext/mx4j.jar');
     # 
     $jpp->get_section('build')->subst(qr'ln -s \$\(build-classpath mx4j/mx4j-tools\)','ln -s %{SOURCE100} mx4j-tools.jar');

@@ -1,0 +1,24 @@
+--- hsqldb/bin/hsqldb	2007-08-08 14:52:57 +0300
++++ hsqldb/bin/hsqldb	2007-08-08 14:54:31 +0300
+@@ -186,21 +186,6 @@
+     exit 4
+ }
+ 
+-# Use bsd-style enable/disable if it's in place.
+-BSDCFG=
+-[ -r /etc/rc.conf ] && [ -f /etc/rc.conf ] && {
+-    . /etc/rc.conf
+-    BSDCFG=1
+-}
+-[ -r /etc/rc.conf.local ] && [ -f /etc/rc.conf.local ] && {
+-    . /etc/rc.conf.local
+-    BSDCFG=1
+-}
+-[ -n "$BSDCFG" ] && {
+-    case "$hsqldb_enable" in [Yy][Ee][Ss]);; [Oo][Nn]);; [Tt][Rr][Uu][Ee]);;
+-        *) exit 0;;  # Don't run if not enabled for BSD startup
+-    esac
+-}
+ 
+ COMMAND="$1"; shift
+ 

@@ -20,14 +20,14 @@ jpp geronimo-specs: maven2
 (ant-contrib)
 
 ==duplicate rpms to remove:==
+######### done #########
+#xml-stylebook stylebook
+########################
 maven-wagon wagon 
 regexp jakarta-regexp
 bsf jakarta-bsf
-#xml-stylebook stylebook
+xsdlib msv-xsdlib
 ----------
-
-TODO: add saxon dependency to maven-plugins
-
 
 == deps ==
 activecluster: activemq3-core
@@ -39,9 +39,6 @@ apacheds-shared axis2 cewolf daytrader excalibur: maven2
 asn1: jakarta-commons-test
 burlap3: caucho-services
 cargo: jetty4
-db-ojb: jakarta-jcs
-db-torque: jakarta-commons-configuration
-dbunit: jakarta-poi
 dwr: hibernate3
 ehcache: hibernate3
 
@@ -51,14 +48,3 @@ axion+ javacc saxon
 caucho-services+ servletapi4
 cobertura+ oro
 colt+ corejava-format concurrent
-dumbster+ jaf
-
-classpathx-mail-
-Следующие пакеты имеют неудовлетворенные зависимости:
-  jpackage-1.4-compat: Конфликтует: java (> 1.4.99)
-
-todo:
-fix: Следующие пакеты имеют неудовлетворенные зависимости:
-  hsqldb: Требует: /etc/rc.conf но пакет не может быть установлен
-          Требует: /etc/rc.conf.local но пакет не может быть установлен
-          Требует: /var/lib/hsqldb/lib/functions но пакет не может быть установлен
