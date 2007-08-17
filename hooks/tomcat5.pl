@@ -22,7 +22,7 @@ if [ -d /usr/lib/tomcat5/$i ]; then
     echo "upgrade: moving old /usr/lib/tomcat5/$i to /var/lib/tomcat5/$i"
     mv -f /usr/lib/tomcat5/$i/* /var/lib/tomcat5/$i/
 fi
-
+done || :
 ');
 
 # homedir confilct (to report)
