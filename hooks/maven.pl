@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-require 'set_fix_jakarta_commons_cli.pl';
+#require 'set_fix_jakarta_commons_cli.pl';
 #require 'set_target_14.pl';
 
 # added aspectj
@@ -21,7 +21,7 @@ $spechook = sub {
     $jpp->disable_package('plugin-dashboard');
     $jpp->disable_package('plugin-eclipse');
 #    $jpp->disable_package('plugin-latka');    # latka
-    $jpp->disable_package('plugin-modello');   # modello w/maven
+    $jpp->disable_package('plugin-modello');   # modello w/maven2
     $jpp->disable_package('plugin-genapp');    # hivemind
     $jpp->disable_package('plugin-scm'); # maven-scm
     $jpp->disable_package('plugin-tjdo');    # tjdo
@@ -39,7 +39,7 @@ rm -r ../maven-plugins/jalopy
 rm -r ../maven-plugins/aspectj
 # tests fails
 rm -r ../maven-plugins/dashboard
-# dashboard:findbugs javancss
+#
 rm -r ../maven-plugins/eclipse
 rm -r ../maven-plugins/genapp
 rm -r ../maven-plugins-sandbox/modello
