@@ -9,6 +9,8 @@ $spechook = sub {
     # BUG to report
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');
 
+    $jpp->get_section('package','server-lib')->push_body('Requires: jaf javamail'."\n");
+
     $jpp->get_section('package','')->subst(qr'struts >= 0:1.2.7','struts >= 0:1.2.6');
     $jpp->get_section('package','')->push_body('Provides: %{name}-server = %{version}-%{release}'."\n");
     $jpp->get_section('package','')->push_body('Obsoletes: %{name}-server <= 5.5.16-alt1.1'."\n");
