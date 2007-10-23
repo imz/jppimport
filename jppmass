@@ -46,13 +46,13 @@ mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/gnu.trove ht2html postgresql-jdbc xerces-j2
+my %JPPSKIP=map {$_ => 1} qw/gnu.trove postgresql-jdbc xerces-j2
 maven-plugin-itest
 /
 ;
 
 # crimson = crimson fields battle game
-our @ALTSKIPEXTRA=qw/crimson jpackage-utils junit mysql-connector-java/;
+our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #jakarta-commons-cli-2.0-alt0.1.src.rpm
 #}
 
@@ -71,6 +71,7 @@ wagon maven-wagon
 beanshell bsh2
 jaf sun-jaf
 javamail sun-mail
+jakarta-crimson crimson
 /;
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon

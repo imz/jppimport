@@ -141,6 +141,7 @@ sub jpp_specific_fix {
 
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
+	#print "type is $t\n";
 	if ($t eq 'package') {
 	    &jpp_specific_cleanup_headers($sec);
 	    $sec->subst(
@@ -296,9 +297,10 @@ jce jsse
 
 
 our %DEPSUBST = (
-'%{_sbindir}/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
-'/usr/sbin/update-alternatives', 'alternatives >= 0:0.2.0-alt0.12',
-'mono-core','mono',
+'%{_sbindir}/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
+'/usr/sbin/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
+'mono-core' => 'mono',
+'crimson' => 'jakarta-crimson',
 );
 
 }
@@ -511,13 +513,15 @@ sub new {
     };
     my $TYPE='package';
     my $PACKAGE='';
-    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(\S+))?\s*$/ && $RPM::ImportTool::SECTION{$1}) {
+    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?$/ && $RPM::ImportTool::SECTION{$1}) {
+	#print "new section: ".$self->{BODY}->[0],"\n";
 	$TYPE=$1;
 	$PACKAGE=$2;
+	$PACKAGE='' unless defined $PACKAGE;
+	$PACKAGE=~s/\s*$//;
 	$self->{TYPE}=$TYPE;
 	$self->{PACKAGE}=$PACKAGE;
     }
-    $self->{PACKAGE}='' unless defined $self->{PACKAGE};
     die "Oops! section" if ref $self->{BODY} ne 'ARRAY';
     bless $self, $class;
 #    return $self;
@@ -586,6 +590,23 @@ sub push_body {
 	$i--;
     }
     push @{$bodyptr}, @_, @tail;
+}
+
+sub push_body_after {
+    my $self=shift;
+    my $toinsert = shift;
+    my $pattern = shift;
+    my $bodyptr=$self->{BODY};
+    # move pushed item(s) before %if* block of next section
+    my @tail;
+    my $i=$#{$bodyptr};
+    while ($i>=0 and $bodyptr->[$i]!~/$pattern/ # condition for add
+	) {
+	unshift @tail, pop @{$bodyptr};
+	$i--;
+    }
+
+    push @{$bodyptr}, $toinsert, @tail;
 }
 
 sub empty {
@@ -777,12 +798,10 @@ sub _parse_speclist {
     my $out=[];
     my $TYPE='package';
     foreach (@$specptr) {
-	if (/^\s*\%(\w+)(?:\s+(\S+))?\s*$/ && $SECTION{$1}) {
+	if (/^\s*\%(\w+)\s*/ && $SECTION{$1}) {
 	    #my $NEWTYPE=$1;
-	    #my $NEWPACKAGE=$2;
 	    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out);#, TYPE=>$TYPE, PACKAGE=>$PACKAGE);
 	    $out=[];
-	    #$TYPE=$NEWTYPE;
 	}
 	push @$out, $_;
     }
