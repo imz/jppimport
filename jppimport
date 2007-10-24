@@ -837,7 +837,7 @@ sub get_section {
     my $pkg=shift;
     $pkg='' if (!defined $pkg);
     foreach my $section (@{$self->{SPECSECTIONS}}) {
-	return $section if $section->get_type() eq $type and $section->get_package() eq $pkg;
+	return $section if $section->get_type() eq $type and $self->are_package_names_equal($section->get_package(),$pkg);
     }
     Carp::carp "section $type $pkg not found!";
     return;
@@ -849,8 +849,13 @@ sub are_package_names_equal {
     $name2=~s/^\s*//;
     $name1=~s/\s*$//;
     $name2=~s/\s*$//;
+    $name1=&macro_subst($self->{MACRO},$name1);
+    $name2=&macro_subst($self->{MACRO},$name2);
+    #print STDERR "are_package_names_equal: [$name1] [$name2]\n";
     # TODO: -n handler
     return $name1 eq $name2;
+		
+
 }
 
 sub disable_package {

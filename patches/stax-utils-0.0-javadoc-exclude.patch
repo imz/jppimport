@@ -1,0 +1,15 @@
+diff -ru stax-utils/build.xml stax-utils.new/build.xml
+--- stax-utils/build.xml	2007-10-24 11:12:01 +0400
++++ stax-utils.new/build.xml	2007-10-24 11:21:53 +0400
+@@ -116,7 +116,10 @@
+                  windowtitle="StAX Utils API"
+ 	         source="1.3"
+                  doctitle="StAX Utils API" >
+-            <fileset dir="src"/>
++            <fileset dir="src">
++             <exclude name="**/*.html" />
++             <exclude name="**/*.sav" />
++            </fileset>
+ 	    <classpath>
+                 <pathelement location="build/classes" />
+                 <pathelement path="lib/bea-stax-api.jar"/>
