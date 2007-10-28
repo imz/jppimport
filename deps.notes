@@ -22,11 +22,11 @@ jpp geronimo-specs: maven2
 ==duplicate rpms to remove:==
 xml-commons-external by xml-commons
 mysql-connector-jdbc by mysql-connector-java
+jakarta-regexp by regexp
 ######### done #########
 #xml-stylebook stylebook
 ########################
 #maven-wagon wagon 
-#regexp jakarta-regexp
 #bsf jakarta-bsf
 #xsdlib msv-xsdlib
 ----------

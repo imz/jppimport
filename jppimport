@@ -592,6 +592,42 @@ sub push_body {
     push @{$bodyptr}, @_, @tail;
 }
 
+sub unshift_body_before {
+    my $self=shift;
+    my $toinsert = shift;
+    my $pattern = shift;
+    my @body=();
+    my @tail=@{$self->{BODY}};
+    # move pushed item(s) before %if* block of next section
+    while (@tail>0 and $tail[0]!~/$pattern/ # condition for add
+	) {
+	push @body, shift @tail;
+    }
+    if (@tail) {
+	push @body, $toinsert, @tail;
+	#print "appended $toinsert\n";
+    }
+    $self->{BODY}=\@body;
+}
+
+sub unshift_body_after {
+    my $self=shift;
+    my $toinsert = shift;
+    my $pattern = shift;
+    my @body=();
+    my @tail=@{$self->{BODY}};
+    # move pushed item(s) before %if* block of next section
+    while (@tail>0 and $tail[0]!~/$pattern/ # condition for add
+	) {
+	push @body, shift @tail;
+    }
+    if (@tail) {
+	push @body, shift @tail, $toinsert, @tail;
+	#print "appended $toinsert\n";
+    }
+    $self->{BODY}=\@body;
+}
+
 sub push_body_after {
     my $self=shift;
     my $toinsert = shift;
@@ -605,8 +641,7 @@ sub push_body_after {
 	unshift @tail, pop @{$bodyptr};
 	$i--;
     }
-
-    push @{$bodyptr}, $toinsert, @tail;
+    push @{$bodyptr}, $toinsert, @tail  if @$bodyptr;
 }
 
 sub empty {
