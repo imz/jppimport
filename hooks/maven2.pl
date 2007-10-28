@@ -2,13 +2,13 @@
 
 require 'set_fix_jakarta_commons_cli.pl';
 require 'set_bootstrap.pl';
-#require 'set_target_14.pl';
+require 'set_target_14.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'gnu\.regexp','gnu-regexp');
     $jpp->get_section('package','')->subst(qr'BuildRequires: modello-maven-plugin','##BuildRequires: modello-maven-plugin');
-    $jpp->get_section('package','')->push_body('BuildRequires: checkstyle-optional'."\n");
+    $jpp->get_section('package','')->push_body('BuildRequires: checkstyle-optional jmock'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: saxon-scripts'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven2-bootstrap-bundle'."\n");
     $jpp->get_section('build')->subst(qr'/%3','/[%%]3');
@@ -242,6 +242,12 @@ cat <<EOF > maven2-plugins/maven-site-plugin/src/main/resources/META-INF/plexus/
 </component-set>
 EOF
 ');
+
+# we have jmock 1.2.0 already
+    $jpp->get_section('prep')->push_body('
+#subst s,1.0.1,1.2.0, maven2-plugins/maven-release-plugin/pom.xml
+');
+
 
 };
 
