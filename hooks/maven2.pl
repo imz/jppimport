@@ -2,12 +2,13 @@
 
 #require 'set_fix_jakarta_commons_cli.pl';
 require 'set_bootstrap.pl';
-#require 'set_target_14.pl';
+require 'set_target_14.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'gnu\.regexp','gnu-regexp');
     $jpp->get_section('package','')->subst(qr'BuildRequires: modello-maven-plugin','##BuildRequires: modello-maven-plugin');
+    $jpp->get_section('package','')->push_body('BuildRequires: checkstyle-optional jmock'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: saxon-scripts'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven2-bootstrap-bundle'."\n");
     $jpp->get_section('build')->subst(qr'/%3','/[%%]3');
@@ -220,17 +221,38 @@ cat <<EOF > maven2-plugins/maven-site-plugin/pom.xml
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-i18n</artifactId>
+      <version>1.0-beta-6</version>
     </dependency>
   </dependencies>
 </project>
 EOF
 ');
 
+# does not work :(
+    $jpp->get_section('prep')->push_body('
+mkdir -p maven2-plugins/maven-site-plugin/src/main/resources/META-INF/plexus/
+cat <<EOF > maven2-plugins/maven-site-plugin/src/main/resources/META-INF/plexus/components.xml
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.i18n.I18N</role>
+      <implementation>org.codehaus.plexus.i18n.DefaultI18N</implementation>
+    </component>
+  </components>
+</component-set>
+EOF
+');
+
+# we have jmock 1.2.0 already
+    $jpp->get_section('prep')->push_body('
+#subst s,1.0.1,1.2.0, maven2-plugins/maven-release-plugin/pom.xml
+');
 
 
 };
 
 __END__
+
 maven-site-plugin:
     <dependency>
       <groupId>plexus</groupId>
@@ -239,7 +261,6 @@ maven-site-plugin:
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
-
 
 BuildRequires: jaxen >= 1.1
 BuildRequires: jdom >= 1.0

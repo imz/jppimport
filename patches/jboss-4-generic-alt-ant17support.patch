@@ -1,0 +1,19 @@
+diff -ru jboss-container-0.0.JBossMC.1.0.1-src/tools/etc/buildmagic/buildmagic.ent jboss-container-0.0.JBossMC.1.0.1-src.new/tools/etc/buildmagic/buildmagic.ent
+--- jboss-container-0.0.JBossMC.1.0.1-src/tools/etc/buildmagic/buildmagic.ent	2007-10-24 10:48:26 +0400
++++ jboss-container-0.0.JBossMC.1.0.1-src.new/tools/etc/buildmagic/buildmagic.ent	2007-10-24 10:55:37 +0400
+@@ -16,14 +16,7 @@
+      | become avaialble.
+    -->
+ 
+-  <condition property="buildmagic.ant.compatible">
+-    <or>
+-      <contains string="${ant.version}" 
+-	        substring="Ant version ${buildmagic.ant15.baseversion}"/>
+-      <contains string="${ant.version}" 
+-	        substring="Ant version ${buildmagic.ant16.baseversion}"/>
+-    </or>
+-  </condition>
++  <property name="buildmagic.ant.compatible" value="1"/>
+ 
+   <fail unless="buildmagic.ant.compatible">
+ 

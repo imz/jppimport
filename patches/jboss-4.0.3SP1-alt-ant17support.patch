@@ -1,0 +1,50 @@
+diff -ru jboss-4.0.3SP1-src.old/tools/etc/buildmagic/build-common.xml jboss-4.0.3SP1-src.new/tools/etc/buildmagic/build-common.xml
+--- jboss-4.0.3SP1-src.old/tools/etc/buildmagic/build-common.xml	2005-08-11 22:43:29 +0400
++++ jboss-4.0.3SP1-src.new/tools/etc/buildmagic/build-common.xml	2007-10-23 20:36:33 +0400
+@@ -2,18 +2,14 @@
+ 
+   <!-- Make sure we have the right version of Ant -->
+   <property name="buildmagic.ant16.baseversion" value="1.6"/>
++  <property name="buildmagic.ant16.baseversion" value="1.7"/>
+ 
+   <!--
+      | Add new conditions for other supported Ant versions when they
+      | become avaialble.
+    -->
+ 
+-  <condition property="buildmagic.ant.compatible">
+-    <or>
+-      <contains string="${ant.version}" 
+-	        substring="Ant version ${buildmagic.ant16.baseversion}"/>
+-    </or>
+-  </condition>
++  <property name="buildmagic.ant.compatible" value="1"/>
+ 
+   <fail unless="buildmagic.ant.compatible">
+   Unsupported Ant version:
+diff -ru jboss-4.0.3SP1-src.old/tools/etc/buildmagic/buildmagic.ent jboss-4.0.3SP1-src.new/tools/etc/buildmagic/buildmagic.ent
+--- jboss-4.0.3SP1-src.old/tools/etc/buildmagic/buildmagic.ent	2005-10-19 04:15:42 +0400
++++ jboss-4.0.3SP1-src.new/tools/etc/buildmagic/buildmagic.ent	2007-10-23 20:36:44 +0400
+@@ -10,20 +10,14 @@
+   <!-- Make sure we have the right version of Ant -->
+   <property name="buildmagic.ant15.baseversion" value="1.5"/>
+   <property name="buildmagic.ant16.baseversion" value="1.6"/>
++  <property name="buildmagic.ant17.baseversion" value="1.7"/>
+   
+   <!--
+      | Add new conditions for other supported Ant versions when they
+      | become avaialble.
+    -->
+ 
+-  <condition property="buildmagic.ant.compatible">
+-    <or>
+-      <contains string="${ant.version}"
+-        substring="Ant version ${buildmagic.ant15.baseversion}"/>
+-      <contains string="${ant.version}"
+-        substring="Ant version ${buildmagic.ant16.baseversion}"/>
+-    </or>
+-  </condition>
++  <property name="buildmagic.ant.compatible" value="1"/>
+ 
+   <fail unless="buildmagic.ant.compatible">
+ 

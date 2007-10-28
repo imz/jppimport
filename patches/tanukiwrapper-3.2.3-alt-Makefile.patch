@@ -1,0 +1,38 @@
+diff -ru wrapper_3.2.3_src/src/c/Makefile-linux-x86-32 wrapper_3.2.3_src.new/src/c/Makefile-linux-x86-32
+--- wrapper_3.2.3_src/src/c/Makefile-linux-x86-32	2006-10-17 17:21:14 +0300
++++ wrapper_3.2.3_src.new/src/c/Makefile-linux-x86-32	2007-10-22 22:56:46 +0300
+@@ -1,4 +1,4 @@
+-COMPILE = gcc -O3 -Wall --pedantic
++COMPILE = gcc -O3 -Wall --pedantic -fPIC
+ 
+ INCLUDE=$(JAVA_HOME)/include
+ 
+@@ -24,7 +24,7 @@
+ 	if test ! -d .deps; then mkdir .deps; fi
+ 
+ wrapper: $(wrapper_SOURCE)
+-	$(COMPILE) -pthread $(wrapper_SOURCE) -o $(BIN)/wrapper
++	$(COMPILE) -pthread $(wrapper_SOURCE) -o $(BIN)/wrapper -lm
+ 
+ libwrapper.so: $(libwrapper_so_OBJECTS)
+ 	${COMPILE} -shared -fPIC $(libwrapper_so_OBJECTS) -o $(LIB)/libwrapper.so
+diff -ru wrapper_3.2.3_src/src/c/Makefile-linux-x86-64 wrapper_3.2.3_src.new/src/c/Makefile-linux-x86-64
+--- wrapper_3.2.3_src/src/c/Makefile-linux-x86-64	2006-10-17 17:21:14 +0300
++++ wrapper_3.2.3_src.new/src/c/Makefile-linux-x86-64	2007-10-22 22:57:19 +0300
+@@ -1,6 +1,6 @@
+ # This makefile is inprogess.  It builds, but the resulting libwrapper.so does not yet work.
+ # If you know how to fix it then please help out.
+-COMPILE = gcc -O3 -fPIC -Wall --pedantic
++COMPILE = gcc -O3 -fPIC -Wall --pedantic -fPIC
+ 
+ INCLUDE=$(JAVA_HOME)/include
+ 
+@@ -26,7 +26,7 @@
+ 	if test ! -d .deps; then mkdir .deps; fi
+ 
+ wrapper: $(wrapper_SOURCE)
+-	$(COMPILE) -pthread -lm $(wrapper_SOURCE) -o $(BIN)/wrapper
++	$(COMPILE) -pthread -lm $(wrapper_SOURCE) -o $(BIN)/wrapper -lm
+ 
+ libwrapper.so: $(libwrapper_so_OBJECTS)
+ 	${COMPILE} -shared $(libwrapper_so_OBJECTS) -o $(LIB)/libwrapper.so

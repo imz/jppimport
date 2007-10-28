@@ -20,13 +20,15 @@ jpp geronimo-specs: maven2
 (ant-contrib)
 
 ==duplicate rpms to remove:==
+xml-commons-external by xml-commons
+mysql-connector-jdbc by mysql-connector-java
+jakarta-regexp by regexp
 ######### done #########
 #xml-stylebook stylebook
 ########################
-maven-wagon wagon 
-regexp jakarta-regexp
-bsf jakarta-bsf
-xsdlib msv-xsdlib
+#maven-wagon wagon 
+#bsf jakarta-bsf
+#xsdlib msv-xsdlib
 ----------
 
 == deps ==
@@ -41,6 +43,7 @@ burlap3: caucho-services
 cargo: jetty4
 dwr: hibernate3
 ehcache: hibernate3
+jboss4(core): crimson
 
 avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
 
