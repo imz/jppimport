@@ -23,6 +23,7 @@ jpp geronimo-specs: maven2
 xml-commons-external by xml-commons
 mysql-connector-jdbc by mysql-connector-java
 jakarta-regexp by regexp
+## burlap vs burlap3 : to choose?
 ######### done #########
 #xml-stylebook stylebook
 ########################

@@ -9,6 +9,9 @@ sub rename_package {
     for my $sect (@{$jpp->get_sections()}) {
 	$sect->subst(qr'%{name}','%{oldname}');
 	$sect->subst(qr'%name','%oldname');
+	if ($sect->get_type() eq 'package') {
+	    $sect->subst_if(qr'%{?oldname}?','%{name}',qr'^\s*Requires:\s*%{?oldname}?');
+	}
     }
     $jpp->get_section('package','')->unshift_body('%define oldname '.$oldname."\n");
     $jpp->get_section('package','')->set_tag('Name',$newname);
