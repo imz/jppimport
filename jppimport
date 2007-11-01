@@ -260,6 +260,7 @@ sub jpp_specific_cleanup_headers {
 		or $2 eq "Software Development/Quality Assurance"
 		or $2 eq "Networking/Daemons" # jacarta-common-daemons
 		or $2 eq "System/Boot"
+		or $2 eq "Utilities" # jarjar
 		or $2 eq "Text Processing/Markup/XML"
 		or $2 eq "Text Processing/Markup/HTML"
 		or $2 eq "Documentation" # jacorb

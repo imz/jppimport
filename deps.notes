@@ -1,3 +1,4 @@
+Note: fix groups for Python, GUI, etc...
 #export ANT_OPTS=" -mx256m " against blackdown
 #export ANT_OPTS=" -Xmx256m " against blackdown (compat?)
 
@@ -23,6 +24,8 @@ jpp geronimo-specs: maven2
 xml-commons-external by xml-commons
 mysql-connector-jdbc by mysql-connector-java
 jakarta-regexp by regexp
+javamail by sun-mail
+
 ## burlap vs burlap3 : to choose?
 ######### done #########
 #xml-stylebook stylebook
@@ -30,6 +33,7 @@ jakarta-regexp by regexp
 #maven-wagon wagon 
 #bsf jakarta-bsf
 #xsdlib msv-xsdlib
+#jaf by *-jaf
 ----------
 
 == deps ==

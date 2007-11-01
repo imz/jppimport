@@ -6,13 +6,13 @@
 
 sub add_missingok_config {
     my ($jpp, $configfile,$pkg) = @_;
-    $configfile ||= '%{name}.conf';
+    $configfile ||= '/etc/%{name}.conf';
     $pkg ||='';
     $jpp->get_section('install','')->push_body(q'
-mkdir -p $RPM_BUILD_ROOT/etc
-touch $RPM_BUILD_ROOT/etc/'.$configfile.'
+mkdir -p $RPM_BUILD_ROOT`dirname '.$configfile.'`
+touch $RPM_BUILD_ROOT'.$configfile.'
 ');
-    $jpp->get_section('files','')->push_body('%config(noreplace,missingok) /etc/'.$configfile."\n");
+    $jpp->get_section('files','')->push_body('%config(noreplace,missingok) '.$configfile."\n");
 }
 
 1;
