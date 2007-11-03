@@ -29,46 +29,12 @@ $spechook = sub {
 Requires: jakarta-commons-digester jakarta-commons-betwixt jakarta-commons-jelly-tags-interaction xml-commons-which
 # to proceed w/builds
 
+# not too required, but suppress the warnings above during build
+BuildRequires: jakarta-commons-digester jakarta-commons-betwixt jakarta-commons-jelly-tags-interaction xml-commons-which
 
-
-BuildRequires: ant-junit aspectj javacvs-lib
+# do required
 BuildRequires: jakarta-commons-digester
-BuildRequires: jakarta-commons-jelly-tags-html
 BuildRequires: jakarta-commons-jelly-tags-http
-BuildRequires: jakarta-commons-jelly-tags-fmt
-BuildRequires: velocity-dvsl
-
-# eclipse
-BuildRequires: jakarta-commons-jelly >= 0:1.0-5jpp
-BuildRequires: jakarta-commons-lang >= 0:2.0
-BuildRequires: jakarta-commons-logging >= 0:1.0.4
-BuildRequires: junit >= 0:3.8.2
-BuildRequires: maven-model >= 0:3.0.1
-
-#pdf
-BuildRequires: excalibur-avalon-framework-api 
-#>= 0:4.3.1
-BuildRequires: excalibur-avalon-framework-impl 
-#>= 0:4.3.1
-BuildRequires: excalibur-avalon-logkit 
-#>= 0:2.2.1
-BuildRequires: batik >= 0:1.6
-BuildRequires: batik-rasterizer >= 0:1.6
-BuildRequires: fop >= 0:0.20.5
-BuildRequires: xalan-j2 >= 0:2.7.0
-BuildRequires: xerces-j2 >= 0:2.7.1
-BuildRequires: xml-commons-jaxp-1.3-apis >= 0:1.3.03
-BuildRequires: xml-commons-resolver11
-BuildRequires: gnu-getopt jcoverage jdepend22
-BuildRequires: anttex >= 0.2-3jpp
-BuildRequires: jakarta-commons-lang >= 0:2.0
-# wizard deps
-BuildRequires: jakarta-commons-jelly-tags-interaction >= 0:1.0-5jpp
-BuildRequires: jakarta-commons-jelly-tags-log >= 0:1.0-5jpp
-BuildRequires: jakarta-commons-jelly-tags-swing >= 0:1.0-5jpp
-BuildRequires: jline >= 0:0.9.5
-
-
 ');
 
     # TODO: enable tjdo, dashboard?, wizard
@@ -83,7 +49,7 @@ BuildRequires: jline >= 0:0.9.5
     $jpp->disable_package('plugin-genapp');    # hivemind
 #    $jpp->disable_package('plugin-scm'); # maven-scm
     $jpp->disable_package('plugin-tjdo');    # tjdo
-    $jpp->disable_package('plugin-wizard'); # jakarta-commons-jelly-tags-swing
+#    $jpp->disable_package('plugin-wizard'); #
 
 
     $jpp->get_section('install')->push_body(q!
@@ -129,35 +95,31 @@ rm -r ../maven-plugins/genapp
 rm -r ../maven-plugins-sandbox/modello
 rm -r ../maven-plugins-sandbox/release
 rm -r ../maven-plugins-sandbox/tjdo
-rm -r ../maven-plugins-sandbox/wizard
+#rm -r ../maven-plugins-sandbox/wizard
 });
 
     $jpp->get_section('build')->push_body_after('build-jar-repository home/lib commons-jelly-tags-jsl'."\n",
 						qr'^./build-maven-library');
 
+# TODO: report bug
+    $jpp->get_section('install')->push_body(q'
+# looks like symlink is added in process of build and copied mechanically
+rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/jars/maven-j2ee-plugin.jar
+');
 
 }
 
 
 
 __END__
-./build-maven-library
-# handmade fix! should be just after ./build-maven-library! merge in 1 line?
-build-jar-repository home/lib commons-jelly-tags-jsl
-
 ############# not used #######
 at %build begin
 ## forehead.conf hack: #######
 cp ../maven/src/bin/forehead.conf ../maven/src/bin/forehead.conf.untouched
 ### end forehead.conf hack ###
 
-    # bootstrap :)
-    $jpp->get_section('package','')->subst(qr'define RHEL4 0','define RHEL4 1');
     # fix it!
     $jpp->get_section('package','plugin-aspectwerkz')->subst(qr'gnu-trove','gnu.trove');
-
-#    $jpp->get_section('build')->replace_line('echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**" >> project.properties'."\n", 'echo "maven.plugins.excludes = examples/**,touchstone/**,touchstone-partner/**,plugin-parent/**,itest/**,abbot/**,ashkelon/**,aspectj/**,aspectwerkz/**,changelog/**,clover/**,hibernate/**,jalopy/**,jdeveloper/**,jdiff/**,jetty/**,latex/**,latka/**,native/**,pdf/**,simian/**,tjdo/**,uberjar/**,vdoclet/**,genapp/**,html2xdoc/**,scm/**,xdoc/**,jcoverage/**,junitdoclet/**,wizard/**" >> project.properties'."\n");
-
 
     # ALT Compat provides
     # hack around alt ant deps
