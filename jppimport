@@ -7,6 +7,7 @@ use Getopt::Long;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release);
 my $verbose=0;
+my $quiet=0;
 my $srpmdir='.';
 my $patchdir=&RPM::ImportTool::dirname($0)."/patches";
 
@@ -46,7 +47,7 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet);
 
 print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
@@ -528,6 +529,10 @@ sub new {
 #    return $self;
 }
 
+sub warn_notapplied {
+    print STDERR "@_\n";
+}
+
 sub describe {
     my $self=shift;
     print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body: ==>\n".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
@@ -615,6 +620,7 @@ sub unshift_body_after {
     my $self=shift;
     my $toinsert = shift;
     my $pattern = shift;
+    my $is_applied = 0;
     my @body=();
     my @tail=@{$self->{BODY}};
     # move pushed item(s) before %if* block of next section
@@ -624,9 +630,11 @@ sub unshift_body_after {
     }
     if (@tail) {
 	push @body, shift @tail, $toinsert, @tail;
-	#print "appended $toinsert\n";
+	$is_applied = 1;
     }
     $self->{BODY}=\@body;
+    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    return $is_applied;
 }
 
 sub push_body_after {
