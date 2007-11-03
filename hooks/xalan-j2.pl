@@ -5,16 +5,15 @@ require 'set_manual_no_dereference.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
-#require 'set_manual_no_dereference.pl';
-#    $jpp->get_section('files','manual')->subst(qr'\%doc build/docs/\*','%doc --no-dereference build/docs/*');
 
     # 2 changelogs (jppbug, to be commited in bugzilla
     my $count_changelogs=0;
-    for (my $i=0; $i<@{$jpp->get_sections()}; $i++) {
-	if ($jpp->get_sections()->[$i]->get_type() eq 'changelog') {
+    my $secptr=$jpp->get_sections();
+    for (my $i=0; $i<@$secptr; $i++) {
+	if ($secptr->[$i]->get_type() eq 'changelog') {
 	    if ($count_changelogs>0) {
-		@{$jpp->get_sections()}[$i..$#{$jpp->get_sections()}-1]=@{$jpp->get_sections()}[$i+1..$#{$jpp->get_sections()}];
-		$#{$jpp->get_sections()}--;
+		@{$secptr}[$i..$#{$secptr}-1]=@{$secptr}[$i+1..$#{$secptr}];
+		$#{$secptr}--;
 	    }
 	    $count_changelogs++;
 	}

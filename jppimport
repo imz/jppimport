@@ -980,6 +980,24 @@ sub add_patch {
     $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
 }
 
+sub add_source {
+    my $self=shift;
+    my $name=shift;
+    my %param = (
+	NAME=> $name,
+	NUMBER => 44,
+	@_
+	);
+    # find first unused patch position
+    while ($self->{SOURCES}->[$param{NUMBER}]) {$param{NUMBER}++;}
+    # register patch
+    $self->{SOURCES}->[$param{NUMBER}]=$param{NAME};
+    # add to spec
+    $jpp->get_section('package','')->push_body('Source'.$param{NUMBER}.': '.$param{NAME}."\n");
+    $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
+    return $param{NUMBER};
+}
+
 sub basename {
     my @path= split('/',$_[0]);
     return pop @path;

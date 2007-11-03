@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    # hack around non-jpp mx4j
+    # homedir confilct (TODO: report)
     map {$_->subst(qr'homedir','apphomedir')} @{$jpp->get_sections()};
 };
 

@@ -46,8 +46,7 @@ mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/gnu.trove postgresql-jdbc xerces-j2
-maven-plugin-itest
+my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
 /
 ;
 
@@ -103,7 +102,6 @@ jms
 jmx
 jndi
 sax
-trang
 xsdlib
 /;
 
