@@ -21,15 +21,14 @@ jpp geronimo-specs: maven2
 (ant-contrib)
 
 ==duplicate rpms to remove:==
-xml-commons-external by xml-commons
 mysql-connector-jdbc by mysql-connector-java
-jakarta-regexp by regexp
-javamail by sun-mail
-
 ## burlap vs burlap3 : to choose?
 ######### done #########
 #xml-stylebook stylebook
 ########################
+#xml-commons-external by xml-commons
+#jakarta-regexp by regexp
+#javamail by sun-mail
 #maven-wagon wagon 
 #bsf jakarta-bsf
 #xsdlib msv-xsdlib

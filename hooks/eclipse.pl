@@ -1,27 +1,38 @@
 #!/usr/bin/perl -w
 
+require 'set_target_14.pl';
+
 $spechook = sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst(qr'mozilla-nspr-devel', 'libnspr-devel');
+    $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
+    $jpp->get_section('package','')->subst(qr'BuildRequires: icu4j-eclipse', '#BuildRequires: icu4j-eclipse');
+    $jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
+    $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
+    # bootstrap hack around icu4j w/o eclipse
+    $jpp->get_section('prep')->subst(qr'rm plugins/com.ibm.icu_3.6.1.v20070417.jar', 'mv plugins/com.ibm.icu_3.6.1.v20070417.jar plugins/com.ibm.icu_3.6.1.v20070417.jar.no');
+    $jpp->get_section('prep')->push_body('
+rm plugins/com.ibm.icu_3.6.1.v20070417.jar
+mv plugins/com.ibm.icu_3.6.1.v20070417.jar.no plugins/com.ibm.icu_3.6.1.v20070417.jar
+');
 
-   $jpp->get_section('package','')->unshift_body('BuildRequires: ant-bcel ant-jakarta-oro ant-jakarta-regexp ant-log4j ant-bsf ant-xml-resolver'."\n");
-   $jpp->get_section('package','')->unshift_body('BuildRequires: zip'."\n");
+    # they loose JAVA_HOME :(
+    $jpp->get_section('prep')->unshift_body_after(q{
+find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
+find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
+}, qr'%setup'); # after because before zip/unzip-ing
+
+# desktop-file-validate /usr/src/RPM/SOURCES/eclipse.desktop
+#/usr/src/RPM/SOURCES/eclipse.desktop: error: value "eclipse.png" for key "Icon" in group "Desktop Entry" is an icon name with an extension, but there should be no extension as described in the Icon Theme Specification if the value is not an absolute path
+#/usr/src/RPM/SOURCES/eclipse.desktop: warning: key "Encoding" in group "Desktop Entry" is deprecated
+#/usr/src/RPM/SOURCES/eclipse.desktop: warning: value "Application;IDE;Development;Java;X-Red-Hat-Base;" for key "Categories" in group "Desktop Entry" contains a deprecated value "Application"
+    $jpp->get_section('install')->unshift_body_before(q{%__subst 's,Icon=eclipse.png,Icon=eclipse,' %{SOURCE2}
+%__subst 's,Categories=Application;,Categories=,' %{SOURCE2}
+%__subst 's,X-Red-Hat-Base;,,' %{SOURCE2}
+},qr'desktop-file-validate %{SOURCE2}');
 
 
-    $jpp->get_section('package','ecj')->subst(qr'Obsoletes:	ecj', '#Obsoletes:	ecj');
-    $jpp->get_section('package','ecj')->subst(qr'Provides:	ecj', '#Provides:	ecj');
 
-    $jpp->get_section('build')->subst(qr'%\{SOURCE22','%%{SOURCE22');
-    $jpp->get_section('build')->subst(qr'%\{SOURCE23','%%{SOURCE23');
-    $jpp->get_section('install')->subst(qr'%\{SOURCE23','%%{SOURCE23');
-    $jpp->get_section('files', '-n %{libname}-gtk2 -f %{libname}-gtk2.install')->subst(qr'%%\{swt_bundle_id}','%%{swt_bundle_id}');
-    $jpp->get_section('build')->subst(qr'ln -sf %{_datadir}/lucene/lucene-demos-1.4.3.jar plugins/org.apache.lucene/parser.jar',
-'ln -sf %{_javadir}/lucene-demos.jar plugins/org.apache.lucene/parser.jar');
-
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-bcel','BuildRequires: ant-bcel');
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-oro','BuildRequires: ant-jakarta-oro');
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-regexp','BuildRequires: ant-jakarta-regexp');
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-log4j','BuildRequires: ant-log4j');
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-bcel','BuildRequires: ant-bcel');
-#    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*ant-apache-resolver','BuildRequires: ant-xml-resolver');
 }
+#plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
+
+__END__

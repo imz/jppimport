@@ -3,6 +3,7 @@
 require 'set_fix_jakarta_commons_cli.pl';
 # todo: whether it is really required?
 #require 'set_target_14.pl';
+require 'add_missingok_config.pl';
 
 # added aspectj
 
@@ -72,8 +73,9 @@ EOF
 
 #Следующие пакеты имеют неудовлетворенные зависимости:
 #  maven: Требует: /etc/mavenrc но пакет не может быть установлен
-    $jpp->get_section('package','')->unshift_body('AutoReq: nosh'."\n");
-
+    &add_missingok_config($jpp,'/etc/mavenrc');
+    # unmet dep:maven#0:1.1-alt3_0.beta3.2jpp1.7        java-1.4.2-sun-devel
+    $jpp->get_section('package','')->unshift_body('AutoReq: yes,nosymlinks'."\n");
 
     $jpp->get_section('build')->unshift_body(q{
 subst 's,-classpath "${MAVEN_HOME}/lib/\[forehead\].jar",-classpath "${MAVEN_HOME}/lib/[forehead].jar":"${MAVEN_HOME}/lib/forehead.jar",' ../maven/src/bin/maven

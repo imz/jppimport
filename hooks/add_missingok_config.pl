@@ -8,7 +8,7 @@ sub add_missingok_config {
     my ($jpp, $configfile,$pkg) = @_;
     $configfile ||= '/etc/%{name}.conf';
     $pkg ||='';
-    $jpp->get_section('install','')->push_body(q'
+    $jpp->get_section('install')->push_body(q'
 mkdir -p $RPM_BUILD_ROOT`dirname '.$configfile.'`
 touch $RPM_BUILD_ROOT'.$configfile.'
 ');
