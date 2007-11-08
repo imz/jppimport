@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2);
 my $verbose=0;
 my $quiet=0;
 my $srpmdir='.';
@@ -20,6 +20,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
 		      "release=s"   => \$release,
+		      "nobz2"   => \$nobz2,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -47,7 +48,7 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet, NOBZ2=>$nobz2);
 
 print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
@@ -190,11 +191,17 @@ sub jpp_specific_fix {
 		    &RPM::ImportTool::run ("pushd $convertdir; unzip -q $sourcefile; popd");
 		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
 		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
-		    $sourcefile=~s/\.(zip|jar)$/.tar.bz2/;
-		    &RPM::ImportTool::run ("tar cjf $sourcefile -C $convertdir @files @hidden_files");
+		    my $arjsuff='.bz2';
+		    my $arjtarg='j';
+		    if ($rpm->{NOBZ2}) {
+			$arjtarg='';
+			$arjsuff='';
+		    }
+		    $sourcefile=~s/\.(zip|jar)$/.tar$arjsuff/;
+		    &RPM::ImportTool::run ("tar c${arjtarg}f $sourcefile -C $convertdir @files @hidden_files");
 		    my $rawsource=$rpm->{RAWSOURCES}->[$i];
 		    my $newsource=$rawsource;
-		    $newsource=~s/\.(zip|jar)$/.tar.bz2/;
+		    $newsource=~s/\.(zip|jar)$/.tar$arjsuff/;
 		    $main_sec->subst(qr"$rawsource",$newsource);
 		}
 	    }
@@ -224,6 +231,7 @@ sub jpp_specific_cleanup_files {
 }
 
 BEGIN { our %JPP_GROUP_MAP = (
+"Editors", "Editors",
 "Text Editors", "Editors",
 "Development/Tools/IDE", "Editors",
 "Utilities", "Utilities",
@@ -621,7 +629,9 @@ sub get_type {
 
 sub get_package {
     my $self=shift;
-    return $self->{PACKAGE};
+    my $pkgname=$self->{PACKAGE};
+    $pkgname=~s/\s+-f\s+\S.*//;
+    return $pkgname;
 }
 
 sub get_package_expanded {
@@ -1063,8 +1073,13 @@ sub cleanup {
 
 sub copy_to_sources {
     my $self=shift;
+    return if $self->is_specfile_mode();
     foreach my $file (@_) {
-	run ("cp -f $file $self->{SOURCEDIR}/");
+	if (-e $file) {
+	    run ("cp -f $file $self->{SOURCEDIR}/");
+	} else {
+	    run ("cp -f $self->{PATCHDIR}/$file $self->{SOURCEDIR}/");
+	}
     }
 }
 
