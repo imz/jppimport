@@ -5,13 +5,15 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
 my $verbose=0;
+my $quiet=0;
 my $srpmdir='.';
 my $patchdir=&RPM::ImportTool::dirname($0)."/patches";
 
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
+		      "jvm=s" => \$jvm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
@@ -19,6 +21,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
 		      "release=s"   => \$release,
+		      "nobz2"   => \$nobz2,
 		      "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -30,6 +33,8 @@ if (! $jpprpm && ! $jppspec) {
 --jppspec /path/to/jpackage.spec
 --altspec /path/to/altlinux.spec
 --hook /path/to/hook to be called on resulting spec file
+--jvm jvm JVM required for the build. by default, it is java-1.4.2.
+  values are: 4 5 6 4.2 5.0 6.0
 --srpmdir /path/to/output_dir
 --out  is the same as --srpmdir
 --changelog '- message'
@@ -46,7 +51,7 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose);
+$jpp=RPM::ImportTool->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet, NOBZ2=>$nobz2);
 
 print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
@@ -82,7 +87,16 @@ if ($altrpm || $altspec) {
     }
     $alt->cleanup();
 }
-my $newrel = $altrel."_".$jpprel."1.7";
+
+# for fedora-based imports
+if ($jpprel=~/\%\{\?dist\}/) {
+    $jpprel=~s/\%\{\?dist\}//;
+    $jpprel=~s/jpp//;
+    $jpprel.=q'jpp';
+}
+my $newrel = $altrel."_".$jpprel;
+$newrel .= "1.7" if $newrel=~/jpp$/;
+
 $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
@@ -130,8 +144,18 @@ sub jpp_specific_fix {
     my $secptr=$rpm->get_sections();
     my $main_sec=$rpm->get_section('package','');
 
-    if (not $main_sec->match(qr'BuildRequires: jpackage-1.4-compat')) {
-	$main_sec->unshift_body("BuildRequires: jpackage-1.4-compat\n");
+    if (not $main_sec->match(qr'BuildRequires: jpackage-.+-compat')) {
+	my $jppcompat='1.4';
+	if ($jvm) {
+	    if ($jvm =~ /^4/) {
+		$jppcompat='1.4';
+	    } elsif ($jvm =~ /^5/) {
+		$jppcompat='1.5';
+	    } else {
+		$jppcompat='generic';
+	    }
+	}
+	$main_sec->unshift_body("BuildRequires: jpackage-$jppcompat-compat\n");
 	$main_sec->unshift_body("BuildRequires: /proc\n");
     }
 
@@ -146,6 +170,7 @@ sub jpp_specific_fix {
 	    &jpp_specific_cleanup_headers($sec);
 	    $sec->subst(
 		qr'\%define gcj_support \%{\?_with_gcj_support:1}\%{!\?_with_gcj_support:\%{\?_without_gcj_support:0}\%{!\?_without_gcj_support:\%{\?_gcj_support:\%{_gcj_support}}\%{!\?_gcj_support:0}}}', '%define gcj_support 0');
+	    $sec->subst(qr'\%define\s+gcj_support\s+1', '%define gcj_support 0');
 	} elsif ($t eq 'files') {
 	    &jpp_specific_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
@@ -168,7 +193,7 @@ sub jpp_specific_fix {
 	for (my $i=0;$i<1; $i++) {
 	    my $source=$rpm->{SOURCES}->[$i];
 	    $source=~s/\s*$//;
-	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}')) {
+	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}') and ! $rpm->is_specfile_mode()) {
 		print STDERR "note: try to bzip2 zip source [$source]\n";
 		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::ImportTool::basename($source);
 		if (! -e $sourcefile) {
@@ -179,11 +204,17 @@ sub jpp_specific_fix {
 		    &RPM::ImportTool::run ("pushd $convertdir; unzip -q $sourcefile; popd");
 		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
 		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
-		    $sourcefile=~s/\.(zip|jar)$/.tar.bz2/;
-		    &RPM::ImportTool::run ("tar cjf $sourcefile -C $convertdir @files @hidden_files");
+		    my $arjsuff='.bz2';
+		    my $arjtarg='j';
+		    if ($rpm->{NOBZ2}) {
+			$arjtarg='';
+			$arjsuff='';
+		    }
+		    $sourcefile=~s/\.(zip|jar)$/.tar$arjsuff/;
+		    &RPM::ImportTool::run ("tar c${arjtarg}f $sourcefile -C $convertdir @files @hidden_files");
 		    my $rawsource=$rpm->{RAWSOURCES}->[$i];
 		    my $newsource=$rawsource;
-		    $newsource=~s/\.(zip|jar)$/.tar.bz2/;
+		    $newsource=~s/\.(zip|jar)$/.tar$arjsuff/;
 		    $main_sec->subst(qr"$rawsource",$newsource);
 		}
 	    }
@@ -213,7 +244,9 @@ sub jpp_specific_cleanup_files {
 }
 
 BEGIN { our %JPP_GROUP_MAP = (
+"Editors", "Editors",
 "Text Editors", "Editors",
+"Development/Tools/IDE", "Editors",
 "Utilities", "Utilities",
 "Multimedia/Graphics", "Graphics", # batik
 "Database", "Databases", # derby
@@ -260,6 +293,7 @@ sub jpp_specific_cleanup_headers {
 		or $2 eq "Software Development/Quality Assurance"
 		or $2 eq "Networking/Daemons" # jacarta-common-daemons
 		or $2 eq "System/Boot"
+		or $2 eq "Utilities" # jarjar
 		or $2 eq "Text Processing/Markup/XML"
 		or $2 eq "Text Processing/Markup/HTML"
 		or $2 eq "Documentation" # jacorb
@@ -276,7 +310,7 @@ sub jpp_specific_cleanup_headers {
 	    # throw away
 	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)\s*(?:\(\w+\))?)\s*:\s*(.*\S)\s*$/) {
 	    my $Tag=$1;
-	    my $filtered = &filter_pkg_list($2);
+	    my $filtered = &jpp_filter_pkg_list($2);
 	    push @out, "$Tag: $filtered\n" if ($filtered);
 	} else {
 	    push @out, $_;
@@ -286,9 +320,7 @@ sub jpp_specific_cleanup_headers {
 }
 
 BEGIN {
-our %DEPSKIP = map {$_ => 1} qw!
-%{__make}
-/bin/rm /bin/ln
+our %JPPDEPSKIP = map {$_ => 1} qw!
 java-devel java
 jce jsse 
 !;
@@ -296,25 +328,22 @@ jce jsse
 #jce jsse 
 
 
-our %DEPSUBST = (
-'%{_sbindir}/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
-'/usr/sbin/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
-'mono-core' => 'mono',
+our %JPPDEPSUBST = (
 'crimson' => 'jakarta-crimson',
 );
 
 }
 
-sub filter_pkg_list {
+sub jpp_filter_pkg_list {
     my @in = split /[\s,]+/, $_[0];
     my @out;
     while (@in) {
 	$_ = shift @in;
-	if ($DEPSKIP{$_}) {
+	if ($JPPDEPSKIP{$_}) {
 	    &read_version(\@in);
 	    next;
-	} elsif ($DEPSUBST{$_}) {
-	    push @out, $DEPSUBST{$_};
+	} elsif ($JPPDEPSUBST{$_}) {
+	    push @out, $JPPDEPSUBST{$_};
 	} else {
 	    push @out, $_;
 	}
@@ -339,7 +368,8 @@ sub alt_generic_fix {
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
-	    $sec->exclude('^(Packager|Vendor|Distribution|BuildRoot):');
+	    $sec->exclude('^(Packager|Vendor|Distribution|Build[Rr]oot):');
+	    &alt_generic_cleanup_headers($sec);
 	} elsif ($t eq 'description') {
 	    &alt_generic_fix_desc($sec);
 	} elsif ($t eq 'files') {
@@ -358,6 +388,76 @@ sub alt_generic_fix {
 	}
     }
 }
+
+BEGIN { our %ALT_GROUP_MAP = (
+"Text Editors", "Editors",
+" ", " ",
+	    ); 
+}
+
+
+sub alt_generic_cleanup_headers {
+    my $section=shift;
+    my @out;
+    foreach (@{$section->get_body()}) {
+	if (/^Group:(\s*)(.+\S)\s*$/ && $ALT_GROUP_MAP{$2}) {
+		push @out, "Group:${1}$ALT_GROUP_MAP{$2}\n";
+	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)\s*(?:\(\w+\))?)\s*:\s*(.*\S)\s*$/) {
+	    my $Tag=$1;
+	    my $filtered = &alt_filter_pkg_list($2);
+	    push @out, "$Tag: $filtered\n" if ($filtered);
+	} else {
+	    push @out, $_;
+	}
+    }
+    $section->set_body(\@out);
+}
+
+BEGIN {
+our %ALTDEPSKIP = map {$_ => 1} qw!
+%{__make}
+/bin/rm /bin/ln
+!;
+
+our %ALTDEPSUBST = (
+'%{_sbindir}/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
+'/usr/sbin/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
+'mono-core' => 'mono',
+'mozilla-nspr-devel' => 'libnspr-devel',
+'nspr-devel' => 'libnspr-devel',
+'mesa-libGL-devel' => 'libmesa-devel',
+'mesa-libGLU-devel' => 'libmesa-devel',
+'cairo-devel' => 'libcairo-devel',
+'cairo' => 'libcairo',
+'gnome-vfs2-devel' => 'gnome-vfs-devel',
+'gnome-vfs2' => 'gnome-vfs',
+' ' => ' ',
+);
+
+}
+
+sub alt_filter_pkg_list {
+    $_=$_[0];
+    # hack around add_changelog error
+    #error: Dependency tokens must not contain '%<=>' symbols: Requires: icu4j-eclipse > = 3.6.1
+    s/\>\s+=/>=/g;
+    s/\<\s+=/<=/g;
+    my @in = split /[\s,]+/, $_;
+    my @out;
+    while (@in) {
+	$_ = shift @in;
+	if ($ALTDEPSKIP{$_}) {
+	    &read_version(\@in);
+	    next;
+	} elsif ($ALTDEPSUBST{$_}) {
+	    push @out, $ALTDEPSUBST{$_};
+	} else {
+	    push @out, $_;
+	}
+    }
+    return join(" ",@out);
+};
+
 
 # is macro %name used in spec before Name:,Version: tags
 # it is not allowed in alt
@@ -379,7 +479,6 @@ sub alt_generic_check_ahead {
 	print STDERR "fixed ahead!!!\n";
     }
 }
-
 
 sub alt_generic_fix_desc {
     my $section=shift;
@@ -527,6 +626,10 @@ sub new {
 #    return $self;
 }
 
+sub warn_notapplied {
+    print STDERR "@_\n";
+}
+
 sub describe {
     my $self=shift;
     print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body: ==>\n".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
@@ -539,7 +642,9 @@ sub get_type {
 
 sub get_package {
     my $self=shift;
-    return $self->{PACKAGE};
+    my $pkgname=$self->{PACKAGE};
+    $pkgname=~s/\s+-f\s+\S.*//;
+    return $pkgname;
 }
 
 sub get_package_expanded {
@@ -596,6 +701,7 @@ sub unshift_body_before {
     my $self=shift;
     my $toinsert = shift;
     my $pattern = shift;
+    my $is_applied = 0;
     my @body=();
     my @tail=@{$self->{BODY}};
     # move pushed item(s) before %if* block of next section
@@ -605,27 +711,31 @@ sub unshift_body_before {
     }
     if (@tail) {
 	push @body, $toinsert, @tail;
-	#print "appended $toinsert\n";
+	$is_applied = 1;
     }
     $self->{BODY}=\@body;
+    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    return $is_applied;
 }
 
 sub unshift_body_after {
     my $self=shift;
     my $toinsert = shift;
     my $pattern = shift;
+    my $is_applied = 0;
     my @body=();
     my @tail=@{$self->{BODY}};
-    # move pushed item(s) before %if* block of next section
     while (@tail>0 and $tail[0]!~/$pattern/ # condition for add
 	) {
 	push @body, shift @tail;
     }
     if (@tail) {
 	push @body, shift @tail, $toinsert, @tail;
-	#print "appended $toinsert\n";
+	$is_applied = 1;
     }
     $self->{BODY}=\@body;
+    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    return $is_applied;
 }
 
 sub push_body_after {
@@ -633,7 +743,7 @@ sub push_body_after {
     my $toinsert = shift;
     my $pattern = shift;
     my $bodyptr=$self->{BODY};
-    # move pushed item(s) before %if* block of next section
+    my $is_applied = 0;
     my @tail;
     my $i=$#{$bodyptr};
     while ($i>=0 and $bodyptr->[$i]!~/$pattern/ # condition for add
@@ -641,7 +751,12 @@ sub push_body_after {
 	unshift @tail, pop @{$bodyptr};
 	$i--;
     }
-    push @{$bodyptr}, $toinsert, @tail  if @$bodyptr;
+    if (@$bodyptr) {
+	push @{$bodyptr}, $toinsert, @tail;
+	$is_applied = 1;
+    }
+    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    return $is_applied;
 }
 
 sub empty {
@@ -686,6 +801,7 @@ sub subst {
     my $section=shift;
     my $pattern=shift;
     my $replace=shift;
+    Carp::carp "subst: got undefined argument" unless defined $pattern and defined $replace;
     my @out;
     foreach (@{$section->get_body()}) {
 	s/$pattern/$replace/g;
@@ -787,6 +903,7 @@ sub new {
 	$self->rpm_custom("-i", $self->{RPM});
 	$self->{SPECFILE}=(glob "$self->{TMPDIR}/SPECS/*")[0];
     } elsif ($self->{SPECFILE}) {
+	$self->{_SPECFILE_MODE_}=1;
     } else {
 	die "$class: new: either RPM or SPECFILE is required."
     }
@@ -854,6 +971,11 @@ sub _get_speclist {
     return \@out;
 }
 
+sub is_specfile_mode {
+    my $self=shift;
+    return $self->{_SPECFILE_MODE_};
+}
+
 sub _set_speclist {
     my $self=shift;
     my $ptr=shift;
@@ -884,6 +1006,15 @@ sub are_package_names_equal {
     $name2=~s/^\s*//;
     $name1=~s/\s*$//;
     $name2=~s/\s*$//;
+    $is_name1_n = substr($name1,0,2) eq '-n';
+    $is_name2_n = substr($name2,0,2) eq '-n';
+    if ($is_name1_n or $is_name2_n) {
+	$name1='-n %{name}-'.$name1 unless $is_name1_n;
+	$name2='-n %{name}-'.$name2 unless $is_name2_n;
+	# hack around comparison -n %{name} and ''
+	$name1=~s/-$//;
+	$name2=~s/-$//;
+    }
     $name1=&macro_subst($self->{MACRO},$name1);
     $name2=&macro_subst($self->{MACRO},$name2);
     #print STDERR "are_package_names_equal: [$name1] [$name2]\n";
@@ -955,8 +1086,13 @@ sub cleanup {
 
 sub copy_to_sources {
     my $self=shift;
+    return if $self->is_specfile_mode();
     foreach my $file (@_) {
-	run ("cp -f $file $self->{SOURCEDIR}/");
+	if (-e $file) {
+	    run ("cp -f $file $self->{SOURCEDIR}/");
+	} else {
+	    run ("cp -f $self->{PATCHDIR}/$file $self->{SOURCEDIR}/");
+	}
     }
 }
 
@@ -977,6 +1113,24 @@ sub add_patch {
     $jpp->get_section('prep')->push_body('%patch'.$param{NUMBER}.' -p'.$param{STRIP}."\n");
     $jpp->get_section('package','')->push_body('Patch'.$param{NUMBER}.': '.$param{NAME}."\n");
     $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
+}
+
+sub add_source {
+    my $self=shift;
+    my $name=shift;
+    my %param = (
+	NAME=> $name,
+	NUMBER => 44,
+	@_
+	);
+    # find first unused patch position
+    while ($self->{SOURCES}->[$param{NUMBER}]) {$param{NUMBER}++;}
+    # register patch
+    $self->{SOURCES}->[$param{NUMBER}]=$param{NAME};
+    # add to spec
+    $jpp->get_section('package','')->push_body('Source'.$param{NUMBER}.': '.$param{NAME}."\n");
+    $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
+    return $param{NUMBER};
 }
 
 sub basename {

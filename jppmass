@@ -46,8 +46,7 @@ mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/gnu.trove postgresql-jdbc xerces-j2
-maven-plugin-itest
+my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
 /
 ;
 
@@ -64,13 +63,13 @@ our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #xalan-j xalan-j2
 #excalibur-logkit excalibur-avalon-logkit
 #stax-bea bea-stax
+#jakarta-servletapi4 servletapi4
+#wagon maven-wagon
+#beanshell bsh2
+#jaf sun-jaf
+#javamail sun-mail
 our %ALT2JPPMAP=qw/
 jakarta-commons-cli-1 jakarta-commons-cli
-jakarta-servletapi4 servletapi4
-wagon maven-wagon
-beanshell bsh2
-jaf sun-jaf
-javamail sun-mail
 jakarta-crimson crimson
 /;
 # not so simple... hands required!
@@ -103,7 +102,6 @@ jms
 jmx
 jndi
 sax
-trang
 xsdlib
 /;
 
