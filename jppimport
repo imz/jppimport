@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
 my $verbose=0;
 my $quiet=0;
 my $srpmdir='.';
@@ -13,6 +13,7 @@ my $patchdir=&RPM::ImportTool::dirname($0)."/patches";
 
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
+		      "jvm=s" => \$jvm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
 		      "srpmdir=s"   => \$srpmdir,
@@ -32,6 +33,8 @@ if (! $jpprpm && ! $jppspec) {
 --jppspec /path/to/jpackage.spec
 --altspec /path/to/altlinux.spec
 --hook /path/to/hook to be called on resulting spec file
+--jvm jvm JVM required for the build. by default, it is java-1.4.2.
+  values are: 4 5 6 4.2 5.0 6.0
 --srpmdir /path/to/output_dir
 --out  is the same as --srpmdir
 --changelog '- message'
@@ -141,8 +144,18 @@ sub jpp_specific_fix {
     my $secptr=$rpm->get_sections();
     my $main_sec=$rpm->get_section('package','');
 
-    if (not $main_sec->match(qr'BuildRequires: jpackage-1.4-compat')) {
-	$main_sec->unshift_body("BuildRequires: jpackage-1.4-compat\n");
+    if (not $main_sec->match(qr'BuildRequires: jpackage-.+-compat')) {
+	my $jppcompat='1.4';
+	if ($jvm) {
+	    if ($jvm =~ /^4/) {
+		$jppcompat='1.4';
+	    } elsif ($jvm =~ /^5/) {
+		$jppcompat='1.5';
+	    } else {
+		$jppcompat='generic';
+	    }
+	}
+	$main_sec->unshift_body("BuildRequires: jpackage-$jppcompat-compat\n");
 	$main_sec->unshift_body("BuildRequires: /proc\n");
     }
 
@@ -355,7 +368,7 @@ sub alt_generic_fix {
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'package') {
-	    $sec->exclude('^(Packager|Vendor|Distribution|BuildRoot):');
+	    $sec->exclude('^(Packager|Vendor|Distribution|Build[Rr]oot):');
 	    &alt_generic_cleanup_headers($sec);
 	} elsif ($t eq 'description') {
 	    &alt_generic_fix_desc($sec);
