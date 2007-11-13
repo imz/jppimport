@@ -14,6 +14,14 @@ $spechook = sub {
     $jpp->get_section('build')->subst(qr'%3e','/[%%]3e');
 
     $jpp->add_patch('maven2-2.0.4-MANTTASKS-44.diff');
+    $jpp->get_section('prep')->push_body('
+%__subst "s,import org.jmock.cglib.Mock,import org.jmock.Mock," maven2-plugins/maven-release-plugin/src/test/java/org/apache/maven/plugins/release/PrepareReleaseMojoTest.java
+');
+
+    # to avoid dependency on maven
+    $jpp->get_section('install')->push_body('rm -f $RPM_BUILD_ROOT/usr/share/maven2/bin/*
+');
+
 
     $jpp->get_section('prep')->push_body('
 cat <<EOF > m2_repo/repository/JPP/maven2/default_poms/JPP.maven2.plugins-site-plugin.pom
@@ -242,15 +250,15 @@ cat <<EOF > maven2-plugins/maven-site-plugin/src/main/resources/META-INF/plexus/
 EOF
 ');
 
+};
+
+__END__
+
 # we have jmock 1.2.0 already
     $jpp->get_section('prep')->push_body('
 #subst s,1.0.1,1.2.0, maven2-plugins/maven-release-plugin/pom.xml
 ');
 
-
-};
-
-__END__
 
 maven-site-plugin:
     <dependency>
