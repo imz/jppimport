@@ -2,6 +2,6 @@
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
-    # todo: cli rename!
-    $jpp->get_section('package','')->unshift_body('BuildRequires: hsqldb jakarta-commons-cli-1'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-cli hsqldb'."\n");
+    $jpp->get_section('build')->unshift_body_after("tools-openorb \\\n",qr'export CLASSPATH=\$\(build-classpath');
 }

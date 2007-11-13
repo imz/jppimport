@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 
-#require 'set_fix_jakarta_commons_cli.pl';
 require 'set_bootstrap.pl';
 require 'set_target_14.pl';
 

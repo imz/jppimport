@@ -68,8 +68,8 @@ our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #beanshell bsh2
 #jaf sun-jaf
 #javamail sun-mail
+#jakarta-commons-cli-1 jakarta-commons-cli
 our %ALT2JPPMAP=qw/
-jakarta-commons-cli-1 jakarta-commons-cli
 jakarta-crimson crimson
 /;
 # not so simple... hands required!

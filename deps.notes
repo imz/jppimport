@@ -43,15 +43,10 @@ activesoap: axis
 annogen: findbugs
 apacheds-shared axis2 cewolf daytrader excalibur: maven2
 asn1: jakarta-commons-test
-burlap3: caucho-services
 cargo: jetty4
 dwr: hibernate3
 ehcache: hibernate3
-jboss4(core): crimson
+jboss4: ant-xslp
+fractal: 
 
 avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
-
-axion+ javacc saxon
-caucho-services+ servletapi4
-cobertura+ oro
-colt+ corejava-format concurrent

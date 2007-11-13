@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-require 'set_fix_jakarta_commons_cli.pl';
+#require 'set_fix_jakarta_commons_cli.pl';
 # todo: whether it is really required?
 #require 'set_target_14.pl';
 require 'add_missingok_config.pl';
