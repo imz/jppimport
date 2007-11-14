@@ -3,7 +3,7 @@ Note: fix groups for Python, GUI, etc...
 #export ANT_OPTS=" -Xmx256m " against blackdown (compat?)
 
 ==Curerent unmet dependencies:==
-werkz: jakarta-commons-jelly: 
+werkz: 
 plexus-compiler: aspectj: 
 aspectj: eclipse-*
 maven: maven-scm: maven2
@@ -41,7 +41,6 @@ activeio: geronimo11-base
 activemq3: sf-cobertura-maven-plugin
 activesoap: axis
 annogen: findbugs
-apacheds-shared axis2 cewolf daytrader excalibur: maven2
 asn1: jakarta-commons-test
 cargo: jetty4
 dwr: hibernate3

@@ -6,6 +6,7 @@ require 'set_fix_homedir_macro.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
+    # todo: delete. note: requires mx4j-tools.jar(non-bootstrap mx4j)
     # hack around non-jpp mx4j
     $jpp->get_section('build')->unshift_body('rm -f ext/mx4j.jar');
     # 

@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_without_maven2.pl';
-
 $spechook = sub {
     my ($jpp, $alt) = @_;
 #bug to report

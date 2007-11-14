@@ -1,9 +1,7 @@
 #!/usr/bin/perl -w
 
-require 'remove_java_devel.pl';
 $spechook = sub {
     my ($jpp, $alt) = @_;
-    &remove_java_devel($jpp, $alt);
     # hack around splitting on 2 packages
     if ($alt->get_tag('Name') eq 'jsvc') {
 	$jpp->get_section('package','')->unshift_body("\%define _with_native 1\n");

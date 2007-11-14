@@ -3,6 +3,8 @@
 require 'set_bootstrap.pl';
 require 'set_target_14.pl';
 
+# for no bootstrap: E: Версия >='0:1.0-0.b3.2' для 'maven-scm' не найдена
+
 $spechook = sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'gnu\.regexp','gnu-regexp');
