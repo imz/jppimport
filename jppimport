@@ -161,6 +161,7 @@ sub jpp_specific_fix {
 
     # maven hack
     $main_sec->subst_if(qr'\s+maven(\s|$)',' maven-plugins ', qr'^\s*BuildRequires:\s*');
+    $main_sec->subst_if(qr'\s+maven2(\s|$)',' maven2-plugins ', qr'^\s*BuildRequires:\s*');
 
 
     foreach my $sec (@$secptr) {
