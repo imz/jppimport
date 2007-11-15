@@ -332,6 +332,7 @@ jce jsse
 our %JPPDEPSUBST = (
 'crimson' => 'jakarta-crimson',
 'maven-modello-plugin' => 'maven-plugin-modello',
+'modello-maven-plugin' => 'maven-plugin-modello',
 );
 
 }

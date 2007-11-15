@@ -3,10 +3,15 @@
 require 'set_bootstrap.pl';
 require 'set_target_14.pl';
 
-# for no bootstrap: E: Версия >='0:1.0-0.b3.2' для 'maven-scm' не найдена
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
+    foreach my $section (@{$jpp->get_sections()}) {
+	if ($section->get_type() eq 'package') {
+	    #$section->subst(qr'maven-scm\s*>=\s*0:1.0-0.b3.2','maven-scm ');
+	}
+    }
+
     $jpp->get_section('package','')->subst(qr'gnu\.regexp','gnu-regexp');
     $jpp->get_section('package','')->subst(qr'BuildRequires: modello-maven-plugin','##BuildRequires: modello-maven-plugin');
     $jpp->get_section('package','')->push_body('BuildRequires: checkstyle-optional jmock'."\n");

@@ -3,10 +3,8 @@ Note: fix groups for Python, GUI, etc...
 #export ANT_OPTS=" -Xmx256m " against blackdown (compat?)
 
 ==Curerent unmet dependencies:==
-werkz: 
 plexus-compiler: aspectj: 
 aspectj: eclipse-*
-maven: maven-scm: maven2
 
 ==Dependencies for complete builds:==
 maven(nobootstrap): hivemind: groovy-jsr: 
@@ -42,10 +40,35 @@ activemq3: sf-cobertura-maven-plugin
 activesoap: axis
 annogen: findbugs
 asn1: jakarta-commons-test
-cargo: jetty4
+cargo: 
 dwr: hibernate3
 ehcache: hibernate3
 jboss4: ant-xslp
-fractal: 
 
-avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
+perseus*: fractal
+
+# looks like a ghost
+#avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
+
+==========================================================
+
+  WARNING:  maven.compile.target is not set:
+            using the default value which depends on your JVM
+
+==========================================================
+
+mina:
+     [echo] ====================================================================
+     [echo]                        W A R N I N G
+     [echo]                        -------------
+     [echo] 
+     [echo] Build with 1.4 jvm will not include modules:
+     [echo]  
+     [echo]  o mina-java5
+     [echo]  o mina-filter-ssl
+     [echo]  o mina-integration-spring
+     [echo]  o mina-example
+     [echo]  o mina-jmx
+     [echo] 
+     [echo] Use JDK 1.5 to make sure these modules build.
+     [echo] ====================================================================

@@ -92,8 +92,6 @@ xml-commons-external xml-commons-resolver
 our @ALTSKIPNOJPP=qw/
 drawswf
 eclipse-build-utils
-eclipse-cdt
-eclipse-gef
 jdbc-stdext
 je
 jed
