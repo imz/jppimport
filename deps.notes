@@ -47,6 +47,8 @@ jboss4: ant-xslp
 
 perseus*: fractal
 
+ws-wsif: wsdl15(update?)
+
 # looks like a ghost
 #avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
 

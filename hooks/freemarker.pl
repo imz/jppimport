@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: javacc'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: javacc rhino'."\n");
 };
 
 1;

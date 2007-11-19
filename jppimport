@@ -1038,7 +1038,7 @@ sub disable_package {
 	$keyname='strange_package';
 	warn "disable_package: strange name $name";
     }
-    
+    my $is_applied=0;
     unless ($name) {
 	Carp::carp "main package can't be disabled!\n";
 	return;
@@ -1049,8 +1049,11 @@ sub disable_package {
 	if ($self->are_package_names_equal($section->get_package(), $name)) {
 	    $section->unshift_body_before_section('%if_with '.$keyname."\n");
 	    $section->push_body('%endif #'.$keyname."\n");
+	    $is_applied = 1;
 	}
     }
+    $is_applied || &warn_notapplied("not disabled [$name] - not found");
+
     return;
 }
 

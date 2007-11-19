@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
 require 'set_update_menus.pl';
-require 'set_target_14.pl';
-# todo; set jvm 5? does not help
+#require 'set_target_14.pl';
+# todo; set jvm 5? does not help?
 
 $spechook = sub {
     my ($jpp, $alt) = @_;

@@ -146,7 +146,7 @@ sub jppskipalt {
 	next if $JPP2ALTMAP{$name};
 	my $altrpm = &find_rpm($name, @ALTPATH);
 	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
-	next if $altrpm;
+	next if $altrpm and $altrpm!~/orphaned/;
 	my $jpprpm = &find_rpm($name, @JPPPATH);
 #	print STDERR "found RPM $jpprpm for $name.\n";
 	&run_jppimport($name,$jpprpm,$altrpm);
