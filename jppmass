@@ -47,7 +47,9 @@ mkdir $OUTDIR unless -e $OUTDIR;
 my @packages = @ARGV;
 
 my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
+apache-axiom
 /
+#pache-axiom by ws-commons-axiom
 ;
 
 # crimson = crimson fields battle game
