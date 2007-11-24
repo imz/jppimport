@@ -9,7 +9,7 @@ DEST=`pwd`
 pushd $PREFIX/files/noarch/RPMS/
 for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > $DEST/java-alt-packages.noarch.src
 popd
-echo jpackage-{1.4,1.5,generic}-compat >> $DEST/java-alt-packages.noarch.src
+echo jpackage-{1.4,1.5,generic}-compat jpackage-utils java-common >> $DEST/java-alt-packages.noarch.src
 pushd $PREFIX/files/i586/RPMS/
 for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/java-alt-packages.i586.src
 popd

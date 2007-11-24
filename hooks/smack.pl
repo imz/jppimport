@@ -1,1 +1,0 @@
-set_split_gcj_support.pl

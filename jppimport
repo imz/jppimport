@@ -95,7 +95,13 @@ if ($jpprel=~/\%\{\?dist\}/) {
     $jpprel.=q'jpp';
 }
 my $newrel = $altrel."_".$jpprel;
-$newrel .= "1.7" if $newrel=~/jpp$/;
+if ($newrel=~/jpp$/) {
+    if ($jvm and $jvm =~ /^5/) {
+	$newrel .= "5.0";
+    } else {
+	$newrel .= "1.7";
+    }
+}
 
 $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);

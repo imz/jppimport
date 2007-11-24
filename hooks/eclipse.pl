@@ -4,17 +4,23 @@ require 'set_update_menus.pl';
 #require 'set_target_14.pl';
 # todo; set jvm 5? does not help?
 
+# does we need it?
+#libgnomeui-2.so.0()(64bit)   is needed by libswt3-gtk2-3.3.0-alt1_5jpp1.7
+
 $spechook = sub {
     my ($jpp, $alt) = @_;
 
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
-    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
+#    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
+
+    
+   
 
     #Epoch:  1
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
@@ -38,11 +44,14 @@ $spechook = sub {
     $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
 
 
-    ########### remnants of the hack
-    # around jetty
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty');
-    $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty');
-    ####################################
+    # around jetty (after 3.3.0-7)
+    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty5');
+    $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty5');
+    map {$_->subst('%{_javadir}/jetty/jetty.jar','%{_javadir}/jetty5/jetty5.jar')} 
+    $jpp->get_section('prep'), 
+    $jpp->get_section('build'), 
+    $jpp->get_section('install');
+    # end around jetty 5
 
     # multilib_support temporally disabled due to failed build
     $jpp->get_section('package','')->unshift_body('%def_disable multilib_support'."\n");
@@ -70,8 +79,9 @@ find . -name build.sh -exec %__subst 's,uname -p,uname -m,' {} \;
 
 # SUN JDK support
 find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/x86_64,/usr/lib/jvm/java/jre/lib/amd64,' {} \;
+find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/i586,/usr/lib/jvm/java/jre/lib/i386,' {} \;
 
-# fixed linkage order
+# fixed linkage order with --as-needed
 ## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
 #        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
 find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;

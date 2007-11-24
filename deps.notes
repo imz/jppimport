@@ -1,6 +1,7 @@
 Note: fix groups for Python, GUI, etc...
 #export ANT_OPTS=" -mx256m " against blackdown
 #export ANT_OPTS=" -Xmx256m " against blackdown (compat?)
+#-Dmaven.javadoc.additionalparam=-J-Xmx256m
 
 ==Curerent unmet dependencies:==
 plexus-compiler: aspectj: 
@@ -20,7 +21,8 @@ jpp geronimo-specs: maven2
 
 ==duplicate rpms to remove:==
 mysql-connector-jdbc by mysql-connector-java
-## burlap vs burlap3 : to choose?
+burlap3 by burlap
+hessian3 by hessian
 ######### done #########
 #xml-stylebook stylebook
 ########################
@@ -74,3 +76,7 @@ mina:
      [echo] 
      [echo] Use JDK 1.5 to make sure these modules build.
      [echo] ====================================================================
+
+
+# to do: robot that checks that alternatives does not belong to package?
+file /usr/share/java/jspapi.jar conflicts between attempted installs of tomcat5-jsp-2.0-api-5.5.24-alt3_3jpp1.7 and geronimo-specs-jsp-1.0-alt0.M5.8
