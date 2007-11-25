@@ -47,7 +47,10 @@ mkdir $OUTDIR unless -e $OUTDIR;
 my @packages = @ARGV;
 
 my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
-apache-axiom neethi
+apache-axiom neethi burlap3 hessian3
+
+dead-or-deprecated:
+jalopy
 /
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi

@@ -27,6 +27,7 @@ mkdir -p .maven/repository/JPP/plugins/
 ln -s /usr/share/java/maven-plugins/maven-javaapp-plugin.jar .maven/repository/JPP/plugins/
 !, qr'^maven -Dmaven');
 
+    $jpp->get_section('files','')->push_body('%exclude %_javadir/maven-plugins/maven-clirr-plugin.jar'."\n");
 }
 __END__
     # is it really needed?

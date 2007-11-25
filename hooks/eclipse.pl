@@ -19,8 +19,17 @@ $spechook = sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
 
-    
-   
+    # misplaced in requires
+    $jpp->get_section('package','')->unshift_body('
+%add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_4.1.230.v20070531/lib/jspapi.jar
+%add_findreq_skiplist /usr/lib64/eclipse/swt-gtk-3.3.0.jar
+');   
+
+    # hack around requires in post / postun scripts
+    $jpp->get_section('package','rcp')->unshift_body('Provides: /usr/lib64/eclipse/configuration/config.ini'."\n");
+
+    # hack around requires in post / postun scripts
+    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: /usr/lib64/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_64_3.3.0.v3346.jar'."\n");
 
     #Epoch:  1
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
@@ -29,6 +38,7 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');
     $jpp->copy_to_sources('eclipse-altlinux-splash-3.3.0.png');
 
+    # overwrite with fixed versions
     # segfault at start: -- getProgramDir() at eclipse.c(947)
     # due to a bug in %patch12
 #diff eclipse-launcher-set-install-dir-and-shared-config.patch{~,}
@@ -36,9 +46,14 @@ $spechook = sub {
 #< +     programDir = malloc( (_tcslen( temp + 1 )) * sizeof(_TCHAR) );
 #---
 #> +     programDir = malloc( (_tcslen( temp ) + 1) * sizeof(_TCHAR) );
-    # overwrite with fixed version
-    # FIXED in 30?
-    $jpp->copy_to_sources('eclipse-launcher-set-install-dir-and-shared-config.patch');
+    $jpp->copy_to_sources('eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
+    # double free bug still exist
+    $jpp->copy_to_sources('eclipse-3.3.0-alt-launcher-double-free-bug.patch');
+    $jpp->get_section('package','')->subst(qr'%{name}-launcher-double-free-bug.patch','eclipse-3.3.0-alt-launcher-double-free-bug.patch');
+    $jpp->get_section('package','')->subst(qr'%{name}-launcher-set-install-dir-and-shared-config.patch','eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
+
+
+
     # in rel30
     $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
     $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
@@ -85,6 +100,26 @@ find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/li
 ## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
 #        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
 find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
+
+# if enable make_xpcominit ...
+#subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+
+# if disable awt
+subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+
+
+
+#subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+});
+
+    $jpp->get_section('install')->push_body(q{
+# avoid warning -- useless
+# shebang.req.files: executable script  not executable
+chmod 755 %buildroot/usr/bin/eclipse
+# todo: symlink to ant
+#chmod 755 %buildroot/usr/share/eclipse/plugins/org.apache.ant_*/bin/*
+chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
+chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
 });
 
 

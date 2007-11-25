@@ -71,12 +71,13 @@ if ($altrpm || $altspec) {
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
     if ($altrel=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
 	my $rel = $1;
+	my $jppfrom = $2;
 	# hack -- cleanup (undefined in jpp) macro in alt release:
 	$rel=~s/.?\%\w+//g;
 	$rel=~s/.?\%\{\w+\}+//g;
 	if ($rel=~/^0\./ or $vercmp != 0) {
 	    $rel=1;
-	} elsif ($2 eq $jpprel) {
+	} elsif ($jppfrom eq $jpprel) {
 	    $rel=$rel+1;
 	}
 	$altrel='alt'.$rel;

@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+$spechook=sub {};
+
 1;
 
 __END__

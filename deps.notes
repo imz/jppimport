@@ -1,6 +1,6 @@
 Note: fix groups for Python, GUI, etc...
-#export ANT_OPTS=" -mx256m " against blackdown
-#export ANT_OPTS=" -Xmx256m " against blackdown (compat?)
+###########export ANT_OPTS="-mx256m" against blackdown
+#export ANT_OPTS="-Xmx256m" against blackdown (compat)
 #-Dmaven.javadoc.additionalparam=-J-Xmx256m
 
 ==Curerent unmet dependencies:==
