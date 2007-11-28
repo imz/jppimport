@@ -49,6 +49,8 @@ my @packages = @ARGV;
 my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
 apache-axiom neethi burlap3 hessian3
 
+useless:
+daytrader
 dead-or-deprecated:
 jalopy
 /
