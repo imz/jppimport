@@ -21,15 +21,17 @@ $spechook = sub {
 
     # misplaced in requires
     $jpp->get_section('package','')->unshift_body('
+# todo: remove this 
 %add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_4.1.230.v20070531/lib/jspapi.jar
-%add_findreq_skiplist /usr/lib64/eclipse/swt-gtk-3.3.0.jar
-');   
+%add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
+%add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
+');
 
     # hack around requires in post / postun scripts
-    $jpp->get_section('package','rcp')->unshift_body('Provides: /usr/lib64/eclipse/configuration/config.ini'."\n");
+    $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
 
-    # hack around requires in post / postun scripts
-    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: /usr/lib64/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_64_3.3.0.v3346.jar'."\n");
+    # hack around requires in spec body (they put it in for biarch reasons
+    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: %{_libdir}/%{name}/plugins/org.eclipse.swt.gtk.linux.%{eclipse_arch}_3.3.0.v3346.jar'."\n");
 
     #Epoch:  1
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
@@ -107,8 +109,6 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 # if disable awt
 subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 
-
-
 #subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
 });
 
@@ -141,6 +141,8 @@ chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates
 #to use our jetty5!!!
 
 __END__
+
+
 	# bootstrap hack around icu4j w/o eclipse
     $jpp->get_section('package','')->subst(qr'^BuildRequires: icu4j-eclipse', '#BuildRequires: icu4j-eclipse');
     $jpp->get_section('package','rcp')->subst(qr'^Requires: icu4j-eclipse', '#Requires: icu4j-eclipse');
@@ -160,31 +162,6 @@ mv plugins/com.ibm.icu_3.6.1.v20070417.jar.no plugins/com.ibm.icu_3.6.1.v2007041
 	$jpp->get_section('install')->subst(qr'ln -s \%{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_\$JETTYPLUGINVERSION', '#ln -s %{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_$JETTYPLUGINVERSION');
 
 
-	# no jasper plugin in our tomcat
-	$jpp->get_section('package','')->subst(qr'jasper-eclipse','jasper');
-	$jpp->get_section('package','platform')->subst(qr'jasper-eclipse','jasper');
-	$jpp->get_section('prep')->unshift_body_before(q!%if 0
-!,qr'# link to jasper');
-	$jpp->get_section('prep')->unshift_body_after(q!%endif
-!,qr'   plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-	$jpp->get_section('install')->unshift_body_before(q!%if 0
-!,qr'# link to jasper');
-	$jpp->get_section('install')->unshift_body_after(q!%endif
-!,qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-
-	# hack around lucene-contrib
-	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+lucene-contrib','#BuildRequires: lucene-contrib');
-	$jpp->get_section('package','platform')->subst(qr'Requires:\s+lucene-contrib','#Requires: lucene-contrib');
-	$jpp->get_section('prep')->unshift_body_before(q!%if 0
-!,qr'# link to lucene');
-	$jpp->get_section('prep')->unshift_body_after(q!%endif
-!,qr'ln -s \%{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-	$jpp->get_section('install')->unshift_body_before(q!%if 0
-!,qr'# link to lucene');
-	$jpp->get_section('install')->unshift_body_after(q!%endif
-!,qr'ln -s \%{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-
-
 #########################
     $appversion=$jpp->get_section('package','')->get_tag('Version');
     print STDERR "in appversion: $appversion\n";
@@ -199,7 +176,3 @@ mv plugins/com.ibm.icu_3.6.1.v20070417.jar.no plugins/com.ibm.icu_3.6.1.v2007041
 
 
 #######################################################
-
-
-ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar
-ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar

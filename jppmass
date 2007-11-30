@@ -8,7 +8,7 @@ my $verbose;
 my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned';
 my $JPPPATH='/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 my $OUTDIR="./OUT";
-my ($changelog, $release);
+my ($changelog, $release, $jvm);
 my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
@@ -16,6 +16,7 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "out=s" => \$OUTDIR,
 			 "changelog=s"   => \$changelog,
 			 "strategy=s" => \$strategy,
+			 "jvm=s" => \$jvm,
 #			 "release=s"   => \$release,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
@@ -178,6 +179,7 @@ sub run_jppimport {
     my $importcmd="$jppimport --srpmdir $OUTDIR";
     $importcmd.=" --changelog '$changelog'" if ($changelog);
     $importcmd.=" --alt $altrpm" if ($altrpm);
+    $importcmd.=" --jvm $jvm" if ($jvm);
     if ($jpprpm) {
 	$importcmd.=" --jpp $jpprpm";
     } else {

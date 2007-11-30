@@ -1,0 +1,8 @@
+#!/usr/bin/perl -w
+#require 'set_fix_eclipse_dep.pl';
+
+push @SPECHOOKS, sub {
+    my ($jpp, $alt) = @_;
+    $jpp->get_section('prep')->subst(qr'%{_libdir}/svn-javahl/svn-javahl.jar','/usr/share/java/svn-javahl.jar');
+};
+

@@ -8,8 +8,19 @@ $spechook = sub {
     # for servletapi 5
     #$jpp->get_section('package','servlet-2.4-api')->push_body('Provides: servletapi5 = 0:%{version}'."\n");
 
-    # BUG to report
+    # BUG to report (5.5.25 1-fc9) too
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');
+
+    # fedora specific (5.5.25 1-fc9)
+    $jpp->get_section('package','')->push_body('BuildRequires: zip'."\n");
+    # break build with java 1.5.0
+    $jpp->get_section('prep')->subst(qr'%patch19 -b .p19','#%patch19 -b .p19');
+    $jpp->get_section('prep')->subst(qr'%patch20 -b .p20','#%patch20 -b .p20');
+    $jpp->get_section('prep')->subst(qr'%patch21 -b .p21','#%patch21 -b .p21');
+
+    # to make them 1.4, not 1.5
+    $jpp->get_section('build')->subst(qr'ant\s+-Dservletapi.build="build"','ant -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 -Dservletapi.build="build"');
+    # end fedora specific 
 
     $jpp->get_section('package','server-lib')->push_body('Requires: jaf javamail'."\n");
 

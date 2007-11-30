@@ -1,6 +1,7 @@
 Note: fix groups for Python, GUI, etc...
 ###########export ANT_OPTS="-mx256m" against blackdown
 #export ANT_OPTS="-Xmx256m" against blackdown (compat)
+#export MAVEN_OPTS="-Xmx256m"
 #-Dmaven.javadoc.additionalparam=-J-Xmx256m
 #-Dmaven.test.skip=true
 #ant -Dtest.failonerror=false 

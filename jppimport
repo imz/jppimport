@@ -158,6 +158,8 @@ sub jpp_specific_fix {
 		$jppcompat='1.4';
 	    } elsif ($jvm =~ /^5/) {
 		$jppcompat='1.5';
+	    } elsif ($jvm =~ /^6/) {
+		$jppcompat='1.6';
 	    } else {
 		$jppcompat='generic';
 	    }
@@ -179,6 +181,8 @@ sub jpp_specific_fix {
 	    $sec->subst(
 		qr'\%define gcj_support \%{\?_with_gcj_support:1}\%{!\?_with_gcj_support:\%{\?_without_gcj_support:0}\%{!\?_without_gcj_support:\%{\?_gcj_support:\%{_gcj_support}}\%{!\?_gcj_support:0}}}', '%define gcj_support 0');
 	    $sec->subst(qr'\%define\s+gcj_support\s+1', '%define gcj_support 0');
+	    $sec->subst(qr'\%define\s+_with_gcj_support\s+1', '%define _with_gcj_support 0');
+
 	} elsif ($t eq 'files') {
 	    &jpp_specific_cleanup_files($sec);
 	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
@@ -441,6 +445,8 @@ our %ALTDEPSUBST = (
 'cairo' => 'libcairo',
 'gnome-vfs2-devel' => 'gnome-vfs-devel',
 'gnome-vfs2' => 'gnome-vfs',
+'apr-devel' => 'libapr1-devel',
+'openssl-devel' => 'libssl-devel',
 ' ' => ' ',
 );
 
