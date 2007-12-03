@@ -16,7 +16,7 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'BuildRequires: modello-maven-plugin','##BuildRequires: modello-maven-plugin');
     $jpp->get_section('package','')->push_body('BuildRequires: checkstyle-optional jmock'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: saxon-scripts'."\n");
-    $jpp->get_section('package','')->push_body('BuildRequires: maven2-bootstrap-bundle'."\n");
+    #$jpp->get_section('package','')->push_body('BuildRequires: maven2-bootstrap-bundle'."\n");
     $jpp->get_section('build')->subst(qr'/%3','/[%%]3');
     $jpp->get_section('build')->subst(qr'%3e','/[%%]3e');
 

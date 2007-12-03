@@ -52,8 +52,20 @@ apache-axiom neethi burlap3 hessian3
 
 useless:
 daytrader
+
+fractalish:
+jorm
+jorm-rdb-adapter
+medor
+perseus-cache
+perseus-concurrency
+perseus-persistence
+perseus-pool
+
 dead-or-deprecated:
 jalopy
+
+
 /
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi

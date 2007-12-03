@@ -1,0 +1,159 @@
+#!/bin/sh
+#
+# jetty5	This shell script takes care of starting and stopping jetty
+#
+# chkconfig: - 80 20
+# description: The Jetty Webserver and Servlet Container
+# processname: jetty
+# pidfile: /var/run/jetty5/jetty5.pid
+# config:  /etc/jetty5/jetty5.conf
+#
+#
+# Portions from tomcat4.init by:
+#
+# Gomez Henri <hgomez@users.sourceforge.net>
+# Keith Irwin <keith_irwin@non.hp.com>
+# Nicolas Mailhot <nicolas.mailhot@one2team.com>
+#
+#
+
+
+# Source function library.
+if [ -x /etc/rc.d/init.d/functions ]; then
+    . /etc/rc.d/init.d/functions
+fi
+
+[ -r /etc/java/java.conf ] && . /etc/java/java.conf
+export JAVA_HOME
+
+# Get Jetty5's config
+                                                                                                                                                             
+JETTY_CFG="/etc/jetty5/jetty5.conf"
+                                                                                                                                                             
+[ -r "$JETTY_CFG" ] && . "${JETTY_CFG}"
+
+# Path to the jetty5 launch script (direct don't use the wrapper)
+JETTY_SCRIPT=/usr/bin/djetty5
+
+# if JETTY_USER is not set, use jetty5
+if [ -z "$JETTY_USER" ]; then
+    JETTY_USER="jetty5"
+fi
+                                                                                                                                                             
+# if JETTY_HOME is not set, use /usr/share/jetty5
+if [ -z "$JETTY_HOME" ]; then
+    JETTY_HOME="/usr/share/jetty5"
+fi
+
+if [ -z "$SHUTDOWN_WAIT" ]; then
+    SHUTDOWN_WAIT=10
+fi
+
+if [ -z "$JETTY_PID" ]; then
+    JETTY_PID=/var/run/jetty5/jetty5.pid
+fi
+
+
+RETVAL=0
+
+start() {
+    echo -n "Starting $JETTY_PROG: "
+
+        if [ -f /var/lock/subsys/jetty5 ] ; then
+                if [ -f $JETTY_PID ]; then
+                        read kpid < $JETTY_PID
+                        if checkpid $kpid 2>&1; then
+                                echo "process already running"
+                                return -1
+                        else
+                                echo "lock file found but no process running for pid $kpid, continuing"
+                        fi
+                fi
+        fi
+
+#        touch $JETTY_PID
+#        chown $JETTY_USER:$JETTY_USER $JETTY_PID
+
+#	[ -x ${JETTY_HOME}/ext ] &&
+#	  	rebuild-jar-repository -s ${JETTY_HOME}/ext
+
+        if [ -x /etc/rc.d/init.d/functions ]; then
+                start_daemon --user $JETTY_USER $JETTY_SCRIPT
+        else
+                su - $JETTY_USER -c "$JETTY_SCRIPT start"
+        fi
+
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch /var/lock/subsys/jetty5
+        return $RETVAL
+}
+
+
+stop() {
+    echo -n "Stopping $JETTY_PROG: "
+                                                                                                                                                             
+    if [ -f /var/lock/subsys/jetty5 ] ; then
+      if [ -x /etc/rc.d/init.d/functions ]; then
+          stop_daemon --user $JETTY_USER $JETTY_SCRIPT
+      else
+          su - $JETTY_USER -c "$JETTY_SCRIPT stop"
+      fi
+      RETVAL=$?
+
+      if [ $RETVAL = 0 ]; then
+        count=0;
+
+        if [ -f /var/run/jetty5/jetty5.pid ]; then
+
+            read kpid < $JETTY_PID
+            let kwait=$SHUTDOWN_WAIT
+
+            until [ `ps --pid $kpid 2> /dev/null | grep -c $kpid 2> /dev/null` -eq '0' ] || [ $count -gt $kwait ]
+            do
+                echo "waiting for processes to exit";
+                sleep 1
+                let count=$count+1;
+            done
+                                                                                                                                                             
+            if [ $count -gt $kwait ]; then
+                echo "killing processes which didn't stop after $SHUTDOWN_WAIT seconds"
+                kill -9 $kpid
+            fi
+        fi
+        rm -f /var/lock/subsys/jetty5 $JETTY_PID
+      fi
+    fi
+}
+
+
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        sleep 2
+        start
+        ;;
+  condrestart)
+        if [ -f $JETTY_PID ] ; then
+                stop
+                start
+        fi
+        ;;
+  *)
+        echo "Usage: $JETTY_PROG {start|stop|restart|condrestart}"
+        exit 1
+esac
+                                                                                                                                                             
+exit $RETVAL
+
+#
+#
+# end
