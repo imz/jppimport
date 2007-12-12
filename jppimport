@@ -63,10 +63,14 @@ my $altrel="alt1";
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
 my $jppver = $jpp->get_section('package','')->get_tag('Version');
 
+# $jpprel_branch is used to keep branch of fedora or mandriva
+my $jpprel_branch='';
+
 # for fedora-based imports (hack :()
 if ($jpprel=~/\%\{\?dist\}/) {
     $jpprel=~s/\%\{\?dist\}//;
-    $jpprel=~s/jpp//;
+    $jpprel=~s/jpp(\.\d+)?//;
+    $jpprel_branch=$1 if $1;
     $jpprel.=q'jpp';
 }
 
@@ -97,7 +101,7 @@ if ($altrpm || $altspec) {
     $alt->cleanup();
 }
 
-my $newrel = $altrel."_".$jpprel;
+my $newrel = $altrel.$jpprel_branch."_".$jpprel;
 if ($newrel=~/jpp$/) {
     if ($jvm and $jvm =~ /^5/) {
 	$newrel .= "5.0";
@@ -776,6 +780,39 @@ sub push_body_after {
     $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
     return $is_applied;
 }
+
+sub subst_after {
+    my $self=shift;
+    my $whatpattern=shift;
+    my $replace=shift;
+    my $afterpattern = shift;
+    my $is_applied = 0;
+    my $is_found_after=0;
+    my @body=();
+    my $count = 0;
+    my $maxcount=1;
+    my @tail=@{$self->{BODY}};
+    while (@tail>0 and $tail[0]!~/$afterpattern/ # condition for add
+	) {
+	push @body, shift @tail;
+    }
+    $is_found_after = 1 if @tail;
+    while (@tail>0 && $count <= $maxcount) {
+	$_=shift @tail;
+	#print STDERR "try:$_";
+	if (s/$whatpattern/$replace/g) {
+	    $is_applied = 1;
+	    $count++;
+	}
+	push @body, $_;
+    }
+    push @body, @tail;
+    $self->set_body(\@body);
+    $is_found_after || &warn_notapplied("pattern [$afterpattern] not found");
+    $is_applied || &warn_notapplied("not replaced [$whatpattern]");
+    return $is_applied;
+}
+
 
 sub empty {
     my $self=shift;

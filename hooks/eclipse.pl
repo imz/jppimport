@@ -13,6 +13,14 @@ $spechook = sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
+    # disable java-1.6.0 code
+    $jpp->get_section('package','')->unshift_body('%def_without java6'."\n");
+
+#    $jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
+    $jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
+    $jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
+
+
 #    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
 
@@ -104,12 +112,12 @@ find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/li
 find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
 
 # if enable make_xpcominit ...
-#subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
 
 # if disable awt
 # subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
-
-#subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
 });
 
     $jpp->get_section('install')->push_body(q{
@@ -122,6 +130,11 @@ chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
 chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
 });
 
+    # hack around added in -15 exact versions
+    $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
+
+    # hack around added in -13 fix-java-home.patch (we fix it in our subst)
+    $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
 
 # desktop-file-validate /usr/src/RPM/SOURCES/eclipse.desktop
 #/usr/src/RPM/SOURCES/eclipse.desktop: error: value "eclipse.png" for key "Icon" in group "Desktop Entry" is an icon name with an extension, but there should be no extension as described in the Icon Theme Specification if the value is not an absolute path
@@ -137,42 +150,4 @@ chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates
 }
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
 
-### TODO:!!! fix /usr/src/RPM/BUILD/eclipse-3.3.0/plugins/org.eclipse.equinox.http.jetty/build.xml
-#to use our jetty5!!!
-
 __END__
-
-
-	# bootstrap hack around icu4j w/o eclipse
-    $jpp->get_section('package','')->subst(qr'^BuildRequires: icu4j-eclipse', '#BuildRequires: icu4j-eclipse');
-    $jpp->get_section('package','rcp')->subst(qr'^Requires: icu4j-eclipse', '#Requires: icu4j-eclipse');
-
-	$jpp->get_section('prep')->subst(qr'rm plugins/com.ibm.icu_3.6.1.v20070417.jar', 'mv plugins/com.ibm.icu_3.6.1.v20070417.jar plugins/com.ibm.icu_3.6.1.v20070417.jar.no');
-	$jpp->get_section('prep')->push_body('
-rm plugins/com.ibm.icu_3.6.1.v20070417.jar
-mv plugins/com.ibm.icu_3.6.1.v20070417.jar.no plugins/com.ibm.icu_3.6.1.v20070417.jar
-');
-
-	# around jetty
-	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty');
-	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty');
-	$jpp->get_section('prep')->subst(qr'rm plugins/org.mortbay.jetty_\$JETTYPLUGINVERSION', '#rm plugins/org.mortbay.jetty_$JETTYPLUGINVERSION');
-	$jpp->get_section('prep')->subst(qr'ln -s \%{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_\$JETTYPLUGINVERSION', '#ln -s %{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_$JETTYPLUGINVERSION');
-	$jpp->get_section('install')->subst(qr'rm plugins/org.mortbay.jetty_\$JETTYPLUGINVERSION', '#rm plugins/org.mortbay.jetty_$JETTYPLUGINVERSION');
-	$jpp->get_section('install')->subst(qr'ln -s \%{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_\$JETTYPLUGINVERSION', '#ln -s %{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty_$JETTYPLUGINVERSION');
-
-
-#########################
-    $appversion=$jpp->get_section('package','')->get_tag('Version');
-    print STDERR "in appversion: $appversion\n";
-
-    if ($appversion eq '3.2.2') {
-	$jpp->get_section('prep')->unshift_body_before(q!%__subst 's,ant.java.version\}" arg2="1.4"/>,ant.java.version}" arg2="1.7"/>,' build.xml
-%__subst 's,compiler="javac1.3",,' build.xml
-!,qr!^ant .*eclipseProjects$!);
-
-#	$jpp->get_section('build')->subst(qr'ant -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 build.update.jar', 'ant build.update.jar');
-    } elsif ($appversion eq '3.3.0') {
-
-
-#######################################################
