@@ -13,13 +13,16 @@ $spechook = sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
+    # note: disabled in 16 and enabled in 18 again
+    if ($apprelease < 18) {
+	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
+	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
+	$jpp->get_section('build')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# Build the rest of Eclipse');
+	$jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
+    }
+
     # disable java-1.6.0 code
     $jpp->get_section('package','')->unshift_body('%def_without java6'."\n");
-
-#    $jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
-    $jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
-    $jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
-
 
 #    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
@@ -85,15 +88,11 @@ $spechook = sub {
     $jpp->get_section('install')->unshift_body_after(q{%endif # multilib_support
 }, qr'rm -rf \${RPM_BUILD_ROOT}/tmp');
 
-
-# the issue with zip/unzip is fixed in 30
-    if ($apprelease < 30) {
     # they loose JAVA_HOME :(
     $jpp->get_section('prep')->unshift_body_after(q{
 find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
 find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
 }, qr'%setup'); # after because before zip/unzip-ing
-    }
 
     $jpp->get_section('prep')->push_body(q{
 find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
@@ -130,11 +129,43 @@ chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
 chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
 });
 
+    # hack around added in -13 Obsoletes in pde
+    $jpp->get_section('package','pde')->subst(qr'1:3.3.0-13.fc8','0:3.3.0-alt2_13jpp5.0');
+
+
+    # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
+    $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
+    $jpp->get_section('prep')->subst_after(qr'^sed --in-place "s/JAVA_HOME','#sed --in-place "s/JAVA_HOME',qr'# liblocalfile fixes');
+
+$jpp->get_section('prep')->push_body_after(
+q!
+pushd plugins/org.eclipse.swt/Eclipse\ SWT\ PI/gtk/library
+# /usr/lib -> /usr/lib64
+sed --in-place "s:/usr/lib/:%{_libdir}/:g" build.sh
+%ifarch x86_64
+sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/amd64:" make_linux.mak
+%endif
+%ifarch %ix86
+sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/i386:" make_linux.mak
+%endif
+popd
+!, qr'plugins/org.junit4/junit.jar');
+
+    # added in -14
+    $jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
+
+    # seamonkey provides mozilla
+    $jpp->get_section('package','-n %{libname}-gtk2')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
+
     # hack around added in -15 exact versions
     $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
+    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-8jpp','Requires: jakarta-commons-el >= 1.0-alt1_8.2jpp1.7');
+    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5 >= 5.5.23-9jpp.4','Requires: tomcat5 >= 5.5.25-alt1_1.1jpp');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.23-9jpp.4','Requires: tomcat5-jasper-eclipse >= 5.5.25-alt1_1.1jpp');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-servlet-2.4-api >= 5.5.23-9jpp.4','Requires: tomcat5-servlet-2.4-api >= 5.5.25-alt1_1.1jpp');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jsp-2.0-api >= 5.5.23-9jpp.4','Requires: tomcat5-jsp-2.0-api >= 5.5.25-alt1_1.1jpp');
 
-    # hack around added in -13 fix-java-home.patch (we fix it in our subst)
-    $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
 
 # desktop-file-validate /usr/src/RPM/SOURCES/eclipse.desktop
 #/usr/src/RPM/SOURCES/eclipse.desktop: error: value "eclipse.png" for key "Icon" in group "Desktop Entry" is an icon name with an extension, but there should be no extension as described in the Icon Theme Specification if the value is not an absolute path
@@ -145,9 +176,15 @@ chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates
 %__subst 's,X-Red-Hat-Base;,,' %{SOURCE2}
 },qr'desktop-file-validate %{SOURCE2}');
 
-
+    #TODO: support for alt feature
+    $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
+    $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.0.zip');
+    foreach my $section (@{$jpp->get_sections()}) {
+	$section->subst(qr'org.fedoraproject','org.altlinux');
+    }
+    $jpp->get_section('package','')->subst_if(qr'\.\d+.zip','.zip',qr'^Source4:');
 
 }
-#plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
 
+#plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
 __END__

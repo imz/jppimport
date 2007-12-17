@@ -8,15 +8,20 @@ require 'add_missingok_config.pl';
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
+
+    # TODO: report against 1.1 -2jpp -- split macro; as always :(
+#:0}%{!?_without_bootstrap:%{?_bootstrap:%{_bootstrap}}%{!?_bootstrap:0}}}
+    $jpp->get_section('package','')->subst(qr'%define bootstrap %{\?_with_bootstrap:1}%{!\?_with_bootstrap:%{\?_without_bootstrap\s*','%define bootstrap %{?_with_bootstrap:1}%{!?_with_bootstrap:%{?_without_bootstrap');
+
     # quote bugs
     $jpp->get_section('prep')->subst(qr'%{SOURCE1}','%%{SOURCE1}');
 
     #E: Версия >='0:4.3.1' для 'excalibur-avalon-framework-api' не найдена
     foreach my $section (@{$jpp->get_sections()}) {
 	if ($section->get_type() eq 'package') {
-	    $section->subst(qr'excalibur-avalon-framework-api\s*>=\s*0:4.3.1','excalibur-avalon-framework-api ');
-	    $section->subst(qr'excalibur-avalon-framework-impl\s*>=\s*0:4.3.1','excalibur-avalon-framework-impl ');
-	    $section->subst(qr'excalibur-avalon-logkit\s*>=\s*0:2.2.1','excalibur-avalon-logkit ');
+	    #$section->subst(qr'excalibur-avalon-framework-api\s*>=\s*0:4.3.1','excalibur-avalon-framework-api ');
+	    #$section->subst(qr'excalibur-avalon-framework-impl\s*>=\s*0:4.3.1','excalibur-avalon-framework-impl ');
+	    #$section->subst(qr'excalibur-avalon-logkit\s*>=\s*0:2.2.1','excalibur-avalon-logkit ');
 	}
     }
 
@@ -37,7 +42,7 @@ BuildRequires: jakarta-commons-digester
 BuildRequires: jakarta-commons-jelly-tags-http
 ');
 
-    $jpp->disable_package('plugin-jalopy');
+#    $jpp->disable_package('plugin-jalopy');
     $jpp->disable_package('plugin-aspectj');
 #    $jpp->disable_package('plugin-release');
     $jpp->disable_package('plugin-dashboard');
@@ -72,7 +77,8 @@ EOF
 #  maven: Требует: /etc/mavenrc но пакет не может быть установлен
     &add_missingok_config($jpp,'/etc/mavenrc');
     # unmet dep:maven#0:1.1-alt3_0.beta3.2jpp1.7        java-1.4.2-sun-devel
-    $jpp->get_section('package','')->unshift_body('AutoReq: yes,nosymlinks'."\n");
+    #$jpp->get_section('package','')->unshift_body('AutoReq: yes,nosymlinks'."\n");
+    $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist %_datadir/maven/repository/javadoc/jars/*'."\n");
 
     $jpp->get_section('build')->unshift_body(q{
 subst 's,-classpath "${MAVEN_HOME}/lib/\[forehead\].jar",-classpath "${MAVEN_HOME}/lib/[forehead].jar":"${MAVEN_HOME}/lib/forehead.jar",' ../maven/src/bin/maven
@@ -84,7 +90,7 @@ subst 's,ant\]\[,,' ../maven/src/bin/forehead.conf
 });
 
     $jpp->get_section('prep')->push_body(qq{
-rm -r ../maven-plugins/jalopy
+#rm -r ../maven-plugins/jalopy
 rm -r ../maven-plugins/aspectj
 # tests fails
 rm -r ../maven-plugins/dashboard

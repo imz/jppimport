@@ -809,7 +809,7 @@ sub subst_after {
     push @body, @tail;
     $self->set_body(\@body);
     $is_found_after || &warn_notapplied("pattern [$afterpattern] not found");
-    $is_applied || &warn_notapplied("not replaced [$whatpattern]");
+    $is_applied || &warn_notapplied("not replaced [$whatpattern] after [$afterpattern]");
     return $is_applied;
 }
 
