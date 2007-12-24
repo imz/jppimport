@@ -131,8 +131,10 @@ if ($hook) {
     our $spechook;
     require $hook;
     if ($spechook or @SPECHOOKS) {
+	$jpp->{QUIET}++;
 	map {&$_($jpp,$alt)} @SPECHOOKS;
 	&$spechook($jpp,$alt) if $spechook;
+	$jpp->{QUIET}--;
     } else {
 	die "script $hook does not have a valid hook!\n";
     }
@@ -340,6 +342,7 @@ sub jpp_specific_cleanup_headers {
 BEGIN {
 our %JPPDEPSKIP = map {$_ => 1} qw!
 java-devel java
+java-1.4.2-devel java-1.5.0-devel
 jce jsse 
 !;
 # java-devel jce jsse ...  are hack around Conflicts: in jpackage-1.x-compat
@@ -350,6 +353,7 @@ our %JPPDEPSUBST = (
 'crimson' => 'jakarta-crimson',
 'maven-modello-plugin' => 'maven-plugin-modello',
 'modello-maven-plugin' => 'maven-plugin-modello',
+#'ant-xslp' => 'ant-optional',
 );
 
 }
@@ -648,8 +652,9 @@ sub new {
 #    return $self;
 }
 
-sub warn_notapplied {
-    print STDERR "@_\n";
+sub _warn_notapplied {
+    my $self=shift;
+    print STDERR "@_\n" if defined $self->{QUIET} and $self->{QUIET}>0;
 }
 
 sub describe {
@@ -736,7 +741,7 @@ sub unshift_body_before {
 	$is_applied = 1;
     }
     $self->{BODY}=\@body;
-    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
     return $is_applied;
 }
 
@@ -756,7 +761,7 @@ sub unshift_body_after {
 	$is_applied = 1;
     }
     $self->{BODY}=\@body;
-    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
     return $is_applied;
 }
 
@@ -777,7 +782,7 @@ sub push_body_after {
 	push @{$bodyptr}, $toinsert, @tail;
 	$is_applied = 1;
     }
-    $is_applied || &warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
+    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
     return $is_applied;
 }
 
@@ -808,8 +813,8 @@ sub subst_after {
     }
     push @body, @tail;
     $self->set_body(\@body);
-    $is_found_after || &warn_notapplied("pattern [$afterpattern] not found");
-    $is_applied || &warn_notapplied("not replaced [$whatpattern] after [$afterpattern]");
+    $is_found_after || $self->_warn_notapplied("pattern [$afterpattern] not found");
+    $is_applied || $self->_warn_notapplied("not replaced [$whatpattern] after [$afterpattern]");
     return $is_applied;
 }
 
@@ -853,29 +858,38 @@ sub exclude {
 }
 
 sub subst {
-    my $section=shift;
+    my $self=shift;
     my $pattern=shift;
     my $replace=shift;
     Carp::carp "subst: got undefined argument" unless defined $pattern and defined $replace;
+    my $is_applied = 0;
     my @out;
-    foreach (@{$section->get_body()}) {
-	s/$pattern/$replace/g;
+    foreach (@{$self->get_body()}) {
+	$is_applied++ if s/$pattern/$replace/g;
 	push @out, $_;
     }
-    $section->set_body(\@out);
+    $is_applied || $self->_warn_notapplied("not subst [$pattern]");
+    $self->set_body(\@out);
+    return $is_applied;
 }
 
 sub subst_if {
-    my $section=shift;
+    my $self=shift;
     my $pattern=shift;
     my $replace=shift;
     my $ifpattern=shift;
+    Carp::carp 'if_pattern is required' unless $ifpattern;
     my @out;
-    foreach (@{$section->get_body()}) {
-	s/$pattern/$replace/g if /$ifpattern/;
+    my $is_applied = 0;
+    foreach (@{$self->get_body()}) {
+	if (/$ifpattern/) {
+	    $is_applied++ if s/$pattern/$replace/g;
+	}
 	push @out, $_;
     }
-    $section->set_body(\@out);
+    $is_applied || $self->_warn_notapplied("not subst [$pattern] if [$ifpattern]");
+    $self->set_body(\@out);
+    return $is_applied;
 }
 
 sub replace_line {
@@ -1104,7 +1118,7 @@ sub disable_package {
 	    $is_applied = 1;
 	}
     }
-    $is_applied || &warn_notapplied("not disabled [$name] - not found");
+    $is_applied || $self->_warn_notapplied("not disabled [$name] - not found");
 
     return;
 }

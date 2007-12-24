@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+
+package RPM::SpecFile::Bootstrap;
+
+use strict;
+use warnings;
+
+die unless @ARGV;
+my $rpmfile= $ARGV[0];
+my $jpp=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
+
+my $trippletname=$jpp->query('NAME')."-".$jpp->query('VERSION')."-".$jpp->query('RELEASE');
+my $tmpdir = $trippletname.$$;
+my $SOURCESDIR="$tmpdir/SOURCES";
+my $SPECSDIR="$tmpdir/SPECS";
+my $specfile=$SPECSDIR."/".$jpp->query('NAME').'.spec';
+mkdir $tmpdir;
+mkdir $SOURCESDIR;
+mkdir $SPECSDIR;
+
+`rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
+
+open SPEC, '>', $specfile;
+
+foreach my $tag qw/
+NAME
+VERSION
+SUMMARY
+EPOCH
+LICENSE
+URL
+/ {
+    print SPEC ucfirst(lc($tag)).": ".$jpp->query($tag)."\n";
+}
+
+print SPEC '
+BuildArch: noarch
+Group: Development/Java
+Release: alt0.1
+Source: '.$trippletname.".cpio\n\n";
+
+foreach my $tag qw/DESCRIPTION
+/ {
+    my $query = $jpp->query($tag);
+    print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
+}
+
+print SPEC '
+%prep
+cpio -idmu --quiet --no-absolute-filenames < %{SOURCE0}
+
+%build
+cpio --list < %{SOURCE0} > %name-list
+
+%install
+mkdir -p $RPM_BUILD_ROOT
+for i in usr var etc; do
+[ -d $i ] && mv $i $RPM_BUILD_ROOT/
+done
+
+%files -f %name-list
+
+%changelog
+';
+
+system ('add_changelog', '-e','- bootstrap pack of jars created with jppbootstrap script
+- temporary package to sutisfy circular dependencies',$specfile);
+`rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir .' -bs $specfile`;
+`rm -r $tmpdir`;
+
+sub new {
+    my $class=shift;
+    my $self = {
+	@_,
+    };
+    return bless $self, $class;
+}
+
+sub eval {
+    my $tag = shift;
+    #%packager
+    return `rpmquery --eval '$tag' 2>/dev/null`
+
+}
+
+sub query {
+    my $self=shift;
+    my $tag=shift;
+    return `rpmquery -p --queryformat '\%{$tag}' $self->{RPM}`;
+}
+
+__END__
+SERIAL
+ARCH
+GROUP
+RELEASE
+COPYRIGHT
+SOURCE
+PATCH
+PREIN
+POSTIN
+PREUN
+POSTUN
+PROVIDENAME
+PROVIDES
+CONFLICTFLAGS
+REQUIRENAME
+REQUIREVERSION
+CONFLICTFLAGS
+CONFLICTNAME
+CONFLICTVERSION
+OBSOLETENAME
+OBSOLETES
+PROVIDEFLAGS
+PROVIDEVERSION
+OBSOLETEFLAGS
+OBSOLETEVERSION

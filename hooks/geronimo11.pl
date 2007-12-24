@@ -1,15 +1,15 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, \&set_bootstrap;
-
-sub set_bootstrap {
+push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-# buggy spec
+    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-webapps'."\n");
     $jpp->get_section('package','')->unshift_body('%define _bootstrap1 1'."\n");
     $jpp->get_section('package','')->unshift_body('%define _with_bootstrap1 1'."\n");
-# bug to report
+
+    $jpp->get_section('build')->unshift_body('export MAVEN_OPTS="-Xmx256m"'."\n");
+#-Dmaven.test.skip=true
+# bug to report: 
 # Пакет не существует: %post server-base
     $jpp->disable_package('server-base');
+};
 
-    $jpp->set_changelog('- imported with jppimport script; note: bootstrapped version');
-}
