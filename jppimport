@@ -317,6 +317,7 @@ sub jpp_specific_cleanup_headers {
 		or $2 eq "Text Processing/Markup/XML"
 		or $2 eq "Text Processing/Markup/HTML"
 		or $2 eq "Documentation" # jacorb
+		or $2 eq "Development/Debuggers" # findbugs
 ) {
 		push @out, "Group:${1}Development/Java\n";
 	    } elsif ($JPP_GROUP_MAP{$2}) {

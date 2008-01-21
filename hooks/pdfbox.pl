@@ -5,6 +5,8 @@ sub {
     my ($jpp, $alt) = @_;
     # TODO: lucene1
     $jpp->get_section('package','')->unshift_body("BuildRequires: checkstyle jakarta-commons-beanutils jakarta-commons-logging regexp\n");
+    $jpp->get_section('package','')->subst_if('lucene','lucene1', qr'Requires:');
+
 };
 
 # TODO: report (no bugzilla yet)

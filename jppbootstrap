@@ -36,7 +36,7 @@ URL
 print SPEC '
 BuildArch: noarch
 Group: Development/Java
-Release: alt0.1
+Release: alt0.1jpp
 Source: '.$trippletname.".cpio\n\n";
 
 foreach my $tag qw/DESCRIPTION
@@ -45,12 +45,12 @@ foreach my $tag qw/DESCRIPTION
     print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
 }
 
-print SPEC '
+print SPEC q!
 %prep
 cpio -idmu --quiet --no-absolute-filenames < %{SOURCE0}
 
 %build
-cpio --list < %{SOURCE0} > %name-list
+cpio --list < %{SOURCE0} | sed -e 's,^\.,,' > %name-list
 
 %install
 mkdir -p $RPM_BUILD_ROOT
@@ -61,7 +61,7 @@ done
 %files -f %name-list
 
 %changelog
-';
+!;
 
 system ('add_changelog', '-e','- bootstrap pack of jars created with jppbootstrap script
 - temporary package to sutisfy circular dependencies',$specfile);

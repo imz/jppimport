@@ -13,18 +13,6 @@ $spechook = sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
-    # note: disabled in 16 and enabled in 18 again
-    if ($apprelease < 18) {
-	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
-	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
-	$jpp->get_section('build')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# Build the rest of Eclipse');
-	$jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
-    }
-
-    # disable java-1.6.0 code
-    $jpp->get_section('package','')->unshift_body('%def_without java6'."\n");
-
-#    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
@@ -48,8 +36,6 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
     $jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
     $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
-    $jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');
-    $jpp->copy_to_sources('eclipse-altlinux-splash-3.3.0.png');
 
     # overwrite with fixed versions
     # segfault at start: -- getProgramDir() at eclipse.c(947)
@@ -65,12 +51,9 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'%{name}-launcher-double-free-bug.patch','eclipse-3.3.0-alt-launcher-double-free-bug.patch');
     $jpp->get_section('package','')->subst(qr'%{name}-launcher-set-install-dir-and-shared-config.patch','eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
 
-
-
     # in rel30
     $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
     $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
-
 
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty5');
@@ -123,7 +106,7 @@ subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.ecli
 # avoid warning -- useless
 # shebang.req.files: executable script  not executable
 chmod 755 %buildroot/usr/bin/eclipse
-# todo: symlink to ant
+# todo: symlink to ant-scripts
 #chmod 755 %buildroot/usr/share/eclipse/plugins/org.apache.ant_*/bin/*
 chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
 chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
@@ -131,7 +114,6 @@ chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates
 
     # hack around added in -13 Obsoletes in pde
     $jpp->get_section('package','pde')->subst(qr'1:3.3.0-13.fc8','0:3.3.0-alt2_13jpp5.0');
-
 
     # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
     $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
@@ -151,8 +133,8 @@ sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/i386:" make_linux
 popd
 !, qr'plugins/org.junit4/junit.jar');
 
-    # added in -14
-    $jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
+    # added in -14, removed -in -19
+    #$jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
 
     # seamonkey provides mozilla
     $jpp->get_section('package','-n %{libname}-gtk2')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
@@ -184,7 +166,90 @@ popd
     }
     $jpp->get_section('package','')->subst_if(qr'\.\d+.zip','.zip',qr'^Source4:');
 
+    # ALT ant has extra packages, so enable them
+    #################### ANT ####################
+    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook', qr!# Fedora.  When that's done, add it here and symlink below.!);
+foreach my $antcmt (qr"# Need to investigate why we don't build ant-apache-bsf or ant-commons-net in",
+qr"# Fedora.  When that's done, add it here and symlink below.",
+qr'# https://bugzilla.redhat.com/bugzilla/show_bug.cgi\?id=180642') {
+    $jpp->get_section('package','')->subst($antcmt,'');
+    $jpp->get_section('package','platform')->subst($antcmt,'');
+}
+    $jpp->get_section('package','platform')->subst(qr'^#Requires: ant-apache-bsf ant-commons-net', 
+	   'Requires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook');
+
+#ln -s %{_javadir}/ant/ant-apache-bsf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
+#ln -s %{_javadir}/ant/ant-commons-net.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
+#ln -s %{_javadir}/ant/ant-jai.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
+#ln -s %{_javadir}/ant/ant-jmf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
+#ln -s %{_javadir}/ant/ant-stylebook.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
+    $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
+
+#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
+#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
+#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
+#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
+#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
+    $jpp->get_section('install')->subst_if(qr'#rm plugins/org.apache.ant_1.7.0.v200706080842','rm plugins/org.apache.ant_1.7.0.v200706080842',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
+#ln -s %{_javadir}/ant/ant-apache-bsf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
+#ln -s %{_javadir}/ant/ant-commons-net.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
+#ln -s %{_javadir}/ant/ant-jai.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
+#ln -s %{_javadir}/ant/ant-jmf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
+#ln -s %{_javadir}/ant/ant-stylebook.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
+    $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
+    ################ END ANT ####################
+
+    ############### jasper ######################
+    # fix for jasper ; looks like it is required for help to work
+    #$jpp->get_section('install')->unshift_body_after('ln -s %{_javadir}/tomcat5-jasper-runtime.jar plugins/org.apache.jasper_5.5.17.v200706111724.jar',qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
+    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
+    $jpp->get_section('package','platform')->subst(qr'^Requires: tomcat5-jasper-eclipse', 'Conflicts: tomcat5-jasper-eclipse');
+
+# link to jasper in prep
+#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar
+#ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar \
+#   plugins/org.apache.jasper_5.5.17.v200706111724.jar
+    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'^\s+plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#   plugins/org.apache.jasper_5.5.17.v200706111724.jar');
+    $jpp->get_section('files','platform')->unshift_body('%{_datadir}/%{name}/plugins/org.apache.jasper_5.5.17.*'."\n");
+    #############################################
+
+    # lucene: let it leave eclipse version
+    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene >= 1.9.1', '#Requires: lucene >= 1.9.1');
+    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene-contrib >= 1.9.1', '#Requires: lucene-contrib >= 1.9.1');
+    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene >= 1.9.1', '#BuildRequires: lucene >= 1.9.1');
+    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene-contrib >= 1.9.1', '#BuildRequires: lucene-contrib >= 1.9.1');
+
+    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+
+    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    # end lucene
+
 }
 
-#plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
+
+
 __END__
+
+#plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
+    # note: disabled in 16 and enabled in 18 again
+    if ($apprelease < 18) {
+	# disable java-1.6.0 code
+	$jpp->get_section('package','')->unshift_body('%def_without java6'."\n");
+	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
+	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
+	$jpp->get_section('build')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# Build the rest of Eclipse');
+	$jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
+    }
+#    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
+
+# now we use theme
+$jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');
+$jpp->copy_to_sources('eclipse-altlinux-splash-3.3.0.png');

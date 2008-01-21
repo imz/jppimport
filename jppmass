@@ -66,6 +66,40 @@ dead-or-deprecated:
 jalopy
 avalon-excalibur
 
+excalibur-avalon-logkit
+excalibur-component
+excalibur-cornerstone-connection-api
+excalibur-cornerstone-connection-impl
+excalibur-cornerstone-datasources-api
+excalibur-cornerstone-datasources-impl
+excalibur-cornerstone-scheduler-api
+excalibur-cornerstone-scheduler-impl
+excalibur-cornerstone-sockets-api
+excalibur-cornerstone-sockets-impl
+excalibur-cornerstone-store-api
+excalibur-cornerstone-store-impl
+excalibur-cornerstone-threads-api
+excalibur-cornerstone-threads-impl
+excalibur-datasource
+excalibur-event-api
+excalibur-event-impl
+excalibur-fortress-container-api
+excalibur-fortress-meta
+excalibur-instrument-api
+excalibur-instrument-client
+excalibur-instrument-mgr-api
+excalibur-instrument-mgr-http
+excalibur-instrument-mgr-impl
+excalibur-lifecycle-api
+excalibur-lifecycle-impl
+excalibur-logger
+excalibur-pool-api
+excalibur-pool-impl
+excalibur-pool-instrumented
+excalibur-testcase
+excalibur-thread-api
+excalibur-thread-impl
+excalibur-thread-instrumented
 /
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi

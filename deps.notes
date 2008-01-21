@@ -4,6 +4,14 @@ Note: fix groups for Python, GUI, etc...
 #export MAVEN_OPTS="-Xmx256m"
 #-Dmaven.javadoc.additionalparam=-J-Xmx256m
 #-Dmaven.test.skip=true
+#-Dmaven.test.skip.exec=true
+#-Dmaven.compile.target=1.4
+#http://maven.apache.org/maven-1.x/plugins/test/properties.html
+#-Dmaven.junit.jvmargs='-Xmx256m -verbose'
+# does not work :(
+##List of ant patterns (spared by commas) used in test:match goal to specify the tests that shouldn't run
+##-Dtestnotmatchpattern='*'
+##-Dtestnotmatchpattern='Hey*,Joo*,??Kaa*'
 #ant -Dtest.failonerror=false 
 
 ==Curerent unmet dependencies:==
@@ -11,24 +19,23 @@ plexus-compiler: aspectj:
 aspectj: eclipse-*
 
 ==Dependencies for complete builds:==
-maven(nobootstrap): hivemind: groovy-jsr: 
-batik(nobootstrap): jython
-jetty5(nobootstrap): howl-logger
+maven(nobootstrap): 
+batik(nobootstrap): 
+jetty5(nobootstrap): 
 xdoclet(w_mockobjects): 
-mx4j(nobootstrap): jython
-struts(jpp): aspectj jakarta-cactus
-jpp geronimo-specs: maven2
+mx4j(nobootstrap): 
+struts(jpp): aspectj 
 
 ==care==
 (ant-contrib)
 
 ==duplicate rpms to remove:==
 mysql-connector-jdbc by mysql-connector-java
-burlap3 by burlap
-hessian3 by hessian
 ######### done #########
 #xml-stylebook stylebook
 ########################
+#hessian3 by hessian
+#burlap3 by burlap
 #xml-commons-external by xml-commons
 #jakarta-regexp by regexp
 #javamail by sun-mail
@@ -40,22 +47,12 @@ hessian3 by hessian
 
 == deps ==
 activecluster: activemq3-core
-activeio: geronimo11-base
-activemq3: sf-cobertura-maven-plugin
-activesoap: axis
-annogen: findbugs
+activemq3: geronimo11-base w/bootstrap2
 asn1: jakarta-commons-test
-cargo: 
 dwr: hibernate3
 ehcache: hibernate3
-jboss4: ant-xslp
 
 perseus*: fractal
-
-ws-wsif: wsdl15(update?)
-
-# looks like a ghost
-#avalon-excalibur E: Версия >='0:1.0.1' для 'avalon-logkit' не найдена
 
 ==========================================================
 
@@ -63,7 +60,6 @@ ws-wsif: wsdl15(update?)
             using the default value which depends on your JVM
 
 ==========================================================
-
 mina:
      [echo] ====================================================================
      [echo]                        W A R N I N G
