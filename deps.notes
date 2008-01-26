@@ -14,16 +14,14 @@ Note: fix groups for Python, GUI, etc...
 ##-Dtestnotmatchpattern='Hey*,Joo*,??Kaa*'
 #ant -Dtest.failonerror=false 
 
+# for PermGen error, running out of memory
+export MAVEN_OPTS=-XX:MaxPermSize=512m
+
 ==Curerent unmet dependencies:==
 plexus-compiler: aspectj: 
 aspectj: eclipse-*
 
 ==Dependencies for complete builds:==
-maven(nobootstrap): 
-batik(nobootstrap): 
-jetty5(nobootstrap): 
-xdoclet(w_mockobjects): 
-mx4j(nobootstrap): 
 struts(jpp): aspectj 
 
 ==care==
@@ -47,7 +45,6 @@ mysql-connector-jdbc by mysql-connector-java
 
 == deps ==
 activecluster: activemq3-core
-activemq3: geronimo11-base w/bootstrap2
 asn1: jakarta-commons-test
 dwr: hibernate3
 ehcache: hibernate3
