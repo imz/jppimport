@@ -64,7 +64,7 @@ done
 !;
 
 system ('add_changelog', '-e','- bootstrap pack of jars created with jppbootstrap script
-- temporary package to sutisfy circular dependencies',$specfile);
+- temporary package to satisfy circular dependencies',$specfile);
 `rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir .' -bs $specfile`;
 `rm -r $tmpdir`;
 

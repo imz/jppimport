@@ -1,0 +1,171 @@
+#!/bin/sh
+#
+# Startup script for JBoss
+# JPackage Project <http://www.jpackage.org/>
+# $Id$
+
+# chkconfig: - 86 11
+# description: JBoss EJB Container
+# config: __ETC__/jboss4.conf
+# pidfile: __VAR__/run/jboss4.pid
+
+### BEGIN INIT INFO
+# Provides: jboss4
+# Required-Start: $local_fs $network
+# Short-Description: JBoss EJB Container
+### END INIT INFO
+
+# Source LSB function library.
+#[ -f /lib/lsb/init-functions ] && . /lib/lsb/init-functions
+# Do not load RH compatibility interface.
+WITHOUT_RC_COMPAT=1
+
+# Source function library.
+. /etc/init.d/functions
+
+# Get config.
+. __ETC__/jboss4.conf
+
+# Set some essential variables
+JBOSS_BINDIR="$JBOSS_HOME/bin"
+
+LOCKFILE=__VAR__/lock/subsys/jboss4
+PIDFILE=__VAR__/run/jboss4.pid
+TMPDIR=__VAR__/cache/jboss4
+
+# Functions
+start ()
+{
+    if [ ! -f $LOCKFILE ]; then
+        # Check that JBOSS_USER exists
+        id $JBOSS_USER > /dev/null 2>&1
+        if [ $? -ne 0 -o -z "$JBOSS_USER" ]; then
+            echo "User $JBOSS_USER does not exist..."
+            RETVAL=1
+            return $RETVAL
+        fi
+
+        echo "Starting jboss4: "
+
+        touch $LOCKFILE
+
+        # Reset log to make sure we don't read old start message below
+        mkdir -p $JBOSS_HOME/server/$JBOSS_CONFIGURATION/log
+        > $JBOSS_HOME/server/$JBOSS_CONFIGURATION/log/server.log
+
+        chown -R $JBOSS_USER:$JBOSS_USER \
+            $JBOSS_HOME/server/$JBOSS_CONFIGURATION/db \
+            $JBOSS_HOME/server/$JBOSS_CONFIGURATION/log \
+            $JBOSS_HOME/server/$JBOSS_CONFIGURATION/log/server.log \
+            $TMPDIR/$JBOSS_CONFIGURATION \
+            > /dev/null 2>&1
+
+        export JAVA_HOME JAVACMD JAVA_OPTS JBOSS_CONFIGURATION \
+            JBOSS_OPTIONS JBOSS_CLASSPATH JAVAC_JAR PROFILER JETTY_PORT \
+            JETTY_PORT_SSL JETTY_PORT_AJP
+
+        initlog -q -c "su $JBOSS_USER -s /bin/sh -c \"cd $TMPDIR/$JBOSS_CONFIGURATION && sh $JBOSS_BINDIR/run.sh -c $JBOSS_CONFIGURATION $JBOSS_OPTIONS\"" &
+
+        sleep=0
+        RETVAL=1
+        while [ $sleep -lt 180 -a $RETVAL -eq 1 ]; do
+            sleep 10
+            sleep=`expr $sleep + 10`
+            grep -q MicroKernel $JBOSS_HOME/server/$JBOSS_CONFIGURATION/log/server.log > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                RETVAL=0
+            fi
+        done
+        # Uncomment if JBoss doesn't deploy everything in time
+        #sleep 60
+        [ $RETVAL -eq 0 ] && success "jboss4 startup" || ( failure "jboss startup" && rm -f $LOCKFILE )
+        echo ""
+    else
+        echo "lockfile for jboss4 already exists..."
+        RETVAL=1
+    fi
+    return $RETVAL
+}
+
+stop ()
+{
+    echo -n "Shutting down jboss4: "
+
+    # Don't stop it if it's not running..
+    status > /dev/null 2>&1
+    if [ $? -eq 3 ]; then
+        success "jboss4 shutdown"
+        echo ""
+        return 0
+    fi
+
+    export JAVA_HOME JAVACMD JAVA_OPTS JBOSS_CONFIGURATION JBOSS_OPTIONS \
+        JBOSS_CLASSPATH JAVAC_JAR PROFILER JETTY_PORT JETTY_PORT_SSL \
+        JETTY_PORT_AJP
+
+    initlog -q -c "su $JBOSS_USER -s /bin/sh -c \"sh $JBOSS_BINDIR/shutdown.sh $JBOSS_SHUTDOWN_OPTIONS --\"" &
+
+    # Sleep every 10 seconds for up to 180 seconds, and check to see if
+    # jboss is still running
+    sleep=10
+    RETVAL=1
+    while [ $sleep -lt 180 -a $RETVAL -eq 1 ]; do
+        sleep 5
+        sleep=`expr $sleep + 10`
+        pslist=$( ps -af | grep java | grep $JBOSS_USER | awk '{print $2}' | tr '\n' ' ' | sed -e s/\ $// )
+        [ -z "$pslist" ]
+        if [ $? -eq 0 ]; then
+            RETVAL=0
+        fi
+    done
+    [ $RETVAL -eq 0 ] && ( success "jboss4 shutdown" && rm -f $LOCKFILE ) || failure "jboss4 shutdown"
+    echo ""
+    return $RETVAL
+}
+
+status ()
+{
+    pslist=$( ps -af | grep java | grep $JBOSS_USER | awk '{print $2}' | tr '\n' ' ' | sed -e s/\ $// )
+    if [ -n "$pslist" ]; then
+        echo "jboss4 (pid $pslist) is running"
+        return 0
+    fi
+    if [ -f $PIDFILE ]; then
+        echo "jboss4 dead but pid file exists"
+        return 1
+    fi
+    if [ -f $LOCKFILE ]; then
+        echo "jboss4 dead but subsys locked"
+        return 2
+    fi
+    echo "jboss4 is stopped"
+    return 3
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        RETVAL=$?
+        ;;
+    restart|reload|force-reload)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f $LOCKFILE ]; then
+            restart
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart}"
+        exit 1
+esac
+
+exit $RETVAL

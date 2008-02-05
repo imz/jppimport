@@ -1,0 +1,12 @@
+--- wadi-2.0-M1/modules/core/project.xml	2005-10-27 15:08:54 +0400
++++ wadi-2.0-M1/modules/core/project.xml	2008-01-28 15:51:13 +0300
+@@ -87,9 +87,6 @@
+       <id>commons-httpclient</id>
+       <version>2.0.2</version>
+       <url>http://jakarta.apache.org/commons/httpclient/</url>
+-      <properties>
+-	<dist.bundle>lib</dist.bundle>
+-      </properties>
+       <javadoc>http://jakarta.apache.org/commons/httpclient/apidocs</javadoc>
+       <type>jar</type>
+       <properties>

@@ -30,8 +30,12 @@ zip -u lib/org.mortbay.jetty.jar META-INF/MANIFEST.MF
 ');
 
     # remove explicit group ids
-    $jpp->get_section('pre','')->subst_if(qr'-[gu]\s+%\{jtuid\}','',qr'add');
-    #-s /bin/sh?
+    $jpp->get_section('pre','')->subst_if(qr'-[gu]\s+%\{jtuid\}','-r',qr'add');
+    # set default shell to /dev/null (will it work ?)
+    $jpp->get_section('pre','')->subst_if(qr'-s /bin/sh','/dev/null',qr'add');
+    # hack to fix upgrade from -alt2 if rmuser/adduser to be applied
+    #$jpp->get_section('post','')->push_body('chown -R %{name}.%{name} %logdir'."\n");
+
     #$jpp->get_section('pre','')->subst_if(qr'-s /bin/sh','/bin/false',qr'add');
     $jpp->get_section('files','')->unshift_body('%{_mavendepmapfragdir}/*
 %_datadir/maven2/poms/*'."\n");

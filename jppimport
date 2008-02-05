@@ -199,8 +199,15 @@ sub jpp_specific_fix {
 	} elsif ($t eq 'changelog') {
 	}
 	# general hacks here
+	# is it worth wrapping in one?
+	$sec->subst(qr'%{_localstatedir}/', '%{_var}/');
 	# altlinux vs redhat incompatibility (found in hsqldb)
-	$sec->subst(qr'%{_localstatedir}/lib', '%{_var}/lib');
+	#$sec->subst(qr'%{_localstatedir}/lib', '%{_var}/lib');
+	#$sec->subst(qr'%{_localstatedir}/log', '%{_var}/log');# jetty 5
+	#$sec->subst(qr'%{_localstatedir}/run', '%{_var}/run');# jetty 5
+	#$sec->subst(qr'%{_localstatedir}/cache', '%{_var}/cache');# jetty 5
+	# due to feature of alt findreq
+	$sec->subst(qr'%{_sysconfdir}/init.d','%_initdir');
     }
 
     # hack... it looks like it should be moved to RPM::ImportTool
