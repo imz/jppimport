@@ -2,23 +2,14 @@
 
 $spechook = sub {
     my ($jpp, $alt) = @_;
-    # todo: report?
-    $jpp->get_section('package','')->unshift_body('BuildRequires: sf-maven-plugins'."\n");
-    $jpp->get_section('package','')->unshift_body('
-#[JPackage-announce] [RPM (1.7)] clirr-0.6-3jpp
-# does not matter, as we use dependency on maven-plugins
-BuildRequires:  maven-plugins-base
-BuildRequires:  maven-plugin-changes
-BuildRequires:  maven-plugin-developer-activity
-BuildRequires:  maven-plugin-file-activity
-BuildRequires:  maven-plugin-jdepend
-BuildRequires:  maven-plugin-jxr
-BuildRequires:  maven-plugin-license
-BuildRequires:  maven-plugin-linkcheck
-BuildRequires:  maven-plugin-multiproject
-BuildRequires:  maven-plugin-tasklist
-BuildRequires:  maven-plugin-test
-BuildRequires:  maven-plugin-xdoc
+    # bugs to report
+    # TODO: clirr manual is empty!!!
+    # BUG; why it depends on maven!
+    $jpp->get_section('package','')->subst(qr'^Requires:\s+maven','#Requires: maven');
+    $jpp->get_section('package','maven-plugin')->push_body('
+# moved form core package (strange deps for it)
+Requires: maven >= 0:1.1                                                        
+Requires: maven-model
 ');
 
     $jpp->get_section('build')->unshift_body_before(q!
@@ -27,7 +18,46 @@ mkdir -p .maven/repository/JPP/plugins/
 ln -s /usr/share/java/maven-plugins/maven-javaapp-plugin.jar .maven/repository/JPP/plugins/
 !, qr'^maven -Dmaven');
 
-    $jpp->get_section('files','')->push_body('%exclude %_javadir/maven-plugins/maven-clirr-plugin.jar'."\n");
+    # BUG: duplicate files with maven-plugin
+    $jpp->get_section('files','')->push_body('%exclude %_javadir/maven-plugins*'."\n");
+
+    # TODO: script
+    $jpp->get_section('files','')->push_body('%_bindir/%name'."\n");
+    $jpp->get_section('install')->push_body(q{
+mkdir -p $RPM_BUILD_ROOT%_bindir/
+cat > $RPM_BUILD_ROOT%_bindir/%name <<'EOF'
+#!/bin/sh
+# 
+# Clirr startup script
+#
+# JPackage Project <http://www.jpackage.org/>
+
+# Source functions library
+if [ -f /usr/share/java-utils/java-functions ] ; then 
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't find functions library, aborting"
+  exit 1
+fi
+
+# Configuration
+MAIN_CLASS=net.sf.clirr.cli.Clirr
+BASE_JARS="bcel commons-cli commons-lang"
+
+# Set parameters
+set_jvm
+set_classpath $BASE_JARS
+set_flags $BASE_FLAGS
+set_options $BASE_OPTIONS
+
+# Let's start
+run "$@"
+EOF
+
+chmod 755 $RPM_BUILD_ROOT%_bindir/%name
+});
+    
+
 }
 __END__
     # is it really needed?

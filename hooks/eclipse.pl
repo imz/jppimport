@@ -21,7 +21,7 @@ $spechook = sub {
     # misplaced in requires
     $jpp->get_section('package','')->unshift_body('
 # todo: remove this 
-%add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_4.1.230.v20070531/lib/jspapi.jar
+%add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
 %add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
 %add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
 ');
@@ -148,7 +148,6 @@ popd
     $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-servlet-2.4-api >= 5.5.23-9jpp.4','Requires: tomcat5-servlet-2.4-api >= 5.5.25-alt1_1.1jpp');
     $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jsp-2.0-api >= 5.5.23-9jpp.4','Requires: tomcat5-jsp-2.0-api >= 5.5.25-alt1_1.1jpp');
 
-
 # desktop-file-validate /usr/src/RPM/SOURCES/eclipse.desktop
 #/usr/src/RPM/SOURCES/eclipse.desktop: error: value "eclipse.png" for key "Icon" in group "Desktop Entry" is an icon name with an extension, but there should be no extension as described in the Icon Theme Specification if the value is not an absolute path
 #/usr/src/RPM/SOURCES/eclipse.desktop: warning: key "Encoding" in group "Desktop Entry" is deprecated
@@ -158,7 +157,7 @@ popd
 %__subst 's,X-Red-Hat-Base;,,' %{SOURCE2}
 },qr'desktop-file-validate %{SOURCE2}');
 
-    #TODO: support for alt feature
+    #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
     $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.0.zip');
     foreach my $section (@{$jpp->get_sections()}) {
@@ -166,6 +165,17 @@ popd
     }
     $jpp->get_section('package','')->subst_if(qr'\.\d+.zip','.zip',qr'^Source4:');
 
+    &replace_built_in_ant($jpp);
+    &leave_built_in_lucene($jpp);
+    #&leave_built_in_jasper_plugin($jpp);
+
+#TODO: sed --in-place "s/4.1.130/5.5.23/g" на sed --in-place "s/4.1.230/5.5.25/g"
+
+
+};
+
+sub replace_built_in_ant {
+    my $jpp=shift;
     # ALT ant has extra packages, so enable them
     #################### ANT ####################
     $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook', qr!# Fedora.  When that's done, add it here and symlink below.!);
@@ -177,28 +187,15 @@ qr'# https://bugzilla.redhat.com/bugzilla/show_bug.cgi\?id=180642') {
 }
     $jpp->get_section('package','platform')->subst(qr'^#Requires: ant-apache-bsf ant-commons-net', 
 	   'Requires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook');
-
-#ln -s %{_javadir}/ant/ant-apache-bsf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
-#ln -s %{_javadir}/ant/ant-commons-net.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
-#ln -s %{_javadir}/ant/ant-jai.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
-#ln -s %{_javadir}/ant/ant-jmf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
-#ln -s %{_javadir}/ant/ant-stylebook.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
     $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
-
-#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
-#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
-#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
-#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
-#rm plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
     $jpp->get_section('install')->subst_if(qr'#rm plugins/org.apache.ant_1.7.0.v200706080842','rm plugins/org.apache.ant_1.7.0.v200706080842',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
-#ln -s %{_javadir}/ant/ant-apache-bsf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-apache-bsf.jar
-#ln -s %{_javadir}/ant/ant-commons-net.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-commons-net.jar
-#ln -s %{_javadir}/ant/ant-jai.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jai.jar
-#ln -s %{_javadir}/ant/ant-jmf.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-jmf.jar
-#ln -s %{_javadir}/ant/ant-stylebook.jar plugins/org.apache.ant_1.7.0.v200706080842/lib/ant-stylebook.jar
     $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
     ################ END ANT ####################
+}
 
+
+sub leave_built_in_jasper_plugin {
+    my $jpp=shift;
     ############### jasper ######################
     # fix for jasper ; looks like it is required for help to work
     #$jpp->get_section('install')->unshift_body_after('ln -s %{_javadir}/tomcat5-jasper-runtime.jar plugins/org.apache.jasper_5.5.17.v200706111724.jar',qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
@@ -214,7 +211,10 @@ qr'# https://bugzilla.redhat.com/bugzilla/show_bug.cgi\?id=180642') {
     $jpp->get_section('prep')->subst(qr'^\s+plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#   plugins/org.apache.jasper_5.5.17.v200706111724.jar');
     $jpp->get_section('files','platform')->unshift_body('%{_datadir}/%{name}/plugins/org.apache.jasper_5.5.17.*'."\n");
     #############################################
+}
 
+sub leave_built_in_lucene {
+    my $jpp=shift;
     # lucene: let it leave eclipse version
     $jpp->get_section('package','platform')->subst(qr'^Requires: lucene >= 1.9.1', '#Requires: lucene >= 1.9.1');
     $jpp->get_section('package','platform')->subst(qr'^Requires: lucene-contrib >= 1.9.1', '#Requires: lucene-contrib >= 1.9.1');
@@ -226,17 +226,39 @@ qr'# https://bugzilla.redhat.com/bugzilla/show_bug.cgi\?id=180642') {
     $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
     $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
 
-    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('install')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
+    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    $jpp->get_section('install')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
     # end lucene
-
 }
 
-
-
 __END__
+
+12.02.2008 21:16:10 org.mortbay.jetty.servlet.ServletHandler handle             WARNING: Error for /help/index.jsp
+java.lang.IncompatibleClassChangeError: Class org.apache.jasper.servlet.JspServlet does not implement the requested interface javax.servlet.Servlet
+        at org.eclipse.equinox.jsp.jasper.JspServlet.init(JspServlet.java:81)
+        at org.eclipse.equinox.http.registry.internal.ServletManager$ServletWrapper.initializeDelegate(ServletManager.java:195)
+        at org.eclipse.equinox.http.registry.internal.ServletManager$ServletWrapper.service(ServletManager.java:179)
+        at org.eclipse.equinox.http.servlet.internal.ServletRegistration.handleRequest(ServletRegistration.java:90)
+        at org.eclipse.equinox.http.servlet.internal.ProxyServlet.processAlias(ProxyServlet.java:109)
+        at org.eclipse.equinox.http.servlet.internal.ProxyServlet.service(ProxyServlet.java:75)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:803)
+        at org.eclipse.equinox.http.jetty.internal.HttpServerManager$InternalHttpServiceServlet.service(HttpServerManager.java:280)   
+        at org.mortbay.jetty.servlet.ServletHolder.handle(ServletHolder.java:428)
+        at org.mortbay.jetty.servlet.ServletHandler.dispatch(ServletHandler.java:677)
+        at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:568)
+        at org.mortbay.http.HttpContext.handle(HttpContext.java:1530)
+        at org.mortbay.http.HttpContext.handle(HttpContext.java:1482)
+        at org.mortbay.http.HttpServer.service(HttpServer.java:909)
+        at org.mortbay.http.HttpConnection.service(HttpConnection.java:820)
+        at org.mortbay.http.HttpConnection.handleNext(HttpConnection.java:986)
+        at org.mortbay.http.HttpConnection.handle(HttpConnection.java:837)
+        at org.mortbay.http.SocketListener.handleConnection(SocketListener.java:245)
+        at org.mortbay.util.ThreadedServer.handle(ThreadedServer.java:357)
+        at org.mortbay.util.ThreadPool$PoolThread.run(ThreadPool.java:534)
+
+
 
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
     # note: disabled in 16 and enabled in 18 again

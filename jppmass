@@ -124,6 +124,7 @@ our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #jaf sun-jaf
 #javamail sun-mail
 #jakarta-commons-cli-1 jakarta-commons-cli
+#xerces-j xerces-j2
 our %ALT2JPPMAP=qw/
 jakarta-crimson crimson
 /;
