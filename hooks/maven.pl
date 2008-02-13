@@ -42,25 +42,21 @@ BuildRequires: jakarta-commons-digester
 BuildRequires: jakarta-commons-jelly-tags-http
 ');
 
-#    $jpp->disable_package('plugin-jalopy');
-    $jpp->disable_package('plugin-aspectj');
+#    $jpp->disable_package('plugin-aspectj');
 #    $jpp->disable_package('plugin-release');
-    $jpp->disable_package('plugin-dashboard');
-    $jpp->disable_package('plugin-eclipse');
-#    $jpp->disable_package('plugin-latka');    # latka
-#    $jpp->disable_package('plugin-modello');   # modello w/maven2
-    $jpp->disable_package('plugin-genapp');    # hivemind
-#    $jpp->disable_package('plugin-scm'); # maven-scm
-#    $jpp->disable_package('plugin-tjdo');    # tjdo
-#    $jpp->disable_package('plugin-wizard'); #
+#    $jpp->disable_package('plugin-dashboard');
+#    $jpp->disable_package('plugin-eclipse');
+    $jpp->disable_package('plugin-genapp');    # jboss4-server
+
+    $jpp->get_section('package','')->push_body(q!# eclipse plugin requirements (removed eclipse-pde)
+BuildRequires: jakarta-cactus eclipse
+!);
+
+    # hack around excalibur-bootstrap-bundle
+    $jpp->get_section('package','aspectj')->subst_if(qr'aspectj >= 0:1.2.1','aspectj',qr'Requires:');
 
 
-    $jpp->get_section('install')->push_body(q!
-
-## forehead.conf hack: #######
-#cat ../maven/src/bin/forehead.conf.untouched > $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/forehead.conf
-### end forehead.conf hack ###
-# new hack ###################
+    $jpp->get_section('install')->push_body(q!# new hack ###################
 cp $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library.orig
 grep -v 'exit 0' $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library.orig > $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library
 cat >> $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library <<EOF
@@ -81,26 +77,18 @@ EOF
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist %_datadir/maven/repository/javadoc/jars/*'."\n");
 
     $jpp->get_section('build')->unshift_body(q{
-subst 's,-classpath "${MAVEN_HOME}/lib/\[forehead\].jar",-classpath "${MAVEN_HOME}/lib/[forehead].jar":"${MAVEN_HOME}/lib/forehead.jar",' ../maven/src/bin/maven
-subst 's,\]\.jar,.jar,' ../maven/src/bin/forehead.conf
-subst 's,lib/\[,lib/,' ../maven/src/bin/forehead.conf
-subst 's,ant\]\[,,' ../maven/src/bin/forehead.conf
+subst 's,-classpath "${MAVEN_HOME}/lib/\[forehead\].jar",-classpath "${MAVEN_HOME}/lib/[forehead].jar":"${MAVEN_HOME}/lib/forehead.jar",' ../maven-1.1/src/bin/maven
+subst 's,\]\.jar,.jar,' ../maven-1.1/src/bin/forehead.conf
+subst 's,lib/\[,lib/,' ../maven-1.1/src/bin/forehead.conf
+subst 's,ant\]\[,,' ../maven-1.1/src/bin/forehead.conf
 
 
 });
 
     $jpp->get_section('prep')->push_body(qq{
-#rm -r ../maven-plugins/jalopy
-rm -r ../maven-plugins/aspectj
-# tests fails
-rm -r ../maven-plugins/dashboard
-#
-rm -r ../maven-plugins/eclipse
+#rm -r ../maven-plugins/{aspectj,dashboard,eclipse}
 rm -r ../maven-plugins/genapp
-#rm -r ../maven-plugins-sandbox/modello
-#rm -r ../maven-plugins-sandbox/release
-#rm -r ../maven-plugins-sandbox/tjdo
-#rm -r ../maven-plugins-sandbox/wizard
+#rm -r ../maven-plugins-sandbox/{modello,release,tjdo,wizard}
 });
 
     $jpp->get_section('build')->push_body_after('build-jar-repository home/lib commons-jelly-tags-jsl'."\n",
@@ -109,7 +97,11 @@ rm -r ../maven-plugins/genapp
 # TODO: report bug
     $jpp->get_section('install')->push_body(q'
 # looks like symlink is added in process of build and is copied mechanically
-rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/jars/maven-j2ee-plugin.jar
+# gone away in 1.1-2jpp
+#rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/jars/maven-j2ee-plugin.jar
+# broken symlinks :(
+rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/jars/maven-changes-plugin-1.7.jar
+rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/plugins/maven-jcoverage-plugin-1.0.9.jar
 ');
 
 }
@@ -117,8 +109,6 @@ rm -f $RPM_BUILD_ROOT/usr/share/maven/repository/maven/jars/maven-j2ee-plugin.ja
 
 
 __END__
-############# not used #######
-at %build begin
 ## forehead.conf hack: #######
-cp ../maven/src/bin/forehead.conf ../maven/src/bin/forehead.conf.untouched
+#cat ../maven/src/bin/forehead.conf.untouched > $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/forehead.conf
 ### end forehead.conf hack ###

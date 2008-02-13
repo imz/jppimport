@@ -12,7 +12,5 @@ maven -e \
         -Dmaven.home.local=$(pwd)/.maven \
         jar javadoc
 
-mkdir -p .maven/cache/maven-xdoc-plugin-1.11-SNAPSHOT/commons-build/
-cp commons-build/commons-site.jsl .maven/cache/maven-xdoc-plugin-1.11-SNAPSHOT/commons-build/
 !, qr'^maven');
 }
