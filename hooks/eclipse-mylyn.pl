@@ -4,7 +4,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # due to old splitting...
-    $jpp->get_section('package','')->unshift_body('BuildRequires: lucene-demo jetty5 tomcat5-jasper'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: lucene1-demo jetty5 tomcat5-jasper'."\n");
     $jpp->get_section('install')->subst('^rm \*\.jar\s*$','rm -f *.jar'."\n");
 
 };

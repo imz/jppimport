@@ -39,6 +39,11 @@ fi
 done || :
 ');
 
+    # #14415
+    $jpp->get_section('package','')->subst(qr'We invite you to participate in this open development project. To','');
+    $jpp->get_section('package','')->subst(qr'learn more about getting involved, click here.','');
+
+
 $jpp->get_section('pre')->subst(qr'-[gu] %\{tcuid\}','');
 
 # do not apply; let strange admins do it themselves

@@ -6,6 +6,6 @@ require 'set_target_14.pl';
 $spechook = sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
-#    $jpp->get_section('package','')->subst(qr'jsse >= 0:1.0.2-6jpp','jsse');
-#    $jpp->get_section('package','')->subst(qr'jce >= 0:1.2.2','jce');
+    # no network; hm... maybe altspecific...
+    $jpp->add_patch('mx4j-3.0.1-alt-local-xsl-stylesheets.patch');
 }
