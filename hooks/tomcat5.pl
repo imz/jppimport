@@ -5,17 +5,17 @@ require 'set_fix_homedir_macro.pl';
 $spechook = sub {
     my ($jpp, $alt) = @_;
 
-    # for servletapi 5
-    #$jpp->get_section('package','servlet-2.4-api')->push_body('Provides: servletapi5 = 0:%{version}'."\n");
-
     # BUG to report (5.5.25 1-fc9) too
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');
 
     # fedora specific (5.5.25 1-fc9)
     $jpp->get_section('package','')->push_body('BuildRequires: zip'."\n");
+
     # break build with java 1.5.0
+    #Patch19: %{name}-%{majversion}-connectors-util-build.patch
     $jpp->get_section('prep')->subst(qr'%patch19 -b .p19','#%patch19 -b .p19');
-    $jpp->get_section('prep')->subst(qr'%patch20 -b .p20','#%patch20 -b .p20');
+    #$jpp->get_section('prep')->subst(qr'%patch20 -b .p20','#%patch20 -b .p20');
+    #Patch21: %{name}-%{majversion}-acceptlangheader.patch
     $jpp->get_section('prep')->subst(qr'%patch21 -b .p21','#%patch21 -b .p21');
 
     # to make them 1.4, not 1.5
@@ -40,59 +40,30 @@ done || :
 ');
 
     # #14415
-    $jpp->get_section('package','')->subst(qr'We invite you to participate in this open development project. To','');
-    $jpp->get_section('package','')->subst(qr'learn more about getting involved, click here.','');
+    $jpp->get_section('description','')->subst(qr'We invite you to participate in this open development project. To','');
+    $jpp->get_section('description','')->subst(qr'learn more about getting involved, click here.','');
 
 
-$jpp->get_section('pre')->subst(qr'-[gu] %\{tcuid\}','');
+    $jpp->get_section('pre')->subst(qr'-[gu] %\{tcuid\}','');
 
-# do not apply; let strange admins do it themselves
-# warn; out of %endif
-# does not work with warning 'user tomcat exists'
-#$jpp->get_section('pre')->push_body(q'useradd -G apache tomcat || :'."\n");
-# adapter
-#%_sbindir/groupadd -r -f tomcat -g `id -g %tomcat_user` -o >/dev/null 2>&1 ||:
-#%_sbindir/useradd -r -g %tomcat_group -c "Tomcat server" -d %tomcat_home -s /dev/null -n %tomcat_user \
-#        >/dev/null 2>&1 ||:
+    # a part of #%post_service %name that is not implemented there:
+    # condrestart on upgrade 
+    $jpp->get_section('post')->push_body('/sbin/service %name condrestart'."\n");
 
-# alt
-#%_sbindir/groupadd -r -f %tomcat_group >/dev/null 2>&1 ||:
-#%_sbindir/useradd -r -g %tomcat_group -c "Tomcat server" -d %tomcat_home -s /dev/null -n %tomcat_user \
-#        >/dev/null 2>&1 ||:
-
-# Add the "tomcat" user and group
-# we need a shell to be able to use su - later
-#%{_sbindir}/groupadd -g %{tcuid} -r tomcat 2> /dev/null || :
-#%{_sbindir}/useradd -c "Apache Tomcat" -u %{tcuid} -g tomcat \
-#    -s /bin/sh -r -d %{homedir} tomcat 2> /dev/null || :
-
-# merge from old alt tomcat5:
-# do we really need all of this?
-$jpp->get_section('post')->push_body(q'
-%post_service %name
+    # merge from old alt tomcat5:
+    # do we really need all of this?
+    $jpp->get_section('post','webapps')->push_body(q'/sbin/service %name condrestart
 ');
 
-$jpp->get_section('post','webapps')->push_body(q'
-/sbin/service %name condrestart
+    $jpp->get_section('post','webapps-admin')->push_body(q'/sbin/service %name condrestart
 ');
 
-
-$jpp->get_section('post','webapps-admin')->push_body(q'
-/sbin/service %name condrestart
+    $jpp->get_section('preun','webapps')->push_body(q'[ $1 != 0 ] || /sbin/service %name condrestart
 ');
 
-$jpp->get_section('preun')->push_body(q'
-%preun_service %name
-');
-
-$jpp->get_section('preun','webapps')->push_body(q'
-[ $1 != 0 ] || /sbin/service %name condrestart
-');
-
-$jpp->get_section('preun','webapps-admin')->push_body(q'
-[ $1 != 0 ] || /sbin/service %name condrestart
+    $jpp->get_section('preun','webapps-admin')->push_body(q'[ $1 != 0 ] || /sbin/service %name condrestart
 ');
 
 }
 __DATA__
-todo: logrotate
+todo: verify logrotate

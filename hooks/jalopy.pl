@@ -2,7 +2,7 @@
 
 #require 'set_target_13.pl';
 # todo: create empty post/un!
-#require 'set_update_menus.pl';
+require 'set_update_menus.pl';
 
 # other way is
 push @SPECHOOKS, sub {
@@ -27,4 +27,22 @@ push @SPECHOOKS, sub {
     $jpp->get_section('install')->subst_if(qr'^', '#', qr!cp -pr tmp~/docs/api!);
     $jpp->get_section('install')->subst_if(qr'^', '#', qr!tmp~/docs/manual!);
     $jpp->disable_package('javadoc');
+
+    # one pixmap is 16x16
+    $jpp->get_section('install')->push_body(q'
+mkdir -p $RPM_BUILD_ROOT/%_liconsdir
+mkdir -p $RPM_BUILD_ROOT/%_miconsdir
+mkdir -p $RPM_BUILD_ROOT/%_niconsdir
+ln -s $(relative $RPM_BUILD_ROOT/usr/share/pixmaps/%{name}-settings.png $RPM_BUILD_ROOT/%_niconsdir/) $RPM_BUILD_ROOT/%_niconsdir/
+ln -s $(relative $RPM_BUILD_ROOT/usr/share/pixmaps/%{name}-settings.png $RPM_BUILD_ROOT/%_liconsdir/) $RPM_BUILD_ROOT/%_liconsdir/
+ln -s $(relative $RPM_BUILD_ROOT/usr/share/pixmaps/%{name}-settings.png $RPM_BUILD_ROOT/%_miconsdir/) $RPM_BUILD_ROOT/%_miconsdir/
+');
+
+    $jpp->get_section('files')->push_body(q'
+%_liconsdir/*
+%_miconsdir/*
+%_niconsdir/*
+');
+
+
 }

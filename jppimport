@@ -646,7 +646,7 @@ sub new {
     };
     my $TYPE='package';
     my $PACKAGE='';
-    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?$/ && $RPM::ImportTool::SECTION{$1}) {
+    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?\s*$/ && $RPM::ImportTool::SECTION{$1}) {
 	#print "new section: ".$self->{BODY}->[0],"\n";
 	$TYPE=$1;
 	$PACKAGE=$2;
@@ -1021,8 +1021,7 @@ triggerpostun
 }
 
 sub _parse_speclist {
-    my $rpm=shift;
-    my $specptr=shift;
+    my ($rpm, $specptr)=@_;
     my @outpart;
     my $out=[];
     my $TYPE='package';
@@ -1039,6 +1038,15 @@ sub _parse_speclist {
     #foreach (@{$rpm->{SPECSECTIONS}}) {	$_->describe() }
 }
 
+sub _reset_speclist {
+    my $self=shift;
+    my @out;
+    foreach my $multiline (@{$self->_get_speclist()}) {
+	push @out, split /(?<=\n)/, $multiline;
+    }
+    $self->_set_speclist(\@out);
+}
+
 sub _get_speclist {
     my $self=shift;
     my @out;
@@ -1046,6 +1054,24 @@ sub _get_speclist {
 	push @out, @{$_->get_body()};
     }
     return \@out;
+}
+
+sub add_section {
+    my ($self, $secname, $pkg) =@_;
+    $pkg ||= '';
+    return if $self->get_section($secname,$pkg);
+    return $self->_raw_add_section($secname, $pkg);
+}
+
+sub _raw_add_section {
+    my ($self, $secname, $pkg) =@_;
+    $pkg ||= '';
+    my $instsec=$self->get_section('install');
+    $instsec->push_body("
+\%$secname $pkg
+
+");
+    $self->_reset_speclist();
 }
 
 sub is_specfile_mode {
@@ -1073,8 +1099,9 @@ sub get_section {
     foreach my $section (@{$self->{SPECSECTIONS}}) {
 	return $section if $section->get_type() eq $type and $self->are_package_names_equal($section->get_package(),$pkg);
     }
-    Carp::carp "section $type $pkg not found!";
-    return;
+    $self->_raw_add_section($type,$pkg);
+    Carp::carp "notice: section $type $pkg not found - created.\n";
+    return $self->get_section($type,$pkg);
 }
 
 sub are_package_names_equal {
@@ -1191,9 +1218,9 @@ sub add_patch {
     # register patch
     $self->{PATCHES}->[$param{NUMBER}]=$param{NAME};
     # add patch to spec
-    $jpp->get_section('prep')->push_body('%patch'.$param{NUMBER}.' -p'.$param{STRIP}."\n");
-    $jpp->get_section('package','')->push_body('Patch'.$param{NUMBER}.': '.$param{NAME}."\n");
-    $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
+    $self->get_section('prep')->push_body('%patch'.$param{NUMBER}.' -p'.$param{STRIP}."\n");
+    $self->get_section('package','')->push_body('Patch'.$param{NUMBER}.': '.$param{NAME}."\n");
+    $self->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
 }
 
 sub add_source {
@@ -1209,8 +1236,8 @@ sub add_source {
     # register patch
     $self->{SOURCES}->[$param{NUMBER}]=$param{NAME};
     # add to spec
-    $jpp->get_section('package','')->push_body('Source'.$param{NUMBER}.': '.$param{NAME}."\n");
-    $jpp->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
+    $self->get_section('package','')->push_body('Source'.$param{NUMBER}.': '.$param{NAME}."\n");
+    $self->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
     return $param{NUMBER};
 }
 
