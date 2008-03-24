@@ -260,6 +260,10 @@ sub jpp_specific_cleanup_files {
 #	} elsif (/^\s*\%ghost\s*\%dir\s*\%{_javadocdir}/) {
 	    # throw away -- seems dangerous
 #	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
+	} elsif (/^\s*\%ghost\s*\%{_javadir}/) {
+	    # seems to be touch for alternatives. better to exclude.
+	    s/^\s*\%ghost\s*/\%exclude /;
+	    push @out, $_;
 	} elsif (/^\s*\%ghost\s*/) {
 	    # alternatives ?
 	    push @out, "#".$_;
