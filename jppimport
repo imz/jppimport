@@ -9,7 +9,7 @@ my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
 my $verbose=0;
 my $quiet=0;
 my $srpmdir='.';
-my $patchdir=&RPM::SRPM::Editor::dirname($0)."/patches";
+my $patchdir=&RPM::Source::Editor::dirname($0)."/patches";
 
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
@@ -51,7 +51,7 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::SRPM::Editor->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet, NOBZ2=>$nobz2);
+$jpp=RPM::Source::Editor->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet, NOBZ2=>$nobz2, CHANGELOG=>'- converted from JPackage by jppimport script');
 
 print STDERR "entering alt_generic_fixes\n" if $verbose;
 &alt_generic_fix($jpp);
@@ -75,7 +75,7 @@ if ($jpprel=~/\%\{\?dist\}/) {
 }
 
 if ($altrpm || $altspec) {
-    $alt=RPM::SRPM::Editor->new(RPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    $alt=RPM::Source::Editor->new(RPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     $altrel = $alt->get_section('package','')->get_tag('Release');
     $altver = $alt->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
@@ -114,7 +114,7 @@ $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
 # our -- hack ?
-our $jpptoolsdir=&RPM::SRPM::Editor::dirname($0);
+our $jpptoolsdir=&RPM::Source::Editor::dirname($0);
 # for cross-references in hooks
 push @INC, $jpptoolsdir."/hooks";
 
@@ -210,7 +210,7 @@ sub jpp_specific_fix {
 	$sec->subst(qr'%{_sysconfdir}/init.d','%_initdir');
     }
 
-    # hack... it looks like it should be moved to RPM::SRPM::Editor
+    # hack... it looks like it should be moved to RPM::Source::Editor
     # zip -> bz2 due to alt buggy rpm (/usr/bin/unzip -qL) :(
     $main_sec=$rpm->get_section('package','');
     if ($main_sec->match(qr'^\s*Source\d*:.+\.(zip|jar)\s*$') 
@@ -222,13 +222,13 @@ sub jpp_specific_fix {
 	    $source=~s/\s*$//;
 	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}') and ! $rpm->is_specfile_mode()) {
 		print STDERR "note: try to bzip2 zip source [$source]\n";
-		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::SRPM::Editor::basename($source);
+		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::Source::Editor::basename($source);
 		if (! -e $sourcefile) {
 		    warn "Internal error: source $source not found!";
 		} else {
 		    my $convertdir= $rpm->{TMPDIR}.'/CONVERT'.$i;
 		    mkdir $convertdir;
-		    &RPM::SRPM::Editor::run ("pushd $convertdir; unzip -q $sourcefile; popd");
+		    &RPM::Source::Editor::run ("pushd $convertdir; unzip -q $sourcefile; popd");
 		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
 		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
 		    my $arjsuff='.bz2';
@@ -238,7 +238,7 @@ sub jpp_specific_fix {
 			$arjsuff='';
 		    }
 		    $sourcefile=~s/\.(zip|jar)$/.tar$arjsuff/;
-		    &RPM::SRPM::Editor::run ("tar c${arjtarg}f $sourcefile -C $convertdir @files @hidden_files");
+		    &RPM::Source::Editor::run ("tar c${arjtarg}f $sourcefile -C $convertdir @files @hidden_files");
 		    my $rawsource=$rpm->{RAWSOURCES}->[$i];
 		    my $newsource=$rawsource;
 		    $newsource=~s/\.(zip|jar)$/.tar$arjsuff/;
@@ -638,7 +638,7 @@ sub read_space {
     $$lineptr=~s/^\s*//;
 }
 
-package RPM::SpecSection;
+package RPM::Source::SpecSection;
 
 sub new {
     my $class = shift;
@@ -650,7 +650,7 @@ sub new {
     };
     my $TYPE='package';
     my $PACKAGE='';
-    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?\s*$/ && $RPM::SRPM::Editor::SECTION{$1}) {
+    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?\s*$/ && $RPM::Source::Editor::SECTION{$1}) {
 	#print "new section: ".$self->{BODY}->[0],"\n";
 	$TYPE=$1;
 	$PACKAGE=$2;
@@ -938,7 +938,7 @@ sub get_tag {
 	    #warn "tag=$tag raw =$1";
 	    my $val=$1;
 	    if (!$options{RAW}) {
-		&RPM::SRPM::Editor::macro_subst_inplace($section->{RPM}->{MACRO},\$val);
+		&RPM::Source::Editor::macro_subst_inplace($section->{RPM}->{MACRO},\$val);
 	    }
 	    return $val;
 	}
@@ -959,7 +959,7 @@ sub set_tag {
 }
 
 
-package RPM::SRPM::Editor;
+package RPM::Source::Editor;
 
 sub new {
     my $class = shift;
@@ -1032,12 +1032,12 @@ sub _parse_speclist {
     foreach (@$specptr) {
 	if (/^\s*\%(\w+)\s*/ && $SECTION{$1}) {
 	    #my $NEWTYPE=$1;
-	    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out);#, TYPE=>$TYPE, PACKAGE=>$PACKAGE);
+	    push @outpart, RPM::Source::SpecSection->new(RPM=>$rpm, BODY=>$out);#, TYPE=>$TYPE, PACKAGE=>$PACKAGE);
 	    $out=[];
 	}
 	push @$out, $_;
     }
-    push @outpart, RPM::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE => $TYPE);
+    push @outpart, RPM::Source::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE => $TYPE);
     $rpm->{SPECSECTIONS}=\@outpart;
     #foreach (@{$rpm->{SPECSECTIONS}}) {	$_->describe() }
 }
