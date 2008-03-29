@@ -90,7 +90,8 @@ if ($altrpm || $altspec) {
 	if ($rel=~/^0\./ or $vercmp != 0) {
 	    $rel=1;
 	} elsif ($jppfrom eq $jpprel) {
-	    $rel=$rel+1;
+	    $rel=~/^(\d+)/;
+	    $rel=$1+1;
 	}
 	$altrel='alt'.$rel;
     } else {

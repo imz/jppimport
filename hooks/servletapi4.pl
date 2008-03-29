@@ -18,9 +18,5 @@ EOF
 ');
     $jpp->get_section('files')->push_body('%_altdir/servletapi_*'."\n");
     $jpp->get_section('post')->push_body('%register_alternatives servletapi_%{name}'."\n");
-    $jpp->get_section('postun')->push_body('
-if [ "$1" = "0" ]; then
-        %unregister_alternatives servletapi_%{name}
-fi
-'."\n");
+    $jpp->get_section('postun')->push_body('%unregister_alternatives servletapi_%{name}'."\n");
 }

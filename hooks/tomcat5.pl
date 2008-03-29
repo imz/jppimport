@@ -28,17 +28,6 @@ $spechook = sub {
     $jpp->get_section('package','')->push_body('Obsoletes: %{name}-server <= 5.5.16-alt1.1'."\n");
     $jpp->get_section('package','admin-webapps')->push_body('Provides: %{name}-admin-webapps = %{version}-%{release}'."\n");
     $jpp->raw_rename_section('admin-webapps','webapps-admin');
-    $jpp->get_section('install')->push_body(
-q'
-%triggerpostun -- tomcat5-server <= 5.5.16-alt1.1
-for i in common/classes common/endorsed common/lib shared/classes shared/lib webapps; do
-if [ -d /usr/lib/tomcat5/$i ]; then
-    echo "upgrade: moving old /usr/lib/tomcat5/$i to /var/lib/tomcat5/$i"
-    mv -f /usr/lib/tomcat5/$i/* /var/lib/tomcat5/$i/
-fi
-done || :
-');
-
     # #14415
     $jpp->get_section('description','')->subst(qr'We invite you to participate in this open development project. To','');
     $jpp->get_section('description','')->subst(qr'learn more about getting involved, click here.','');
@@ -62,6 +51,27 @@ done || :
 ');
 
     $jpp->get_section('preun','webapps-admin')->push_body(q'[ $1 != 0 ] || /sbin/service %name condrestart
+');
+
+    # todo: make an extension?
+    $jpp->get_section('install')->push_body('mkdir -p $RPM_BUILD_ROOT/%_altdir/
+cat >>$RPM_BUILD_ROOT/%_altdir/servletapi_%{name}<<EOF
+%{_javadir}/servletapi.jar	%{_javadir}/%{name}-servlet-2.4-api-%{version}.jar	20400
+EOF
+');
+    $jpp->get_section('files','servlet-2.4-api')->push_body('%_altdir/servletapi_*'."\n");
+    $jpp->get_section('post','servlet-2.4-api')->push_body('%register_alternatives servletapi_%{name}'."\n");
+    $jpp->get_section('postun','servlet-2.4-api')->push_body('%unregister_alternatives servletapi_%{name}'."\n");
+
+    $jpp->get_section('install')->push_body(
+q'
+%triggerpostun -- tomcat5-server <= 5.5.16-alt1.1
+for i in common/classes common/endorsed common/lib shared/classes shared/lib webapps; do
+if [ -d /usr/lib/tomcat5/$i ]; then
+    echo "upgrade: moving old /usr/lib/tomcat5/$i to /var/lib/tomcat5/$i"
+    mv -f /usr/lib/tomcat5/$i/* /var/lib/tomcat5/$i/
+fi
+done || :
 ');
 
 }
