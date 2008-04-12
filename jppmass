@@ -223,7 +223,7 @@ sub get_name_and_rpm {
 
 sub run_jppimport {
     my ($name, $jpprpm, $altrpm)=@_;
-    my $importcmd="$jppimport --srpmdir $OUTDIR";
+    my $importcmd="$jppimport --outdir $OUTDIR";
     $importcmd.=" --changelog '$changelog'" if ($changelog);
     $importcmd.=" --alt $altrpm" if ($altrpm);
     $importcmd.=" --jvm $jvm" if ($jvm);

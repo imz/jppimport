@@ -4,25 +4,25 @@
 use warnings;
 use Carp;
 use Getopt::Long;
+use RPM::Source::Editor;
+use File::Basename;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
-my $verbose=0;
-my $quiet=0;
-my $srpmdir='.';
-my $patchdir=&RPM::Source::Editor::dirname($0)."/patches";
+my $verbose=1;
+my $outputdir='.';
+my $patchdir=dirname($0)."/patches";
 
 my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "alt=s"   => \$altrpm,
 		      "jvm=s" => \$jvm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
-		      "srpmdir=s"   => \$srpmdir,
-		      "out=s"   => \$srpmdir,
+		      "outdir=s"   => \$outputdir,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
 		      "release=s"   => \$release,
 		      "nobz2"   => \$nobz2,
-		      "verbose"  => \$verbose);
+		      "verbose+"  => \$verbose);
 my ($alt,$jpp);
 
 if (! $jpprpm && ! $jppspec) {
@@ -35,8 +35,7 @@ if (! $jpprpm && ! $jppspec) {
 --hook /path/to/hook to be called on resulting spec file
 --jvm jvm JVM required for the build. by default, it is java-1.4.2.
   values are: 4 5 6 4.2 5.0 6.0
---srpmdir /path/to/output_dir
---out  is the same as --srpmdir
+--out /path/to/output_dir
 --changelog '- message'
 --release 'release' - if we need to adjust the package's release
 
@@ -51,13 +50,13 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::Source::Editor->new(RPM => $jpprpm, SPECFILE=> $jppspec, SRPMDIR=> $srpmdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, QUIET=>$quiet, NOBZ2=>$nobz2, CHANGELOG=>'- converted from JPackage by jppimport script');
+$jpp=RPM::Source::Editor->new(SOURCERPM => $jpprpm, SPECFILE=> $jppspec, OUTPUTDIR=> $outputdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, NOBZ2=>$nobz2, CHANGELOG=>'- converted from JPackage by jppimport script');
 
-print STDERR "entering alt_generic_fixes\n" if $verbose;
+print STDERR "entering alt_generic_fixes\n" if $verbose>1;
 &alt_generic_fix($jpp);
-print STDERR "done alt_generic_fixes\n" if $verbose;
+print STDERR "done alt_generic_fixes\n" if $verbose>1;
 &jpp_specific_fix($jpp);
-print STDERR "done jpp_specific_fixes\n" if $verbose;
+print STDERR "done jpp_specific_fixes\n" if $verbose>1;
 
 my $altrel="alt1";
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
@@ -75,7 +74,7 @@ if ($jpprel=~/\%\{\?dist\}/) {
 }
 
 if ($altrpm || $altspec) {
-    $alt=RPM::Source::Editor->new(RPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     $altrel = $alt->get_section('package','')->get_tag('Release');
     $altver = $alt->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
@@ -115,7 +114,7 @@ $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
 # our -- hack ?
-our $jpptoolsdir=&RPM::Source::Editor::dirname($0);
+our $jpptoolsdir=dirname($0);
 # for cross-references in hooks
 push @INC, $jpptoolsdir."/hooks";
 
@@ -132,10 +131,10 @@ if ($hook) {
     our $spechook;
     require $hook;
     if ($spechook or @SPECHOOKS) {
-	$jpp->{QUIET}++;
+	$jpp->{WARN_NOTAPPLIED}++;
 	map {&$_($jpp,$alt)} @SPECHOOKS;
 	&$spechook($jpp,$alt) if $spechook;
-	$jpp->{QUIET}--;
+	$jpp->{WARN_NOTAPPLIED}--;
     } else {
 	die "script $hook does not have a valid hook!\n";
     }
@@ -145,7 +144,7 @@ if ($changelog) {
     $jpp->set_changelog($changelog);
 }
 
-print $jpp->get_spec() if $jppspec or $verbose;
+print $jpp->get_spec() if $jppspec or $verbose>1;
 $jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
@@ -223,7 +222,7 @@ sub jpp_specific_fix {
 	    $source=~s/\s*$//;
 	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}') and ! $rpm->is_specfile_mode()) {
 		print STDERR "note: try to bzip2 zip source [$source]\n";
-		my $sourcefile=$rpm->{SOURCEDIR}."/".&RPM::Source::Editor::basename($source);
+		my $sourcefile=$rpm->{SOURCEDIR}."/".basename($source);
 		if (! -e $sourcefile) {
 		    warn "Internal error: source $source not found!";
 		} else {
@@ -545,6 +544,7 @@ sub alt_generic_cleanup_files {
 	    ) {
 	    # throw away
 	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
+	    # dangerous: as in antlr may cause lost 755 rights in /usr/bin
 	    push @out, "#".$_;
 	} elsif (/^\s*\%doc\s*\%\{_docdir\}\s*$/) {
 	    push @out, '%doc %{_docdir}/*'."\n";
@@ -637,754 +637,6 @@ sub read_shell_token {
 sub read_space {
     my ($lineptr) =@_;
     $$lineptr=~s/^\s*//;
-}
-
-package RPM::Source::SpecSection;
-
-sub new {
-    my $class = shift;
-    my $self= {
-	TYPE=> 'package',
-	PACKAGE=> '',
-	BODY=>[],
-	@_
-    };
-    my $TYPE='package';
-    my $PACKAGE='';
-    if ($self->{BODY}->[0]=~/^\s*\%(\w+)(?:\s+(.+))?\s*$/ && $RPM::Source::Editor::SECTION{$1}) {
-	#print "new section: ".$self->{BODY}->[0],"\n";
-	$TYPE=$1;
-	$PACKAGE=$2;
-	$PACKAGE='' unless defined $PACKAGE;
-	$PACKAGE=~s/\s*$//;
-	$self->{TYPE}=$TYPE;
-	$self->{PACKAGE}=$PACKAGE;
-    }
-    die "Oops! section" if ref $self->{BODY} ne 'ARRAY';
-    bless $self, $class;
-#    return $self;
-}
-
-sub _warn_notapplied {
-    my $self=shift;
-    print STDERR "@_\n" if defined $self->{QUIET} and $self->{QUIET}>0;
-}
-
-sub describe {
-    my $self=shift;
-    print "SpecSection: type=$self->{TYPE}; package=$self->{PACKAGE}; body: ==>\n".join('',@{$self->{BODY}}),"============== END BODY ====================\n";
-}
-
-sub get_type {
-    my $self=shift;
-    return $self->{TYPE};
-}
-
-sub get_package {
-    my $self=shift;
-    my $pkgname=$self->{PACKAGE};
-    $pkgname=~s/\s+-f\s+\S.*//;
-    return $pkgname;
-}
-
-sub get_package_expanded {
-    my $self=shift;
-    my $pkg= $self->{PACKAGE};
-    return '%{name}' unless $pkg;
-    return $pkg if $pkg=~s/-n\s*//;
-    return '%{name}-'.$pkg; 
-}
-
-sub get_body {
-    my $self=shift;
-    return $self->{BODY};
-}
-
-sub set_body {
-    my $self=shift;
-    my $ptr=shift;
-    die "not an array pointer!" if ref $ptr ne 'ARRAY';
-    $self->{BODY}=$ptr;
-}
-
-sub unshift_body {
-    my $self=shift;
-    if ($self->is_head_section()) {
-	unshift @{$self->{BODY}}, @_;
-    } else {
-	my $head = shift @{$self->{BODY}};
-	unshift @{$self->{BODY}}, $head, @_;
-    }
-}
-
-sub unshift_body_before_section {
-    my $self=shift;
-    unshift @{$self->{BODY}}, @_;
-}
-
-sub push_body {
-    my $self=shift;
-    my $bodyptr=$self->{BODY};
-    # move pushed item(s) before %if* block of next section
-    my @tail;
-    my $i=$#{$bodyptr};
-    while ($i>=0 and
-	       $bodyptr->[$i]=~/^\s*(?:$|\%if)/ # empty line or condition for the next section 
-	) {
-	unshift @tail, pop @{$bodyptr};
-	$i--;
-    }
-    push @{$bodyptr}, @_, @tail;
-}
-
-sub unshift_body_before {
-    my $self=shift;
-    my $toinsert = shift;
-    my $pattern = shift;
-    my $is_applied = 0;
-    my @body=();
-    my @tail=@{$self->{BODY}};
-    # move pushed item(s) before %if* block of next section
-    while (@tail>0 and $tail[0]!~/$pattern/ # condition for add
-	) {
-	push @body, shift @tail;
-    }
-    if (@tail) {
-	push @body, $toinsert, @tail;
-	$is_applied = 1;
-    }
-    $self->{BODY}=\@body;
-    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
-    return $is_applied;
-}
-
-sub unshift_body_after {
-    my $self=shift;
-    my $toinsert = shift;
-    my $pattern = shift;
-    my $is_applied = 0;
-    my @body=();
-    my @tail=@{$self->{BODY}};
-    while (@tail>0 and $tail[0]!~/$pattern/ # condition for add
-	) {
-	push @body, shift @tail;
-    }
-    if (@tail) {
-	push @body, shift @tail, $toinsert, @tail;
-	$is_applied = 1;
-    }
-    $self->{BODY}=\@body;
-    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
-    return $is_applied;
-}
-
-sub push_body_after {
-    my $self=shift;
-    my $toinsert = shift;
-    my $pattern = shift;
-    my $bodyptr=$self->{BODY};
-    my $is_applied = 0;
-    my @tail;
-    my $i=$#{$bodyptr};
-    while ($i>=0 and $bodyptr->[$i]!~/$pattern/ # condition for add
-	) {
-	unshift @tail, pop @{$bodyptr};
-	$i--;
-    }
-    if (@$bodyptr) {
-	push @{$bodyptr}, $toinsert, @tail;
-	$is_applied = 1;
-    }
-    $is_applied || $self->_warn_notapplied("not inserted [$toinsert] - pattern [$pattern] not found");
-    return $is_applied;
-}
-
-sub subst_after {
-    my $self=shift;
-    my $whatpattern=shift;
-    my $replace=shift;
-    my $afterpattern = shift;
-    my $is_applied = 0;
-    my $is_found_after=0;
-    my @body=();
-    my $count = 0;
-    my $maxcount=1;
-    my @tail=@{$self->{BODY}};
-    while (@tail>0 and $tail[0]!~/$afterpattern/ # condition for add
-	) {
-	push @body, shift @tail;
-    }
-    $is_found_after = 1 if @tail;
-    while (@tail>0 && $count <= $maxcount) {
-	$_=shift @tail;
-	#print STDERR "try:$_";
-	if (s/$whatpattern/$replace/g) {
-	    $is_applied = 1;
-	    $count++;
-	}
-	push @body, $_;
-    }
-    push @body, @tail;
-    $self->set_body(\@body);
-    $is_found_after || $self->_warn_notapplied("pattern [$afterpattern] not found");
-    $is_applied || $self->_warn_notapplied("not replaced [$whatpattern] after [$afterpattern]");
-    return $is_applied;
-}
-
-
-sub empty {
-    my $self=shift;
-    $#{$self->{BODY}}=0 if ($#{$self->{BODY}}>0);
-}
-
-sub delete {
-    my $self=shift;
-    $self->{BODY}=[];
-}
-
-sub is_empty {
-    my $self=shift;
-    return 1 if $#{$self->{BODY}}<1;
-    foreach (@{$self->{BODY}}[1..$#{$self->{BODY}}]){
-	#print "is_empty: [$_]" if ! /^\s*(#.*)?$/;
-	return 0 if ! /^\s*(#.*)?$/;
-    }
-    return 1;
-}
-
-sub is_head_section {
-    my $self=shift;
-    return 1 if $self->{TYPE} eq 'package' && $self->{PACKAGE} eq '';
-    return 0;
-}
-
-sub exclude {
-    my $section=shift;
-    my $pattern=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	unless (/$pattern/) {
-	    push @out, $_;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-sub subst {
-    my $self=shift;
-    my $pattern=shift;
-    my $replace=shift;
-    Carp::carp "subst: got undefined argument" unless defined $pattern and defined $replace;
-    my $is_applied = 0;
-    my @out;
-    foreach (@{$self->get_body()}) {
-	$is_applied++ if s/$pattern/$replace/g;
-	push @out, $_;
-    }
-    $is_applied || $self->_warn_notapplied("not subst [$pattern]");
-    $self->set_body(\@out);
-    return $is_applied;
-}
-
-sub subst_if {
-    my $self=shift;
-    my $pattern=shift;
-    my $replace=shift;
-    my $ifpattern=shift;
-    Carp::carp 'if_pattern is required' unless $ifpattern;
-    my @out;
-    my $is_applied = 0;
-    foreach (@{$self->get_body()}) {
-	if (/$ifpattern/) {
-	    $is_applied++ if s/$pattern/$replace/g;
-	}
-	push @out, $_;
-    }
-    $is_applied || $self->_warn_notapplied("not subst [$pattern] if [$ifpattern]");
-    $self->set_body(\@out);
-    return $is_applied;
-}
-
-sub replace_line {
-    my $section=shift;
-    my $stringwhat=shift;
-    my $stringreplace=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	$_ = $stringreplace if $_ eq $stringwhat;
-	push @out, $_;
-    }
-    $section->set_body(\@out);
-}
-
-
-
-sub match {
-    my $section=shift;
-    my $pattern=shift;
-    foreach (@{$section->get_body()}) {
-	return 1 if /$pattern/;
-    }
-    return 0;
-}
-
-sub get_tag {
-    my $section=shift;
-    my $tag=shift;
-    my %options = (
-	RAW=>0,
-	@_);
-    foreach (@{$section->get_body()}) {
-	if (/^$tag\s*:\s*(\S+)\s*$/) {
-	    #warn "tag=$tag raw =$1";
-	    my $val=$1;
-	    if (!$options{RAW}) {
-		&RPM::Source::Editor::macro_subst_inplace($section->{RPM}->{MACRO},\$val);
-	    }
-	    return $val;
-	}
-    }
-    return;
-}
-
-sub set_tag {
-    my ($section, $tag, $val)=@_;
-    my $specptr=$section->get_body();
-    for (my $i=0; $i<=$#{$specptr}; $i++) {
-	if ($specptr->[$i]=~/^$tag:(\s*)/) {
-	    $specptr->[$i]="$tag:$1$val\n";
-	    last;
-	}
-    }
-    return $section;
-}
-
-
-package RPM::Source::Editor;
-
-sub new {
-    my $class = shift;
-    my $self = {
-	CHANGELOG=>'- converted from JPackage by jppimport script',
-	PATCHDIR=> '.',
-	@_
-    };
-    bless $self, $class;
-    if ($self->{RPM}) {
-	if ($self->{RPM}!~/.src.rpm$/ && `file $self->{RPM}`!~/RPM/) {
-	    die "$self->{RPM}: not a rpm file!\n";
-	}
-	my $dirname=&basename($self->{RPM});
-	$dirname=~s/.src.rpm//;
-	my $pwd= `pwd`;
-	chomp $pwd;
-	$self->{TMPDIR}||="$pwd/$dirname.$$";
-	$self->{SOURCEDIR}||="$self->{TMPDIR}/SOURCES";
-	$self->{SPECDIR}||="$self->{TMPDIR}/SPECS";
-	$self->{SRPMDIR}||="$self->{TMPDIR}/SRPMS";
-	$self->rpm_custom("-i", $self->{RPM});
-	$self->{SPECFILE}=(glob "$self->{TMPDIR}/SPECS/*")[0];
-    } elsif ($self->{SPECFILE}) {
-	$self->{_SPECFILE_MODE_}=1;
-    } else {
-	die "$class: new: either RPM or SPECFILE is required."
-    }
-    $self->_set_speclist(load_file($self->{SPECFILE}));
-    $self->load_macro();
-    #print STDERR "done load_macro\n" if $self->{VERBOSE};
-    return $self;
-}
-
-sub write_rpm {
-    my $self=shift;
-    my $newdir="$self->{TMPDIR}/NEW";
-    mkdir $newdir;
-    my $newspec="$newdir/".basename($self->{SPECFILE});
-    &write_file($newspec, $self->get_spec());
-    run("add_changelog -e '$self->{CHANGELOG}' $newspec");
-    $self->rpm_custom('-bs --nodeps', $newspec);
-}
-
-BEGIN {
-    our %SECTION=map {$_=>1} qw!
-package
-description
-prep
-build
-install
-clean
-files
-changelog
-pre
-post
-preun
-postun
-triggerin
-triggerun
-triggerpostun
-!
-}
-
-sub _parse_speclist {
-    my ($rpm, $specptr)=@_;
-    my @outpart;
-    my $out=[];
-    my $TYPE='package';
-    foreach (@$specptr) {
-	if (/^\s*\%(\w+)\s*/ && $SECTION{$1}) {
-	    #my $NEWTYPE=$1;
-	    push @outpart, RPM::Source::SpecSection->new(RPM=>$rpm, BODY=>$out);#, TYPE=>$TYPE, PACKAGE=>$PACKAGE);
-	    $out=[];
-	}
-	push @$out, $_;
-    }
-    push @outpart, RPM::Source::SpecSection->new(RPM=>$rpm, BODY=>$out, TYPE => $TYPE);
-    $rpm->{SPECSECTIONS}=\@outpart;
-    #foreach (@{$rpm->{SPECSECTIONS}}) {	$_->describe() }
-}
-
-sub _reset_speclist {
-    my $self=shift;
-    my @out;
-    foreach my $multiline (@{$self->_get_speclist()}) {
-	push @out, split /(?<=\n)/, $multiline;
-    }
-    $self->_set_speclist(\@out);
-}
-
-sub _get_speclist {
-    my $self=shift;
-    my @out;
-    foreach (@{$self->{SPECSECTIONS}}) {
-	push @out, @{$_->get_body()};
-    }
-    return \@out;
-}
-
-sub add_section {
-    my ($self, $secname, $pkg) =@_;
-    $pkg ||= '';
-    return if $self->get_section($secname,$pkg);
-    return $self->_raw_add_section($secname, $pkg);
-}
-
-sub _raw_add_section {
-    my ($self, $secname, $pkg) =@_;
-    $pkg ||= '';
-    my $instsec=$self->get_section('install');
-    $instsec->push_body("
-\%$secname $pkg
-
-");
-    $self->_reset_speclist();
-}
-
-sub is_specfile_mode {
-    my $self=shift;
-    return $self->{_SPECFILE_MODE_};
-}
-
-sub _set_speclist {
-    my $self=shift;
-    my $ptr=shift;
-    die "not an array pointer!" if ! ref $ptr eq 'ARRAY';
-    $self->_parse_speclist($ptr);
-}
-
-sub get_spec {
-    my $self=shift;
-    return join('',@{$self->_get_speclist()})
-}
-
-sub get_section {
-    my $self=shift;
-    my $type=shift;
-    my $pkg=shift;
-    $pkg='' if (!defined $pkg);
-    foreach my $section (@{$self->{SPECSECTIONS}}) {
-	return $section if $section->get_type() eq $type and $self->are_package_names_equal($section->get_package(),$pkg);
-    }
-    $self->_raw_add_section($type,$pkg);
-    Carp::carp "notice: section $type $pkg not found - created.\n";
-    return $self->get_section($type,$pkg);
-}
-
-sub are_package_names_equal {
-    my ($self, $name1, $name2)=@_;
-    $name1=~s/^\s*//;
-    $name2=~s/^\s*//;
-    $name1=~s/\s*$//;
-    $name2=~s/\s*$//;
-    $is_name1_n = substr($name1,0,2) eq '-n';
-    $is_name2_n = substr($name2,0,2) eq '-n';
-    if ($is_name1_n or $is_name2_n) {
-	$name1='-n %{name}-'.$name1 unless $is_name1_n;
-	$name2='-n %{name}-'.$name2 unless $is_name2_n;
-	# hack around comparison -n %{name} and ''
-	$name1=~s/-$//;
-	$name2=~s/-$//;
-    }
-    $name1=&macro_subst($self->{MACRO},$name1);
-    $name2=&macro_subst($self->{MACRO},$name2);
-    #print STDERR "are_package_names_equal: [$name1] [$name2]\n";
-    # TODO: -n handler
-    return $name1 eq $name2;
-		
-
-}
-
-sub disable_package {
-    my $self=shift;
-    my $name=shift;
-    $name=~s/^\s*//;
-    $name=~s/\s*$//;
-    my $keyname=$name;
-    $keyname=~s/^.+\s+//;
-    $keyname=~s/-/_/;
-    unless ($keyname) {
-	$keyname='strange_package';
-	warn "disable_package: strange name $name";
-    }
-    my $is_applied=0;
-    unless ($name) {
-	Carp::carp "main package can't be disabled!\n";
-	return;
-    }
-    $self->{SPECSECTIONS}->[0]->unshift_body('%def_without '.$keyname."\n");
-    for (my $i=0; $i<@{$self->{SPECSECTIONS}}; $i++) {
-	my $section = $self->{SPECSECTIONS}->[$i];
-	if ($self->are_package_names_equal($section->get_package(), $name)) {
-	    $section->unshift_body_before_section('%if_with '.$keyname."\n");
-	    $section->push_body('%endif #'.$keyname."\n");
-	    $is_applied = 1;
-	}
-    }
-    $is_applied || $self->_warn_notapplied("not disabled [$name] - not found");
-
-    return;
-}
-
-sub raw_rename_section {
-    my $self=shift;
-    my $oldname=shift;
-    my $newname=shift;
-    foreach my $section (@{$self->{SPECSECTIONS}}) {
-	$section->{PACKAGE}=$newname if ($section->get_body()->[0]=~s/(\s*\%\w+\s+)($oldname)\s*/$1$newname\n/);
-    }
-    return;
-}
-
-sub get_sections {
-    my $self=shift;
-    #return @{$self->{SPECSECTIONS}};
-    return $self->{SPECSECTIONS};
-}
-
-sub set_changelog {
-    my $self=shift;
-    return $self->{CHANGELOG}=shift();
-}
-
-sub rpm_custom {
-    my $self=shift;
-    my $cmd =qq{rpm --define "_specdir $self->{SPECDIR}" --define "_sourcedir $self->{SOURCEDIR}" --define "_srcrpmdir $self->{SRPMDIR}" @_};
-    &run($cmd);
-}
-
-sub cleanup {
-    my $self=shift;
-    my $tmpdir=$self->{TMPDIR};
-    run("rm -rf $tmpdir") if $tmpdir;
-}
-
-sub copy_to_sources {
-    my $self=shift;
-    return if $self->is_specfile_mode();
-    foreach my $file (@_) {
-	if (-e $file) {
-	    run ("cp -f $file $self->{SOURCEDIR}/");
-	} else {
-	    run ("cp -f $self->{PATCHDIR}/$file $self->{SOURCEDIR}/");
-	}
-    }
-}
-
-sub add_patch {
-    my $self=shift;
-    my $name=shift;
-    my %param = (
-	NAME=> $name,
-	STRIP => 1,
-	NUMBER => 33,
-	@_
-	);
-    # find first unused patch position
-    while ($self->{PATCHES}->[$param{NUMBER}]) {$param{NUMBER}++;}
-    # register patch
-    $self->{PATCHES}->[$param{NUMBER}]=$param{NAME};
-    # add patch to spec
-    $self->get_section('prep')->push_body('%patch'.$param{NUMBER}.' -p'.$param{STRIP}."\n");
-    $self->get_section('package','')->push_body('Patch'.$param{NUMBER}.': '.$param{NAME}."\n");
-    $self->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
-}
-
-sub add_source {
-    my $self=shift;
-    my $name=shift;
-    my %param = (
-	NAME=> $name,
-	NUMBER => 44,
-	@_
-	);
-    # find first unused patch position
-    while ($self->{SOURCES}->[$param{NUMBER}]) {$param{NUMBER}++;}
-    # register patch
-    $self->{SOURCES}->[$param{NUMBER}]=$param{NAME};
-    # add to spec
-    $self->get_section('package','')->push_body('Source'.$param{NUMBER}.': '.$param{NAME}."\n");
-    $self->copy_to_sources($self->{PATCHDIR}.'/'.$param{NAME});
-    return $param{NUMBER};
-}
-
-sub basename {
-    my @path= split('/',$_[0]);
-    return pop @path;
-}
-
-sub dirname {
-    my @path= split('/',$_[0]);
-    pop @path;
-    return join('/',@path);
-}
-
-sub run {
-    my $cmd=shift;
-    #print $cmd,"\n";
-    system($cmd) && Carp::confess ("$cmd failed: $?");
-}
-
-sub load_file {
-    my ($name)=@_;
-    open FN, $name || die "can't open $name: $!";
-    my @result = <FN>;
-    close FN, $name || die "can't open $name: $!";
-    return \@result;
-}
-
-sub write_array_to_file {
-    my ($name, $ptr)=@_;
-    open FN, '>', $name || die "can't open $name: $!";
-    print FN @$ptr;
-    close FN, $name || die "can't open $name: $!";
-}
-
-sub write_file {
-    my ($name, $str)=@_;
-    open FN, '>', $name || die "can't open $name: $!";
-    print FN $str;
-    close FN, $name || die "can't open $name: $!";
-}
-
-sub load_macro {
-    my $self=shift;
-    print STDERR "entering load_macro\n" if $self->{VERBOSE};
-    my $specfile = $self->{SPECFILE};
-    my %macro;
-    $macro{'nil'}='';
-    $macro{'homedir'}=$ENV{'HOME'};
-    $macro{'_topsrcdir'}='%_topdir';
-    $macro{'_sourcedir'}="%_topsrcdir/SOURCES";
-    $macro{'_specdir'}="%_topsrcdir/SPECS";
-    $macro{'_srcrpmdir'}="%_topdir/SRPMS";
-    if (-e $ENV{'HOME'}.'/.rpmmacros') {
-	open (RPMMACROS, $ENV{'HOME'}.'/.rpmmacros') || die "can't open .rpmmacros:$!";
-	while (<RPMMACROS>) {
-	    if (/^[%]([\w_\/.\d]+)\s+(.*\S)\s*$/) {
-		$macro{$1}=$2 ;
-		&macro_subst_inplace(\%macro,\$macro{$1});
-	    }
-	}
-	close (RPMMACROS);
-    }
-    $macro{'_topdir'}||="$ENV{'HOME'}/RPM";
-    
-    my @source;
-    my @patch;
-    my @setup_n;
-    my @is_setup;
-    
-    open (SPECFILE, $specfile) || die "can't open spec $specfile: $!";
-    while (<SPECFILE>) {
-	chomp;
-	# to avoid recursion Name: %name; old hack is && not $macro{'version'};
-	$macro{'name'}=&macro_subst(\%macro, $1) if /^Name\s*:\s*(.*\S)\s*$/;
-	$macro{'version'}=&macro_subst(\%macro, $1) if /^Version\s*:\s*(.*\S)\s*$/;
-	$macro{'release'}=&macro_subst(\%macro, $1) if /^Release\s*:\s*(.*\S)\s*$/;
-
-	$macro{$1}=$2 if /^\s*[%]define\s+([\w_\d]+)\s+(\S+)\s*$/;
-	# not needed there
-	$source[$1 ? $1 : 0]=$3 if /^Source(\d*)\s*:\s*(.+\/)?([^\/]+)\s*$/;
-	$patch[$1 ? $1 : 0]=$3 if /^Patch(\d*)\s*:\s*(.+\/)?([^\/]+)\s*$/;
-	$setup_n[$1 ? $1 : 0] =$3 if /^[%]setup(\d*)\s*(.+)?-n\s+(\S+)/;
-	$is_setup[$1 ? $1 : 0] =1 if /^[%]setup(\d*)/;
-    }
-    close (SPECFILE);
-
-    my @rawsource=@source;
-    my @rawpatch=@patch;
-    foreach my $dep (grep {$_} @source, @patch) {
-	print STDERR "loop3 $dep\n" if $self->{VERBOSE};
-	&macro_subst_inplace(\%macro,\$dep);
-    }
-    #print join("\n",@require),"\n";
-    #print join("\n",keys %macro),"\n";
-
-    foreach my $key  
-	(qw/
-     _sourcedir
-     _specdir
-     _srcrpmdir
-     name
-     version
-     release
-     /) {
-	    if (!$macro{$key}) {
-		print STDERR "WARNING: undefined $key!\n";
-	    }
-	    &macro_subst_inplace(\%macro,\$macro{$key});
-    }
-    $self->{MACRO}=\%macro;
-    $self->{SOURCES}=\@source;
-    $self->{PATCHES}=\@patch;
-    $self->{RAWSOURCES}=\@rawsource;
-    $self->{RAWPATCHES}=\@rawpatch;
-    $self->{SETUP_N}=\@setup_n;
-    $self->{IS_SETUP}=\@is_setup;
-}
-
-sub macro_subst {
-    my $macroptr=shift;
-    my $arg=shift;
-    &macro_subst_inplace($macroptr, \$arg);
-    #print STDERR "macro subst: $arg\n";
-    return $arg;
-}
-
-
-sub macro_subst_inplace {
-    my $macroptr=shift;
-    my $argptr=shift;
-    #print STDERR "subst: $$argptr\n";
-    Carp::cluck "undef" unless defined $$argptr;
-    while ($$argptr=~/\%\{?([\w_\d]+)\}?/ and defined $macroptr->{$1}) {
-	#print STDERR ":: $$argptr\n";
-	my $oldval=$$argptr;
-	$$argptr=~s/\%\{?([\w_\d]+)\}?/$macroptr->{$1}/;
-	if ($oldval eq $$argptr) {
-	    warn "macro substitution recursion for ".$oldval."\n";
-	    last;
-	}
-    }
 }
 
 1;

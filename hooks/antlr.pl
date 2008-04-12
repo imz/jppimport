@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_bin_755.pl';
+
 $spechook = sub {
     my ($jpp, $alt) = @_;
 
