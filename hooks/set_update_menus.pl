@@ -13,11 +13,9 @@ push @SPECHOOKS, sub {
 	    }
 	}
     }
-#    $jpp->add_section('post', $desktop_package);
-#    $jpp->add_section('postun',$desktop_package);
-    $jpp->get_section('post',$desktop_package)->push_body(q'%update_menus
+    $jpp->add_section('post',$desktop_package)->push_body(q'%update_menus
 ');
-    $jpp->get_section('postun',$desktop_package)->push_body(q'%clean_menus
+    $jpp->add_section('postun',$desktop_package)->push_body(q'%clean_menus
 ');
 };
 

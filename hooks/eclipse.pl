@@ -136,6 +136,9 @@ popd
     # added in -14, removed -in -19
     #$jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
 
+    # present at least in 3.3.0: warning: file /usr/share/eclipse/plugins/org.eclipse.swt_3.3.0.v3346.jar is packaged into both libswt3-gtk2 and eclipse-rcp
+    $jpp->get_section('files','rcp')->subst(qr'\%{_datadir}/\%{name}/plugins/org.eclipse.swt_','#%{_datadir}/%{name}/plugins/org.eclipse.swt_');
+
     # seamonkey provides mozilla
     $jpp->get_section('package','-n %{libname}-gtk2')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
 
@@ -163,7 +166,7 @@ popd
     foreach my $section (@{$jpp->get_sections()}) {
 	$section->subst(qr'org.fedoraproject','org.altlinux');
     }
-    $jpp->get_section('package','')->subst_if(qr'\.\d+.zip','.zip',qr'^Source4:');
+    $jpp->get_section('package','')->subst_if(qr'[.-]\d+.zip','.zip',qr'^Source4:');
 
     &replace_built_in_ant($jpp);
     &leave_built_in_lucene($jpp);
