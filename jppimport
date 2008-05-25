@@ -4,10 +4,12 @@
 use warnings;
 use Carp;
 use Getopt::Long;
-use RPM::Source::Editor;
 use File::Basename;
+use RPM::Source::Editor;
+use RPM::Source::Convert::Generic2ALT;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
+my $packager='auto';
 my $verbose=1;
 my $outputdir='.';
 my $patchdir=dirname($0)."/patches";
@@ -18,6 +20,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "jppspec=s" => \$jppspec,
 		      "altspec=s"   => \$altspec,
 		      "outdir=s"   => \$outputdir,
+		      "packager=s"   => \$packager,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
 		      "release=s"   => \$release,
@@ -50,10 +53,17 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$jpp=RPM::Source::Editor->new(SOURCERPM => $jpprpm, SPECFILE=> $jppspec, OUTPUTDIR=> $outputdir, PATCHDIR=>$patchdir, VERBOSE=> $verbose, NOBZ2=>$nobz2, CHANGELOG=>'- converted from JPackage by jppimport script');
+$jpp=RPM::Source::Editor->new(
+    SOURCERPM => $jpprpm, 
+    SPECFILE=> $jppspec, 
+    OUTPUTDIR=> $outputdir, 
+    PATCHDIR=>$patchdir, 
+    VERBOSE=> $verbose,
+    CONVERT::NOBZ2=>$nobz2, 
+    CHANGELOG=>'- converted from JPackage by jppimport script');
 
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
-&alt_generic_fix($jpp);
+&RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);
 print STDERR "done alt_generic_fixes\n" if $verbose>1;
 &jpp_specific_fix($jpp);
 print STDERR "done jpp_specific_fixes\n" if $verbose>1;
@@ -97,6 +107,10 @@ if ($altrpm || $altspec) {
 	$altrel=~s/.?\%\w+//g;
 	$altrel=~s/.?\%\{\w+\}+//g;
 	$altrel='alt1' if $altrel=~/^alt0\./ or $vercmp != 0;
+    }
+    if ($packager eq 'auto') {
+	my $altpackager=$alt->get_section('package','')->get_tag('Packager');
+	$packager=$altpackager if $altpackager;
     }
     $alt->cleanup();
 }
@@ -142,6 +156,18 @@ if ($hook) {
 
 if ($changelog) {
     $jpp->set_changelog($changelog);
+}
+
+if ($packager eq 'auto') {
+    $packager=&RPM::Source::Editor::macro_subst($jpp->{MACRO},'%{packager}');
+}
+
+if ($packager) {
+    if ($packager ne 'none') {
+	$jpp->get_section('package','')->set_tag('Packager',$packager);
+    } else {
+	$jpp->get_section('package','')->clear_tag('Packager');
+    }
 }
 
 print $jpp->get_spec() if $jppspec or $verbose>1;
@@ -233,7 +259,7 @@ sub jpp_specific_fix {
 		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
 		    my $arjsuff='.bz2';
 		    my $arjtarg='j';
-		    if ($rpm->{NOBZ2}) {
+		    if ($rpm->{CONVERT::NOBZ2}) {
 			$arjtarg='';
 			$arjsuff='';
 		    }
@@ -376,7 +402,7 @@ sub jpp_filter_pkg_list {
     while (@in) {
 	$_ = shift @in;
 	if ($JPPDEPSKIP{$_}) {
-	    &read_version(\@in);
+	    &RPM::Source::Convert::Generic2ALT::read_tag_version(\@in);
 	    next;
 	} elsif ($JPPDEPSUBST{$_}) {
 	    push @out, $JPPDEPSUBST{$_};
@@ -385,258 +411,6 @@ sub jpp_filter_pkg_list {
 	}
     }
     return join(" ",@out)
-}
-
-sub read_version {
-    my $ptr=shift;
-    return if ($#{$ptr}<1);
-    if ($ptr->[0] =~/^(?:<|>|=|!=|>=|<=)$/) {
-	return (shift @$ptr, shift @$ptr);
-    }
-    return;
-}
-
-sub alt_generic_fix {
-    my $rpm=shift;
-    my $secptr=$rpm->get_sections();
-    my $cleanroot_pattern='^\s*(rm|%{__rm}) -rf (\$RPM_BUILD_ROOT|\%rpm_build_root)\s*$';
-    &alt_generic_check_ahead($secptr->[0]);
-    foreach my $sec (@$secptr) {
-	my $t = $sec->get_type();
-	if ($t eq 'package') {
-	    $sec->exclude('^(Packager|Vendor|Distribution|Build[Rr]oot):');
-	    &alt_generic_cleanup_headers($sec);
-	} elsif ($t eq 'description') {
-	    &alt_generic_fix_desc($sec);
-	} elsif ($t eq 'files') {
-	    &alt_generic_cleanup_files($sec);
-	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
-	    $sec->exclude($cleanroot_pattern);
-	} elsif ($t eq 'clean') {
-	    $sec->exclude($cleanroot_pattern);
-	    $sec->delete() if ($sec->is_empty());
-	} elsif ($t eq 'changelog') {
-	    $sec->empty();
-	} elsif ($t eq 'post') {
-	    &alt_generic_convert_alternatives($rpm,$sec);
-	} elsif (($t eq 'postun') or ($t eq 'preun')) {
-	    &alt_generic_convert_alternatives($rpm,$sec);
-	}
-    }
-}
-
-BEGIN { our %ALT_GROUP_MAP = (
-"Text Editors", "Editors",
-" ", " ",
-	    ); 
-}
-
-
-sub alt_generic_cleanup_headers {
-    my $section=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	if (/^Group:(\s*)(.+\S)\s*$/ && $ALT_GROUP_MAP{$2}) {
-		push @out, "Group:${1}$ALT_GROUP_MAP{$2}\n";
-	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)\s*(?:\(\w+\))?)\s*:\s*(.*\S)\s*$/) {
-	    my $Tag=$1;
-	    my $filtered = &alt_filter_pkg_list($2);
-	    push @out, "$Tag: $filtered\n" if ($filtered);
-	} else {
-	    push @out, $_;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-BEGIN {
-our %ALTDEPSKIP = map {$_ => 1} qw!
-%{__make}
-/bin/rm /bin/ln
-!;
-
-our %ALTDEPSUBST = (
-'%{_sbindir}/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
-'/usr/sbin/update-alternatives' => 'alternatives >= 0:0.2.0-alt0.12',
-'mono-core' => 'mono',
-'mozilla-nspr-devel' => 'libnspr-devel',
-'nspr-devel' => 'libnspr-devel',
-'mesa-libGL-devel' => 'libmesa-devel',
-'mesa-libGLU-devel' => 'libmesa-devel',
-'cairo-devel' => 'libcairo-devel',
-'cairo' => 'libcairo',
-'gnome-vfs2-devel' => 'gnome-vfs-devel',
-'gnome-vfs2' => 'gnome-vfs',
-'apr-devel' => 'libapr1-devel',
-'openssl-devel' => 'libssl-devel',
-' ' => ' ',
-);
-
-}
-
-sub alt_filter_pkg_list {
-    $_=$_[0];
-    # hack around add_changelog error
-    #error: Dependency tokens must not contain '%<=>' symbols: Requires: icu4j-eclipse > = 3.6.1
-    s/\>\s+=/>=/g;
-    s/\<\s+=/<=/g;
-    my @in = split /[\s,]+/, $_;
-    my @out;
-    while (@in) {
-	$_ = shift @in;
-	if ($ALTDEPSKIP{$_}) {
-	    &read_version(\@in);
-	    next;
-	} elsif ($ALTDEPSUBST{$_}) {
-	    push @out, $ALTDEPSUBST{$_};
-	} else {
-	    push @out, $_;
-	}
-    }
-    return join(" ",@out);
-};
-
-
-# is macro %name used in spec before Name:,Version: tags
-# it is not allowed in alt
-sub alt_generic_check_ahead {
-    my $section=shift;
-    my @out;
-    my $is_name_passed=0;
-    my $is_name_ahead=0;
-    foreach (@{$section->get_body()}) {
-	m/^\s*Name:/ and $is_name_passed=1; #and print STDERR "passed $_\n";
-	$is_name_ahead=1 if m/\%\{name\}/ and $is_name_passed==0;
-#print STDERR "AHEAD $_\n";
-	$is_name_ahead=1 if m/\%name(?:[^\w\d_]|$)/ and $is_name_passed==0;
-#print STDERR "ahead $_\n";
-    }
-    if ($is_name_ahead) {
-	$section->unshift_body('%define name '.$jpp->get_section('package','')->get_tag('Name')."\n");
-	$section->unshift_body('%define version '.$jpp->get_section('package','')->get_tag('Version')."\n");
-	print STDERR "fixed ahead!!!\n";
-    }
-}
-
-sub alt_generic_fix_desc {
-    my $section=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-# some distro use iso in description. alt use ascii only.
-	    #tr/é/e/;
-	    tr/éöóêåíãøùçõúôûâàïðîëäæýÿñìèòüáþÉÖÓÊÅÍÃØÙÇÕÚÔÛÂÀÏÐÎËÄÆÝßÑÌÈÒÜÁÞ/eooeaiaoucououaaidieaayvnieouabEOOEAIAOUCOUOUAAIDIEAAYVNIEOUAB/;
-	    # % in description
-	    s,%(\s|$),%% ,g;
-	    push @out, $_;
-    }
-    $section->set_body(\@out);
-}
-
-sub alt_generic_cleanup_files {
-    my $section=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	s/^\s*\%attr\(-,root,root\)\s*//;
-	#if (/^\s*\%defattr\(0644,root,root,0755\)\s*$/
-	if (/^\s*\%defattr\((?:0644|-),root,root,(?:0755|-)\)\s*$/
-	    or /^\s*\%defattr\((?:0664|-),root,root,(?:0755|-)\)\s*$/
-	    or /^\s*\%defattr\((?:0644|-),root,root\)\s*$/
-	    ) {
-	    # throw away
-	} elsif (/^\s*\%defattr\(0755,root,root,0755\)\s*$/) {
-	    # dangerous: as in antlr may cause lost 755 rights in /usr/bin
-	    push @out, "#".$_;
-	} elsif (/^\s*\%doc\s*\%\{_docdir\}\s*$/) {
-	    push @out, '%doc %{_docdir}/*'."\n";
-	} else {
-	    push @out, $_;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-sub alt_generic_convert_alternatives {
-    my $rpm=shift;
-    my $section=shift;
-    my @out;
-    my $ptr = $section->get_body();
-    while (@$ptr>0) {
-	my $line = shift @$ptr;
-	if ($line!~/\s*#/ && $line=~s,^(\s*)(?:(?:\%{_sbindir}|/usr/sbin)/)?update-alternatives --(\w+),,) {
-	    my $preline=$1;
-	    my $updcmd=$2;
-	    $line=&read_multiline($line, $ptr);
-	    # the end is abandoned :(
-	    if ($updcmd eq "remove") {
-		my $name=&read_shell_token(\$line);
-		push @out, $preline.'%unregister_alternatives '.&get_alternatives_file_name($rpm,$section,$name)."\n";
-	    } elsif ($updcmd eq "install") {
-		my $link=&read_shell_token(\$line);
-		my $name=&read_shell_token(\$line);
-		my $path=&read_shell_token(\$line);
-		my $priority=&read_shell_token(\$line);
-		my @alternatives=($link,$path,$priority);
-		&read_space(\$line);
-		while ($line=~/--slave/) {
-		    &read_shell_token(\$line);
-		    my $slink=&read_shell_token(\$line);
-		    my $sname=&read_shell_token(\$line);
-		    my $spath=&read_shell_token(\$line);
-		    push @alternatives, ($slink,$spath,$path);
-		}
-		&create_alternatives($rpm,$section, &get_alternatives_file_name($rpm,$section,$name),\@alternatives);
-		push @out, $preline.'%register_alternatives '.&get_alternatives_file_name($rpm,$section,$name)."\n";
-	    } else {
-		push @out, $preline."# unknown update-alternatives --$updcmd\n";
-	    }
-	} else {
-	    push @out, $line;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-sub create_alternatives {
-    my ($rpm, $section, $alternatives_file_name,$alternativesptr) = @_;
-    my @text=('install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/'.$alternatives_file_name.'<<EOF
-');
-    while (@$alternativesptr>0) {
-	my $provided=shift(@$alternativesptr);
-	my $alternative=shift(@$alternativesptr);
-	my $weight=shift(@$alternativesptr);
-	push @text, $provided."\t".$alternative."\t".$weight."\n";
-    }
-    push @text, "EOF\n";
-    $rpm->get_section('install')->push_body(@text);
-    $rpm->get_section('files',$section->get_package())->unshift_body('%_altdir/'.$alternatives_file_name."\n");
-}
-
-sub get_alternatives_file_name {
-    my ($rpm,$section,$name)=@_;
-    return $name.'_'.$section->get_package_expanded();
-}
-
-sub read_multiline {
-    my ($line, $ptr) =@_;
-    while (@$ptr>0 && $line=~s/\\[\r\n]+?$//) {
-	chomp $line;
-#	print "MULTILINE:$line\n";
-	$line.=shift(@$ptr);
-    }
-    return $line;
-}
-
-sub read_shell_token {
-    my ($lineptr) =@_;
-    if ($$lineptr=~s/^\s*(\S+)//) {
-	return $1;
-    }
-    return "";
-}
-
-sub read_space {
-    my ($lineptr) =@_;
-    $$lineptr=~s/^\s*//;
 }
 
 1;

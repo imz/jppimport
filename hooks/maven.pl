@@ -53,8 +53,10 @@ BuildRequires: jakarta-cactus eclipse
 !);
 
     # hack around excalibur-bootstrap-bundle
-    $jpp->get_section('package','aspectj')->subst_if(qr'aspectj >= 0:1.2.1','aspectj',qr'Requires:');
+    $jpp->get_section('package','plugin-aspectj')->subst_if(qr'aspectj >= 0:1.2.1','aspectj',qr'Requires:');
 
+    $jpp->get_section('build')->subst(qr'JAVA_HOME=\%{_jvmdir}/java-1.4.2','JAVA_HOME=%{java_home}');
+    
 
     $jpp->get_section('install')->push_body(q!# new hack ###################
 cp $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library $RPM_BUILD_ROOT%{_datadir}/%{name}/bin/build-maven-library.orig
