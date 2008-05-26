@@ -2,8 +2,18 @@
 
 package RPM::SpecFile::Bootstrap;
 
+use Getopt::Long;
 use strict;
 use warnings;
+
+my $release='0.1';
+my $verbose=0;
+my $changelog='- bootstrap pack of jars created with jppbootstrap script
+- temporary package to satisfy circular dependencies';
+my $result = GetOptions (
+		      "changelog=s"   => \$changelog,
+		      "release=s"   => \$release,
+		      "verbose+"  => \$verbose);
 
 die unless @ARGV;
 my $rpmfile= $ARGV[0];
@@ -33,10 +43,24 @@ URL
     print SPEC ucfirst(lc($tag)).": ".$jpp->query($tag)."\n";
 }
 
+my $pkgname=$jpp->query('NAME');
+
+foreach my $tag qw/
+PROVIDENAME
+REQUIRENAME
+/ {
+    my @tagval=$jpp->multiquery($tag);
+    my $tagname=ucfirst(lc($tag));
+    $tagname=~s/name/s/;
+    foreach my $val (@tagval) {
+	print SPEC $tagname.": ".$val."\n" if $val ne $pkgname;
+    }
+}
+
 print SPEC '
 BuildArch: noarch
 Group: Development/Java
-Release: alt0.1jpp
+Release: alt'.$release.'jpp
 Source: '.$trippletname.".cpio\n\n";
 
 foreach my $tag qw/DESCRIPTION
@@ -57,14 +81,30 @@ mkdir -p $RPM_BUILD_ROOT
 for i in usr var etc; do
 [ -d $i ] && mv $i $RPM_BUILD_ROOT/
 done
+!;
+
+foreach my $sec qw/
+PREIN
+PREUN
+POSTIN
+POSTUN
+/ {
+    my $secname=lc($sec);
+    $secname=~s/in$//;
+    my $val=$jpp->query($sec);
+    print SPEC '
+%'.$secname."\n".$val."\n" if $val and $val ne "(none)";
+}
+
+
+print SPEC q!
 
 %files -f %name-list
 
 %changelog
 !;
 
-system ('add_changelog', '-e','- bootstrap pack of jars created with jppbootstrap script
-- temporary package to satisfy circular dependencies',$specfile);
+system ('add_changelog', '-e',$changelog,$specfile);
 `rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir .' -bs $specfile`;
 `rm -r $tmpdir`;
 
@@ -86,8 +126,17 @@ sub eval {
 sub query {
     my $self=shift;
     my $tag=shift;
-    return `rpmquery -p --queryformat '\%{$tag}' $self->{RPM}`;
+    my $query=`rpmquery -p --queryformat '\%{$tag}' $self->{RPM}`;
+    chomp $query;
+    return $query;
 }
+
+sub multiquery {
+    my $self=shift;
+    my $tag=shift;
+    return grep {$_ and $_!~/^.+\(/} split (/\s+/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
+}
+
 
 __END__
 SERIAL

@@ -53,6 +53,9 @@ apache-axiom neethi burlap3 hessian3
 useless:
 daytrader
 
+conflict_with_jal_and_not_needed:
+jal
+
 fractalish:
 jorm
 jorm-rdb-adapter
