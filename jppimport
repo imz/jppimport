@@ -159,7 +159,7 @@ if ($changelog) {
 }
 
 if ($packager eq 'auto') {
-    $packager=&RPM::Source::Editor::macro_subst($jpp->{MACRO},'%{packager}');
+    $packager=$jpp->macros()->macro_subst('%{packager}');
 }
 
 if ($packager) {

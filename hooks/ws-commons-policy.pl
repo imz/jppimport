@@ -8,7 +8,9 @@ cat project.xml | grep -v '<name>WS-Policy Implementation</name>' > project.xml.
 mv project.xml.0 project.xml
 !);
 
-}
+};
+
+__END__
 # TODO:
 #http://mail-archives.apache.org/mod_mbox/ws-axis-dev/200609.mbox/%3Cf43ea5790609141335m292b0b9chcbbaf0007e829a23@mail.gmail.com%3E
 #Hmmm...
