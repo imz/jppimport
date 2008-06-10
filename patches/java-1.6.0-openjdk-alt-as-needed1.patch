@@ -1,0 +1,11 @@
+--- icedtea6-1.2/openjdk/jdk/make/com/sun/java/pack/Makefile	2008-06-10 00:53:46 +0400
++++ icedtea6-1.2/openjdk/jdk/make/com/sun/java/pack/Makefile	2008-06-10 01:24:53 +0400
+@@ -142,7 +142,7 @@
+ 
+ $(UNPACK_EXE): $(UNPACK_EXE_FILES_o) winres 
+ 	$(prep-target)
+-	$(LINKER)  $(LDDFLAGS) $(UNPACK_EXE_FILES_o) $(RES) $(LIBCXX) $(LDOUTPUT)$(TEMPDIR)/unpack200$(EXE_SUFFIX)
++	$(LINKER)  $(UNPACK_EXE_FILES_o) $(RES) $(LDDFLAGS) $(LIBCXX) $(LDOUTPUT)$(TEMPDIR)/unpack200$(EXE_SUFFIX)
+ 	$(CP) $(TEMPDIR)/unpack200$(EXE_SUFFIX) $(UNPACK_EXE)
+ 
+ 

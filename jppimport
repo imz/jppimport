@@ -62,6 +62,33 @@ $jpp=RPM::Source::Editor->new(
     CONVERT::NOBZ2=>$nobz2, 
     CHANGELOG=>'- converted from JPackage by jppimport script');
 
+# our -- hack ?
+our $jpptoolsdir=dirname($0);
+# for cross-references in hooks
+push @INC, $jpptoolsdir."/hooks";
+
+if (not $hook) {
+    # looking for default hook
+    my $name = $jpp->get_section('package','')->get_tag('Name');
+    my $defhook="$jpptoolsdir/hooks/$name.pl";
+    # macro_expansion should be here
+    #print "looking for default hook $defhook\n";
+    $hook = $defhook if (-e $defhook);
+}
+
+our @SPECHOOKS;
+our @PREHOOKS;
+our $spechook;
+if ($hook) {
+    require $hook;
+    die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS or $spechook;
+    if (@PREHOOKS) {
+	$jpp->{WARN_NOTAPPLIED}++;
+	map {&$_($jpp,$alt)} @PREHOOKS;
+	$jpp->{WARN_NOTAPPLIED}--;
+    }
+}
+
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
 &RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);
 print STDERR "done alt_generic_fixes\n" if $verbose>1;
@@ -127,30 +154,12 @@ if ($newrel=~/jpp$/) {
 $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
-# our -- hack ?
-our $jpptoolsdir=dirname($0);
-# for cross-references in hooks
-push @INC, $jpptoolsdir."/hooks";
-
-if (not $hook) {
-    # looking for default hook
-    my $name = $jpp->get_section('package','')->get_tag('Name');
-    my $defhook="$jpptoolsdir/hooks/$name.pl";
-    # macro_expansion should be here
-    #print "looking for default hook $defhook\n";
-    $hook = $defhook if (-e $defhook);
-}
 if ($hook) {
-    our @SPECHOOKS;
-    our $spechook;
-    require $hook;
     if ($spechook or @SPECHOOKS) {
 	$jpp->{WARN_NOTAPPLIED}++;
 	map {&$_($jpp,$alt)} @SPECHOOKS;
 	&$spechook($jpp,$alt) if $spechook;
 	$jpp->{WARN_NOTAPPLIED}--;
-    } else {
-	die "script $hook does not have a valid hook!\n";
     }
 }
 
