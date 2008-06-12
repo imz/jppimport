@@ -2,7 +2,7 @@
 
 require 'set_fix_homedir_macro.pl';
 
-$spechook = sub {
+push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
     # BUG to report (5.5.25 1-fc9) too

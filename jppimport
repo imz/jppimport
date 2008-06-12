@@ -7,6 +7,7 @@ use Getopt::Long;
 use File::Basename;
 use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
+use RPM::Source::Convert::JPackage2ALT;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
 my $packager='auto';
@@ -59,7 +60,8 @@ $jpp=RPM::Source::Editor->new(
     OUTPUTDIR=> $outputdir, 
     PATCHDIR=>$patchdir, 
     VERBOSE=> $verbose,
-    CONVERT::NOBZ2=>$nobz2, 
+    CONVERT::JPACKAGE::JVM=>$jvm,
+    CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
     CHANGELOG=>'- converted from JPackage by jppimport script');
 
 # our -- hack ?
@@ -92,7 +94,7 @@ if ($hook) {
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
 &RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);
 print STDERR "done alt_generic_fixes\n" if $verbose>1;
-&jpp_specific_fix($jpp);
+&RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($jpp);
 print STDERR "done jpp_specific_fixes\n" if $verbose>1;
 
 my $altrel="alt1";
@@ -117,9 +119,10 @@ if ($altrpm || $altspec) {
     my $vercmp = `rpmvercmp $altver $jppver`;
     chomp $vercmp;
     $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    if ($altrel=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+    if ($altrel=~/^alt([^_]+)_(.+jpp)(\d(?:\.\d)?)$/) {
 	my $rel = $1;
 	my $jppfrom = $2;
+	my $jppdist= $3;
 	# hack -- cleanup (undefined in jpp) macro in alt release:
 	$rel=~s/.?\%\w+//g;
 	$rel=~s/.?\%\{\w+\}+//g;
@@ -145,7 +148,9 @@ if ($altrpm || $altspec) {
 my $newrel = $altrel.$jpprel_branch."_".$jpprel;
 if ($newrel=~/jpp$/) {
     if ($jvm and $jvm =~ /^5/) {
-	$newrel .= "5.0";
+	$newrel .= "5";
+    } elsif ($jvm and $jvm =~ /^6/) {
+	$newrel .= "6";
     } else {
 	$newrel .= "1.7";
     }
@@ -183,243 +188,3 @@ print $jpp->get_spec() if $jppspec or $verbose>1;
 $jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
-my $TODO=qq~
-%if %{native} %if ! %{gcj_support}
-BuildRequires:  %{_bindir}/gcj, %{__perl}, 
-~;
-
-
-sub jpp_specific_fix {
-    my $rpm=shift;
-    my $secptr=$rpm->get_sections();
-    my $main_sec=$rpm->get_section('package','');
-
-    if (not $main_sec->match(qr'BuildRequires: jpackage-.+-compat')) {
-	my $jppcompat='1.4';
-	if ($jvm) {
-	    if ($jvm =~ /^4/) {
-		$jppcompat='1.4';
-	    } elsif ($jvm =~ /^5/) {
-		$jppcompat='1.5';
-	    } elsif ($jvm =~ /^6/) {
-		$jppcompat='1.6';
-	    } else {
-		$jppcompat='generic';
-	    }
-	}
-	$main_sec->unshift_body("BuildRequires: jpackage-$jppcompat-compat\n");
-	$main_sec->unshift_body("BuildRequires: /proc\n");
-    }
-
-    # maven hack
-    $main_sec->subst_if(qr'\s+maven(\s|$)',' maven-plugins ', qr'^\s*BuildRequires:\s*');
-    $main_sec->subst_if(qr'\s+maven2(\s|$)',' maven2-plugins ', qr'^\s*BuildRequires:\s*');
-
-
-    foreach my $sec (@$secptr) {
-	my $t = $sec->get_type();
-	#print "type is $t\n";
-	if ($t eq 'package') {
-	    &jpp_specific_cleanup_headers($sec);
-	    $sec->subst(
-		qr'\%define gcj_support \%{\?_with_gcj_support:1}\%{!\?_with_gcj_support:\%{\?_without_gcj_support:0}\%{!\?_without_gcj_support:\%{\?_gcj_support:\%{_gcj_support}}\%{!\?_gcj_support:0}}}', '%define gcj_support 0');
-	    $sec->subst(qr'\%define\s+gcj_support\s+1', '%define gcj_support 0');
-	    $sec->subst(qr'\%define\s+_with_gcj_support\s+1', '%define _with_gcj_support 0');
-
-	} elsif ($t eq 'files') {
-	    &jpp_specific_cleanup_files($sec);
-	} elsif ($t eq 'prep' || $t eq 'build' || $t eq 'install') {
-	} elsif ($t eq 'post') {
-	} elsif ($t eq 'postun') {
-	} elsif ($t eq 'changelog') {
-	}
-	# general hacks here
-	# is it worth wrapping in one?
-	$sec->subst(qr'%{_localstatedir}/', '%{_var}/');
-	# altlinux vs redhat incompatibility (found in hsqldb)
-	#$sec->subst(qr'%{_localstatedir}/lib', '%{_var}/lib');
-	#$sec->subst(qr'%{_localstatedir}/log', '%{_var}/log');# jetty 5
-	#$sec->subst(qr'%{_localstatedir}/run', '%{_var}/run');# jetty 5
-	#$sec->subst(qr'%{_localstatedir}/cache', '%{_var}/cache');# jetty 5
-	# due to feature of alt findreq
-	$sec->subst(qr'%{_sysconfdir}/init.d','%_initdir');
-    }
-
-    # hack... it looks like it should be moved to RPM::Source::Editor
-    # zip -> bz2 due to alt buggy rpm (/usr/bin/unzip -qL) :(
-    $main_sec=$rpm->get_section('package','');
-    if ($main_sec->match(qr'^\s*Source\d*:.+\.(zip|jar)\s*$') 
-	) {
-        # source0 only!! others should be not %setup'ed, or we need explicit check
-	#for (my $i=0;$i<@{$rpm->{SOURCES}}; $i++) {
-	for (my $i=0;$i<1; $i++) {
-	    my $source=$rpm->{SOURCES}->[$i];
-	    $source=~s/\s*$//;
-	    if ($source=~/\.(zip|jar)$/ and ! $rpm->get_section('prep')->match(qr'unzip -q %{SOURCE'.$i.'\}') and ! $rpm->is_specfile_mode()) {
-		print STDERR "note: try to bzip2 zip source [$source]\n";
-		my $sourcefile=$rpm->{SOURCEDIR}."/".basename($source);
-		if (! -e $sourcefile) {
-		    warn "Internal error: source $source not found!";
-		} else {
-		    my $convertdir= $rpm->{TMPDIR}.'/CONVERT'.$i;
-		    mkdir $convertdir;
-		    &RPM::Source::Editor::run ("pushd $convertdir; unzip -q $sourcefile; popd");
-		    my @files= map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/*");
-		    my @hidden_files=grep {!/\.$/ && ! /\*$/} map {s,^\Q$convertdir\E/,,; $_} glob ("$convertdir/.*");
-		    my $arjsuff='.bz2';
-		    my $arjtarg='j';
-		    if ($rpm->{CONVERT::NOBZ2}) {
-			$arjtarg='';
-			$arjsuff='';
-		    }
-		    $sourcefile=~s/\.(zip|jar)$/.tar$arjsuff/;
-		    &RPM::Source::Editor::run ("tar c${arjtarg}f $sourcefile -C $convertdir @files @hidden_files");
-		    my $rawsource=$rpm->{RAWSOURCES}->[$i];
-		    my $newsource=$rawsource;
-		    $newsource=~s/\.(zip|jar)$/.tar$arjsuff/;
-		    $main_sec->subst(qr"$rawsource",$newsource);
-		}
-	    }
-	}
-    }
-}
-
-sub jpp_specific_cleanup_files {
-    my $section=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	if (/^\s*\%ghost\s*((?:\%dir|\%doc)\s*)*\%{_javadocdir}/) {
-	    # we will leave ghost there... a usual symlink will not upgrade from directory
-#	    s,^\s*\%ghost\s*,,g;
-	    push @out, $_;
-#	} elsif (/^\s*\%ghost\s*\%dir\s*\%{_javadocdir}/) {
-	    # throw away -- seems dangerous
-#	} elsif (/^\s*\%ghost\s*%{_bindir}/) {
-	} elsif (/^\s*\%ghost\s*\%{_javadir}/) {
-	    # seems to be touch for alternatives. better to exclude.
-	    s/^\s*\%ghost\s*/\%exclude /;
-	    push @out, $_;
-	} elsif (/^\s*\%ghost\s*/) {
-	    # alternatives ?
-	    push @out, "#".$_;
-	} else {
-	    push @out, $_;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-BEGIN { our %JPP_GROUP_MAP = (
-"Editors", "Editors",
-"Text Editors", "Editors",
-"Development/Tools/IDE", "Editors",
-"Utilities", "Utilities",
-"Multimedia/Graphics", "Graphics", # batik
-"Database", "Databases", # derby
-"Applications/Databases", "Databases",
-"Networking/Instant messaging", "Networking/Instant messaging", # jext ??? horrible :(
-"Internet/Log Analysis", "Monitoring",
-"System/Servers", "System/Servers",
-"System/Libraries", "System/Libraries", # ht2html
-"Text Editors/Integrated Development Environments (IDE)", "Editors",
-" ", " ",
-	    ); 
-}
-
-sub jpp_specific_cleanup_headers {
-    my $section=shift;
-    my @out;
-    foreach (@{$section->get_body()}) {
-	if (/^Group:(\s*)(.+\S)\s*$/) {
-	    #if ($2) eq "System/Libraries" and ht2html
-	    if (
-		$2 eq "Development/Build Tools"
-		or $2 eq "Development/Code Generators"
-		or $2 eq "Development/Compilers"
-		or $2 eq "Development/Framework"
-		or $2 eq "Development/Java"
-		or $2 eq "Development/Languages" # ecj
-		or $2 eq "Development/Libraries"
-		or $2 eq "Development/Libraries/Application Frameworks"
-		or $2 eq "Development/LIbraries/Java" # jgroups (bug!)
-		or $2 eq "Development/Libraries/Java"
-		or $2 eq "Development/libraries/java" # axis2 (bug!)
-		or $2 eq "Development/Test/Java"
-		or $2 eq "Development/Testing"
-		or $2 eq "Development/Tools"
-		or $2 eq "Internet/WWW/Dynamic Content" #tomcat
-		or $2 eq "Internet/WWW/Servers" #jboss
-		or $2 eq "Internet/WWW/Indexing/Search" # lucene
-		or $2 eq "Applications/Internet" # apacheds
-		or $2 eq "System/Logging" # log4j
-		or $2 eq "System/Networking" # mina
-		or $2 eq "System Environment/Applications" #tomcat
-		or $2 eq "System Environment/Libraries"
-		or $2 eq "Security/Cryptography"
-		or $2 eq "Software Development/Quality Assurance"
-		or $2 eq "Networking/Daemons" # jacarta-common-daemons
-		or $2 eq "System/Boot"
-		or $2 eq "Utilities" # jarjar
-		or $2 eq "Text Processing/Markup/XML"
-		or $2 eq "Text Processing/Markup/HTML"
-		or $2 eq "Documentation" # jacorb
-		or $2 eq "Development/Debuggers" # findbugs
-) {
-		push @out, "Group:${1}Development/Java\n";
-	    } elsif ($JPP_GROUP_MAP{$2}) {
-		push @out, "Group:${1}$JPP_GROUP_MAP{$2}\n";
-	    } elsif ($2 eq "Development/Documentation") {
-		push @out, $_;
-	    } else {
-		die "unknown conversion for Group: $2";
-	    }
-	} elsif (/^\s*\%define\s+section\s+free\s*$/) {
-	    # throw away
-	} elsif (/^\s*((?:BuildRequires|PreReq|BuildPreReq|BuildPrereqs|Requires|Conflicts)\s*(?:\(\w+\))?)\s*:\s*(.*\S)\s*$/) {
-	    my $Tag=$1;
-	    my $filtered = &jpp_filter_pkg_list($2);
-	    push @out, "$Tag: $filtered\n" if ($filtered);
-	} else {
-	    push @out, $_;
-	}
-    }
-    $section->set_body(\@out);
-}
-
-BEGIN {
-our %JPPDEPSKIP = map {$_ => 1} qw!
-java-devel java
-java-1.4.2-devel java-1.5.0-devel
-jce jsse 
-!;
-# java-devel jce jsse ...  are hack around Conflicts: in jpackage-1.x-compat
-#jce jsse 
-
-
-our %JPPDEPSUBST = (
-'crimson' => 'jakarta-crimson',
-'maven-modello-plugin' => 'maven-plugin-modello',
-'modello-maven-plugin' => 'maven-plugin-modello',
-#'ant-xslp' => 'ant-optional',
-);
-
-}
-
-sub jpp_filter_pkg_list {
-    my @in = split /[\s,]+/, $_[0];
-    my @out;
-    while (@in) {
-	$_ = shift @in;
-	if ($JPPDEPSKIP{$_}) {
-	    &RPM::Source::Convert::Generic2ALT::read_tag_version(\@in);
-	    next;
-	} elsif ($JPPDEPSUBST{$_}) {
-	    push @out, $JPPDEPSUBST{$_};
-	} else {
-	    push @out, $_;
-	}
-    }
-    return join(" ",@out)
-}
-
-1;
