@@ -23,8 +23,15 @@ BuildRequires(pre): browser-plugins-npapi-devel
 %define javaws_ver      %{javaver}
 ');
 
+    map {if ($_->get_type() eq "package") {
+	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
+	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
+	 }
+    } @{$jpp->get_sections()};
+
+    # for M40; can(should?) be disabled on M41
+    $jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    $jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'gecko-devel','firefox-devel');
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
@@ -38,7 +45,6 @@ Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 
     $jpp->get_section('build')->unshift_body('unset JAVA_HOME'."\n");
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    #$jpp->get_section('build')->subst(qr'^make\s*$','make OTHER_LDFAGS="-L /usr/lib/jvm/jre/lib/amd64/server -L /usr/lib/jvm/jre/lib/amd64"'."\n");
     $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
 patch -p1 < %{PATCH34}
 ',qr'make stamps/patch.stamp');
@@ -107,15 +113,15 @@ with %{name} J2SE Runtime Environment.
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 ');
     $jpp->_reset_speclist();
+    $jpp->add_section('files','javaws');
     #map{$_->describe()} @{$jpp->get_sections()};
 
-#    $jpp->add_section('files','javawc');
-#    $jpp->get_section('files','javawc')->unshift_body('%_altdir/%altname-javawc
-#%{_datadir}/applications/%{name}-javaws.desktop
-#');
-#    $jpp->get_section('files','-n %name-mozilla')->unshift_body('%_altdir/%altname-mozilla
-#%{_datadir}/applications/%{name}-control-panel.desktop
-#');
+    $jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
+%{_datadir}/applications/%{name}-javaws.desktop
+');
+    $jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
+%{_datadir}/applications/%{name}-control-panel.desktop
+');
 
 # I did!!!
 #s,%altname-j2se,%altname-java,g

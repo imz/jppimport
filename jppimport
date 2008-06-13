@@ -12,6 +12,7 @@ use RPM::Source::Convert::JPackage2ALT;
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
 my $packager='auto';
 my $verbose=1;
+my $cleanup=0;
 my $outputdir='.';
 my $patchdir=dirname($0)."/patches";
 
@@ -24,6 +25,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "packager=s"   => \$packager,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
+		      "cleanup!"   => \$cleanup,
 		      "release=s"   => \$release,
 		      "nobz2"   => \$nobz2,
 		      "verbose+"  => \$verbose);
@@ -60,9 +62,48 @@ $jpp=RPM::Source::Editor->new(
     OUTPUTDIR=> $outputdir, 
     PATCHDIR=>$patchdir, 
     VERBOSE=> $verbose,
+    CLEANUP=> $cleanup,
+    CHANGELOG=>'- converted from JPackage by jppimport script',
     CONVERT::JPACKAGE::JVM=>$jvm,
     CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
-    CHANGELOG=>'- converted from JPackage by jppimport script');
+);
+
+my $jpprel = $jpp->get_section('package','')->get_tag('Release');
+my $jppver = $jpp->get_section('package','')->get_tag('Version');
+
+my $altrel="alt1";
+if ($altrpm || $altspec) {
+    $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    $altrel = $alt->get_section('package','')->get_tag('Release');
+    $altver = $alt->get_section('package','')->get_tag('Version');
+    my $vercmp = `rpmvercmp $altver $jppver`;
+    chomp $vercmp;
+    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
+    if ($altrel=~/^alt([^_]+)_(.+jpp)(\d(?:\.\d)?)$/) {
+	my $rel = $1;
+	my $jppfrom = $2;
+	my $jppdist= $3;
+	# hack -- cleanup (undefined in jpp) macro in alt release:
+	$rel=~s/.?\%\w+//g;
+	$rel=~s/.?\%\{\w+\}+//g;
+	if ($rel=~/^0\./ or $vercmp != 0) {
+	    $rel=1;
+	} elsif ($jppfrom eq $jpprel) {
+	    $rel=~/^(\d+)/;
+	    $rel=$1+1;
+	}
+	$altrel='alt'.$rel;
+    } else {
+	$altrel=~s/.?\%\w+//g;
+	$altrel=~s/.?\%\{\w+\}+//g;
+	$altrel='alt1' if $altrel=~/^alt0\./ or $vercmp != 0;
+    }
+    if ($packager eq 'auto') {
+	my $altpackager=$alt->get_section('package','')->get_tag('Packager');
+	$packager=$altpackager if $altpackager;
+    }
+    $alt->cleanup();
+}
 
 # our -- hack ?
 our $jpptoolsdir=dirname($0);
@@ -97,10 +138,6 @@ print STDERR "done alt_generic_fixes\n" if $verbose>1;
 &RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($jpp);
 print STDERR "done jpp_specific_fixes\n" if $verbose>1;
 
-my $altrel="alt1";
-my $jpprel = $jpp->get_section('package','')->get_tag('Release');
-my $jppver = $jpp->get_section('package','')->get_tag('Version');
-
 # $jpprel_branch is used to keep branch of fedora or mandriva
 my $jpprel_branch='';
 
@@ -110,39 +147,6 @@ if ($jpprel=~/\%\{\?dist\}/) {
     $jpprel=~s/jpp(\.\d+)?//;
     $jpprel_branch=$1 if $1;
     $jpprel.=q'jpp';
-}
-
-if ($altrpm || $altspec) {
-    $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
-    $altrel = $alt->get_section('package','')->get_tag('Release');
-    $altver = $alt->get_section('package','')->get_tag('Version');
-    my $vercmp = `rpmvercmp $altver $jppver`;
-    chomp $vercmp;
-    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
-    if ($altrel=~/^alt([^_]+)_(.+jpp)(\d(?:\.\d)?)$/) {
-	my $rel = $1;
-	my $jppfrom = $2;
-	my $jppdist= $3;
-	# hack -- cleanup (undefined in jpp) macro in alt release:
-	$rel=~s/.?\%\w+//g;
-	$rel=~s/.?\%\{\w+\}+//g;
-	if ($rel=~/^0\./ or $vercmp != 0) {
-	    $rel=1;
-	} elsif ($jppfrom eq $jpprel) {
-	    $rel=~/^(\d+)/;
-	    $rel=$1+1;
-	}
-	$altrel='alt'.$rel;
-    } else {
-	$altrel=~s/.?\%\w+//g;
-	$altrel=~s/.?\%\{\w+\}+//g;
-	$altrel='alt1' if $altrel=~/^alt0\./ or $vercmp != 0;
-    }
-    if ($packager eq 'auto') {
-	my $altpackager=$alt->get_section('package','')->get_tag('Packager');
-	$packager=$altpackager if $altpackager;
-    }
-    $alt->cleanup();
 }
 
 my $newrel = $altrel.$jpprel_branch."_".$jpprel;
@@ -186,5 +190,5 @@ if ($packager) {
 
 print $jpp->get_spec() if $jppspec or $verbose>1;
 $jpp->write_rpm() if $jpprpm;
-$jpp->cleanup();
+#$jpp->cleanup();
 
