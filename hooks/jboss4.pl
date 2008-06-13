@@ -26,7 +26,7 @@ push @SPECHOOKS, sub {
     for my $sec ('prep', 'build', 'install') {
 	$jpp->get_section($sec)->subst(qr'build-classpath wsdl4j', 'build-classpath wsdl4j-jboss4');
     }
-    foreach my $section (@{$jpp->get_sections()}) {
+    foreach my $section (@{$jpp->get_sections_ref()}) {
 	if ($section->get_type() eq 'package') {
 	    $section->subst_if(qr'wsdl4j', 'wsdl4j-jboss4', qr'Requires:');
 	}

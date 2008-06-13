@@ -11,7 +11,7 @@ push @SPECHOOKS, sub {
 #    $jpp->get_section('package','')->subst(qr'mysql-connector-java','mysql-connector-jdbc');
 #    $jpp->get_section('prep')->subst(qr'mysql-connector-java','mysql-connector-jdbc');
 #    $jpp->get_section('build')->subst(qr'mysql-connector-java','mysql-connector-jdbc');
-    foreach my $section (@{$jpp->get_sections()}) {
+    foreach my $section (@{$jpp->get_sections_ref()}) {
 	if ($section->get_type() eq 'package') {
 #	    $section->subst(qr'PyXML\s*>=\s*0:%{pyxml_version}','python-module-PyXML ');
 	    $section->subst(qr'PyXML\s*>=\s*0:%{pyxml_version}','python-module-PyXML ');

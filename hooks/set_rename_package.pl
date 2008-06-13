@@ -1,6 +1,6 @@
 sub rename_package {
     my ($jpp, $alt, $oldname, $newname) = @_;
-    for my $sect (@{$jpp->get_sections()}) {
+    for my $sect (@{$jpp->get_sections_ref()}) {
 	$sect->subst(qr'%{name}','%{oldname}');
 	$sect->subst(qr'%name','%oldname');
 	if ($sect->get_type() eq 'package') {

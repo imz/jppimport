@@ -3,7 +3,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     my $desktop_package='';
-    my $secptr=$jpp->get_sections();
+    my $secptr=$jpp->get_sections_ref();
     foreach my $sec (@$secptr) {
 	my $t = $sec->get_type();
 	if ($t eq 'files') {

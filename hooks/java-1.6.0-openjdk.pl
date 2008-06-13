@@ -5,7 +5,7 @@ push @PREHOOKS, sub {
     print STDERR "prehook is called!\n";
     my %type=map {$_=>1} qw/post postun/;
     my %pkg=map {$_=>1} '', 'devel','plugin';
-    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_package()}} @{$jpp->get_sections()};
+    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
 };
 
@@ -27,7 +27,7 @@ BuildRequires(pre): browser-plugins-npapi-devel
 	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
 	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 	 }
-    } @{$jpp->get_sections()};
+    } $jpp->get_sections();
 
     # for M40; can(should?) be disabled on M41
     $jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
@@ -114,7 +114,7 @@ with %{name} J2SE Runtime Environment.
 ');
     $jpp->_reset_speclist();
     $jpp->add_section('files','javaws');
-    #map{$_->describe()} @{$jpp->get_sections()};
+    #map{$_->describe()} $jpp->get_sections();
 
     $jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
 %{_datadir}/applications/%{name}-javaws.desktop

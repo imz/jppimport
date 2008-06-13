@@ -17,7 +17,7 @@ $spechook = sub {
     $jpp->get_section('prep')->subst(qr'%{SOURCE1}','%%{SOURCE1}');
 
     #E: Версия >='0:4.3.1' для 'excalibur-avalon-framework-api' не найдена
-    foreach my $section (@{$jpp->get_sections()}) {
+    foreach my $section (@{$jpp->get_sections_ref()}) {
 	if ($section->get_type() eq 'package') {
 	    #$section->subst(qr'excalibur-avalon-framework-api\s*>=\s*0:4.3.1','excalibur-avalon-framework-api ');
 	    #$section->subst(qr'excalibur-avalon-framework-impl\s*>=\s*0:4.3.1','excalibur-avalon-framework-impl ');

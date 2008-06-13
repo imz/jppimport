@@ -6,7 +6,7 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 # reported #294
     # homedir confilct 
-    map {$_->subst(qr'homedir','apphomedir')} @{$jpp->get_sections()};
+    map {$_->subst(qr'homedir','apphomedir')} @{$jpp->get_sections_ref()};
     # /var/lib/juddi/webapps not packaged
     $jpp->get_section('install')->push_body('mkdir -p $RPM_BUILD_ROOT/var/lib/juddi/webapps'."\n");
     $jpp->get_section('files')->push_body('%dir /var/lib/juddi/webapps'."\n");
