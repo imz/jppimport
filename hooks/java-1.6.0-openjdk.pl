@@ -2,7 +2,6 @@
 
 push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
-    print STDERR "prehook is called!\n";
     my %type=map {$_=>1} qw/post postun/;
     my %pkg=map {$_=>1} '', 'devel','plugin';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_package()}} $jpp->get_sections();
@@ -13,6 +12,11 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ eclipse-ecj libstdc++-devel-static
 BuildRequires(pre): browser-plugins-npapi-devel
+# hack :(
+# BuildRequires: chrpath
+# todo: remove after as-needed fix
+%set_verify_elf_method unresolved=relaxed
+
 %def_enable javaws
 %def_enable moz_plugin
 %def_disable desktop
@@ -29,6 +33,10 @@ BuildRequires(pre): browser-plugins-npapi-devel
 	 }
     } $jpp->get_sections();
 
+    $jpp->get_section('package','plugin')->subst_if(qr'\%\{syslibdir\}/mozilla/plugins','browser-plugins-npapi',qr'^Requires:');
+    $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
+    $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
+
     # for M40; can(should?) be disabled on M41
     $jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
@@ -44,10 +52,15 @@ Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 });
 
     $jpp->get_section('build')->unshift_body('unset JAVA_HOME'."\n");
+#    $jpp->get_section('build')->unshift_body('export LDFLAGS="$LDFLAGS -Wl,--no-as-needed"'."\n");
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
 patch -p1 < %{PATCH34}
 ',qr'make stamps/patch.stamp');
+    # hack for sun-based build (i586) only!!!
+    $jpp->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
+    # builds end up randomly :(
+    $jpp->get_section('build')->subst(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
     $jpp->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
@@ -57,6 +70,22 @@ patch -p1 < %{PATCH34}
     $jpp->get_section('install')->unshift_body_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
+
+    # chrpath hack (disabled)
+    if (0) {
+	$jpp->get_section('package','')->push_body(q'# hack :(
+BuildRequires: chrpath
+# todo: remove after as-needed fix
+%set_verify_elf_method unresolved=relaxed
+');
+	$jpp->get_section('install')->push_body(q!
+# chrpath hack :(
+find $RPM_BUILD_ROOT -name '*.so' -exec chrpath -d {} \;
+find $RPM_BUILD_ROOT/%{sdkbindir}/ -exec chrpath -d {} \;
+find $RPM_BUILD_ROOT/%{jrebindir}/ -exec chrpath -d {} \;
+!);
+    }
+    # end chrpath hack
 
     $jpp->get_section('files','')->subst(qr'#\%ghost \%{_jvmdir}/\%{jredir}/lib/security','%ghost %{_jvmdir}/%{jredir}/lib/security');
 
@@ -126,6 +155,16 @@ with %{name} J2SE Runtime Environment.
 # I did!!!
 #s,%altname-j2se,%altname-java,g
     $jpp->get_section('install')->push_body(q!
+# HACK around find-requires
+%define __find_requires    $RPM_BUILD_ROOT/.find-requires
+cat > $RPM_BUILD_ROOT/.find-requires <<EOF
+(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | sed -e s,^/usr/lib64/,, | sed -e s,^/usr/lib/,,) || :
+EOF
+chmod 755 $RPM_BUILD_ROOT/.find-requires
+# end HACK around find-requires
+
+
+
 ##################################################
 # --- alt linux specific, shared with openjdk ---#
 ##################################################
