@@ -82,6 +82,9 @@ if ($jpprel=~/\%\{\?dist\}/) {
     $jpprel.=q'jpp';
 }
 
+# for new jpackage 5.0
+$jpprel=~s/\%\{dist\}/jpp5/;
+
 my $altrel="alt1";
 if ($altrpm || $altspec) {
     $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
