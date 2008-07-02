@@ -10,7 +10,10 @@ push @PREHOOKS, sub {
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ eclipse-ecj libstdc++-devel-static
+    # added in 16 - TODO - comment out
+    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
+
+    $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static
 BuildRequires(pre): browser-plugins-npapi-devel
 # hack :(
 # BuildRequires: chrpath
@@ -33,6 +36,7 @@ BuildRequires(pre): browser-plugins-npapi-devel
 	 }
     } $jpp->get_sections();
 
+    $jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
     $jpp->get_section('package','plugin')->subst_if(qr'\%\{syslibdir\}/mozilla/plugins','browser-plugins-npapi',qr'^Requires:');
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
@@ -64,6 +68,8 @@ patch -p1 < %{PATCH34}
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
     $jpp->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
+
+    # TODO: fix caserts!!!
 
     # desktop-file-install is crying! TODO: replace with ALT
     $jpp->get_section('install')->unshift_body_after('install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n",qr'for e in jconsole policytool');
@@ -158,7 +164,7 @@ with %{name} J2SE Runtime Environment.
 # HACK around find-requires
 %define __find_requires    $RPM_BUILD_ROOT/.find-requires
 cat > $RPM_BUILD_ROOT/.find-requires <<EOF
-(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | sed -e s,^/usr/lib64/,, | sed -e s,^/usr/lib/,,) || :
+(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | sed -e s,^/usr/lib64/lib,lib, | sed -e s,^/usr/lib/lib,lib,) || :
 EOF
 chmod 755 $RPM_BUILD_ROOT/.find-requires
 # end HACK around find-requires

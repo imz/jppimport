@@ -9,7 +9,8 @@ use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2,$jvm);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2);
+my $jvm=5;
 my $packager='auto';
 my $verbose=1;
 my $cleanup=0;
@@ -151,12 +152,14 @@ print STDERR "done jpp_specific_fixes\n" if $verbose>1;
 
 my $newrel = $altrel.$jpprel_branch."_".$jpprel;
 if ($newrel=~/jpp$/) {
-    if ($jvm and $jvm =~ /^5/) {
+    if ($jvm and $jvm =~ /^4/) {
+	$newrel .= "1.7";
+    } elsif ($jvm and $jvm =~ /^5/) {
 	$newrel .= "5";
     } elsif ($jvm and $jvm =~ /^6/) {
 	$newrel .= "6";
     } else {
-	$newrel .= "1.7";
+	$newrel .= "5";
     }
 }
 
