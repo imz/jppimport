@@ -92,7 +92,6 @@ if ($altrpm || $altspec) {
     $altver = $alt->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
     chomp $vercmp;
-    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
     if ($altrel=~/^alt([^_]+)_(.+jpp)(\d(?:\.\d)?)$/) {
 	my $rel = $1;
 	my $jppfrom = $2;
@@ -100,7 +99,7 @@ if ($altrpm || $altspec) {
 	# hack -- cleanup (undefined in jpp) macro in alt release:
 	$rel=~s/.?\%\w+//g;
 	$rel=~s/.?\%\{\w+\}+//g;
-	print STDERR "new alt release: $jpprel $rel $jppfrom $jppdist\n" if $verbose>0;
+	print STDERR "new alt release: $jpprel $rel $jppfrom $jppdist\n" if $verbose>1;
 	if ($rel=~/^0\./ or $vercmp != 0) {
 	    $rel=1;
 	} elsif ($jppfrom eq $jpprel) {
@@ -176,6 +175,10 @@ if ($hook) {
 	&$spechook($jpp,$alt) if $spechook;
 	$jpp->{WARN_NOTAPPLIED}--;
     }
+}
+
+if ($altrpm || $altspec) {
+    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
 }
 
 if ($changelog) {
