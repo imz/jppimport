@@ -30,7 +30,8 @@ $spechook = sub {
     $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
 
     # hack around requires in spec body (they put it in for biarch reasons
-    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: %{_libdir}/%{name}/plugins/org.eclipse.swt.gtk.linux.%{eclipse_arch}_3.3.0.v3346.jar'."\n");
+    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: %{_libdir}/%{name}/plugins/org.eclipse.swt.gtk.linux.%{eclipse_arch}_3.3.2.v3349.jar
+'."\n");
 
     #Epoch:  1
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
@@ -103,7 +104,9 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 # if enable make_xpcominit ...
 subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+# was used for build with firefox
 #subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+# used for build with xulrunner
 subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
 
 # if disable awt
