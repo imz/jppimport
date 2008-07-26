@@ -51,6 +51,13 @@ $spechook = sub {
     $jpp->get_section('package','')->subst(qr'%{name}-launcher-double-free-bug.patch','eclipse-3.3.0-alt-launcher-double-free-bug.patch');
     $jpp->get_section('package','')->subst(qr'%{name}-launcher-set-install-dir-and-shared-config.patch','eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
 
+    # change in 3.3.2 (due to firefox 3.0?)
+    $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
+
+    # until osgi requires will be complete;
+    $jpp->get_section('package','')->subst(qr'icu4j-eclipse >= 3.6.1-1jpp.4','icu4j-eclipse >= 3.6.1-alt1.6');
+    $jpp->get_section('package','rcp')->subst(qr'icu4j-eclipse >= 3.6.1-1jpp.4','icu4j-eclipse >= 3.6.1-alt1.6');
+
     # in rel30
     $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
     $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
@@ -96,7 +103,8 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 # if enable make_xpcominit ...
 subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+#subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
 
 # if disable awt
 # subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
@@ -162,7 +170,7 @@ popd
 
     #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
-    $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.0.zip');
+    $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.2.zip');
     foreach my $section (@{$jpp->get_sections_ref()}) {
 	$section->subst(qr'org.fedoraproject','org.altlinux');
     }

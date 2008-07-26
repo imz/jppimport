@@ -172,18 +172,28 @@ EOF
 chmod 755 $RPM_BUILD_ROOT/.find-requires
 # end HACK around find-requires
 
-
-
 ##################################################
 # --- alt linux specific, shared with openjdk ---#
 ##################################################
 
-%if_enabled moz_plugin
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
+if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/jvisualvm ]; then
+  cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-jvisualvm.desktop << EOF
+[Desktop Entry]
+Name=Java VisualVM (%{name})
+Comment=Java Virtual Machine Monitoring, Troubleshooting, and Profiling Tool
+Exec=jvisualvm
+Icon=%{name}
+Terminal=false
+Type=Application
+Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
+EOF
+fi
+
+%if_enabled moz_plugin
 # ControlPanel freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
 [Desktop Entry]
-Encoding=UTF-8
 Name=Java Plugin Control Panel (%{name})
 Comment=Java Control Panel
 Exec=jcontrol
@@ -196,10 +206,9 @@ EOF
 # javaws freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
 [Desktop Entry]
-Encoding=UTF-8
 Name=Java Web Start (%{name})
 Comment=Java Application Launcher
-MimeType=application/x-java-jnlp-file
+MimeType=application/x-java-jnlp-file;
 Exec=%{_jvmdir}/%{jredir}/bin/javaws %%u
 Icon=%{name}
 Terminal=false
@@ -266,12 +275,14 @@ EOF
 
 # binaries and manuals
 for i in appletviewer extcheck idlj jar jarsigner javadoc javah javap jdb native2ascii rmic serialver apt jconsole jinfo jmap jps jsadebugd jstack jstat jstatd \
-jhat jrunscript schemagen wsgen wsimport xjc
+jhat jrunscript jvisualvm schemagen wsgen wsimport xjc
 do
+  if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/$i ]; then
   %__cat <<EOF >>%buildroot%_altdir/%altname-javac
 %_bindir/$i	%{_jvmdir}/%{sdkdir}/bin/$i	%{_jvmdir}/%{sdkdir}/bin/javac
 %_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
+  fi
 done
 # binaries w/o manuals
 for i in HtmlConverter
@@ -349,16 +360,22 @@ fi
 
 %post devel
 %register_alternatives %altname-javac
+%update_menus
 
 %preun devel
 %unregister_alternatives %altname-javac
 
+%postun devel
+%clean_menus
+
 %if_enabled desktop
 %post -n java-%{origin}-desktop
 %update_mimedb
+%update_desktopdb
 
 %postun -n java-%{origin}-desktop
 %clean_mimedb
+%clean_desktopdb
 %endif
 
 %if_enabled moz_plugin
