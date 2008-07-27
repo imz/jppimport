@@ -54,6 +54,7 @@ $spechook = sub {
 
     # change in 3.3.2 (due to firefox 3.0?)
     $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
+    $jpp->get_section('package','-n libswt3-gtk2')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
 
     # until osgi requires will be complete;
     $jpp->get_section('package','')->subst(qr'icu4j-eclipse >= 3.6.1-1jpp.4','icu4j-eclipse >= 3.6.1-alt1.6');
