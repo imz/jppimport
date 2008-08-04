@@ -50,12 +50,16 @@ BuildRequires(pre): browser-plugins-npapi-devel
 
     $jpp->copy_to_sources('java-1.6.0-openjdk-alt-ldflag.patch');
     $jpp->copy_to_sources('java-1.6.0-openjdk-alt-as-needed1.patch');
+    $jpp->add_patch('java-1.6.0-openjdk-alt-as-needed-gcjwebplugin.patch',
+		    STRIP => 0,NUMBER => 35);
     $jpp->get_section('package','')->unshift_body(q{
 Patch33: java-1.6.0-openjdk-alt-ldflag.patch
 Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 });
 
-    $jpp->get_section('build')->unshift_body('unset JAVA_HOME'."\n");
+    $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
+%autoreconf
+!);
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
 patch -p1 < %{PATCH34}
@@ -160,6 +164,10 @@ with %{name} J2SE Runtime Environment.
     $jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
 %{_datadir}/applications/%{name}-control-panel.desktop
 ');
+
+    $jpp->get_section('install')->push_body(q!
+%__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};' %buildroot/usr/share/applications/policytool.desktop
+!);
 
 # I did!!!
 #s,%altname-j2se,%altname-java,g
