@@ -13,12 +13,16 @@ push @SPECHOOKS, sub {
     # added in 16 - TODO - comment out
     #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
 
+    # hack against old alt remnants
+    $jpp->get_section('package','')->push_body(q'Provides: j2se = %version
+');
+
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static
 BuildRequires(pre): browser-plugins-npapi-devel
 # hack :(
 # BuildRequires: chrpath
 # todo: remove after as-needed fix
-%set_verify_elf_method unresolved=relaxed
+#set_verify_elf_method unresolved=relaxed
 
 %def_enable javaws
 %def_enable moz_plugin
@@ -166,7 +170,7 @@ with %{name} J2SE Runtime Environment.
 ');
 
     $jpp->get_section('install')->push_body(q!
-%__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};' %buildroot/usr/share/applications/policytool.desktop
+%__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
 !);
 
 # I did!!!

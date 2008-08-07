@@ -10,14 +10,31 @@ my $PATH2='/var/ftp/pub/Linux/ALT/4.0/branch/files/SRPMS';
 
 my $result = GetOptions (
 			 "full" => \$full,
+			 "path1" => \$PATH1,
+			 "path2" => \$PATH2,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
 
-if (0) {
-    print "usage [ options ] [ list of rpms/names ]
+sub usage {
+    print "usage: $0 [ options ]
 options:
--- /path/to/altlinux/src/RPMS
+--full 
+--verbose
+--path1 /path/to/repo1/SRPMS 
+--path2 /path/to/repo2/SRPMS
+";
+}
 
+
+
+unless (-d $PATH1) {
+    print STDERR "path1 not found: $PATH1
+";
+    exit (64);
+}
+
+unless (-d $PATH2) {
+    print STDERR "path1 not found: $PATH2
 ";
     exit (64);
 }
