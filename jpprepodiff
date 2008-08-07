@@ -10,8 +10,8 @@ my $PATH2='/var/ftp/pub/Linux/ALT/4.0/branch/files/SRPMS';
 
 my $result = GetOptions (
 			 "full" => \$full,
-			 "path1" => \$PATH1,
-			 "path2" => \$PATH2,
+			 "path1=s" => \$PATH1,
+			 "path2=s" => \$PATH2,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -34,7 +34,7 @@ unless (-d $PATH1) {
 }
 
 unless (-d $PATH2) {
-    print STDERR "path1 not found: $PATH2
+    print STDERR "path2 not found: $PATH2
 ";
     exit (64);
 }
