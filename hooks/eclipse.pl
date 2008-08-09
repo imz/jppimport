@@ -35,8 +35,10 @@ $spechook = sub {
 
     #Epoch:  1
     $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
-    $jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
-    $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
+
+    # seems let it be.
+    #$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
+    #$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
 
     # overwrite with fixed versions
     # segfault at start: -- getProgramDir() at eclipse.c(947)
@@ -46,11 +48,11 @@ $spechook = sub {
 #< +     programDir = malloc( (_tcslen( temp + 1 )) * sizeof(_TCHAR) );
 #---
 #> +     programDir = malloc( (_tcslen( temp ) + 1) * sizeof(_TCHAR) );
-    $jpp->copy_to_sources('eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
-    # double free bug still exist
-    $jpp->copy_to_sources('eclipse-3.3.0-alt-launcher-double-free-bug.patch');
-    $jpp->get_section('package','')->subst(qr'%{name}-launcher-double-free-bug.patch','eclipse-3.3.0-alt-launcher-double-free-bug.patch');
-    $jpp->get_section('package','')->subst(qr'%{name}-launcher-set-install-dir-and-shared-config.patch','eclipse-3.3.0-alt-launcher-set-install-dir-and-shared-config.patch');
+    $jpp->copy_to_sources('eclipse-3.3.2-alt-launcher-set-install-dir-and-shared-config.patch');
+    $jpp->get_section('package','')->subst(qr'%{name}-launcher-set-install-dir-and-shared-config.patch','eclipse-3.3.2-alt-launcher-set-install-dir-and-shared-config.patch');
+    # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
+    # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
+    # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
     # change in 3.3.2 (due to firefox 3.0?)
     $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
@@ -186,7 +188,10 @@ popd
 
 #TODO: sed --in-place "s/4.1.130/5.5.23/g" на sed --in-place "s/4.1.230/5.5.25/g"
 
-
+    # let them be noarches
+    $jpp->get_section('package','ecj')->push_body("BuildArch: noarch\n");
+    $jpp->get_section('package','cvs-client')->push_body("BuildArch: noarch\n");
+    $jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
 };
 
 sub replace_built_in_ant {

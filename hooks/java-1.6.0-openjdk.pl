@@ -424,6 +424,16 @@ fi
 
 !);
 
+    $jpp->_reset_speclist();
+    $jpp->add_section('post','')->unshift_body('
+%update_desktopdb
+%update_menus
+');
+    $jpp->add_section('postun','')->unshift_body('
+%clean_desktopdb
+%clean_menus
+');
+
 }
 
 

@@ -5,8 +5,8 @@ use Getopt::Long;
 use strict;
 
 my ($verbose,$full);
-my $PATH1='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
-my $PATH2='/var/ftp/pub/Linux/ALT/4.0/branch/files/SRPMS';
+my $PATH1='/var/ftp/pub/Linux/ALT/4.1/branch/files/SRPMS';
+my $PATH2='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
 
 my $result = GetOptions (
 			 "full" => \$full,
@@ -20,8 +20,8 @@ sub usage {
 options:
 --full 
 --verbose
---path1 /path/to/repo1/SRPMS 
---path2 /path/to/repo2/SRPMS
+--path1 /path/to/oldrepo/SRPMS 
+--path2 /path/to/newrepo/SRPMS
 ";
 }
 
@@ -49,32 +49,32 @@ for my $name (@ARGV) {
 	next;
     }
     unless ($rpm2) {
-#	print "info: new $rpm1 \n";
-	push @newer, $rpm1;
+#	print "info: deprecated $rpm1 \n";
+	push @deprecated, $rpm1;
 	next;
     }
     unless ($rpm1) {
-#	print "info: depr $rpm2 \n";
-	push @deprecated, $rpm2;
+#	print "info: newer $rpm2 \n";
+	push @newer, $rpm2;
 	next;
     }
-    my $cmp = &rpmevrcmp(&get_rpm_evr($rpm1), &get_rpm_evr($rpm2));
+    my $cmp = &rpmevrcmp(&get_rpm_evr($rpm2), &get_rpm_evr($rpm1));
     if ($cmp >0) {
 #	print "oops:cmp=$cmp for $rpm1 $rpm2 \n";
-	push @newer, $rpm1;
+	push @newer, $rpm2;
     }
 }
 
 print "\nthe following packages are newer:\n";
-for my $rpm1 (@newer) {
-#    my $nvr=&get_rpm_nvr($rpm1);
+for my $rpm (@newer) {
+#    my $nvr=&get_rpm_nvr($rpm);
 #    print "".$nvr."\n";
-    print &get_rpm_nvr($rpm1)."\n";
+    print &get_rpm_nvr($rpm)."\n";
 }
 
 print "\nthe following packages are deprecated:\n";
-for my $rpm2 (@deprecated) {
-    print &get_rpm_nvr($rpm2)."\n";
+for my $rpm (@deprecated) {
+    print &get_rpm_nvr($rpm)."\n";
 }
 
 #-------------------------------------------------------

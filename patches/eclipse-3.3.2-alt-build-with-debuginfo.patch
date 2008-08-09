@@ -1,0 +1,16 @@
+Index: features/org.eclipse.equinox.executable/library/gtk/make_linux.mak
+===================================================================
+RCS file: /cvsroot/eclipse/org.eclipse.equinox.executable/library/gtk/make_linux.mak,v
+retrieving revision 1.10
+diff -u -r1.10 make_linux.mak
+--- features/org.eclipse.equinox.executable/library/gtk/make_linux.mak	7 Feb 2007 18:13:48 -0000	1.10
++++ features/org.eclipse.equinox.executable/library/gtk/make_linux.mak	1 Mar 2007 03:44:19 -0000
+@@ -43,7 +43,7 @@
+ DLL = $(PROGRAM_LIBRARY)
+ LIBS = `pkg-config --libs-only-L gtk+-2.0` -lgtk-x11-2.0 -lgdk_pixbuf-2.0 -lgobject-2.0 -lgdk-x11-2.0 -lpthread -ldl
+ LFLAGS = -shared -fpic -Wl,--export-dynamic 
+-CFLAGS = -O -s -Wall\
++CFLAGS = -O -s -Wall -g \
+ 	-fpic \
+ 	-DLINUX \
+ 	-DMOZILLA_FIX \
