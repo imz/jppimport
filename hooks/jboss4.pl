@@ -9,14 +9,16 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-crimson'."\n");
     $jpp->add_patch('jboss-4.0.3SP1-alt-ant17support.patch');
 
+################### deprecated ############################
     # TODO: report
     # hack:user and group are created in main package: dependency shoud be fixed
 #warning: user jboss4 does not exist - using root
 #warning: group jboss4 does not exist - using root
 #jboss4-default-4.0.3.1-alt2_5jpp5.0
 #jboss4-4.0.3.1-alt2_5jpp5.0
-    $jpp->get_section('package','-n jboss4-default')->subst(qr'Requires: jboss4 =','Requires(pre): jboss4 =');
-
+    
+    #$jpp->get_section('package','-n jboss4-default')->subst(qr'Requires: jboss4 =','Requires(pre): jboss4 =');
+#############################################################
 
     # otherwise Depends: /lib/lsb/init-functions but it is not installable
     $jpp->copy_to_sources('jboss4.init');

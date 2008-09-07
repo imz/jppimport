@@ -49,9 +49,9 @@ popd
 %{_mavendepmapfragdir}
 ');
 
-    $jpp->get_section('post','')->unshift_body('%update_maven_depmap
+    $jpp->add_section('post','')->unshift_body('%update_maven_depmap
 ');
-    $jpp->get_section('postun','')->unshift_body('%update_maven_depmap
+    $jpp->add_section('postun','')->unshift_body('%update_maven_depmap
 ');
 
 }

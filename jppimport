@@ -112,6 +112,7 @@ if ($altrpm || $altspec) {
 	}
 	$altrel='alt'.$rel;
     } else {
+	print STDERR "first alt release $altrel\n" if $verbose>1;
 	$altrel=~s/.?\%\w+//g;
 	$altrel=~s/.?\%\{\w+\}+//g;
 	$altrel='alt1' if $altrel=~/^alt0\./ or $vercmp != 0;
@@ -201,7 +202,7 @@ if ($packager) {
     }
 }
 
-print $jpp->get_spec() if $jppspec or $verbose>2;
+print $jpp->get_spec() if $jppspec or $verbose>3;
 $jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
