@@ -12,7 +12,7 @@ sub add_missingok_config {
 mkdir -p $RPM_BUILD_ROOT`dirname '.$configfile.'`
 touch $RPM_BUILD_ROOT'.$configfile.'
 ');
-    $jpp->get_section('files','')->push_body('%config(noreplace,missingok) '.$configfile."\n");
+    $jpp->get_section('files',$pkg)->push_body('%config(noreplace,missingok) '.$configfile."\n");
 }
 
 1;

@@ -9,7 +9,7 @@ use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$nobz2);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$rename,$nobz2);
 my $jvm=5;
 my $packager='auto';
 my $verbose=1;
@@ -26,6 +26,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "packager=s"   => \$packager,
 		      "hook=s"   => \$hook,
 		      "changelog=s"   => \$changelog,
+		      "rename=s"   => \$rename,
 		      "cleanup!"   => \$cleanup,
 		      "release=s"   => \$release,
 		      "nobz2"   => \$nobz2,
@@ -132,6 +133,7 @@ push @INC, $jpptoolsdir."/hooks";
 if (not $hook) {
     # looking for default hook
     my $name = $jpp->get_section('package','')->get_tag('Name');
+    $name=$rename if $rename;
     my $defhook="$jpptoolsdir/hooks/$name.pl";
     # macro_expansion should be here
     #print "looking for default hook $defhook\n";
@@ -150,6 +152,8 @@ if ($hook) {
 	$jpp->{WARN_NOTAPPLIED}--;
     }
 }
+
+$jpp->rename_package($rename) if $rename;
 
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
 &RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);

@@ -12,7 +12,7 @@ my $JPPPATH='/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Lin
 
 
 my $OUTDIR="./OUT";
-my ($changelog, $release, $jvm, $nobz2);
+my ($changelog, $jvm, $nobz2, $release, $rename);
 my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
@@ -22,7 +22,8 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "strategy=s" => \$strategy,
 			 "jvm=s" => \$jvm,
 			 "nobz2" => \$nobz2,
-#			 "release=s"   => \$release,
+			 "rename=s"   => \$rename,
+			 "release=s"   => \$release,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
 
@@ -58,9 +59,6 @@ apache-axiom neethi burlap3 hessian3
 useless:
 daytrader
 
-conflict_with_jal_and_not_needed:
-jal
-
 fractalish:
 jorm
 jorm-rdb-adapter
@@ -71,6 +69,10 @@ perseus-persistence
 perseus-pool
 
 dead-or-deprecated:
+maven2-stylus-skin
+maven2-default-skin
+maven2-classic-skin
+
 jalopy
 avalon-excalibur
 
@@ -135,6 +137,8 @@ our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #xerces-j xerces-j2
 our %ALT2JPPMAP=qw/
 jakarta-crimson crimson
+jsmc smc
+sg-jal jal
 lucene2 lucene
 /;
 # not so simple... hands required!
@@ -160,9 +164,6 @@ eclipse-build-utils
 je
 jed
 jikes
-jms
-jmx
-sax
 xsdlib
 /;
 
@@ -180,6 +181,7 @@ if ($strategy eq 'alt2jpp') {
 
 sub alt2jpp {
     foreach my $name (@packages) {
+	next if $JPPSKIP{$name};
 	next if $ALTSKIP{$name};
 	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
 	print STDERR "WARNING: alt RPM $altname not found.\n" unless $altrpm;
@@ -232,6 +234,8 @@ sub run_jppimport {
     my ($name, $jpprpm, $altrpm)=@_;
     my $importcmd="$jppimport --outdir $OUTDIR";
     $importcmd.=" --changelog '$changelog'" if ($changelog);
+    $importcmd.=" --release '$release'" if ($release);
+    $importcmd.=" --rename '$rename'" if ($rename);
     $importcmd.=" --alt $altrpm" if ($altrpm);
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);

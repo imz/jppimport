@@ -1,0 +1,21 @@
+diff -ru ht2html-2.0/PDOGenerator.py ht2html-2.0.new/PDOGenerator.py
+--- ht2html-2.0/PDOGenerator.py	2008-09-10 21:14:40 +0400
++++ ht2html-2.0.new/PDOGenerator.py	2002-04-08 22:45:09 +0400
+@@ -3,7 +3,7 @@
+ 
+ import os
+ import posixpath
+-import whrandom
++import random
+ 
+ from Skeleton import Skeleton
+ from Sidebar import Sidebar, BLANKCELL
+@@ -58,7 +58,7 @@
+         # calculate the random corner
+         # XXX Should really do a list of the pics directory...
+         NBANNERS = 64
+-        i = whrandom.randint(0, NBANNERS-1)
++        i = random.randint(0, NBANNERS-1)
+         s = "PyBanner%03d.gif" % i
+         self.__d['banner'] = s
+         self.__whichbanner = i
