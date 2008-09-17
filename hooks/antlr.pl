@@ -2,7 +2,8 @@
 
 require 'set_bin_755.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
 
     $jpp->disable_package('jedit');

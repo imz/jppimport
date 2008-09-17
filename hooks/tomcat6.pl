@@ -2,7 +2,8 @@
 
 require 'set_fix_homedir_macro.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     # FHS-2.3 back to 2.2 :(
     $jpp->get_section('package','')->subst(qr'appdir /srv/','appdir /var/lib/');

@@ -2,7 +2,7 @@
 
 require 'set_target_14.pl';
 
-$spechook = \&fix_mail;
+push @SPECHOOKS, \&fix_mail;
 
 # until old jaf will be in Sisyphus
 sub fix_mail {

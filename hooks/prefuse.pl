@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook=sub {};
+push @SPECHOOKS, sub {};
 
 1;
 

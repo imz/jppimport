@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     # hack before jms will be obsolete
     $jpp->get_section('package','')->subst('Requires: jms\s*=\s*0:1.1','Requires: geronimo-jms-1.1-api');

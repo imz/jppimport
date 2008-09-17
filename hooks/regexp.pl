@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('Obsoletes: jakarta-regexp = 1.4-alt4'."\n");
     $jpp->get_section('package','')->unshift_body('Obsoletes: jakarta-regexp = 1.4-alt3'."\n");

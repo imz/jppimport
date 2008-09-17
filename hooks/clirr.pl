@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
     # bugs to report
     # TODO: clirr manual is empty!!!

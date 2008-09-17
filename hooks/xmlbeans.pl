@@ -3,7 +3,7 @@
 require 'set_without_maven.pl';
 require 'set_target_14.pl';
 
-$spechook = \&fix_svn;
+push @SPECHOOKS, \&fix_svn;
 
 sub fix_svn {
     my ($jpp, $alt) = @_;

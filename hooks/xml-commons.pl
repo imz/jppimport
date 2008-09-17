@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
 # bugfix; to be commited in bugzilla
     $jpp->get_section('install')->subst(qr'ln -s %{name}-resolver-12-%{version}','ln -s %{name}-resolver12-%{version}');

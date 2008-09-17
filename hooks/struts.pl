@@ -1,7 +1,8 @@
 require 'set_add_jspapi_dep.pl';
 require 'set_with_coreonly.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->disable_package('webapps-tomcat3');
     $jpp->disable_package('webapps-tomcat4');

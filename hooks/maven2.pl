@@ -4,7 +4,8 @@
 require 'set_target_14.pl';
 
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     foreach my $section (@{$jpp->get_sections_ref()}) {
 	if ($section->get_type() eq 'package') {

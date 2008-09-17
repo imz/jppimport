@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
 # due to out of memory errors
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
     # todo: report?
     $jpp->get_section('build')->subst(qr!jar javadoc xdoc:transform!,'xdoc:transform');

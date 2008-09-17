@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
     # hack around splitting on 2 packages
     if ($alt->get_tag('Name') eq 'jsvc') {

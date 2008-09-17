@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: servletapi4 jakarta-commons-validator'."\n");
     # over shebang.req.files: executable script /usr/src/tmp/quartz-buildroot/usr/share/quartz-1.5.2/bin/buildcp.sh not executable

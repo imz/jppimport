@@ -2,7 +2,8 @@
 
 require 'set_bin_755.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body("BuildRequires: xml-commons-resolver\n");
     $jpp->get_section('package','')->push_body("Provides: xerces-j = %version-%release\n");

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook = \&fix_jaf;
+push @SPECHOOKS, \&fix_jaf;
 
 # until old jaf will be in Sisyphus
 sub fix_jaf {

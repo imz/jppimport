@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
 # bugfix; to be commited in bugzilla
     $jpp->get_section('package','')->subst(qr'^BuildArch:','##BuildArch:');

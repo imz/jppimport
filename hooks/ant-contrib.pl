@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook = \&fix_junit_epoch;
+push @SPECHOOKS, \&fix_junit_epoch;
 
 sub fix_junit_epoch {
     my ($jpp, $alt) = @_;

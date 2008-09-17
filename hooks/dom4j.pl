@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # included in jpackage-compat
     $jpp->get_section('package','')->subst_if('msv-msv','msv',qr'Requires:');

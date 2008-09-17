@@ -6,7 +6,8 @@ require 'add_missingok_config.pl';
 
 # added aspectj
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
 
     # TODO: report against 1.1 -2jpp -- split macro; as always :(

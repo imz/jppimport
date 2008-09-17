@@ -3,7 +3,8 @@
 # is it needed?
 require 'set_manual_no_dereference.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
 # is it needed?
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-optional'."\n");

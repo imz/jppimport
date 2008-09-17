@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = \&fix_etc_rhino_conf;
+push @SPECHOOKS, 
+\&fix_etc_rhino_conf;
 
 sub fix_etc_rhino_conf {
     my ($jpp, $alt) = @_;

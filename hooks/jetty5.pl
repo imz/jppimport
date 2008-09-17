@@ -4,7 +4,8 @@ require 'set_without_extra.pl';
 require 'set_add_jspapi_dep.pl';
 require 'set_fix_homedir_macro.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
     map {$_->subst(qr'%{_sysconfdir}/init.d','%{_initdir}')} @{$jpp->get_sections_ref()};
 

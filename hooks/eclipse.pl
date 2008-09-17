@@ -7,7 +7,8 @@ require 'set_update_menus.pl';
 # does we need it?
 #libgnomeui-2.so.0()(64bit)   is needed by libswt3-gtk2-3.3.0-alt1_5jpp1.7
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
 
     $apprelease=$jpp->get_section('package','')->get_tag('Release');

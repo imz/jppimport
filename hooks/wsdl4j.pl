@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     # TODO: detect and remove such lines in jppimport.
     # first it could be grepped in existing specs...

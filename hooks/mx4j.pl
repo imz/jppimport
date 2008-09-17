@@ -3,7 +3,8 @@
 #require 'set_bootstrap.pl';
 require 'set_target_14.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
     # no network; hm... maybe altspecific...

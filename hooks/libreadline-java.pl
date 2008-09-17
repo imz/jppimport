@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-$spechook = sub {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'readline-devel', 'libreadline-devel');
     $jpp->get_section('package','')->subst(qr'%{_libdir}/libtermcap.so', 'libtinfo-devel');

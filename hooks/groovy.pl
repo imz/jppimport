@@ -2,7 +2,8 @@
 
 #require 'set_target_14.pl';
 
-$spechook = sub {
+push @SPECHOOKS, 
+ sub {
     my ($jpp, $alt) = @_;
 #    $jpp->get_section('package','')->unshift_body('BuildRequires: xml-commons-jaxp-1.1-apis'."\n");
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist /usr/share/groovy-1.0/lib/*junit*.jar'."\n");
