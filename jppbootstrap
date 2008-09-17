@@ -16,23 +16,27 @@ my $result = GetOptions (
 		      "verbose+"  => \$verbose);
 
 die unless @ARGV;
-my $rpmfile= $ARGV[0];
-my $jpp=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
 
-my $trippletname=$jpp->query('NAME')."-".$jpp->query('VERSION')."-".$jpp->query('RELEASE');
-my $tmpdir = $trippletname.$$;
-my $SOURCESDIR="$tmpdir/SOURCES";
-my $SPECSDIR="$tmpdir/SPECS";
-my $specfile=$SPECSDIR."/".$jpp->query('NAME').'.spec';
-mkdir $tmpdir;
-mkdir $SOURCESDIR;
-mkdir $SPECSDIR;
+map {&package($_)} @ARGV;
 
-`rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
+sub package {
+    my $rpmfile=shift;
+    my $jpp=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
 
-open SPEC, '>', $specfile;
+    my $trippletname=$jpp->query('NAME')."-".$jpp->query('VERSION')."-".$jpp->query('RELEASE');
+    my $tmpdir = $trippletname.$$;
+    my $SOURCESDIR="$tmpdir/SOURCES";
+    my $SPECSDIR="$tmpdir/SPECS";
+    my $specfile=$SPECSDIR."/".$jpp->query('NAME').'.spec';
+    mkdir $tmpdir;
+    mkdir $SOURCESDIR;
+    mkdir $SPECSDIR;
+    
+    `rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
 
-foreach my $tag qw/
+    open SPEC, '>', $specfile;
+
+    foreach my $tag qw/
 NAME
 VERSION
 SUMMARY
@@ -43,9 +47,9 @@ URL
     print SPEC ucfirst(lc($tag)).": ".$jpp->query($tag)."\n";
 }
 
-my $pkgname=$jpp->query('NAME');
+    my $pkgname=$jpp->query('NAME');
 
-foreach my $tag qw/
+    foreach my $tag qw/
 PROVIDENAME
 REQUIRENAME
 / {
@@ -57,19 +61,19 @@ REQUIRENAME
     }
 }
 
-print SPEC '
+    print SPEC '
 BuildArch: noarch
 Group: Development/Java
 Release: alt'.$release.'jpp
 Source: '.$trippletname.".cpio\n\n";
 
-foreach my $tag qw/DESCRIPTION
+    foreach my $tag qw/DESCRIPTION
 / {
     my $query = $jpp->query($tag);
     print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
 }
 
-print SPEC q!
+    print SPEC q!
 %prep
 cpio -idmu --quiet --no-absolute-filenames < %{SOURCE0}
 
@@ -107,6 +111,7 @@ print SPEC q!
 system ('add_changelog', '-e',$changelog,$specfile);
 `rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir .' -bs $specfile`;
 `rm -r $tmpdir`;
+}
 
 sub new {
     my $class=shift;

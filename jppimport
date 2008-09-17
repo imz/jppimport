@@ -142,10 +142,9 @@ if (not $hook) {
 
 our @SPECHOOKS;
 our @PREHOOKS;
-our $spechook;
 if ($hook) {
     require $hook;
-    die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS or $spechook;
+    die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS;
     if (@PREHOOKS) {
 	$jpp->{WARN_NOTAPPLIED}++;
 	map {&$_($jpp,$alt)} @PREHOOKS;
@@ -178,10 +177,9 @@ $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
 if ($hook) {
-    if ($spechook or @SPECHOOKS) {
+    if (@SPECHOOKS) {
 	$jpp->{WARN_NOTAPPLIED}++;
 	map {&$_($jpp,$alt)} @SPECHOOKS;
-	&$spechook($jpp,$alt) if $spechook;
 	$jpp->{WARN_NOTAPPLIED}--;
     }
 }
