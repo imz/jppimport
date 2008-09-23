@@ -61,10 +61,12 @@ REQUIRENAME
     }
 }
 
+    $release='alt'.$release unless $release=~/^alt/;
+    $release=$release.'jpp' unless $release=~/jpp/;
     print SPEC '
 BuildArch: noarch
 Group: Development/Java
-Release: alt'.$release.'jpp
+Release: '.$release.'
 Source: '.$trippletname.".cpio\n\n";
 
     foreach my $tag qw/DESCRIPTION
