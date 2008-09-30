@@ -27,3 +27,10 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
 	$jpp->get_section('package','-n '.$new)->push_body('Provides: '.$old.' = 1.1'."\n");
     }
 }
+__END__
+# hack for 1.1 to be built under java5
+diff geronimo-specs.spec.0 geronimo-specs.spec.1 
+424c424
+<     -Dfile=$(build-classpath mockobjects-j2ee1.4)
+---
+>     -Dfile=$(build-classpath mockobjects-jdk1.4-j2ee1.4)

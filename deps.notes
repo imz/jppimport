@@ -17,6 +17,23 @@ Note: fix groups for Python, GUI, etc...
 # for PermGen error, running out of memory
 export MAVEN_OPTS=-XX:MaxPermSize=512m
 
+an example how to install missing jar file manually
+#--------------------------------------------------------------
+# Mock objects is sort of a special case since it does not reside in 
+# /usr/share/java. So we install it manually via maven.
+
+export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
+mkdir -p $MAVEN_REPO_LOCAL
+
+mvn-jpp install:install-file \
+    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+    -DgroupId=mockobjects \
+    -DartifactId=mockobjects-jdk1.4-j2ee1.3 \
+    -Dversion=0.09 \
+    -Dpackaging=jar \
+    -Dfile=$(build-classpath mockobjects-jdk1.4-j2ee1.4)
+#--------------------------------------------------------------
+
 ==Curerent unmet dependencies:==
 plexus-compiler: aspectj: 
 aspectj: eclipse-*
@@ -29,25 +46,11 @@ struts(jpp): aspectj
 
 ==duplicate rpms to remove:==
 mysql-connector-jdbc by mysql-connector-java
-######### done #########
-#xml-stylebook stylebook
-########################
-#hessian3 by hessian
-#burlap3 by burlap
-#xml-commons-external by xml-commons
-#jakarta-regexp by regexp
-#javamail by sun-mail
-#maven-wagon wagon 
-#bsf jakarta-bsf
-#xsdlib msv-xsdlib
-#jaf by *-jaf
+ibatis by apache-ibatis
 ----------
 
 == deps ==
-activecluster: activemq3-core
-asn1: jakarta-commons-test
-dwr: hibernate3
-ehcache: hibernate3
+
 
 perseus*: fractal
 
