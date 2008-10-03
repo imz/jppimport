@@ -76,6 +76,8 @@ Source: '.$trippletname.".cpio\n\n";
 }
 
     print SPEC q!
+# sometimes commpress gets crazy (see maven-scm-javadoc for details)
+%set_compress_method none
 %prep
 cpio -idmu --quiet --no-absolute-filenames < %{SOURCE0}
 

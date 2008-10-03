@@ -12,7 +12,7 @@ my $JPPPATH='/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Lin
 
 
 my $OUTDIR="./OUT";
-my ($changelog, $jvm, $nobz2, $release, $rename);
+my ($changelog, $jvm, $nobz2, $nozip, $release, $rename);
 my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
@@ -22,6 +22,7 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "strategy=s" => \$strategy,
 			 "jvm=s" => \$jvm,
 			 "nobz2" => \$nobz2,
+			 "nozip" => \$nozip,
 			 "rename=s"   => \$rename,
 			 "release=s"   => \$release,
 			 "verbose"  => \$verbose);
@@ -240,6 +241,7 @@ sub run_jppimport {
     $importcmd.=" --alt $altrpm" if ($altrpm);
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);
+    $importcmd.=" --nozip" if ($nozip);
     if ($jpprpm) {
 	$importcmd.=" --jpp $jpprpm";
     } else {

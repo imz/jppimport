@@ -9,7 +9,7 @@ use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$rename,$nobz2);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$rename,$nobz2,$nozip);
 my $jvm=5;
 my $packager='auto';
 my $verbose=1;
@@ -30,6 +30,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "cleanup!"   => \$cleanup,
 		      "release=s"   => \$release,
 		      "nobz2"   => \$nobz2,
+		      "nozip"   => \$nozip,
 		      "verbose+"  => \$verbose);
 my ($alt,$jpp);
 
@@ -68,6 +69,7 @@ $jpp=RPM::Source::Editor->new(
     CHANGELOG=>'- converted from JPackage by jppimport script',
     CONVERT::JPACKAGE::JVM=>$jvm,
     CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
+    CONVERT::JPACKAGE::NOZIP=>$nozip, 
 );
 
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
