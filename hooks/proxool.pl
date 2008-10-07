@@ -14,7 +14,7 @@ sub {
 
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: checkstyle'."\n");
-    foreach my $section (@{$jpp->get_sections_ref()}) {
+    foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'package') {
 	    $section->subst(qr'hsqldb\s*>=\s*0:1.80','hsqldb');
 	}

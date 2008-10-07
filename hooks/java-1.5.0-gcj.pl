@@ -17,7 +17,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','src')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
     $jpp->get_section('package','src')->subst(qr'^Requires(triggerin)','#Requires(triggerin)');
 
-    foreach my $section (@{$jpp->get_sections_ref()}) {
+    foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'triggerin') {
 	    $section->subst_if(qr'gccsuffix','gccrpmsuffix',qr'^\%trigger');
 	}
@@ -44,6 +44,6 @@ done
     $jpp->get_section('files','devel')->subst(qr'%{python_sitelib}','#%{python_sitelib}');
     $jpp->get_section('files','devel')->push_body('/usr/lib/python*/*'."\n");
 
-#    my @sections=grep {$_->get_type() ne 'triggerin' && !($_->get_type() eq 'postun' && $_->get_package() eq 'plugin')} @{$jpp->get_sections_ref()};
+#    my @sections=grep {$_->get_type() ne 'triggerin' && !($_->get_type() eq 'postun' && $_->get_package() eq 'plugin')} $jpp->get_sections();
 #    $jpp->set_sections(\@sections);
 }

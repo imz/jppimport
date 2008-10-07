@@ -24,13 +24,12 @@ push @SPECHOOKS, sub {
 __END__
     # 2 changelogs (jppbug, to be commited in bugzilla
     my $count_changelogs=0;
-    my $secptr=$jpp->get_sections_ref();
-    for (my $i=0; $i<@$secptr; $i++) {
-	if ($secptr->[$i]->get_type() eq 'changelog') {
-	    if ($count_changelogs>0) {
-		@{$secptr}[$i..$#{$secptr}-1]=@{$secptr}[$i+1..$#{$secptr}];
-		$#{$secptr}--;
-	    }
-	    $count_changelogs++;
+    my @newsec;
+    foreach my $sec ($jpp->get_sections()) {
+	if ($sec->get_type() eq 'changelog') {
+	    push @newsec, $sec unless $count_changelogs++;
+	} else {
+	    push @newsec, $sec;
 	}
     }
+    $jpp->set_sections(\@newsec);

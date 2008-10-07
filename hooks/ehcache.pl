@@ -1,8 +1,10 @@
 #!/usr/bin/perl -w
 
-require 'set_velocity14.pl';
+#require 'set_velocity14.pl';
+push @SPECHOOKS, sub {};
 
-push @SPECHOOKS, 
+__END__
+
 
 sub {
     my ($jpp, $alt) = @_;
@@ -30,4 +32,3 @@ ln -s /usr/share/java/velocity-1.4.jar .m2/repository/velocity/velocity/1.4/
     # }
 }
 
-__END__

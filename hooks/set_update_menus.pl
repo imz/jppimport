@@ -3,8 +3,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     my $desktop_package='';
-    my $secptr=$jpp->get_sections_ref();
-    foreach my $sec (@$secptr) {
+    foreach my $sec ($jpp->get_sections()) {
 	my $t = $sec->get_type();
 	if ($t eq 'files') {
 	    if ($sec->match(qr'^%{_datadir}/applications')) {

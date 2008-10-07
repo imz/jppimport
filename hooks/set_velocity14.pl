@@ -12,7 +12,7 @@ mkdir -p .m2/repository/velocity/velocity/1.4
 ln -s /usr/share/java/velocity-1.4.jar .m2/repository/velocity/velocity/1.4/
 !);
 
-    foreach my $section (@{$jpp->get_sections_ref()}) {
+    foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'package') {
 	    $section->subst_if(qr'velocity','velocity14',qr'Requires:');
 	}

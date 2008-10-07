@@ -28,6 +28,25 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
     }
 }
 __END__
+# hack for 1.2 to be built under (old maven2)?
+939c939
+<   geronimo-spec-corba-2.3/target/geronimo-corba_2.3_spec-null.jar \
+---
+>   geronimo-spec-corba-2.3/target/geronimo-corba_2.3_spec-1.1.jar \
+952c952
+<   geronimo-spec-corba-3.0/target/geronimo-corba_3.0_spec-null.jar \
+---
+>   geronimo-spec-corba-3.0/target/geronimo-corba_3.0_spec-1.1.jar \
+965c965
+<   geronimo-spec-corba/target/geronimo-spec-corba-null.jar \
+---
+>   geronimo-spec-corba/target/geronimo-spec-corba-1.0.jar \
+1367c1367
+<   geronimo-spec-commonj/target/geronimo-commonj_1.1_spec-null.jar \
+---
+>   geronimo-spec-commonj/target/geronimo-commonj_1.1_spec-1.0.jar \
+
+
 # hack for 1.1 to be built under java5
 diff geronimo-specs.spec.0 geronimo-specs.spec.1 
 424c424

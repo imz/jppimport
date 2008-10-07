@@ -4,6 +4,8 @@ require 'set_without_maven.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('package')->subst(qr'^Requires: maven2-bootstrap','#Requires: maven2');
+
     # maven-shared-plugin-testing-harness require maven2 and conflicts w/maven-bootstrap
     #$jpp->get_section('package')->subst_if(qr'BuildRequires: ','#BuildRequires: ', qr'maven-shared-plugin-testing-harness');
     # done manually:

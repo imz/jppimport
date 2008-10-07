@@ -178,7 +178,7 @@ popd
     #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
     $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.2.zip');
-    foreach my $section (@{$jpp->get_sections_ref()}) {
+    foreach my $section ($jpp->get_sections()) {
 	$section->subst(qr'org.fedoraproject','org.altlinux');
     }
     $jpp->get_section('package','')->subst_if(qr'[.-]\d+.zip','.zip',qr'^Source4:');

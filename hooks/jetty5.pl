@@ -7,7 +7,7 @@ require 'set_fix_homedir_macro.pl';
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
-    map {$_->subst(qr'%{_sysconfdir}/init.d','%{_initdir}')} @{$jpp->get_sections_ref()};
+    map {$_->subst(qr'%{_sysconfdir}/init.d','%{_initdir}')} $jpp->get_sections();
 
 # TODO: investigate problems with deps on xml-commons-apis.jar
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist /usr/share/jetty5/ext/xml-commons-apis.jar'."\n");
