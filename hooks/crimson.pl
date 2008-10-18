@@ -1,4 +1,5 @@
 require 'set_rename_package.pl';
+# NOTE: jvm4
 
 push @SPECHOOKS, 
 sub {

@@ -1,0 +1,13 @@
+diff -ru cmi/src/org/objectweb/carol/cmi/DistributedEquivSystem.java cmi/src/org/objectweb/carol/cmi/DistributedEquivSystem.java
+--- cmi/src/org/objectweb/carol/cmi/DistributedEquivSystem.java	2006-07-20 18:55:58 +0000
++++ cmi/src/org/objectweb/carol/cmi/DistributedEquivSystem.java	2008-10-17 19:25:23 +0000
+@@ -609,7 +609,8 @@
+         // Register the JMX MBeans
+         String mbeanName = MBeanUtils.buildObjectName("name=JGroups,channel=" + chan.getChannelName());
+         try {
+-            JmxConfigurator.registerChannel(chan, MBeanUtils.getMBeanServer(), mbeanName, true);
++            JmxConfigurator.registerChannel(chan, MBeanUtils.getMBeanServer(), mbeanName);
++            JmxConfigurator.registerProtocols(MBeanUtils.getMBeanServer(), chan, mbeanName);
+         } catch (Exception e) {
+             if (TraceCmi.isDebugCmiDes()) {
+                 TraceCmi.debugCmiDes("Unable to register the MBean to the MBean Server - ObjectName="+mbeanName + " e=" + e);

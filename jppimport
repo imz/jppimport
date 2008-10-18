@@ -106,12 +106,16 @@ if ($altrpm || $altspec) {
 	$rel=~s/.?\%\{\w+\}+//g;
 	print STDERR "new alt release: jpprel=$jpprel rel=$rel branch=$rel_branch jppfrom=$jppfrom jbranch=$jpprel_branch $jppdist\n" if $verbose>1;
 	if ($rel=~/^0\./ or $vercmp != 0) {
+	    print STDERR "set rel=1\n" if $verbose>1;
 	    $rel=1;
 	} elsif ($jppfrom eq $jpprel and $rel_branch and $jpprel_branch and $rel_branch < $jpprel_branch) {
 	    # nothing to do
-	} elsif ($jppfrom eq $jpprel) {
+	    print STDERR "nothing to do: rel_branch is higher\n" if $verbose>1;
+	#} elsif ($jppfrom eq $jpprel) {
+	} else {
 	    $rel=~/^(\d+)/;
 	    $rel=$1+1;
+	    print STDERR "++rel=$rel\n" if $verbose>1;
 	}
 	$altrel='alt'.$rel;
     } else {
