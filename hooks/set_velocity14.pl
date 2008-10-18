@@ -6,13 +6,16 @@ sub {
 
     # it provides velocity, so nothing should be installed?
     $jpp->get_section('package','')->unshift_body('BuildRequires(pre): velocity14'."\n");
+    $jpp->get_section('package','')->unshift_body('Conflicts: velocity >= 1.5'."\n");
 
 
-#    $jpp->get_section('build')->unshift_body(q!
-## hack used to build ehcache w/velocity 1.4
-#mkdir -p .m2/repository/velocity/velocity/1.4
-#ln -s /usr/share/java/velocity14.jar .m2/repository/velocity/velocity/1.4/velocity-1.4.jar
-#!);
+    $jpp->get_section('build')->unshift_body(q!
+# hack used to build ehcache w/velocity 1.4
+mkdir -p .m2/repository/velocity/velocity/1.4
+ln -s /usr/share/java/velocity14.jar .m2/repository/velocity/velocity/1.4/velocity-1.4.jar
+ln -s /usr/share/java/velocity14.jar .m2/repository/velocity/velocity/1.4/velocity-1.5.jar
+ln -s /usr/share/java/velocity14.jar .m2/repository/velocity/velocity/1.4/velocity14-1.4.jar
+!);
 
     foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'package') {
