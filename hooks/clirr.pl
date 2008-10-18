@@ -43,7 +43,7 @@ fi
 
 # Configuration
 MAIN_CLASS=net.sf.clirr.cli.Clirr
-BASE_JARS="bcel commons-cli commons-lang"
+BASE_JARS="bcel commons-cli commons-lang clirr-core"
 
 # Set parameters
 set_jvm

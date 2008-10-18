@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+require 'set_target_14.pl';
 
 push @SPECHOOKS, 
 

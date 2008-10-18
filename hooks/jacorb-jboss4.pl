@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#require 'set_target_14.pl';
+require 'set_target_14.pl';
 
 # other way is
 push @SPECHOOKS, sub {

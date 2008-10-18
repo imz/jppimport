@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_velocity14.pl';
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;

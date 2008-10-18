@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+# 1.7 hacks ; may deprecate at 5.0
+require 'set_target_14.pl';
+
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
