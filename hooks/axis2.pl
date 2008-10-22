@@ -1,20 +1,44 @@
 #!/usr/bin/perl -w
 
-require 'set_target_14.pl';
+#require 'set_target_14.pl';
 
 push @SPECHOOKS, 
 
 sub {
     my ($jpp, $alt) = @_;
+    # it looks like circular dependency; we need bootstrap first
+#    $jpp->get_section('package','')->unshift_body('BuildRequires: axis2'."\n");
+
+    # 1.7 stuff: test and remove
+    #----------------------------------
     $jpp->get_section('package','')->unshift_body('BuildRequires: maven-shared-plugin-testing-harness mojo-maven2-plugin-build-helper excalibur-avalon-framework'."\n");
     # it requires jaxb: try JaxMe
     $jpp->get_section('package','')->unshift_body('BuildRequires: ws-jaxme'."\n");
-    # it looks like circular dependency; we need bootstrap first
-    $jpp->get_section('package','')->unshift_body('BuildRequires: axis2'."\n");
 
 }
 
 __END__
+note: w/o axis2 dep...
+still need maven-shared
+> jar cf $MAVEN_REPO_LOCAL/org.apache.axis2/axis2-saaj-api.jar dummy
+> jar cf $MAVEN_REPO_LOCAL/org.apache.axis2/axis2-jaxws-api.jar dummy
+> jar cf $MAVEN_REPO_LOCAL/org.apache.axis2/axis2-saaj.jar dummy
+> jar cf $MAVEN_REPO_LOCAL/org.apache.axis2/axis2-jaxws.jar dummy
+> jar cf $MAVEN_REPO_LOCAL/org.apache.axis2/axis2-metadata.jar dummy
+
+or 
+mvn-jpp -e \
+        -s ${MAVEN_SETTINGS} \
+        -Dmaven2.jpp.mode=true \
+        -Dmaven2.jpp.depmap.file=%{SOURCE2} \
+        -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+        install:install-file -DgroupId=org.apache.axis2 \
+        -DartifactId=axis2-xmlbeans \ 
+        -Dversion=1.2 -Dpackaging=jar \
+        -Dfile=$(build-classpath axis2/xmlbeans.jar)
+
+
+1.7
 # TODO: diff is not mentioned in spec
   <dependency>
 	<maven>

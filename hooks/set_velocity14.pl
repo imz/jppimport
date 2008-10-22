@@ -6,7 +6,7 @@ sub {
 
     # it provides velocity, so nothing should be installed?
     $jpp->get_section('package','')->unshift_body('BuildRequires(pre): velocity14'."\n");
-    $jpp->get_section('package','')->unshift_body('Conflicts: velocity >= 1.5'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildConflicts: velocity >= 1.5'."\n");
 
 
     $jpp->get_section('build')->unshift_body(q!

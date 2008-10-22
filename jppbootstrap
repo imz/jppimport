@@ -3,6 +3,7 @@
 package RPM::SpecFile::Bootstrap;
 
 use Getopt::Long;
+use RPM::Source::Macros;
 use strict;
 use warnings;
 
@@ -16,6 +17,10 @@ my $result = GetOptions (
 		      "verbose+"  => \$verbose);
 
 die unless @ARGV;
+
+my $macros=RPM::Source::Macros->new();
+my $packager=$macros->macro_subst('%{packager}');
+$packager=undef if $packager eq '%{packager}';
 
 map {&package($_)} @ARGV;
 
@@ -46,6 +51,7 @@ URL
 / {
     print SPEC ucfirst(lc($tag)).": ".$jpp->query($tag)."\n";
 }
+    print SPEC "Packager: $packager\n" if $packager;
 
     my $pkgname=$jpp->query('NAME');
 

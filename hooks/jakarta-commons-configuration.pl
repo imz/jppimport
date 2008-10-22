@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+require 'set_fix_mockobjects_14.pl';
 push @SPECHOOKS, 
 
 sub  {

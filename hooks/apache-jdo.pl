@@ -1,9 +1,10 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, \&set_without_maven;
-#$spechook = \&set_without_maven;
-
-sub set_without_maven {
+push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('%define _without_maven 1'."\n");
-}
+    $jpp->get_section('build')->unshift_body('
+# for PermGen error, running out of memory
+# export MAVEN_OPTS=-XX:MaxPermSize=512m
+    ');
+};
+

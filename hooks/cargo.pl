@@ -1,9 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, 
-
-# todo: add fragments for checkstyle-optional?
-
+# 1.7, but proved useful in 5.0
 sub {
     my ($jpp, $alt) = @_;
     # hack ! geronimo poms !
@@ -17,3 +15,17 @@ find ./core/samples/java/src/test/java -name '*.java' -delete
 !."\n");
 
 }
+
+__END__
+# hack for old modello poms
+mvn-jpp install:install-file \
+        -s $SETTINGS \
+        -Dcargo.core.version=0.9 \
+        -Dmaven2.jpp.mode=true \
+        -Dmaven2.jpp.depmap.file=%{SOURCE6} \
+    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+    -DgroupId=saxpath \
+    -DartifactId=saxpath \
+    -Dversion=1.0-FCS \
+    -Dpackaging=jar \
+    -Dfile=$(build-classpath jaxen)
