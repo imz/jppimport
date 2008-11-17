@@ -372,50 +372,26 @@ fi
 
 %post devel
 %register_alternatives %altname-javac
-%update_menus
 
 %preun devel
 %unregister_alternatives %altname-javac
-
-%postun devel
-%clean_menus
-
-%if_enabled desktop
-%post -n java-%{origin}-desktop
-%update_mimedb
-%update_desktopdb
-
-%postun -n java-%{origin}-desktop
-%clean_mimedb
-%clean_desktopdb
-%endif
 
 %if_enabled moz_plugin
 %post -n mozilla-plugin-%name
 if [ -d %browser_plugins_path ]; then
     %register_alternatives %name-mozilla
 fi
-%update_menus
 
 %preun -n mozilla-plugin-%name
 %unregister_alternatives %name-mozilla
-
-%postun -n mozilla-plugin-%name
-%clean_menus
 %endif	# enabled moz_plugin
 
 %if_enabled javaws
 %post javaws
 %register_alternatives %altname-javaws
-%update_menus
-%update_desktopdb
 
 %preun javaws
 %unregister_alternatives %altname-javaws
-
-%postun javaws
-%clean_menus
-%clean_desktopdb
 %endif # enabled javaws
 
 ##################################################
@@ -425,15 +401,6 @@ fi
 !);
 
     $jpp->_reset_speclist();
-    $jpp->add_section('post','')->unshift_body('
-%update_desktopdb
-%update_menus
-');
-    $jpp->add_section('postun','')->unshift_body('
-%clean_desktopdb
-%clean_menus
-');
-
 }
 
 

@@ -1,8 +1,6 @@
-# todo: fix push_body in %%if_ed posts!
-#require 'set_update_menus.pl';
 require 'add_missingok_config.pl';
 # TODO
-#require 'set_target_14.pl';
+require 'set_target_14.pl';
 
 push @SPECHOOKS, 
  sub {
@@ -12,12 +10,7 @@ push @SPECHOOKS,
     $jpp->disable_package('mdkmenu');
     $jpp->get_section('install')->push_body(q{# fix to report
 %__subst 's,Categories=Application;Development;X-JPackage;,Categories=X-JPackage;Java;Development;IDE;,' $RPM_BUILD_ROOT%_desktopdir/jpackage-%name.desktop
-
-# hack around push_body in %%if_ed posts!!!
-%post
-%update_menus
-%postun
-%clean_menus
+%__subst 's,.png$,,' $RPM_BUILD_ROOT%_desktopdir/jpackage-%name.desktop
 
 });
 

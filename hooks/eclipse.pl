@@ -1,9 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_update_menus.pl';
-#require 'set_target_14.pl';
-# todo; set jvm 5? does not help?
-
 # does we need it?
 #libgnomeui-2.so.0()(64bit)   is needed by libswt3-gtk2-3.3.0-alt1_5jpp1.7
 

@@ -1,8 +1,6 @@
 #!/usr/bin/perl -w
 
 #require 'set_target_13.pl';
-# todo: create empty post/un!
-require 'set_update_menus.pl';
 
 # other way is
 push @SPECHOOKS, sub {
