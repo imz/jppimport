@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'set_bin_755.pl';
+require 'set_target_14.pl';
 
 push @SPECHOOKS, 
  sub {
@@ -8,7 +9,9 @@ push @SPECHOOKS,
 
     $jpp->disable_package('jedit');
 
-#    $jpp->get_section('package','')->subst(qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 0');
+# or ?
+#    $jpp->get_section('package','')->subst(qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 1');
+
 #    $jpp->disable_package('native');
 #    $jpp->set_changelog('- imported with jppimport script; note: w/o native');
 
@@ -19,6 +22,7 @@ push @SPECHOOKS,
 
     $jpp->get_section('package','')->subst(qr'BuildArch:\s*noarch', '##BuildArch: noarch');
     $jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
+    $jpp->add_patch('antlr-2.7.7-alt-gcc43.patch', STRIP=>1);
 
     $jpp->get_section('description','native')->push_body(q{
 %package        native-devel

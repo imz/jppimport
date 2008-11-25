@@ -1,0 +1,13 @@
+diff -ru httpunit-1.7.old/src/com/meterware/httpunit/parsing/JTidyHTMLParser.java httpunit-1.7/src/com/meterware/httpunit/parsing/JTidyHTMLParser.java
+--- httpunit-1.7.old/src/com/meterware/httpunit/parsing/JTidyHTMLParser.java	2008-05-20 16:25:36 +0000
++++ httpunit-1.7/src/com/meterware/httpunit/parsing/JTidyHTMLParser.java	2008-11-25 18:21:05 +0000
+@@ -87,7 +87,8 @@
+ 
+     private static Tidy getParser( URL url ) {
+         Tidy tidy = new Tidy();
+-        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
++        tidy.setInputEncoding( UTF_ENCODING );
++        tidy.setOutputEncoding( UTF_ENCODING );
+         tidy.setQuiet( true );
+         tidy.setShowWarnings( HTMLParserFactory.isParserWarningsEnabled() );
+         if (!HTMLParserFactory.getHTMLParserListeners().isEmpty()) {

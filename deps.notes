@@ -75,5 +75,8 @@ mina:
      [echo] Use JDK 1.5 to make sure these modules build.
      [echo] ====================================================================
 
-# to do: robot that checks that alternatives does not belong to package?
+# TODO: geronimo-j2ee-1.4-apis should not provide javamail or jaf because they do not have the corresponding symlinks!
+
+# done: robot that checks that alternatives does not belong to package.
 file /usr/share/java/jspapi.jar conflicts between attempted installs of tomcat5-jsp-2.0-api-5.5.24-alt3_3jpp1.7 and geronimo-specs-jsp-1.0-alt0.M5.8
+

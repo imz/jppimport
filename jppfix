@@ -1,0 +1,116 @@
+#!/usr/bin/perl -w
+
+#use strict;
+use warnings;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+use RPM::Source::Editor;
+#use RPM::Source::Convert::Generic2ALT;
+#use RPM::Source::Convert::JPackage2ALT;
+
+my ($jpprpm,$jppspec,$hook,$changelog,$release,$rename,$nobz2,$nozip);
+my $jvm=5;
+my $packager='auto';
+my $verbose=1;
+my $cleanup=0;
+my $outputdir='.';
+my $patchdir=dirname($0)."/patches";
+
+my $result = GetOptions ("rpm=s" => \$jpprpm,
+		      "jvm=s" => \$jvm,
+		      "jppspec=s" => \$jppspec,
+		      "outdir=s"   => \$outputdir,
+		      "packager=s"   => \$packager,
+		      "hook=s"   => \$hook,
+		      "changelog=s"   => \$changelog,
+		      "rename=s"   => \$rename,
+		      "cleanup!"   => \$cleanup,
+		      "release=s"   => \$release,
+		      "nobz2"   => \$nobz2,
+		      "nozip"   => \$nozip,
+		      "verbose+"  => \$verbose);
+my ($jpp);
+
+if (! $jpprpm && ! $jppspec) {
+    print "ERROR: one of --jpp | --jppspec is required!\n";
+    print "options:
+--jpp /path/to/altlinux.src.rpm
+--jppspec /path/to/altlinux.spec
+--hook /path/to/hook to be called on resulting spec file
+--jvm jvm JVM required for the build. by default, it is java-1.4.2.
+  values are: 4 5 6 4.2 5.0 6.0
+--out /path/to/output_dir
+--changelog '- message'
+--release 'release' - if we need to adjust the package's release
+
+usage examples:
+";
+    exit (64);
+}
+
+$jpp=RPM::Source::Editor->new(
+    SOURCERPM => $jpprpm, 
+    SPECFILE=> $jppspec, 
+    OUTPUTDIR=> $outputdir, 
+    PATCHDIR=>$patchdir, 
+    VERBOSE=> $verbose,
+    CLEANUP=> $cleanup,
+    CHANGELOG=>'- fixed by jppfix script',
+);
+
+# our -- hack ?
+our $jpptoolsdir=dirname($0);
+# for cross-references in hooks
+push @INC, $jpptoolsdir."/hooks";
+
+our @SPECHOOKS;
+our @PREHOOKS;
+if ($hook) {
+    require $hook;
+    die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS;
+    if (@PREHOOKS) {
+	$jpp->{WARN_NOTAPPLIED}++;
+	map {&$_($jpp)} @PREHOOKS;
+	$jpp->{WARN_NOTAPPLIED}--;
+    }
+}
+
+$jpp->rename_package($rename) if $rename;
+
+my $jpprel = $jpp->get_section('package','')->get_tag('Release');
+
+my $newrel;
+if ($jpprel=~/alt([\d.]+)(_.*)?/) {
+    $newrel = "alt".($1+1).$2;
+}
+$newrel=$release if ($release);
+$jpp->get_section('package','')->set_tag('Release',$newrel) if $newrel;
+
+if ($hook) {
+    if (@SPECHOOKS) {
+	$jpp->{WARN_NOTAPPLIED}++;
+	map {&$_($jpp)} @SPECHOOKS;
+	$jpp->{WARN_NOTAPPLIED}--;
+    }
+}
+
+if ($changelog) {
+    $jpp->set_changelog($changelog);
+}
+
+if ($packager eq 'auto') {
+    $packager=$jpp->macros()->macro_subst('%{packager}');
+}
+
+if ($packager) {
+    if ($packager ne 'none') {
+	$jpp->get_section('package','')->set_tag('Packager',$packager);
+    } else {
+	$jpp->get_section('package','')->clear_tag('Packager');
+    }
+}
+
+#print $jpp->get_spec() if $jppspec or $verbose>3;
+$jpp->write_rpm() if $jpprpm;
+$jpp->cleanup();
