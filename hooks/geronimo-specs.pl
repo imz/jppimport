@@ -24,7 +24,7 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
 	my $new = shift @obsolete;
 	my $old = shift @obsolete;
 	$jpp->get_section('package','-n '.$new)->push_body('Obsoletes: '.$old.' < 1.1'."\n");
-	$jpp->get_section('package','-n '.$new)->push_body('Provides: '.$old.' = 1.1'."\n");
+#	$jpp->get_section('package','-n '.$new)->push_body('Provides: '.$old.' = 1.1'."\n");
     }
 }
 __END__

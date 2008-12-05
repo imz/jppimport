@@ -1,0 +1,16 @@
+#!/bin/bash
+GREPARG=aspect
+hshS="hsh --apt-config=/etc/apt/apt.conf.SS --with-stuff --mountpoints=/proc"
+mkdir success failure
+for i in "$@"; do
+    if rpmquery --requires -p $i | grep "$GREPARG" >/dev/null; then 
+	echo rebuilding $i
+	if $hshS $i > hsh.log 2>&1 ; then
+	    mv hsh.log success/`basename $i`.log
+	else 
+	    mv hsh.log failure/`basename $i`.log
+	    echo FAILED: $i
+	fi
+    fi
+    rm -f ~/hasher/repo/SRPMS.hasher/*.src.rpm ~/hasher/repo/x86_64/RPMS.hasher/*.rpm
+done

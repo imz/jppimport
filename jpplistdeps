@@ -1,0 +1,16 @@
+#!/bin/sh
+
+ARG=${1:-/usr/share/java}
+TMPd=${TMPDIR:-/tmp}/jar
+for i in `find $ARG -name '*.jar' -print`; do
+    rm -rf $TMPd
+    mkdir $TMPd
+    pushd $TMPd >/dev/null
+    echo jar xf $i
+    jar xf $i
+    for j in `find . -name '*.class'`; do
+	jclassinfo --classes $j | egrep -v '^java\.' | while read class; do echo $i $j $class; done
+    done
+    popd >/dev/null
+    rm -rf $TMPd
+done

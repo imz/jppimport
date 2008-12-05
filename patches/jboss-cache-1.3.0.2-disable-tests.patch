@@ -1,0 +1,51 @@
+--- JBossCache-1.3.0.2-src/build.xml.old	2008-12-02 18:25:53 +0000
++++ JBossCache-1.3.0.2-src/build.xml	2008-12-02 18:26:35 +0000
+@@ -163,26 +163,6 @@
+          <exclude name="**/*1_4*"/>
+       </javac>
+ 
+-      <!-- compile test classes -->
+-      <javac destdir="${compiletest.dir}"
+-         debug="on"
+-         deprecation="${deprecation}"
+-         optimize="off"
+-         includes="**/*.java"
+-         target="1.4"
+-         source="1.4"
+-         failonerror="true">
+-         <src path="${functional.tests.dir}"/>
+-         <src path="${stress.tests.dir}"/>
+-         <src path="${perf.tests.dir}"/>
+-         <src path="${jrunit.tests.dir}"/>
+-         <src path="${interop.tests.dir}"/>
+-         <classpath path="${compile.dir}"/>
+-         <classpath refid="library.classpath"/>
+-         <exclude name="**/obsolete/**"/>
+-         <exclude name="**/*1_4*"/>
+-      </javac>
+-
+       <copy todir="${output.etc.dir}" filtering="no" overwrite="yes">
+          <fileset dir="${etc.dir}">
+          	<include name="META-INF/*.xml"/>
+@@ -215,21 +195,6 @@
+          <src path="${src.dir.50}"/>
+          <classpath refid="library.classpath"/>
+       </javac>
+-      <!-- compile test classes -->
+-      <javac destdir="${compiletest.dir.50}"
+-         debug="on"
+-         deprecation="${deprecation}"
+-         optimize="off"
+-         includes="**/*.java"
+-         target="1.5"
+-         source="1.5"
+-         failonerror="true">
+-         <src path="${functional.tests.dir.50}"/>
+-         <classpath path="${compile.dir.50}"/>
+-         <classpath path="${compile.dir}"/>
+-         <classpath refid="library.classpath"/>
+-      </javac>
+-
+    </target>
+ 
+ <!--   <target name="generate-rmi">-->

@@ -11,7 +11,9 @@ push @SPECHOOKS, sub {
 		$manualsec->subst(qr'^\s*%doc\s+build/docs','%doc --no-dereference build/docs');
 		$manualsec->subst(qr'^\s*%doc\s+build/javadocs','%doc --no-dereference build/javadocs');
 		$manualsec->subst(qr'^\s*%doc\s+dist/docs','%doc --no-dereference dist/docs');
-		$manualsec->subst(qr'^\s*%doc\s+docs/','%doc --no-dereference docs/');
+		$manualsec->subst(qr'^\s*%doc\s+(?=(?:tmp~/)?docs)','%doc --no-dereference ');
+		#$manualsec->subst(qr'^\s*%doc\s+docs/','%doc --no-dereference docs/');
+		$manualsec->subst(qr'^\s*%doc\s+/','%doc --no-dereference docs/');
 	    }
 	    );
     } else {

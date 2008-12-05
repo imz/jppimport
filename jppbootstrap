@@ -4,15 +4,18 @@ package RPM::SpecFile::Bootstrap;
 
 use Getopt::Long;
 use RPM::Source::Macros;
+use File::Path;
 use strict;
 use warnings;
 
 my $release='0.1';
 my $verbose=0;
+my $outdir='.';
 my $changelog='- bootstrap pack of jars created with jppbootstrap script
 - temporary package to satisfy circular dependencies';
 my $result = GetOptions (
 		      "changelog=s"   => \$changelog,
+		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
 		      "verbose+"  => \$verbose);
 
@@ -119,7 +122,8 @@ print SPEC q!
 !;
 
 system ('add_changelog', '-e',$changelog,$specfile);
-`rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir .' -bs $specfile`;
+mkpath([$outdir]) unless -d $outdir;
+`rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir $outdir' -bs $specfile`;
 `rm -r $tmpdir`;
 }
 

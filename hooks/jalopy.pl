@@ -1,10 +1,27 @@
 #!/usr/bin/perl -w
 
+# TODO:
 #require 'set_target_13.pl';
+require 'set_manual_no_dereference.pl';
 
 # other way is
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    # jpackage 5.0 compat
+    $jpp->get_section('package','')->subst_if(qr'docbook-xsl-java-saxon', 'docbook-xsl-saxon', qr'BuildRequires:');
+
+    $jpp->get_section('package','')->unshift_body('BuildRequires: docbook-style-xsl docbook-dtds'."\n");
+    # xsl fix
+    $jpp->get_section('prep')->subst(qr'/sgml/docbook/xsl-stylesheets', '/xml/docbook/xsl-stylesheets');
+    $jpp->get_section('build')->subst(qr'/sgml/docbook/xml-dtd-4.2\*/', '/xml/docbook/dtd/4.2*/');
+# without xml fix
+#    $jpp->disable_package('manual');
+#    $jpp->get_section('build')->subst(qr'build-docu', '');
+#    $jpp->get_section('install')->subst_if(qr'^', '#', qr!cp -pr tmp~/docs/api!);
+#    $jpp->get_section('install')->subst_if(qr'^', '#', qr!tmp~/docs/manual!);
+#    $jpp->disable_package('javadoc');
+
+     
     #$jpp->get_section('build')->unshift_body('export ANT_OPTS="-Xmx256m"'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-trax'."\n");
     $jpp->get_section('build')->subst('^com.icl.saxon.TransformerFactoryImpl"', 'com.icl.saxon.TransformerFactoryImpl -Xmx256m"');
@@ -19,12 +36,6 @@ push @SPECHOOKS, sub {
 
     $jpp->disable_package('eclipse');
 
-#xsl-stylesheets :(
-    $jpp->disable_package('manual');
-    $jpp->get_section('build')->subst(qr'build-docu', '');
-    $jpp->get_section('install')->subst_if(qr'^', '#', qr!cp -pr tmp~/docs/api!);
-    $jpp->get_section('install')->subst_if(qr'^', '#', qr!tmp~/docs/manual!);
-    $jpp->disable_package('javadoc');
 
     # one pixmap is 16x16
     $jpp->get_section('install')->push_body(q'

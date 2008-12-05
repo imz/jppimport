@@ -36,7 +36,7 @@ mvn-jpp install:install-file \
 #--------------------------------------------------------------
 
 ==duplicate rpms to remove:==
-mysql-connector-jdbc by mysql-connector-java
+#mysql-connector-jdbc by mysql-connector-java
 ibatis by apache-ibatis
 portals-pluto && portals-pluto10
 dups TODO:
@@ -45,7 +45,8 @@ apacheds by apacheds10?
 mina mina10?
 xmlgraphics-fop,batik
 jaxen-bootstrap jaxen
-java_cup java-cup
+#java_cup java-cup
+wadi by wadi2
 ----------
 
 == deps ==
@@ -75,8 +76,11 @@ mina:
      [echo] Use JDK 1.5 to make sure these modules build.
      [echo] ====================================================================
 
-# TODO: geronimo-j2ee-1.4-apis should not provide javamail or jaf because they do not have the corresponding symlinks!
+# TODO: geronimo-j2ee-1.4-apis should not provide ... because they do not have the corresponding symlinks!
 
 # done: robot that checks that alternatives does not belong to package.
 file /usr/share/java/jspapi.jar conflicts between attempted installs of tomcat5-jsp-2.0-api-5.5.24-alt3_3jpp1.7 and geronimo-specs-jsp-1.0-alt0.M5.8
 
+# to report:
+docbook-xsl-java-xalan is dead because of xalan-j 2.5 specific code (does not rebuild)
+so I pick manually docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xsl-saxon.
