@@ -1,5 +1,6 @@
 #!/bin/bash
-GREPARG=aspect
+GREPARG=$1
+shift
 hshS="hsh --apt-config=/etc/apt/apt.conf.SS --with-stuff --mountpoints=/proc"
 mkdir success failure
 for i in "$@"; do

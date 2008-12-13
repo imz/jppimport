@@ -1,0 +1,17 @@
+--- Makefile.am.orig	2008-12-13 08:07:52 +0000
++++ Makefile.am	2008-12-13 08:12:45 +0000
+@@ -1381,11 +1381,11 @@
+ 	if [ -n "$(PKGVERSION)" ]; then plugin_version=" ($(PKGVERSION))"; fi; \
+ 	plugin_version=" $(PACKAGE_VERSION)$$revision$$plugin_version"; \
+ 	$(CXX) $(CXXFLAGS) $(MOZILLA_CFLAGS) \
+-	  $(MOZILLA_LIBS) $(GLIB_CFLAGS) $(GLIB_LIBS) \
+-	  $(GTK_CFLAGS) $(GTK_LIBS) \
++	  $(GLIB_CFLAGS) $(GTK_CFLAGS) \
+ 	  -DPACKAGE_VERSION="\"$(PACKAGE_VERSION)\"" \
+ 	  -DPLUGIN_VERSION="\"$$plugin_version\"" \
+-	  -fPIC -shared -o $@ $<
++	  -fPIC -shared -o $@ $< \
++	  $(MOZILLA_LIBS) $(GLIB_LIBS) $(GTK_LIBS)
+ 
+ clean-gcjwebplugin:
+ 	rm -f gcjwebplugin.so

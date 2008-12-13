@@ -13,17 +13,15 @@ push @SPECHOOKS, sub {
     # added in 16 - TODO - comment out
     #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
 
+    $jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','BuildRequires: netbeans-platform8');
+
     # hack against old alt remnants
-    $jpp->get_section('package','')->push_body(q'Provides: j2se = %version
-');
+    # $jpp->get_section('package','')->push_body(q'Provides: j2se = %version'."\n");
 
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static
 BuildRequires(pre): browser-plugins-npapi-devel
-# hack :(
-# BuildRequires: chrpath
-# todo: remove after as-needed fix
-#set_verify_elf_method unresolved=relaxed
 
+%def_enable visualvm
 %def_enable javaws
 %def_enable moz_plugin
 %def_disable desktop
@@ -34,7 +32,7 @@ BuildRequires(pre): browser-plugins-npapi-devel
 %define javaws_ver      %{javaver}
 ');
 
-    map {if ($_->get_type() eq "package") {
+    map {if ($_->get_type() eq 'package') {
 	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
 	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 	 }
@@ -50,11 +48,13 @@ BuildRequires(pre): browser-plugins-npapi-devel
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'gecko-devel','firefox-devel');
+    $jpp->get_section('package','')->subst(qr'xulrunner-devel-unstable','xulrunner-devel');
+
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
 
     $jpp->copy_to_sources('java-1.6.0-openjdk-alt-ldflag.patch');
     $jpp->copy_to_sources('java-1.6.0-openjdk-alt-as-needed1.patch');
-    $jpp->add_patch('java-1.6.0-openjdk-alt-as-needed-gcjwebplugin.patch',
+    $jpp->add_patch('java-1.6.0-openjdk-b12-alt-as-needed-gcjwebplugin.patch',
 		    STRIP => 0,NUMBER => 35);
     $jpp->get_section('package','')->unshift_body(q{
 Patch33: java-1.6.0-openjdk-alt-ldflag.patch
@@ -65,9 +65,13 @@ Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 %autoreconf
 !);
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
+
     $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
 patch -p1 < %{PATCH34}
-',qr'make stamps/patch.stamp');
+',qr'configure');
+
+    $jpp->get_section('build')->subst(qr'-Fedora-\%{fedora}','-ALTLinux');
     # hack for sun-based build (i586) only!!!
     $jpp->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # builds end up randomly :(
@@ -87,22 +91,6 @@ patch -p1 < %{PATCH34}
     $jpp->get_section('install')->unshift_body_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
-
-    # chrpath hack (disabled)
-    if (0) {
-	$jpp->get_section('package','')->push_body(q'# hack :(
-BuildRequires: chrpath
-# todo: remove after as-needed fix
-%set_verify_elf_method unresolved=relaxed
-');
-	$jpp->get_section('install')->push_body(q!
-# chrpath hack :(
-find $RPM_BUILD_ROOT -name '*.so' -exec chrpath -d {} \;
-find $RPM_BUILD_ROOT/%{sdkbindir}/ -exec chrpath -d {} \;
-find $RPM_BUILD_ROOT/%{jrebindir}/ -exec chrpath -d {} \;
-!);
-    }
-    # end chrpath hack
 
     $jpp->get_section('files','')->subst(qr'#\%ghost \%{_jvmdir}/\%{jredir}/lib/security','%ghost %{_jvmdir}/%{jredir}/lib/security');
 
@@ -360,39 +348,6 @@ fi
 # fi
 # %endif
 # ----- JPackage stuff ------
-%register_alternatives %altname-java
-
-# though it is useless for openjdk, it is harmless
-%pre
-[ -L %{_jvmdir}/%{jredir}/lib/fonts ] || %__rm -rf %{_jvmdir}/%{jredir}/lib/fonts
-[ -L %{_jvmdir}/%{jredir}/lib/oblique-fonts ] || %__rm -rf %{_jvmdir}/%{jredir}/lib/oblique-fonts
-
-%preun
-%unregister_alternatives %altname-java
-
-%post devel
-%register_alternatives %altname-javac
-
-%preun devel
-%unregister_alternatives %altname-javac
-
-%if_enabled moz_plugin
-%post -n mozilla-plugin-%name
-if [ -d %browser_plugins_path ]; then
-    %register_alternatives %name-mozilla
-fi
-
-%preun -n mozilla-plugin-%name
-%unregister_alternatives %name-mozilla
-%endif	# enabled moz_plugin
-
-%if_enabled javaws
-%post javaws
-%register_alternatives %altname-javaws
-
-%preun javaws
-%unregister_alternatives %altname-javaws
-%endif # enabled javaws
 
 ##################################################
 # - END alt linux specific, shared with openjdk -#
@@ -405,53 +360,24 @@ fi
 
 
 __END__
+    # chrpath hack (disabled)
+    if (0) {
+	$jpp->get_section('package','')->push_body(q'# hack :(
+BuildRequires: chrpath
+# todo: remove after as-needed fix
+%set_verify_elf_method unresolved=relaxed
+');
+	$jpp->get_section('install')->push_body(q!
+# chrpath hack :(
+find $RPM_BUILD_ROOT -name '*.so' -exec chrpath -d {} \;
+find $RPM_BUILD_ROOT/%{sdkbindir}/ -exec chrpath -d {} \;
+find $RPM_BUILD_ROOT/%{jrebindir}/ -exec chrpath -d {} \;
+!);
+    }
+    # end chrpath hack
+
+
 ### original alternatives
-%post
-ext=.gz
-%register_alternatives java_%{name}
-%register_alternatives jre_%{origin}_%{name}
-%register_alternatives jre_%{javaver}_%{name}
-%register_alternatives %{localpolicy}_%{name}
-
-# Update for jnlp handling.
-update-desktop-database -q %{_datadir}/applications || :
-
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
-  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor
-fi
-
-%postun
-if [ $1 -eq 0 ]
-then
-  %unregister_alternatives java_%{name}
-  %unregister_alternatives jre_%{origin}_%{name}
-  %unregister_alternatives jre_%{javaver}_%{name}
-  %unregister_alternatives %{localpolicy}_%{name}
-fi
-
-# Update for jnlp handling.
-update-desktop-database -q %{_datadir}/applications || :
-
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
-  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor
-fi
-
-%post devel
-ext=.gz
-%register_alternatives javac_%{name}-devel
-%register_alternatives java_sdk_%{origin}_%{name}-devel
-%register_alternatives java_sdk_%{javaver}_%{name}-devel
-
-%postun devel
-if [ $1 -eq 0 ]
-then
-  %unregister_alternatives javac_%{name}-devel
-  %unregister_alternatives java_sdk_%{origin}_%{name}-devel
-  %unregister_alternatives java_sdk_%{javaver}_%{name}-devel
-fi
-
 %post javadoc
 %register_alternatives javadocdir_%{name}-javadoc
 
@@ -461,11 +387,3 @@ then
   %unregister_alternatives javadocdir_%{name}-javadoc
 fi
 
-%post plugin
-%register_alternatives %{javaplugin}_%{name}-plugin
-
-%postun plugin
-if [ $1 -eq 0 ]
-then
-  %unregister_alternatives %{javaplugin}_%{name}-plugin
-fi
