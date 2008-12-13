@@ -13,15 +13,23 @@ push @SPECHOOKS, sub {
     # added in 16 - TODO - comment out
     #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
 
-    $jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','BuildRequires: netbeans-platform8');
+    # hack until RPM::Source::Convert will be enhanced
+    $jpp->del_section('post','javadoc');
+    $jpp->del_section('postun','javadoc');
 
-    # hack against old alt remnants
-    # $jpp->get_section('package','')->push_body(q'Provides: j2se = %version'."\n");
+    $jpp->get_section('package','javadoc')->push_body('BuildArch: noarch'."\n");
 
-    $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static
+
+    # if disabled build of visualvm
+    $jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','#BuildRequires: netbeans');
+
+    $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
+BuildRequires: libXext-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 
-%def_enable visualvm
+%def_enable accessibility
+%def_disable alsa_subpackage
+%def_disable visualvm
 %def_enable javaws
 %def_enable moz_plugin
 %def_disable desktop
@@ -38,7 +46,9 @@ BuildRequires(pre): browser-plugins-npapi-devel
 	 }
     } $jpp->get_sections();
 
-    $jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
+    # seems to be used no more
+    #$jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
+
     $jpp->get_section('package','plugin')->subst_if(qr'\%\{syslibdir\}/mozilla/plugins','browser-plugins-npapi',qr'^Requires:');
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
@@ -66,12 +76,14 @@ Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 !);
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
-
-    $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
-patch -p1 < %{PATCH34}
-',qr'configure');
-
     $jpp->get_section('build')->subst(qr'-Fedora-\%{fedora}','-ALTLinux');
+    # better to insert after stamps/patch-ecj.stamp + skip %endif, 
+    # but we insert here as we does not use %{gcjbootstrap}
+    $jpp->get_section('build')->unshift_body_after(q'
+make MEMORY_LIMIT=-J-Xmx512m stamps/patch.stamp
+patch -p1 < %{PATCH33}
+patch -p1 < %{PATCH34}
+',qr'with-pkgversion');
     # hack for sun-based build (i586) only!!!
     $jpp->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # builds end up randomly :(
@@ -79,11 +91,15 @@ patch -p1 < %{PATCH34}
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
     $jpp->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
+    # just to suppress warnings on %
+    $jpp->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
+    $jpp->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
 
     # TODO: fix caserts!!!
     if ('with static caserts') {
-	$jpp->get_section('install')->unshift_body_before('if /bin/false; then'."\n",qr'# Install cacerts symlink.');
-	$jpp->get_section('install')->unshift_body_before('fi'."\n",qr'# Install extension symlinks.');
+	# now there is a check %if 0%{?fedora} > 9; use given
+	#$jpp->get_section('install')->unshift_body_before('if /bin/false; then'."\n",qr'# Install cacerts symlink.');
+	#$jpp->get_section('install')->unshift_body_before('fi'."\n",qr'# Install extension symlinks.');
     }
 
     # desktop-file-install is crying! TODO: replace with ALT
@@ -92,29 +108,16 @@ patch -p1 < %{PATCH34}
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
 
-    $jpp->get_section('files','')->subst(qr'#\%ghost \%{_jvmdir}/\%{jredir}/lib/security','%ghost %{_jvmdir}/%{jredir}/lib/security');
+    # deprecated
+    #$jpp->get_section('files','')->subst(qr'#\%ghost \%{_jvmdir}/\%{jredir}/lib/security','%ghost %{_jvmdir}/%{jredir}/lib/security');
+
+    # to disable visualvm w/o netbeans
+    $jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
+    $jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->raw_rename_section('plugin','-n mozilla-plugin-%name');
     $jpp->get_section('package','devel')->push_body(q!
-%package        alsa
-Summary:        ALSA support for %{name}
-Group:          Development/Java
-Requires:       %{name} = %{version}-%{release}
-
-%description    alsa
-This package contains Advanced Linux Sound Architecture (ALSA) support
-libraries for %{name}.
-
-%package        jdbc
-Summary:        Native library for JDBC support in Java
-Group:          Development/Databases
-Provides:       j2se-jdbc = %javaver
-Requires:       %name = %version-%release
-
-%description    jdbc
-This package contains the JDBC/ODBC bridge driver for %{name}.
-
 %if_enabled javaws
 %package javaws
 Summary: Java Web Start
@@ -159,10 +162,10 @@ with %{name} J2SE Runtime Environment.
 
     $jpp->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
+%__subst 's,^Categories=.*,Categories=Profiling;Monitor;Development;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/jconsole.desktop
+
 !);
 
-# I did!!!
-#s,%altname-j2se,%altname-java,g
     $jpp->get_section('install')->push_body(q!
 # HACK around find-requires
 %define __find_requires    $RPM_BUILD_ROOT/.find-requires
@@ -294,7 +297,6 @@ done
 
 # ----- JPackage compatibility alternatives ------
   %__cat <<EOF >>%buildroot%_altdir/%altname-javac
-%_prefix/lib/j2se	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 %{_jvmdir}/java	%{_jvmdir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
 %{_jvmjardir}/java	%{_jvmjardir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
 %{_jvmdir}/java-%{origin}	%{_jvmdir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
@@ -303,7 +305,6 @@ done
 %{_jvmjardir}/java-%{javaver}	%{_jvmjardir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
 # ----- end: JPackage compatibility alternatives ------
-
 
 %if_enabled moz_plugin
 # Mozilla plugin alternative
@@ -348,10 +349,13 @@ fi
 # fi
 # %endif
 # ----- JPackage stuff ------
+%force_update_alternatives
 
 ##################################################
 # - END alt linux specific, shared with openjdk -#
 ##################################################
+
+
 
 !);
 
@@ -375,15 +379,3 @@ find $RPM_BUILD_ROOT/%{jrebindir}/ -exec chrpath -d {} \;
 !);
     }
     # end chrpath hack
-
-
-### original alternatives
-%post javadoc
-%register_alternatives javadocdir_%{name}-javadoc
-
-%postun javadoc
-if [ $1 -eq 0 ]
-then
-  %unregister_alternatives javadocdir_%{name}-javadoc
-fi
-
