@@ -238,7 +238,7 @@ sub run_jppimport {
     $importcmd.=" --changelog '$changelog'" if ($changelog);
     $importcmd.=" --release '$release'" if ($release);
     $importcmd.=" --rename '$rename'" if ($rename);
-    $importcmd.=" --epoch '$epoch'" if ($epoch);
+    $importcmd.=" --epoch '$epoch'" if (defined $epoch);
     $importcmd.=" --alt $altrpm" if ($altrpm);
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);

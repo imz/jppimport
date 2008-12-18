@@ -222,7 +222,7 @@ if ($packager) {
     }
 }
 
-if ($epoch) {
+if (defined $epoch) {
     $jpp->get_section('package','')->set_tag('Epoch',$epoch);
 }
 
