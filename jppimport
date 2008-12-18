@@ -9,7 +9,7 @@ use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$rename,$nobz2,$nozip);
+my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
 my $jvm=5;
 my $packager='auto';
 my $verbose=1;
@@ -29,6 +29,7 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "rename=s"   => \$rename,
 		      "cleanup!"   => \$cleanup,
 		      "release=s"   => \$release,
+		      "epoch=s"   => \$epoch,
 		      "nobz2"   => \$nobz2,
 		      "nozip"   => \$nozip,
 		      "verbose+"  => \$verbose);
@@ -72,6 +73,7 @@ $jpp=RPM::Source::Editor->new(
     CONVERT::JPACKAGE::NOZIP=>$nozip, 
 );
 
+my $jppepoch = $jpp->get_section('package','')->get_tag('Epoch');
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
 my $jppver = $jpp->get_section('package','')->get_tag('Version');
 # $jpprel_branch is used to keep branch of fedora or mandriva
@@ -88,9 +90,11 @@ if ($jpprel=~/\%\{\?dist\}/) {
 # for new jpackage 5.0
 $jpprel=~s/\%\{dist\}/jpp5/;
 
+my $altepoch;
 my $altrel="alt1";
 if ($altrpm || $altspec) {
     $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    $altepoch = $alt->get_section('package','')->get_tag('Epoch');
     $altrel = $alt->get_section('package','')->get_tag('Release');
     $altver = $alt->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
@@ -129,7 +133,15 @@ if ($altrpm || $altspec) {
 	$packager=$altpackager if $altpackager;
     }
     $alt->cleanup();
+
+    unless ($epoch) {
+	if (defined $altepoch) {
+	    $epoch=$altepoch if ! defined $jppepoch || $altepoch > $jppepoch;
+	}
+    }
 }
+
+
 
 # our -- hack ?
 our $jpptoolsdir=dirname($0);
@@ -208,6 +220,10 @@ if ($packager) {
     } else {
 	$jpp->get_section('package','')->clear_tag('Packager');
     }
+}
+
+if ($epoch) {
+    $jpp->get_section('package','')->set_tag('Epoch',$epoch);
 }
 
 print $jpp->get_spec() if $jppspec or $verbose>3;

@@ -21,15 +21,14 @@ push @SPECHOOKS, sub {
 
 
     # if disabled build of visualvm
-    $jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','#BuildRequires: netbeans');
+    #$jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','#BuildRequires: netbeans');
 
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 
 %def_enable accessibility
-%def_disable alsa_subpackage
-%def_disable visualvm
+%def_enable visualvm
 %def_enable javaws
 %def_enable moz_plugin
 %def_disable desktop
