@@ -7,7 +7,7 @@
 +Bundle-ManifestVersion: 2
 +Export-Package: org.apache.commons.logging;version="1.0.4",org.apache.
 + commons.logging.impl;version="1.0.4"
-+Bundle-Version: 1.0.4.v200706111724
++Bundle-Version: 1.0.4.v20080605-1930
 +Bundle-SymbolicName: org.apache.commons.logging
 +Bundle-Name: Apache Commons Logging Plug-in
 +Bundle-RequiredExecutionEnvironment: CDC-1.0/Foundation-1.0,J2SE-1.3

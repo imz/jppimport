@@ -4,19 +4,16 @@ require 'set_fix_homedir_macro.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    
+    # TODO: write tomcat5-5.5.init!
+    # as a hack, an old version is taken
+    $jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
 
     # BUG to report (5.5.25 1-fc9) too
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');
 
     # fedora specific (5.5.25 1-fc9)
     $jpp->get_section('package','')->push_body('BuildRequires: zip'."\n");
-
-    # break build with java 1.5.0
-    #Patch19: %{name}-%{majversion}-connectors-util-build.patch
-    $jpp->get_section('prep')->subst(qr'%patch19 -b .p19','#%patch19 -b .p19');
-    #$jpp->get_section('prep')->subst(qr'%patch20 -b .p20','#%patch20 -b .p20');
-    #Patch21: %{name}-%{majversion}-acceptlangheader.patch
-    $jpp->get_section('prep')->subst(qr'%patch21 -b .p21','#%patch21 -b .p21');
 
     # to make them 1.4, not 1.5
     $jpp->get_section('build')->subst(qr'ant\s+-Dservletapi.build="build"','ant -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 -Dservletapi.build="build"');
@@ -60,9 +57,6 @@ cat >>$RPM_BUILD_ROOT/%_altdir/servletapi_%{name}<<EOF
 EOF
 ');
     $jpp->get_section('files','servlet-2.4-api')->push_body('%_altdir/servletapi_*'."\n");
-    $jpp->get_section('post','servlet-2.4-api')->push_body('%register_alternatives servletapi_%{name}'."\n");
-    $jpp->get_section('postun','servlet-2.4-api')->push_body('%unregister_alternatives servletapi_%{name}'."\n");
-
     $jpp->get_section('install')->push_body(
 q'
 %triggerpostun -- tomcat5-server <= 5.5.16-alt1.1
@@ -77,3 +71,9 @@ done || :
 }
 __DATA__
 todo: verify logrotate
+    # break build with java 1.5.0
+    #Patch19: %{name}-%{majversion}-connectors-util-build.patch
+    #$jpp->get_section('prep')->subst(qr'%patch19 -b .p19','#%patch19 -b .p19');
+    #Patch21: %{name}-%{majversion}-acceptlangheader.patch
+    #$jpp->get_section('prep')->subst(qr'%patch21 -b .p21','#%patch21 -b .p21');
+

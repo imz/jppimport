@@ -18,24 +18,13 @@ sub {
     # misplaced in requires
     $jpp->get_section('package','')->unshift_body('
 # todo: remove this 
-%add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
-%add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
-%add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
+#add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
+#add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
+#add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
 ');
 
-    # hack around requires in post / postun scripts
+    # hack around requires in post / postun scripts. Do we need it in 3.4.1?
     $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
-
-    # hack around requires in spec body (they put it in for biarch reasons
-    $jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: %{_libdir}/%{name}/plugins/org.eclipse.swt.gtk.linux.%{eclipse_arch}_3.3.2.v3349.jar
-'."\n");
-
-    #Epoch:  1
-    $jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
-
-    # seems let it be.
-    #$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
-    #$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
 
     # overwrite with fixed versions
     # segfault at start: -- getProgramDir() at eclipse.c(947)
@@ -51,33 +40,22 @@ sub {
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
-    # change in 3.3.2 (due to firefox 3.0?)
+    # change from 3.3.2 (due to firefox 3.0?)
     $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
-    $jpp->get_section('package','-n libswt3-gtk2')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
-
-    # until osgi requires will be complete;
-    $jpp->get_section('package','')->subst(qr'icu4j-eclipse >= 3.6.1-1jpp.4','icu4j-eclipse >= 3.6.1-alt1.6');
-    $jpp->get_section('package','rcp')->subst(qr'icu4j-eclipse >= 3.6.1-1jpp.4','icu4j-eclipse >= 3.6.1-alt1.6');
-
-    # in rel30
-    $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
-    $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
+    $jpp->get_section('package','swt')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
 
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty5');
     $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty5');
+    $jpp->applied_block(
+	"around jetty",
+	sub {
     map {$_->subst('%{_javadir}/jetty/jetty.jar','%{_javadir}/jetty5/jetty5.jar')} 
     $jpp->get_section('prep'), 
     $jpp->get_section('build'), 
     $jpp->get_section('install');
+	});
     # end around jetty 5
-
-    # multilib_support temporally disabled due to failed build
-    $jpp->get_section('package','')->unshift_body('%def_disable multilib_support'."\n");
-    $jpp->get_section('install')->unshift_body_before(q{%if_enabled multilib_support
-}, qr'# Ensure that the zip files are the same across all builds.');
-    $jpp->get_section('install')->unshift_body_after(q{%endif # multilib_support
-}, qr'rm -rf \${RPM_BUILD_ROOT}/tmp');
 
     # they loose JAVA_HOME :(
     $jpp->get_section('prep')->unshift_body_after(q{
@@ -123,9 +101,6 @@ chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
 chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
 });
 
-    # hack around added in -13 Obsoletes in pde
-    $jpp->get_section('package','pde')->subst(qr'1:3.3.0-13.fc8','0:3.3.0-alt2_13jpp5.0');
-
     # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
     $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
     $jpp->get_section('prep')->subst_after(qr'^sed --in-place "s/JAVA_HOME','#sed --in-place "s/JAVA_HOME',qr'# liblocalfile fixes');
@@ -144,23 +119,11 @@ sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/i386:" make_linux
 popd
 !, qr'plugins/org.junit4/junit.jar');
 
-    # added in -14, removed -in -19
-    #$jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
-
-    # present at least in 3.3.0: warning: file /usr/share/eclipse/plugins/org.eclipse.swt_3.3.0.v3346.jar is packaged into both libswt3-gtk2 and eclipse-rcp
-    $jpp->get_section('files','rcp')->subst(qr'\%{_datadir}/\%{name}/plugins/org.eclipse.swt_','#%{_datadir}/%{name}/plugins/org.eclipse.swt_');
-
-    # seamonkey provides mozilla
-    $jpp->get_section('package','-n %{libname}-gtk2')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
-
     # hack around added in -15 exact versions
     $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
-    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-8jpp','Requires: jakarta-commons-el >= 1.0-alt1_8.2jpp1.7');
+    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5 >= 5.5.23-9jpp.4','Requires: tomcat5 >= 5.5.25-alt1_1.1jpp');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.23-9jpp.4','Requires: tomcat5-jasper-eclipse >= 5.5.25-alt1_1.1jpp');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-servlet-2.4-api >= 5.5.23-9jpp.4','Requires: tomcat5-servlet-2.4-api >= 5.5.25-alt1_1.1jpp');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jsp-2.0-api >= 5.5.23-9jpp.4','Requires: tomcat5-jsp-2.0-api >= 5.5.25-alt1_1.1jpp');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.26-1.5','Requires: tomcat5-jasper-eclipse >= 5.5.26-alt1_1.1jpp');
 
 # desktop-file-validate /usr/src/RPM/SOURCES/eclipse.desktop
 #/usr/src/RPM/SOURCES/eclipse.desktop: error: value "eclipse.png" for key "Icon" in group "Desktop Entry" is an icon name with an extension, but there should be no extension as described in the Icon Theme Specification if the value is not an absolute path
@@ -173,21 +136,25 @@ popd
 
     #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
-    $jpp->copy_to_sources('org.altlinux.ide.platform-3.3.2.zip');
-    foreach my $section ($jpp->get_sections()) {
-	$section->subst(qr'org.fedoraproject','org.altlinux');
-    }
-    $jpp->get_section('package','')->subst_if(qr'[.-]\d+.zip','.zip',qr'^Source4:');
+    $jpp->copy_to_sources('org.altlinux.ide.platform-3.4.1.zip');
+    $jpp->applied_block(
+	"support for alt feature",
+	sub {
+	    foreach my $section ($jpp->get_sections()) {
+		$section->subst(qr'org.fedoraproject','org.altlinux');
+	    }
+	});
 
     &replace_built_in_ant($jpp);
     &leave_built_in_lucene($jpp);
+    # TODO: make the transition after 3.4.1 switch!
+    &leave_built_in_icu4j($jpp);
     #&leave_built_in_jasper_plugin($jpp);
 
 #TODO: sed --in-place "s/4.1.130/5.5.23/g" на sed --in-place "s/4.1.230/5.5.25/g"
 
     # let them be noarches
     $jpp->get_section('package','ecj')->push_body("BuildArch: noarch\n");
-    $jpp->get_section('package','cvs-client')->push_body("BuildArch: noarch\n");
     $jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
 };
 
@@ -195,17 +162,9 @@ sub replace_built_in_ant {
     my $jpp=shift;
     # ALT ant has extra packages, so enable them
     #################### ANT ####################
-    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook', qr!# Fedora.  When that's done, add it here and symlink below.!);
-foreach my $antcmt (qr"# Need to investigate why we don't build ant-apache-bsf or ant-commons-net in",
-qr"# Fedora.  When that's done, add it here and symlink below.",
-qr'# https://bugzilla.redhat.com/bugzilla/show_bug.cgi\?id=180642') {
-    $jpp->get_section('package','')->subst($antcmt,'');
-    $jpp->get_section('package','platform')->subst($antcmt,'');
-}
-    $jpp->get_section('package','platform')->subst(qr'^#Requires: ant-apache-bsf ant-commons-net', 
-	   'Requires: ant-apache-bsf ant-commons-net ant-jai ant-jmf ant-stylebook');
+    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf ant-stylebook', qr!BuildRequires: ant-!);
+    $jpp->get_section('package','platform')->push_body('Requires: ant-jai ant-jmf ant-stylebook'."\n");
     $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
-    $jpp->get_section('install')->subst_if(qr'#rm plugins/org.apache.ant_1.7.0.v200706080842','rm plugins/org.apache.ant_1.7.0.v200706080842',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
     $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
     ################ END ANT ####################
 }
@@ -230,29 +189,84 @@ sub leave_built_in_jasper_plugin {
     #############################################
 }
 
+sub leave_built_in_icu4j {
+    my $jpp=shift;
+    $jpp->get_section('package','')->subst_if('BuildRequires','#BuildRequires', qr'icu4j-eclipse >= 3.8.1');
+    $jpp->get_section('package','rcp')->subst_if('Requires','#Requires',qr'icu4j-eclipse >= 3.8.1');
+
+    $jpp->get_section('package','')->unshift_body('%def_disable external_icu4j'."\n");
+    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_icu4j
+}, qr'# link to the icu4j stuff');
+    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_icu4j
+}, qr'ln -s \%{_libdir}/eclipse/plugins/com.ibm.icu_\*\.jar plugins/com.ibm.icu_\$ICUVERSION');
+    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_icu4j
+}, qr'# link to the icu4j stuff');
+    $jpp->get_section('install')->unshift_body_after(q{%endif # external_lucene
+}, qr'rm plugins/com.ibm.icu_\*\.jar');
+    # end icu4j
+}
+
+
 sub leave_built_in_lucene {
     my $jpp=shift;
     # lucene: let it leave eclipse version
-    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene >= 1.9.1', '#Requires: lucene >= 1.9.1');
-    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene-contrib >= 1.9.1', '#Requires: lucene-contrib >= 1.9.1');
-    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene >= 1.9.1', '#BuildRequires: lucene >= 1.9.1');
-    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene-contrib >= 1.9.1', '#BuildRequires: lucene-contrib >= 1.9.1');
-
-    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-    $jpp->get_section('prep')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-
-    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.lucene_1.9.1.v200706111724.jar','#rm plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('install')->subst(qr'ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar','#ln -s %{_javadir}/lucene.jar plugins/org.apache.lucene_1.9.1.v200706111724.jar');
-    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#rm plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
-    $jpp->get_section('install')->subst(qr'ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar','#ln -s %{_javadir}/lucene-contrib/lucene-analyzers.jar plugins/org.apache.lucene.analysis_1.9.1.v200706181610.jar');
+    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene >= 2.3.1', '#Requires: lucene >= 2.3.1');
+    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene-contrib >= 2.3.1', '#Requires: lucene-contrib >= 2.3.1');
+    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene >= 2.3.1', '#BuildRequires: lucene >= 2.3.1');
+    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene-contrib >= 2.3.1', '#BuildRequires: lucene-contrib >= 2.3.1');
+    $jpp->get_section('package','')->unshift_body('%def_disable external_lucene'."\n");
+    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_lucene
+}, qr'# link to lucene');
+    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_lucene
+}, qr'plugins/org.apache.lucene.analysis_\$LUCENEVERSION');
+    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_lucene
+}, qr'# link to lucene');
+    $jpp->get_section('install')->unshift_body_after(q{%endif # external_lucene
+}, qr'plugins/org.apache.lucene.analysis_\$LUCENEVERSION');
     # end lucene
 }
 
 __END__
+
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
+
+# seamonkey provides mozilla
+#$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
 
 # now we use theme
 $jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');
 $jpp->copy_to_sources('eclipse-altlinux-splash-3.3.0.png');
+
+# added in -14, removed -in -19
+#$jpp->get_section('package','')->subst(qr'Requires: eclipse-rpm-editor','#Requires: eclipse-rpm-editor');
+
+#Epoch:  1 let it be. they use Requires: with epoch :(
+#$jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
+
+# seems let it be.
+#$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
+#$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
+
+# hack around added in -13 Obsoletes in pde (we moved to Epoch: 1
+$jpp->get_section('package','pde')->subst(qr'1:3.3.0-13.fc8','0:3.3.0-alt2_13jpp5.0');
+
+    # not in 3.4.1
+    # hack around requires in spec body (they put it in for biarch reasons)
+    #$jpp->get_section('package','-n libswt3-gtk2')->unshift_body('Provides: %{_libdir}/%{name}/plugins/org.eclipse.swt.gtk.linux.%{eclipse_arch}_3.3.2.v3349.jar
+#'."\n");
+
+# no more in 3.4.1
+# multilib_support temporally disabled due to failed build
+$jpp->get_section('package','')->unshift_body('%def_disable multilib_support'."\n");
+$jpp->get_section('install')->unshift_body_before(q{%if_enabled multilib_support
+}, qr'# Ensure that the zip files are the same across all builds.');
+    $jpp->get_section('install')->unshift_body_after(q{%endif # multilib_support
+}, qr'rm -rf \${RPM_BUILD_ROOT}/tmp');
+
+    # present at least in 3.3.0: warning: file /usr/share/eclipse/plugins/org.eclipse.swt_3.3.0.v3346.jar is packaged into both libswt3-gtk2 and eclipse-rcp
+    $jpp->get_section('files','rcp')->subst(qr'\%{_datadir}/\%{name}/plugins/org.eclipse.swt_','#%{_datadir}/%{name}/plugins/org.eclipse.swt_');
+
+    # in rel30
+    $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
+    $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
+
