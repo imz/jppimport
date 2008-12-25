@@ -10,10 +10,37 @@ sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
-    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
+    # hack until gtk-update-icon-cache fix
+    $jpp->del_section('post','platform');
+    $jpp->del_section('postun','platform');
 
+    # hack around x86 - missing %{name}-swt.install
+    $jpp->get_section('package','')->subst_if('1','0',qr'define initialize');
+    #$jpp->get_section('install')->unshift_body_after('echo -n "" > %{_builddir}/%{buildsubdir}/%{name}-swt.install;'."\n",qr!-platform.install;!);
+
+    #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
+    $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-xextproto-devel'."\n");
+
+    # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
+    $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
+
+    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
+
+# add this to debug org.eclipse.equinox.p2
+#-nosplash -debug -consoleLog --launcher.suppressErrors
+
+# eclipse-pde quick hack against osgi provides
+#+ Требует: osgi(Cloudscape)
+#+ Требует: osgi(org.apache.derby)
+#+ Требует: osgi(org.apache.derby.core)
+    $jpp->get_section('package','pde')->unshift_body('Provides: osgi(Cloudscape) osgi(org.apache.derby) osgi(org.apache.derby.core)'."\n");
+    
+
+    # for 3.4.1-12
+    $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-javadoc','java-javadoc',qr'BuildRequires:');
+    $jpp->get_section('package','')->subst(qr'BuildRequires: java-gcj-compat-devel','#BuildRequires: java-gcj-compat-devel');
 
     # misplaced in requires
     $jpp->get_section('package','')->unshift_body('
@@ -22,9 +49,6 @@ sub {
 #add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
 #add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
 ');
-
-    # hack around requires in post / postun scripts. Do we need it in 3.4.1?
-    $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
 
     # overwrite with fixed versions
     # segfault at start: -- getProgramDir() at eclipse.c(947)
@@ -91,16 +115,6 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
 # subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 });
 
-    $jpp->get_section('install')->push_body(q{
-# avoid warning -- useless
-# shebang.req.files: executable script  not executable
-chmod 755 %buildroot/usr/bin/eclipse
-# todo: symlink to ant-scripts
-#chmod 755 %buildroot/usr/share/eclipse/plugins/org.apache.ant_*/bin/*
-chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
-chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
-});
-
     # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
     $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
     $jpp->get_section('prep')->subst_after(qr'^sed --in-place "s/JAVA_HOME','#sed --in-place "s/JAVA_HOME',qr'# liblocalfile fixes');
@@ -134,6 +148,7 @@ popd
 %__subst 's,X-Red-Hat-Base;,,' %{SOURCE2}
 },qr'desktop-file-validate %{SOURCE2}');
 
+    if (1) {
     #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
     $jpp->copy_to_sources('org.altlinux.ide.platform-3.4.1.zip');
@@ -142,57 +157,39 @@ popd
 	sub {
 	    foreach my $section ($jpp->get_sections()) {
 		$section->subst(qr'org.fedoraproject','org.altlinux');
+		$section->subst(qr'Fedora Eclipse','ALT Linux Eclipse');
 	    }
 	});
+    $jpp->get_section('prep')->push_body(q!subst s,org.fedoraproject,org.altlinux, %{SOURCE28}
+!);
+    }
 
     &replace_built_in_ant($jpp);
     &leave_built_in_lucene($jpp);
     # TODO: make the transition after 3.4.1 switch!
     &leave_built_in_icu4j($jpp);
-    #&leave_built_in_jasper_plugin($jpp);
+    &leave_built_in_jetty($jpp);
 
-#TODO: sed --in-place "s/4.1.130/5.5.23/g" на sed --in-place "s/4.1.230/5.5.25/g"
-
-    # let them be noarches
-    $jpp->get_section('package','ecj')->push_body("BuildArch: noarch\n");
-    $jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
+    # let them be noarches - sorry, not in 3.4.x
+    #$jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
 };
 
 sub replace_built_in_ant {
     my $jpp=shift;
     # ALT ant has extra packages, so enable them
     #################### ANT ####################
-    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf ant-stylebook', qr!BuildRequires: ant-!);
+    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf ant-stylebook'."\n", qr!BuildRequires: ant-!);
     $jpp->get_section('package','platform')->push_body('Requires: ant-jai ant-jmf ant-stylebook'."\n");
     $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
     $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
     ################ END ANT ####################
 }
 
-
-sub leave_built_in_jasper_plugin {
-    my $jpp=shift;
-    ############### jasper ######################
-    # fix for jasper ; looks like it is required for help to work
-    #$jpp->get_section('install')->unshift_body_after('ln -s %{_javadir}/tomcat5-jasper-runtime.jar plugins/org.apache.jasper_5.5.17.v200706111724.jar',qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-    $jpp->get_section('install')->subst(qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-    $jpp->get_section('package','platform')->subst(qr'^Requires: tomcat5-jasper-eclipse', 'Conflicts: tomcat5-jasper-eclipse');
-
-# link to jasper in prep
-#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar
-#ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar \
-#   plugins/org.apache.jasper_5.5.17.v200706111724.jar
-    $jpp->get_section('prep')->subst(qr'rm plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#rm plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#ln -s  %{_datadir}/eclipse/plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-    $jpp->get_section('prep')->subst(qr'^\s+plugins/org.apache.jasper_5.5.17.v200706111724.jar', '#   plugins/org.apache.jasper_5.5.17.v200706111724.jar');
-    $jpp->get_section('files','platform')->unshift_body('%{_datadir}/%{name}/plugins/org.apache.jasper_5.5.17.*'."\n");
-    #############################################
-}
-
 sub leave_built_in_icu4j {
     my $jpp=shift;
     $jpp->get_section('package','')->subst_if('BuildRequires','#BuildRequires', qr'icu4j-eclipse >= 3.8.1');
     $jpp->get_section('package','rcp')->subst_if('Requires','#Requires',qr'icu4j-eclipse >= 3.8.1');
+    $jpp->get_section('package','rcp')->push_body('Conflicts: icu4j-eclipse < 3.8'."\n");
 
     $jpp->get_section('package','')->unshift_body('%def_disable external_icu4j'."\n");
     $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_icu4j
@@ -201,11 +198,26 @@ sub leave_built_in_icu4j {
 }, qr'ln -s \%{_libdir}/eclipse/plugins/com.ibm.icu_\*\.jar plugins/com.ibm.icu_\$ICUVERSION');
     $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_icu4j
 }, qr'# link to the icu4j stuff');
-    $jpp->get_section('install')->unshift_body_after(q{%endif # external_lucene
+    $jpp->get_section('install')->unshift_body_after(q{%endif # external_icu4j
 }, qr'rm plugins/com.ibm.icu_\*\.jar');
+#warning: Installed (but unpackaged) file(s) found:
+#    /usr/lib64/eclipse/plugins/com.ibm.icu_3.8.1.v20080530.jar
+    $jpp->get_section('files','rcp')->push_body('%{_libdir}/%{name}/plugins/com.ibm.icu_*');
     # end icu4j
 }
 
+sub leave_built_in_jetty {
+   my $jpp=shift;
+    $jpp->get_section('package','')->unshift_body('%def_disable external_jetty'."\n");
+    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_jetty
+}, qr'rm plugins/org.mortbay.jetty_');
+    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_jetty
+}, qr'ln -s \%{_javadir}/jetty5/jetty5.jar plugins/org.mortbay.jetty_');
+    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_jetty
+}, qr'rm plugins/org.mortbay.jetty_');
+    $jpp->get_section('install')->unshift_body_after(q{%endif # external_jetty
+}, qr'ln -s \%{_javadir}/jetty5/jetty5.jar plugins/org.mortbay.jetty_');
+}
 
 sub leave_built_in_lucene {
     my $jpp=shift;
@@ -269,4 +281,18 @@ $jpp->get_section('install')->unshift_body_before(q{%if_enabled multilib_support
     # in rel30
     $jpp->get_section('package','')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
     $jpp->get_section('package','jdt')->subst(qr'java-javadoc >= 1.6.0','java-javadoc');
+
+# no more fit to in 3.4.x
+#    $jpp->get_section('install')->push_body(q{
+## avoid warning -- useless
+## shebang.req.files: executable script  not executable
+#chmod 755 %buildroot/usr/bin/eclipse
+## todo: symlink to ant-scripts
+#chmod 755 %buildroot/usr/share/eclipse/plugins/org.apache.ant_*/bin/*
+#chmod 755 %buildroot/usr/share/eclipse/buildscripts/copy-platform
+#chmod 755 %buildroot/usr/share/eclipse/plugins/org.eclipse.pde.build_*/templates/package-build/prepare-build-dir.sh
+#});
+
+    # hack around requires in post / postun scripts. Do we do not need it in 3.4.1
+    $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
 

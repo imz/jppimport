@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 use File::Basename;
+use RPM qw/vercmp/;
 use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
@@ -125,7 +126,7 @@ if ($altrpm || $altspec) {
 	} elsif (($jppfrom eq $jpprel) and $subrel and $jppsubrel and $subrel < $jppsubrel) {
 	    # nothing to do
 	    print STDERR "nothing to do: new subrel is higher\n" if $verbose>1;
-	} elsif (not $subrel and ($jppfrom < $jpprel)) {
+	} elsif (not $subrel and &vercmp(0,$jpprel,0,$jppfrom) >0) {
 	    # nothing to do
 	    print STDERR "nothing to do: new jppfrom is higher\n" if $verbose>1;
 	} elsif (($jppfrom eq $jpprel) and not $subrel and $java and ($java < $newjava)) {

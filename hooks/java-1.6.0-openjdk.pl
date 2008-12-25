@@ -19,6 +19,18 @@ push @SPECHOOKS, sub {
 
     $jpp->get_section('package','javadoc')->push_body('BuildArch: noarch'."\n");
 
+    # TODO:
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/US_export_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/US_export_policy.jar not found under RPM_BUILD_ROOT
+
+    # NOTABUG, The Right Thing To DO.
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java for /usr/bin/java is in another subpackage
+#symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
+
+    # TODO:
+    # broken symlink in jvm-exports (b12);
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/ControlPanel for /usr/bin/ControlPanel not found under RPM_BUILD_ROOT
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/jcontrol for /usr/bin/jcontrol not found under RPM_BUILD_ROOT
 
     # if disabled build of visualvm
     #$jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','#BuildRequires: netbeans');
@@ -33,7 +45,8 @@ BuildRequires(pre): browser-plugins-npapi-devel
 %def_enable moz_plugin
 %def_disable desktop
 ');
-    $jpp->get_section('package','')->push_body('%define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
+    $jpp->get_section('package','')->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
+%define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
 %define altname %name
 %define label -%{name}
 %define javaws_ver      %{javaver}
@@ -113,6 +126,7 @@ patch -p1 < %{PATCH34}
     # to disable visualvm w/o netbeans
     $jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
     $jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
+    $jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->raw_rename_section('plugin','-n mozilla-plugin-%name');
@@ -359,6 +373,20 @@ fi
 !);
 
     $jpp->_reset_speclist();
+
+    $jpp->get_section('install')->push_body(q!
+# dirty, dirty hack :(
+pushd %buildroot%{_jvmdir}/%{sdkdir}/lib/visualvm/profiler3/lib/deployed
+rm -rf jdk1?/{mac,solaris-amd64,solaris-i386,solaris-sparc,solaris-sparcv9,windows,windows-amd64}
+%ifarch %{ix86}
+rm -rf jdk1?/linux-amd64
+%endif
+%ifarch x86_64
+rm -rf jdk1?/linux
+%endif
+popd
+!);
+
 }
 
 
