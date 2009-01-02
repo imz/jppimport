@@ -68,6 +68,9 @@ sub {
     $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
     $jpp->get_section('package','swt')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
 
+    # ecj should not have osgi dependencies.
+    $jpp->get_section('package','ecj')->push_body('AutoReq: yes, noosgi'."\n");
+
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty5');
     $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty5');

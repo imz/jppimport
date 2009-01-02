@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-#require 'set_fix_eclipse_dep.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;

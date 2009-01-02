@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_fix_eclipse_dep.pl';
-
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # altbug#13596
@@ -10,5 +8,8 @@ push @SPECHOOKS, sub {
 %add_findreq_skiplist /usr/share/eclipse/plugins/org.python.pydev.jython_*/*/*
 %add_findreq_skiplist /usr/share/eclipse/plugins/org.python.pydev.debug_*/*/*
 %add_findreq_skiplist /usr/share/eclipse/plugins/org.python.pydev_*/*/*
+%add_findreq_skiplist /usr/share/eclipse/dropins/pydev/eclipse/plugins/org.python.pydev.jython_*/*/*
+%add_findreq_skiplist /usr/share/eclipse/dropins/pydev/eclipse/plugins/org.python.pydev.debug_*/*/*
+%add_findreq_skiplist /usr/share/eclipse/dropins/pydev/eclipse/plugins/org.python.pydev_*/*/*
 ');
 };

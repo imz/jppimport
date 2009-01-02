@@ -41,7 +41,7 @@ ln -s $(relative %{_localstatedir}/jython/cachedir %{_datadir}/jython/) $RPM_BUI
 
     $jpp->get_section('post','')->push_body('
 echo "creating jython cache..."
-echo | /usr/bin/jython
+echo | /usr/bin/jython ||:
 
 %preun
 # cleanup

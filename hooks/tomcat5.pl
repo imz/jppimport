@@ -5,9 +5,19 @@ require 'set_fix_homedir_macro.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     
-    # TODO: write tomcat5-5.5.init!
+    # TODO: write proper tomcat5-5.5.init!
     # as a hack, an old version is taken
+    $jpp->copy_to_sources('tomcat5-5.5.init');
     $jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
+
+#warning: file /usr/bin/jasper5-setclasspath.sh is packaged into both tomcat5 and tomcat5-jasper
+#warning: file /usr/bin/jasper5.sh is packaged into both tomcat5 and tomcat5-jasper
+#warning: file /usr/bin/jspc5.sh is packaged into both tomcat5 and tomcat5-jasper
+    $jpp->get_section('files','')->push_body(q'%exclude %_bindir/jasper5-setclasspath.sh
+%exclude %_bindir/jasper5.sh
+%exclude %_bindir/jspc5.sh
+');
+
 
     # BUG to report (5.5.25 1-fc9) too
     $jpp->get_section('build')->subst(qr'%{java.home}','%{java_home}');

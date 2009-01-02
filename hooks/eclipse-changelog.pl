@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
-require 'set_fix_eclipse_dep.pl';
-require 'set_noarch.pl';
+#require 'set_noarch.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
