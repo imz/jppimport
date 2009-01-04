@@ -177,6 +177,8 @@ with %{name} J2SE Runtime Environment.
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
 %__subst 's,^Categories=.*,Categories=Profiling;Monitor;Development;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/jconsole.desktop
 
+%__subst 's,^Encoding,#Encoding,' %buildroot/usr/share/applications/javaws.desktop
+%__subst 's,.png$,,' %buildroot/usr/share/applications/javaws.desktop
 !);
 
     $jpp->get_section('install')->push_body(q!
@@ -246,32 +248,32 @@ install -m644 j2se-devel-buildreq-substitute \
 
 # J2SE alternative
 %__cat <<EOF >%buildroot%_altdir/%altname-java
-%{_bindir}/java	%{jrebindir}/java	%priority
-%_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{jrebindir}/java
+%{_bindir}/java	%{_jvmdir}/%{jredir}/bin/java	%priority
+%_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
 # binaries and manuals
 for i in keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
   %__cat <<EOF >>%buildroot%_altdir/%altname-java
-%_bindir/$i	%{_jvmdir}/%{jredir}/bin/$i	%{jrebindir}/java
-%_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{jrebindir}/java
+%_bindir/$i	%{_jvmdir}/%{jredir}/bin/$i	%{_jvmdir}/%{jredir}/bin/java
+%_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
 done
 
 # ----- JPackage compatibility alternatives ------
 %__cat <<EOF >>%buildroot%_altdir/%altname-java
-%{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{jrebindir}/java
-%{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{jrebindir}/java
-%{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{jrebindir}/java
-%{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{jrebindir}/java
-%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{jrebindir}/java
-%{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{jrebindir}/java
+%{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 EOF
 %if_enabled moz_plugin
 %__cat <<EOF >>%buildroot%_altdir/%altname-java
-%{_bindir}/ControlPanel	%{jrebindir}/ControlPanel	%{jrebindir}/java
-%{_bindir}/jcontrol	%{jrebindir}/jcontrol	%{jrebindir}/java
+%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
+%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
 EOF
 %endif
 # JPackage specific: alternatives for security policy
@@ -329,12 +331,12 @@ EOF
 %if_enabled javaws
 # Java Web Start alternative
 %__cat <<EOF >%buildroot%_altdir/%altname-javaws
-%_bindir/javaws	%{jrebindir}/javaws	%{jrebindir}/java
-%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{jrebindir}/java
+%_bindir/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
+%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
 # ----- JPackage compatibility alternatives ------
 %__cat <<EOF >>%buildroot%_altdir/%altname-javaws
-%{_datadir}/javaws	%{jrebindir}/javaws	%{jrebindir}/java
+%{_datadir}/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
 EOF
 # ----- end: JPackage compatibility alternatives ------
 %endif	# enabled javaws
@@ -402,7 +404,7 @@ BuildRequires: chrpath
 # chrpath hack :(
 find $RPM_BUILD_ROOT -name '*.so' -exec chrpath -d {} \;
 find $RPM_BUILD_ROOT/%{sdkbindir}/ -exec chrpath -d {} \;
-find $RPM_BUILD_ROOT/%{jrebindir}/ -exec chrpath -d {} \;
+find $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin/ -exec chrpath -d {} \;
 !);
     }
     # end chrpath hack

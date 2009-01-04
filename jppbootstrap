@@ -52,7 +52,8 @@ EPOCH
 LICENSE
 URL
 / {
-    print SPEC ucfirst(lc($tag)).": ".$jpp->query($tag)."\n";
+    my $tagval=$jpp->query($tag);
+    print SPEC ucfirst(lc($tag)).": ".$tagval."\n" if defined $tagval && $tagval ne '(none)';
 }
     print SPEC "Packager: $packager\n" if $packager;
 

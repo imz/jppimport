@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'add_missingok_config.pl';
+require 'set_eclipse_core_plugins.pl';
 
 push @SPECHOOKS, 
  sub {
