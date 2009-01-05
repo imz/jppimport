@@ -167,7 +167,7 @@ if ($altrpm || $altspec) {
 # our -- hack ?
 our $jpptoolsdir=dirname($0);
 # for cross-references in hooks
-push @INC, $jpptoolsdir."/hooks";
+push @INC, $jpptoolsdir."/hooks", $jpptoolsdir."/common";
 
 if (not $hook) {
     # looking for default hook
@@ -193,11 +193,14 @@ if ($hook) {
 
 $jpp->rename_package($rename) if $rename;
 
+#map {print STDERR $_->describe(1)} $jpp->get_sections();
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
 &RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);
 print STDERR "done alt_generic_fixes\n" if $verbose>1;
+#map {print STDERR $_->describe(1)} $jpp->get_sections();
 &RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($jpp);
 print STDERR "done jpp_specific_fixes\n" if $verbose>1;
+#map {print STDERR $_->describe(1)} $jpp->get_sections();
 
 
 my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;

@@ -1,9 +1,13 @@
 #!/usr/bin/perl -w
 
 require 'set_fix_homedir_macro.pl';
+require 'windows-thumbnail-database-in-package.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+
+    # due to ecj :(
+    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
     
     # TODO: write proper tomcat5-5.5.init!
     # as a hack, an old version is taken

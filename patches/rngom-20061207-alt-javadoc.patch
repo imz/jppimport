@@ -1,0 +1,11 @@
+--- rngom/build.xml.1	2009-01-05 15:45:31 +0000
++++ rngom/build.xml	2009-01-05 15:48:27 +0000
+@@ -44,7 +44,7 @@
+ 	<target name="javadoc">
+ 		<mkdir dir="build/javadoc"/>
+ 		<javadoc locale="en_US" destdir="build/javadoc">
+-			<fileset dir="src"/>
++			<fileset dir="src"><include name="**/*.java"/></fileset>
+ 		</javadoc>
+ 	</target>
+ 	
