@@ -31,6 +31,11 @@ push @SPECHOOKS, sub {
 
     # to make them 1.4, not 1.5
     $jpp->get_section('build')->subst(qr'ant\s+-Dservletapi.build="build"','ant -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 -Dservletapi.build="build"');
+
+    # additional hacks due to ecj of java6; REPLACE WITH TARGET 1.5 everywhere after get rid of 1.4
+    $jpp->get_section('build')->subst(qr'compiler="modern" javadoc','compiler="modern" -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 javadoc', qr'ant ');
+    $jpp->get_section('build')->subst(qr'java_home}" build','java_home}" -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 build', qr'ant ');
+    $jpp->get_section('install')->subst(qr'ant\s+-D','ant -Dant.build.javac.source=1.4 -D');
     # end fedora specific 
 
     $jpp->get_section('package','server-lib')->push_body('Requires: jaf javamail'."\n");

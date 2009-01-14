@@ -15,11 +15,14 @@ sub {
     $jpp->del_section('postun','platform');
 
     # hack around x86 - missing %{name}-swt.install
-    $jpp->get_section('package','')->subst_if('1','0',qr'define initialize');
+    #$jpp->get_section('package','')->subst_if('1','0',qr'define initialize');
     #$jpp->get_section('install')->unshift_body_after('echo -n "" > %{_builddir}/%{buildsubdir}/%{name}-swt.install;'."\n",qr!-platform.install;!);
 
     #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
-    $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-xextproto-devel'."\n");
+    # X11/extensions/XInput.h
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: xorg-xextproto-devel xorg-inputproto-devel'."\n");
+    # I was lazy to search for the whole list of xorg-*proto-devel :(
+    $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-devel'."\n");
 
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
@@ -84,27 +87,19 @@ sub {
 	});
     # end around jetty 5
 
-    # they loose JAVA_HOME :(
-    $jpp->get_section('prep')->unshift_body_after(q{
-find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
-find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
-}, qr'%setup'); # after because before zip/unzip-ing
-
-    $jpp->get_section('prep')->push_body(q{
-find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
-find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
-
-#uname -p == unknown but exit code is 0 :( (alt feature :( )
-find . -name build.sh -exec %__subst 's,uname -p,uname -m,' {} \;
-
-# SUN JDK support
-find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/x86_64,/usr/lib/jvm/java/jre/lib/amd64,' {} \;
-find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/i586,/usr/lib/jvm/java/jre/lib/i386,' {} \;
-
+    $jpp->add_patch('eclipse-3.4.1-alt-as-needed.patch');
+    # patch was generated with
+    0 && $jpp->get_section('prep')->push_body(q{
 # fixed linkage order with --as-needed
 ## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
 #        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
 find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
+});
+
+    if (1) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
+    $jpp->get_section('prep')->push_body(q{
+#uname -p == unknown but exit code is 0 :( (alt feature :( )
+find . -name build.sh -exec %__subst 's,uname -p,uname -m,' {} \;
 
 # if enable make_xpcominit ...
 subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
@@ -117,24 +112,13 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
 # if disable awt
 # subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 });
+    }################################################### end TODO MAKE AS PATCHES
 
-    # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
-    $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
-    $jpp->get_section('prep')->subst_after(qr'^sed --in-place "s/JAVA_HOME','#sed --in-place "s/JAVA_HOME',qr'# liblocalfile fixes');
 
-$jpp->get_section('prep')->push_body_after(
-q!
-pushd plugins/org.eclipse.swt/Eclipse\ SWT\ PI/gtk/library
-# /usr/lib -> /usr/lib64
-sed --in-place "s:/usr/lib/:%{_libdir}/:g" build.sh
-%ifarch x86_64
-sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/amd64:" make_linux.mak
-%endif
-%ifarch %ix86
-sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/i386:" make_linux.mak
-%endif
-popd
-!, qr'plugins/org.junit4/junit.jar');
+    if ('build' eq 'use openjdk instead of default') {
+	$jpp->get_section('package','')->subst(qr'jpackage-1.?-compat','jpackage-generic-compat');
+	$jpp->get_section('package','')->unshift_body('BuildRequires: java-1.6.0-openjdk-devel');
+    } 
 
     # hack around added in -15 exact versions
     $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
@@ -241,6 +225,11 @@ sub leave_built_in_lucene {
     # end lucene
 }
 
+
+
+
+
+
 __END__
 
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
@@ -298,4 +287,42 @@ $jpp->get_section('install')->unshift_body_before(q{%if_enabled multilib_support
 
     # hack around requires in post / postun scripts. Do we do not need it in 3.4.1
     $jpp->get_section('package','rcp')->unshift_body('Provides: %_libdir/eclipse/configuration/config.ini'."\n");
+
+
+# SUN JDK patches, deprecated in 3.4
+$jpp->get_section('prep')->push_body_after(
+q!
+pushd plugins/org.eclipse.swt/Eclipse\ SWT\ PI/gtk/library
+# /usr/lib -> /usr/lib64; deprecated as of eclipse 3.4
+#sed --in-place "s:/usr/lib/:%{_libdir}/:g" build.sh
+%ifarch x86_64
+sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/amd64:" make_linux.mak
+%endif
+%ifarch %ix86
+sed --in-place "s:-L\$(AWT_LIB_PATH):-L%{_jvmdir}/java/jre/lib/i386:" make_linux.mak
+%endif
+popd
+!, qr'plugins/org.junit4/junit.jar');
+
+
+    if (0){ #old sun support code, deprecated in 3.4 ####################### ZERO
+    # they loose JAVA_HOME :(
+    $jpp->get_section('prep')->unshift_body_after(q{
+find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
+find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
+}, qr'%setup'); # after because before zip/unzip-ing
+
+    $jpp->get_section('prep')->push_body(q{
+find ./features -name build.sh -exec %__subst 's,javaHome="",javaHome="/usr/lib/jvm/java",' {} \;
+find ./plugins \( -name build.sh -or -name Makefile \) -exec %__subst 's,JAVA_HOME \?=.*,JAVA_HOME=/usr/lib/jvm/java,' {} \;
+
+# SUN JDK support; deprecated in 3.4.1
+#find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/x86_64,/usr/lib/jvm/java/jre/lib/amd64,' {} \;
+#find ./plugins -name 'make_linux.mak' -exec %__subst 's,/usr/lib/jvm/java/jre/lib/i586,/usr/lib/jvm/java/jre/lib/i386,' {} \;
+});
+    # hack around added in -13 fix-java-home.patch (we fix it in our subst?)
+    $jpp->get_section('prep')->subst(qr'^%patch26','#%patch26');
+    $jpp->get_section('prep')->subst_after(qr'^sed --in-place "s/JAVA_HOME','#sed --in-place "s/JAVA_HOME',qr'# liblocalfile fixes');
+
+    }######################### END ZERO ###########################
 

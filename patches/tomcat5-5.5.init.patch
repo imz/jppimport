@@ -1,0 +1,15 @@
+--- tomcat5-5.5.init.orig	2009-01-14 20:35:29 +0000
++++ tomcat5-5.5.init	2009-01-14 20:37:56 +0000
+@@ -275,6 +275,12 @@
+             start
+         fi
+         ;;
++    condstop)
++        if [ -f "/var/run/${NAME}.pid" ]; then
++            parseOptions
++            stop
++        fi
++        ;;
+     status)
+         status
+         ;;

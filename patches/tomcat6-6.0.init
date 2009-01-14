@@ -1,16 +1,16 @@
 #!/bin/bash
 #
-# tomcat5      This shell script takes care of starting and stopping Tomcat
+# tomcat6      This shell script takes care of starting and stopping Tomcat
 #
 # chkconfig: - 80 20
 #
 ### BEGIN INIT INFO
-# Provides: tomcat5
+# Provides: tomcat6
 # Required-Start: $network $syslog
 # Required-Stop: $network $syslog
 # Default-Start:
 # Default-Stop:
-# Description: Release implementation for Servlet 2.4 and JSP 2.0
+# Description: Release implementation for Servlet 2.5 and JSP 2.1
 # Short-Description: start and stop tomcat
 ### END INIT INFO
 #
@@ -18,10 +18,8 @@
 # - heavily rewritten by Deepak Bhole and Jason Corley
 #
 
-# Source the function library
-if [ -r "/etc/rc.d/init.d/functions" ]; then
-    . /etc/rc.d/init.d/functions
-fi
+# set a minimalist PATH
+PATH="/bin:/sbin"
 
 NAME="$(basename $0)"
 unset ISBOOT
@@ -34,13 +32,13 @@ fi
 if [ -x "/sbin/runuser" ]; then
     SU="/sbin/runuser"
 else
-    SU="su"
+    SU="/bin/su"
 fi
 
 # Get the tomcat config (use this for environment specific settings)
-TOMCAT_CFG="/etc/tomcat5/tomcat5.conf"
+TOMCAT_CFG="/etc/tomcat6/tomcat6.conf"
 if [ -r "$TOMCAT_CFG" ]; then
-    . ${TOMCAT_CFG}
+    . $TOMCAT_CFG
 fi
 
 # Get instance specific config file
@@ -52,10 +50,7 @@ fi
 CONNECTOR_PORT="${CONNECTOR_PORT:-8080}"
 
 # Path to the tomcat launch script
-TOMCAT_SCRIPT="/usr/bin/dtomcat5"
-
-# Path to the script that will refresh jar symlinks on startup
-TOMCAT_RELINK_SCRIPT="${CATALINA_HOME}/bin/relink"
+TOMCAT_SCRIPT="/usr/bin/dtomcat6"
 
 # Tomcat program name
 TOMCAT_PROG="$NAME"
@@ -63,16 +58,41 @@ TOMCAT_PROG="$NAME"
 # Define the tomcat username
 TOMCAT_USER="${TOMCAT_USER:-tomcat}"
 
-# Define the tomcat group
-TOMCAT_GROUP="${TOMCAT_GROUP:-tomcat}"
-
 # Define the tomcat log file
-TOMCAT_LOG="${TOMCAT_LOG:-/var/log/tomcat5/catalina.out}"
- 
-test -e $TOMCAT_LOG || touch $TOMCAT_LOG
-chown $TOMCAT_USER:$TOMCAT_GROUP $TOMCAT_LOG
+TOMCAT_LOG="${TOMCAT_LOG:-/var/log/tomcat6/catalina.out}"
 
 RETVAL="0"
+
+# pulled from RHEL4 /etc/rc.d/init.d/functions
+function checkpid() {
+    local i
+    for i in $* ; do
+        if [ -d "/proc/${i}" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# pulled from RHEL4 /etc/rc.d/init.d/functions
+function echo_failure() {
+    echo -en "\\033[60G"
+    echo -n "[  "
+    echo -n $"FAILED"
+    echo -n "  ]"
+    echo -ne "\r"
+    return 1
+}
+
+# pulled from RHEL4 /etc/rc.d/init.d/functions
+function echo_success() {
+    echo -en "\\033[60G"
+    echo -n "[  "
+    echo -n $"OK"
+    echo -n "  ]"
+    echo -ne "\r"
+    return 0
+}
 
 # Look for open ports, as the function name might imply
 function findFreePorts() {
@@ -109,22 +129,19 @@ function findFreePorts() {
 function makeHomeDir() {
     if [ ! -d "$CATALINA_HOME" ]; then
         echo "$CATALINA_HOME does not exist, creating"
-        if [ ! -d "/var/lib/${NAME}" ]; then
-            mkdir -p /var/lib/${NAME}
-            cp -pLR /var/lib/tomcat5/* /var/lib/${NAME}
+        if [ ! -d "/usr/share/${NAME}" ]; then
+            mkdir /usr/share/${NAME}
+            cp -pLR /usr/share/tomcat6/* /usr/share/${NAME}
         fi
-        mkdir -p $CATALINA_HOME ${CATALINA_HOME}/conf /var/cache/${NAME}/temp \
-            /var/cache/${NAME}/work /var/log/${NAME}
-        for i in temp work; do
-            ln -fs /var/cache/${NAME}/${i} ${CATALINA_HOME}/${i}
-        done
-        for i in common server shared webapps; do
-            ln -fs /var/lib/${NAME}/${i} ${CATALINA_HOME}/${i}
-        done
-        ln -fs /var/log/${NAME} ${CATALINA_HOME}/logs
-        cp -pLR /etc/tomcat5/* ${CATALINA_HOME}/conf/
-        cp -pLR /usr/share/tomcat5/bin $CATALINA_HOME
-        cp -pLR /var/cache/tomcat5/work/* ${CATALINA_HOME}/work/
+        mkdir -p /var/log/${NAME} \
+                 /var/cache/${NAME} \
+                 /var/tmp/${NAME}
+        ln -fs /var/cache/${NAME} ${CATALINA_HOME}/work
+        ln -fs /var/tmp/${NAME} ${CATALINA_HOME}/temp
+        cp -pLR /usr/share/${NAME}/bin $CATALINA_HOME
+        cp -pLR /usr/share/${NAME}/conf $CATALINA_HOME
+        ln -fs /usr/share/java/tomcat6 ${CATALINA_HOME}/lib
+        ln -fs /usr/share/tomcat6/webapps ${CATALINA_HOME}/webapps
         chown ${TOMCAT_USER}:${TOMCAT_USER} /var/log/${NAME}
     fi
 }
@@ -153,17 +170,20 @@ function start() {
             read kpid < /var/run/${NAME}.pid
                 if checkpid $kpid 2>&1; then
                     echo "$NAME process already running"
-			echo_success
+                        return -1
                     else
                         echo "lock file found but no process running for"
                         echo "pid $kpid, continuing"
                 fi
         fi
     fi
+    # fix permissions on the log and pid files
     export CATALINA_PID="/var/run/${NAME}.pid"
     touch $CATALINA_PID
     chown ${TOMCAT_USER}:${TOMCAT_USER} $CATALINA_PID
-    if [ "$CATALINA_HOME" != "/usr/share/tomcat5" ]; then
+    touch $TOMCAT_LOG
+    chown ${TOMCAT_USER}:${TOMCAT_USER} $TOMCAT_LOG
+    if [ "$CATALINA_HOME" != "/usr/share/tomcat6" ]; then
         # Create a tomcat directory if it doesn't exist
         makeHomeDir
         # If CATALINA_HOME doesn't exist modify port number so that
@@ -173,8 +193,12 @@ function start() {
             -e "s/8009/${randomPort2}/g" -e "s/8443/${randomPort3}/g" \
             ${CATALINA_HOME}/conf/server.xml
     fi
-    $TOMCAT_RELINK_SCRIPT
-    $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT start" >> $TOMCAT_LOG 2>&1
+    if [ "$SECURITY_MANAGER" = "true" ]; then
+        $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT start-security" \
+            >> $TOMCAT_LOG 2>&1
+    else
+        $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT start" >> $TOMCAT_LOG 2>&1
+    fi
     RETVAL="$?"
     if [ "$RETVAL" -eq 0 ]; then 
         echo_success
@@ -193,12 +217,11 @@ function status() {
         if checkpid $kpid 2>&1; then
             echo "$0 is already running (${kpid})"
             RETVAL="0"
-	    echo_success
         else
             echo "lock file found but no process running for pid $kpid"
         fi
     else
-        pid="$(pgrep -u tomcat java)"
+        pid="$(/usr/bin/pgrep -u tomcat java)"
         if [ -n "$pid" ]; then
             echo "$0 running (${pid}) but no PID file exists"
             RETVAL="0"
@@ -210,12 +233,7 @@ function status() {
 }
 
 function stop() {
-    local STOP_VERBOSE="false"
     echo -n "Stopping $TOMCAT_PROG: "
-    if [ ! -f /var/run/${NAME}.pid ]; then
-	echo "$NAME process already stopped"
-	echo_success
-    fi
     if [ -f "/var/lock/subsys/${NAME}" ]; then
         $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT stop" >> $TOMCAT_LOG 2>&1
         RETVAL="$?"
@@ -225,14 +243,14 @@ function stop() {
                 read kpid < /var/run/${NAME}.pid
                 until [ "$(ps --pid $kpid | grep -c $kpid)" -eq "0" ] || \
                       [ "$count" -gt "$SHUTDOWN_WAIT" ]; do
-                    if [ "$STOP_VERBOSE" = "true" ]; then
+                    if [ "$SHUTDOWN_VERBOSE" = "true" ]; then
                         echo -n -e "\nwaiting for processes $kpid to exit"
                     fi
                     sleep 1
                     let count="${count}+1"
                 done
                 if [ "$count" -gt "$SHUTDOWN_WAIT" ]; then
-                    if [ "$STOP_VERBOSE" = "true" ]; then
+                    if [ "$SHUTDOWN_VERBOSE" = "true" ]; then
                         echo -n -e "\nkilling processes which didn't stop"
                         echo -n -e "after "
                         echo -n "$SHUTDOWN_WAIT seconds"
@@ -244,7 +262,7 @@ function stop() {
                     echo -n -e "\n"
                 fi
             fi
-            rm -f /var/lock/subsys/$NAME /var/run/$NAME.pid
+            rm -f /var/lock/subsys/${NAME} /var/run/${NAME}.pid
         else
             echo_failure
         fi
@@ -270,9 +288,7 @@ case "$1" in
         ;;
     condrestart)
         if [ -f "/var/run/${NAME}.pid" ]; then
-            parseOptions
-            stop
-            start
+            restart
         fi
         ;;
     condstop)
@@ -285,13 +301,11 @@ case "$1" in
         status
         ;;
     version)
-        parseOptions
-        "${JAVA_HOME}/bin/java" \
-            -classpath "${CATALINA_HOME}/server/lib/catalina.jar" \
-            org.apache.catalina.util.ServerInfo
+        $TOMCAT_SCRIPT version
         ;;
     *)
-        echo "Usage: $TOMCAT_PROG {start|stop|restart|condrestart|status|version}"
+        echo -n "Usage: $TOMCAT_PROG "
+        echo "{start|stop|restart|condrestart|status|version}"
         exit 1
 esac
 
