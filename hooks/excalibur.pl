@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, 
+require 'set_target_14.pl';
 
+push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
     # hack ! geronimo poms !
@@ -10,4 +11,9 @@ sub {
     # tests fails :(
     $jpp->get_section('build')->unshift_body_after('-Dmaven.test.skip=true \\', qr'mvn-jpp');
 
+    # bug.(jpp5)
+    $jpp->get_section('package','')->subst_if('avalon-framework','excalibur-avalon-framework', qr'BuildRequires:');
+
+    $jpp->get_section('package','avalon-framework')->push_body('Provides: avalon-framework = %framework_version');
+    $jpp->get_section('package','avalon-logkit')->push_body('Provides: avalon-framework = 2.1');
 }

@@ -5,7 +5,7 @@ use Getopt::Long;
 use strict;
 
 my ($verbose,$full);
-my $PATH1='/var/ftp/pub/Linux/ALT/4.1/branch/files/SRPMS';
+my $PATH1='/var/ftp/pub/Linux/ALT/5.0/branch/files/SRPMS';
 my $PATH2='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
 
 my $result = GetOptions (

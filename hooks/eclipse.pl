@@ -31,6 +31,9 @@ sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
 
+    # seamonkey provides mozilla too
+    $jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
+
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors
 
@@ -154,7 +157,7 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
     &replace_built_in_ant($jpp);
     &leave_built_in_lucene($jpp);
     # TODO: make the transition after 3.4.1 switch!
-    &leave_built_in_icu4j($jpp);
+    #&leave_built_in_icu4j($jpp);
     &leave_built_in_jetty($jpp);
 
     # let them be noarches - sorry, not in 3.4.x
@@ -233,9 +236,6 @@ sub leave_built_in_lucene {
 __END__
 
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
-
-# seamonkey provides mozilla
-#$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','#Conflicts:     mozilla');
 
 # now we use theme
 $jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');

@@ -9,6 +9,30 @@ push @SPECHOOKS, sub {
     # due to ecj :(
     $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
     
+    # hack against tomcat parent pom not installed by dependencies.
+    # It may be made a subpackage, but let it be just file dup.
+#    my $addpomline=q!#hack for pom closure
+#%_datadir/maven2/poms/JPP.tomcat5-parent.pom!."\n";
+    my $addpomline=q!#hack for poms cause conflicts :(
+%exclude %_datadir/maven2/poms/*!."\n";
+    $jpp->get_section('files','jasper')->push_body($addpomline);
+    $jpp->get_section('files','jsp-2.0-api')->push_body($addpomline);
+    $jpp->get_section('files','servlet-2.4-api')->push_body($addpomline);
+    $jpp->get_section('files','common-lib')->push_body($addpomline);
+
+    # moreover, old packages as jetty6-core mojo-maven2-plugins nanocontainer plexus-service-jetty
+    # just breaks with new poms installed due to their depmap (TODO: edit it and use tomcat5-poms)
+    $jpp->add_section('package','poms')->push_body(q!Group: Development/Java
+Summary: Apache Tomcat poms for maven2
+
+%description poms
+Apache Tomcat poms for maven2
+
+!);
+    $jpp->add_section('files','poms')->push_body(q!%_datadir/maven2/poms/*
+!);
+
+
     # TODO: write proper tomcat5-5.5.init!
     # as a hack, an old version is taken
     $jpp->copy_to_sources('tomcat5-5.5.init');
@@ -90,9 +114,3 @@ done || :
 }
 __DATA__
 todo: verify logrotate
-    # break build with java 1.5.0
-    #Patch19: %{name}-%{majversion}-connectors-util-build.patch
-    #$jpp->get_section('prep')->subst(qr'%patch19 -b .p19','#%patch19 -b .p19');
-    #Patch21: %{name}-%{majversion}-acceptlangheader.patch
-    #$jpp->get_section('prep')->subst(qr'%patch21 -b .p21','#%patch21 -b .p21');
-

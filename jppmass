@@ -74,6 +74,7 @@ dead-or-deprecated:
 maven2-stylus-skin
 maven2-default-skin
 maven2-classic-skin
+saxon7
 
 java_cup  --by_java-cup--
 avalon-excalibur
