@@ -3,22 +3,21 @@
 PREFIX=/var/ftp/pub/Linux/ALT/Sisyphus
 NAME=java-alt-packages
 
-
-
 [ -n "$1" ] && PREFIX="$1" && shift;
 [ -n "$1" ] && NAME="$1" && shift;
 
 DEST=`pwd`
 
+JAVA_PATTERN='/usr/(share/java|share/netbeans|share/eclipse|lib/eclipse|lib64/eclipse)'
+
 pushd $PREFIX/files/noarch/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > $DEST/$NAME.noarch.src
+for i in *.rpm; do if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > $DEST/$NAME.noarch.src
 popd
-echo jpackage-generic-compat jpackage-utils java-common java-stub-javadoc java-devel-default >> $DEST/$NAME.noarch.src
+echo jpackage-generic-compat jpackage-utils java-common java-javadoc java-stub-javadoc java-devel-default >> $DEST/$NAME.noarch.src
 pushd $PREFIX/files/i586/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | grep /usr/share/java >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/$NAME.i586.src
+for i in *.rpm; do if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/$NAME.i586.src
 popd
 sort -u ./$NAME.i586.src ./$NAME.noarch.src > $NAME.src
 if [ -f $PREFIX/files/list/list.src.classic ]; then
     for i in `cat ./$NAME.src`; do grep "^$i" $PREFIX/files/list/list.src.classic ; done | sort -u > $DEST/$NAME.owners
 fi
-

@@ -13,10 +13,18 @@ my $verbose=0;
 my $outdir='.';
 my $changelog='- bootstrap pack of jars created with jppbootstrap script
 - temporary package to satisfy circular dependencies';
+my (@skiprequires,@skipprovides);
+my (@addprovides,@addrequires,@addobsoletes);
+
 my $result = GetOptions (
 		      "changelog=s"   => \$changelog,
 		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
+		      "skip-requires=s"   => \@skiprequires,
+		      "skip-provides=s"   => \@skipprovides,
+		      "add-provides=s"   => \@addprovides,
+		      "add-requires=s"   => \@addrequires,
+		      "add-obsoletes=s"   => \@addobsoletes,
 		      "verbose+"  => \$verbose);
 
 die unless @ARGV;
@@ -24,6 +32,10 @@ die unless @ARGV;
 my $macros=RPM::Source::Macros->new();
 my $packager=$macros->macro_subst('%{packager}');
 $packager=undef if $packager eq '%{packager}';
+
+my %skip;
+$skip{PROVIDENAME}={map {$_=>1} split(',',join(',',@skipprovides))};
+$skip{REQUIRENAME}={map {$_=>1} split(',',join(',',@skiprequires))};
 
 map {&package($_)} @ARGV;
 
@@ -67,7 +79,7 @@ REQUIRENAME
     my $tagname=ucfirst(lc($tag));
     $tagname=~s/name/s/;
     foreach my $val (@tagval) {
-	print SPEC $tagname.": ".$val."\n" if $val ne $pkgname;
+	print SPEC $tagname.": ".$val."\n" if $val ne $pkgname and not $skip{$tag}->{$val};
     }
 }
 
@@ -78,6 +90,10 @@ BuildArch: noarch
 Group: Development/Java
 Release: '.$release.'
 Source: '.$trippletname.".cpio\n\n";
+
+    print SPEC 'Provides: '.join(' ',@addprovides)."\n" if @addprovides;
+    print SPEC 'Requires: '.join(' ',@addrequires)."\n" if @addrequires;
+    print SPEC 'Obsoletes: '.join(' ',@addobsoletes)."\n" if @addobsoletes;
 
     foreach my $tag qw/DESCRIPTION
 / {

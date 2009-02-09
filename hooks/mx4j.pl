@@ -2,6 +2,8 @@
 
 #require 'set_bootstrap.pl';
 require 'set_target_14.pl';
+# too long :(
+require 'set_without_tests.pl';
 
 push @SPECHOOKS, 
 sub {
