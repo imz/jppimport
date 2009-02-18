@@ -1,12 +1,14 @@
 #!/usr/bin/perl -w
 
+require 'set_xpp3_min_pom.pl';
+
 push @SPECHOOKS, 
 # 1.7, but proved useful in 5.0
 sub {
     my ($jpp, $alt) = @_;
     # hack ! geronimo poms !
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-specs-poms'."\n");
-    $jpp->get_section('package','')->unshift_body('BuildRequires: checkstyle-optional jakarta-commons-vfs maven-plugin-modello maven-shared maven-shared-file-management'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: checkstyle-optional jakarta-commons-vfs modello-maven-plugin maven-shared maven-shared-file-management'."\n");
     # missing dependency on ant-launcher - fixed in pom
     $jpp->add_patch('cargo-0.9-alt-pom-add-ant-launcher-dependency.patch');
     $jpp->get_section('prep')->push_body(q!

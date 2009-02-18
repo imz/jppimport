@@ -7,6 +7,10 @@ push @SPECHOOKS, sub {
 #ln -sf $(build-classpath jruby)
 #ln -sf $(relative %_javadir/jruby.jar %{appdir}/lib/) .
     $jpp->get_section('install')->subst_if(qr'build-classpath jruby','relative %_javadir/jruby.jar %{appdir}/lib/',qr'ln -sf');
+
+    $jpp->get_section('package')->push_body('%add_findreq_skiplist /usr/share/jruby/lib/ruby'."\n");
+    $jpp->get_section('install')->subst(qr'ln -sf \%{_libdir}/ruby','ln -sf /usr/lib/ruby');
+
 };
 
 1;
