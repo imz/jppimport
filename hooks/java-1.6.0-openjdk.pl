@@ -389,6 +389,14 @@ rm -rf jdk1?/linux
 popd
 !);
 
+    #ppc support
+    $jpp->get_section('package','devel')->push_body('
+# hack for missing java 1.5.0 on ppc
+%ifarch ppc ppc64
+Provides: java-devel = 1.5.0
+%endif
+');
+    $jpp->get_section('install')->subst(qr'%ifarch %{ix86}','%ifarch %{ix86} ppc ppc64');
 }
 
 
