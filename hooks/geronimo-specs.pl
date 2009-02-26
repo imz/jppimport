@@ -28,6 +28,10 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
     }
 }
 __END__
+# TODO:
+j2ee-api does not have jms alternative (see hack around spring)
+
+
 # hack for 1.2 to be built under (old maven2)?
 939c939
 <   geronimo-spec-corba-2.3/target/geronimo-corba_2.3_spec-null.jar \

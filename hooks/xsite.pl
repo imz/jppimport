@@ -7,7 +7,7 @@ require 'set_target_14.pl';
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: mojo-maven2-plugin-cobertura maven2-plugin-surefire jetty5 nanocontainer freemarker xstream sitemesh picocontainer mojo-maven2-plugin-dependency maven2-plugin-surefire-report'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: mojo-maven2-plugin-cobertura maven2-plugin-surefire jetty5 nanocontainer freemarker xstream sitemesh picocontainer maven2-plugin-dependency maven2-plugin-surefire-report'."\n");
 }
 
 __END__

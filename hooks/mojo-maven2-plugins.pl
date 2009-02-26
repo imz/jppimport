@@ -34,6 +34,12 @@ sub {
 };
 
 __END__
+TODO:
+add
+mojo-maven2-plugin-cobertura 
+Requires: cobertura
+
+
 subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
 subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml
 subst 's,<module>jasperreports-maven-plugin</module>,,' pom.xml # old jasperreports?

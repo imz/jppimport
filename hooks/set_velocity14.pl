@@ -8,6 +8,7 @@ sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires(pre): velocity14'."\n");
     $jpp->get_section('package','')->unshift_body('BuildConflicts: velocity >= 1.5'."\n");
 
+    $jpp->add_patch('serp-1.13.1-alt-pom-use-maven-jxr.patch', STRIP=>0);
 
     $jpp->get_section('build')->unshift_body(q!
 # hack used to build ehcache w/velocity 1.4

@@ -15,6 +15,7 @@ my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$epoch,$rename,$
 my $jvm=5;
 my $packager='auto';
 my $verbose=1;
+my $usemavenplugins=0;
 my $cleanup=0;
 my $outputdir='.';
 my $patchdir=dirname($0)."/patches";
@@ -62,6 +63,8 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
+$usemavenplugins=1 if $jpprpm and $jpprpm=~m!/1.7/generic/!;
+
 $jpp=RPM::Source::Editor->new(
     SOURCERPM => $jpprpm, 
     SPECFILE=> $jppspec, 
@@ -73,6 +76,7 @@ $jpp=RPM::Source::Editor->new(
     CONVERT::JPACKAGE::JVM=>$jvm,
     CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
     CONVERT::JPACKAGE::NOZIP=>$nozip, 
+    CONVERT::JPACKAGE::USEMAVENPLAGINS=>$usemavenplugins,
 );
 
 my $jppepoch = $jpp->get_section('package','')->get_tag('Epoch');

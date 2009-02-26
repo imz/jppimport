@@ -6,6 +6,7 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: jboss4-common qdox'."\n");
     $jpp->get_section('build')->subst(qr'build-classpath ejb\)','build-classpath ejb_2_1_api)');
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jms-1.1-api'."\n");
 };
 __END__
     # due to our ant that does not support 'OPT_JAR_LIST

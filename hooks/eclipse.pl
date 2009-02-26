@@ -74,6 +74,10 @@ sub {
     $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
     $jpp->get_section('package','swt')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
 
+    # due to #18579
+    $jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
+    $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
+
     # ecj should not have osgi dependencies.
     $jpp->get_section('package','ecj')->push_body('AutoReq: yes, noosgi'."\n");
 
@@ -246,10 +250,6 @@ $jpp->copy_to_sources('eclipse-altlinux-splash-3.3.0.png');
 
 #Epoch:  1 let it be. they use Requires: with epoch :(
 #$jpp->get_section('package','')->subst(qr'Epoch:\s+1', 'Epoch:  0');
-
-# removed due to #18579
-$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
-$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
 
 # hack around added in -13 Obsoletes in pde (we moved to Epoch: 1
 $jpp->get_section('package','pde')->subst(qr'1:3.3.0-13.fc8','0:3.3.0-alt2_13jpp5.0');
