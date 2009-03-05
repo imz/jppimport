@@ -8,5 +8,8 @@ push @SPECHOOKS, sub {
 !);
     # bug to report
     $jpp->get_section('install')->subst(qr'ln -sf %{_javadir}/nanocontainer-booter.jar','ln -sf %{_javadir}/nanocontainer/booter.jar');
+
+    # maven 2.0.7 support
+
 }
 

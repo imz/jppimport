@@ -1,0 +1,28 @@
+diff -ru JPOX-1.1.1.orig/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheClassBasedLevel2Cache.java JPOX-1.1.1/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheClassBasedLevel2Cache.java
+--- JPOX-1.1.1.orig/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheClassBasedLevel2Cache.java	2006-04-30 09:43:22 +0000
++++ JPOX-1.1.1/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheClassBasedLevel2Cache.java	2009-02-27 18:45:50 +0000
+@@ -164,10 +164,6 @@
+         {
+             e.printStackTrace();
+         }
+-        catch (IOException e)
+-        {
+-            e.printStackTrace();
+-        }
+     }
+ 
+     /**
+diff -ru JPOX-1.1.1.orig/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheLevel2Cache.java JPOX-1.1.1/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheLevel2Cache.java
+--- JPOX-1.1.1.orig/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheLevel2Cache.java	2006-04-30 09:43:21 +0000
++++ JPOX-1.1.1/Plugins/Ehcache/src/java/org/jpox/cache/EhcacheLevel2Cache.java	2009-02-27 18:51:06 +0000
+@@ -101,10 +101,6 @@
+         {
+             e.printStackTrace();
+         }
+-        catch (IOException e)
+-        {
+-            e.printStackTrace();
+-        }
+     }
+ 
+     /**

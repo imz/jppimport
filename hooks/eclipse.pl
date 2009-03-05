@@ -79,7 +79,10 @@ sub {
     $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
 
     # ecj should not have osgi dependencies.
-    $jpp->get_section('package','ecj')->push_body('AutoReq: yes, noosgi'."\n");
+    $jpp->get_section('package','ecj')->push_body('
+AutoReq: yes, noosgi
+AutoProv: yes, noosgi
+');
 
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty5');

@@ -1,0 +1,13 @@
+--- retroweaver-2.0.2/build.xml	2008-02-02 17:26:06 +0300
++++ retroweaver-2.0.2/build.xml	2008-02-02 17:27:15 +0300
+@@ -102,9 +102,7 @@
+ 			</classpath>
+ 		</javac>
+ 
+-		<exec executable="svnversion" outputproperty="buildNumber">
+-			<arg line="." />
+-		</exec>
++		<property name="buildNumber" value="dev" />
+ 
+ 		<propertyfile file="${classes.dir}/retroweaver.properties">
+ 			<entry key="retroweaver.version" value="${version}" />

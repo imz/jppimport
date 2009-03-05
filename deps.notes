@@ -43,44 +43,76 @@ dups TODO:
 apacheds-daemon by apacheds10-daemon
 apacheds by apacheds10?
 mina mina10?
-xmlgraphics-fop,batik
 jaxen-bootstrap jaxen
 #java_cup java-cup
 wadi by wadi2
 ----------
 
-== deps ==
-
-
-perseus*: fractal
-
-==========================================================
-
-  WARNING:  maven.compile.target is not set:
-            using the default value which depends on your JVM
-
-==========================================================
-mina:
-     [echo] ====================================================================
-     [echo]                        W A R N I N G
-     [echo]                        -------------
-     [echo] 
-     [echo] Build with 1.4 jvm will not include modules:
-     [echo]  
-     [echo]  o mina-java5
-     [echo]  o mina-filter-ssl
-     [echo]  o mina-integration-spring
-     [echo]  o mina-example
-     [echo]  o mina-jmx
-     [echo] 
-     [echo] Use JDK 1.5 to make sure these modules build.
-     [echo] ====================================================================
-
 # TODO: geronimo-j2ee-1.4-apis should not provide ... because they do not have the corresponding symlinks!
-
-# done: robot that checks that alternatives does not belong to package.
-file /usr/share/java/jspapi.jar conflicts between attempted installs of tomcat5-jsp-2.0-api-5.5.24-alt3_3jpp1.7 and geronimo-specs-jsp-1.0-alt0.M5.8
 
 # to report:
 docbook-xsl-java-xalan is dead because of xalan-j 2.5 specific code (does not rebuild)
 so I pick manually docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xsl-saxon.
+
+# deprecation:
+objenesis is only place that use xsite -> use nanocontainer
+after kill site in objenesis both will be deprecated
+
+# deps:
+jetty6 -> wadi2 (wadi?)
+
+activeio3
+activemq4
+asn1
+bsf3
+buildmagic
+chainedoptions
+easymock-classextension2
+geronimo-txmanager
+glassfish-jsf
+glassfish-jstl
+gmaven
+jackrabbit
+jaxbintros
+jencks
+joramtests
+jradius
+jsr223-scripting-engines
+ldapsdk
+lingo
+maven-archetype2
+maven-doxia
+maven-jaxb2-plugin
+maven-jdocbook-plugin
+mg4j
+openqa-selenium-rc
+ops4j-pax
+portals-bridges
+portals-jetspeed2
+spring-ldap
+spring-osgi
+spring-webflow
+
+richfaces
+sun-jsf
+sysunit
+taglib-maven2-plugin
+tyrex
+wadi2
+wicket
+xwork
+
+
+# conflict with smc
+smc
+
+#up 
+dwr
+easymock-classextension
+maven2-common-poms
+
+# wersiondown
+bcel
+wstx
+itext
+

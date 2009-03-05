@@ -6,13 +6,14 @@ sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath'."\n");
     $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
+    $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
 
     # hacks for missing deps
     $jpp->disable_package('-n mojo-maven2-plugin-findbugs');
-    $jpp->disable_package('-n mojo-maven2-plugin-hibernate2');
-    $jpp->disable_package('-n mojo-maven2-plugin-springbeandoc');
-    $jpp->disable_package('-n mojo-maven2-plugin-sysdeo-tomcat');
-    $jpp->disable_package('-n mojo-maven2-plugin-tomcat');
+#    $jpp->disable_package('-n mojo-maven2-plugin-hibernate2');
+#    $jpp->disable_package('-n mojo-maven2-plugin-springbeandoc');
+#    $jpp->disable_package('-n mojo-maven2-plugin-sysdeo-tomcat');
+#    $jpp->disable_package('-n mojo-maven2-plugin-tomcat');
     $jpp->disable_package('-n mojo-maven2-plugin-xfire');
     $jpp->disable_package('-n mojo-maven2-plugin-jasperreports');
     $jpp->disable_package('-n mojo-maven2-plugin-jspc');
@@ -24,13 +25,14 @@ sub {
 #    $jpp->disable_package('-n ');
 #    $jpp->disable_package('-n ');
 
-    $jpp->get_section('package','')->subst(qr'BuildRequires: hibernate2','#BuildRequires: hibernate2');
-    $jpp->get_section('package','')->subst(qr'BuildRequires: spring2','#BuildRequires: spring2');
-    $jpp->get_section('package','')->subst(qr'BuildRequires: spring-beandoc','#BuildRequires: spring-beandoc');
-    $jpp->get_section('package','')->subst(qr'BuildRequires: xbean','#BuildRequires: xbean');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: hibernate2','#BuildRequires: hibernate2');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: spring2','#BuildRequires: spring2');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: spring-beandoc','#BuildRequires: spring-beandoc');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: xbean','#BuildRequires: xbean');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: tomcat6','#BuildRequires: tomcat6');
+
     $jpp->get_section('package','')->subst(qr'BuildRequires: xfire','#BuildRequires: xfire');
     $jpp->get_section('package','')->subst(qr'BuildRequires: gmaven','#BuildRequires: gmaven');
-    $jpp->get_section('package','')->subst(qr'BuildRequires: tomcat6','#BuildRequires: tomcat6');
 };
 
 __END__
@@ -41,26 +43,19 @@ Requires: cobertura
 
 
 subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
-subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml
+#subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml
 subst 's,<module>jasperreports-maven-plugin</module>,,' pom.xml # old jasperreports?
 subst 's,<module>jspc</module>,,' pom.xml #gmaven
 subst 's,<module>retrotranslator-maven-plugin</module>,,' pom.xml #gmaven
 subst 's,<module>selenium-maven-plugin</module>,,' pom.xml #gmaven
 subst 's,<module>shitty-maven-plugin</module>,,' pom.xml #gmaven
-subst 's,<module>sysdeo-tomcat-maven-plugin</module>,,' pom.xml # tomcat5?
-subst 's,<module>tomcat-maven-plugin</module>,,' pom.xml #tomcat5 can also be used?
-subst 's,<module>maven-springbeandoc-plugin</module>,,' mojo-sandbox/pom.xml
+#subst 's,<module>sysdeo-tomcat-maven-plugin</module>,,' pom.xml # tomcat5?
+#subst 's,<module>tomcat-maven-plugin</module>,,' pom.xml #tomcat5 can also be used?
+#subst 's,<module>maven-springbeandoc-plugin</module>,,' mojo-sandbox/pom.xml
 subst 's,<module>xfire-maven-plugin</module>,,' mojo-sandbox/pom.xml
 subst 's,,,' pom.xml
 subst 's,,,' pom.xml
 
-
-2.0.4
-    # bug in asm2: 
-    # looks like missing group causes ...
-    # but it is wise to replace asm-parent to asm-all!
-#    $jpp->get_section('package','')->unshift_body('BuildRequires: asm2 mojo-maven2-plugins'."\n");
-http://video.stage6.com/1336242/.divx
 --- mojo-maven2-plugins.spec	2009-02-12 20:25:14 +0000
 +++ mojo-maven2-plugins.spec	2009-02-13 08:57:13 +0000
 @@ -2165,6 +2165,19 @@
