@@ -1,0 +1,66 @@
+diff -ru chainedoptions-0.9.0.orig/build-chainedoptions/build.xml chainedoptions-0.9.0/build-chainedoptions/build.xml
+--- chainedoptions-0.9.0.orig/build-chainedoptions/build.xml	2005-08-26 20:05:48 +0000
++++ chainedoptions-0.9.0/build-chainedoptions/build.xml	2009-03-14 19:31:51 +0000
+@@ -163,7 +163,6 @@
+ 
+     <zip zipfile="${target.release.dir}/${release.bin.zip}">
+ 	  <zipfileset dir="../chainedoptions/target/dist/jars" prefix="${zip.toplevel.dir}/dist"/>
+-	  <zipfileset dir="../chainedoptions/target/dist/ivys" prefix="${zip.toplevel.dir}/dist/ivys"/>
+ 	  <zipfileset dir="../chainedoptions/target/javadocs" prefix="${zip.toplevel.dir}/doc/api"/>
+     </zip>
+   </target>
+@@ -176,7 +175,6 @@
+ 
+     <zip zipfile="${target.release.dir}/${release.bin.deps.zip}">
+ 	  <zipfileset dir="../chainedoptions/target/dist/jars" prefix="${zip.toplevel.dir}/dist"/>
+-	  <zipfileset dir="../chainedoptions/target/dist/ivys" prefix="${zip.toplevel.dir}/dist/ivys"/>
+ 	  <zipfileset dir="../chainedoptions/target/javadocs" prefix="${zip.toplevel.dir}/doc/api"/>
+ 	  <zipfileset dir="../chainedoptions/lib/global" prefix="${zip.toplevel.dir}/lib"/>
+     </zip>
+diff -ru chainedoptions-0.9.0.orig/common-build/common-targets.xml chainedoptions-0.9.0/common-build/common-targets.xml
+--- chainedoptions-0.9.0.orig/common-build/common-targets.xml	2005-08-26 19:40:58 +0000
++++ chainedoptions-0.9.0/common-build/common-targets.xml	2009-03-14 19:28:39 +0000
+@@ -320,7 +320,6 @@
+   </presetdef>
+ 
+   <target name="retrieve.all" depends="resolve.all">
+-    <retrieve.all/>
+   </target>
+ 	
+   <target name="resolve.conf" depends="ivy.configure">
+@@ -328,7 +327,6 @@
+   </target>
+ 	
+   <target name="resolve.all" depends="ivy.configure">
+-  	<resolve.all/>
+   </target>
+ 
+   <!-- resolve: resolve dependencies -->
+@@ -336,7 +334,6 @@
+   <target name="resolve.pre"/>
+   <target name="resolve.main">
+   	<property name="main.build.configs" value="global,buildtime,test"/>
+-	<resolve.conf conf="${main.build.configs}"/>
+   </target>
+   <target name="resolve.post"/>
+ 
+@@ -346,8 +343,6 @@
+   <target name="retrieve.main">
+ 	<!-- when we retrieve with revision numbers in jar names, we really have to kill the
+ 	     retrieve dir so we don't get multiple snapshot versions -->
+-    <antcall target="clear.lib.dir.before.retrieve"/>
+-    <retrieve.conf conf="${main.build.configs}"/>
+   </target>
+   <target name="retrieve.post"/>
+ 
+@@ -744,10 +739,6 @@
+ 	<mkdir dir="${ivy.distrib.dir}/jars"/>
+     <copy file="${target.lib.dir}/${project.name}.jar" tofile="${ivy.distrib.dir}/jars/${project.name}-${project.version}.jar" />
+     <copy file="${target.lib.dir}/${project.name}-src.zip" tofile="${ivy.distrib.dir}/jars/${project.name}-src-${project.version}.zip" />
+-	<ivy:publish resolver="integration-repo"
+-                 artifactspattern="${ivy.distrib.dir}/jars/[artifact]-[revision].[ext]"
+-                 pubrevision="${project.version}" pubdate="${pubdate}"
+-                 srcivypattern="${ivy.srcivypattern}" />
+     <echo message="project ${project.name} released with version ${project.version}" />
+   </target>
+     

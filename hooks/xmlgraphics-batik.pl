@@ -17,7 +17,15 @@ subst 's,maxmemory="128m",maxmemory="512m",' build.xml
 
     $jpp->get_section('install')->push_body('
 pushd $RPM_BUILD_ROOT%_javadir
-ln -s xmlgraphics-batik batik
+# due to #19119
+#1: xmlgraphics-batik         error: unpacking of archive failed on file
+#/usr/share/java/batik: cpio: rename failed - Is a directory
+#E: Some errors occurred while running transaction
+#ln -s xmlgraphics-batik batik
+  mkdir batik
+  pushd batik
+    ln -s ../xmlgraphics-batik/* .
+  popd
 popd
 ');
     $jpp->get_section('files','')->push_body('%_javadir/batik
