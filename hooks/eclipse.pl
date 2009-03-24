@@ -75,8 +75,8 @@ sub {
     $jpp->get_section('package','swt')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
 
     # due to #18579
-    $jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
-    $jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
+    #$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
+    #$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
 
     # ecj should not have osgi dependencies.
     $jpp->get_section('package','ecj')->push_body('

@@ -14,14 +14,17 @@ sub {
 #:0}%{!?_without_bootstrap:%{?_bootstrap:%{_bootstrap}}%{!?_bootstrap:0}}}
     $jpp->get_section('package','')->subst(qr'%define bootstrap %{\?_with_bootstrap:1}%{!\?_with_bootstrap:%{\?_without_bootstrap\s*','%define bootstrap %{?_with_bootstrap:1}%{!?_with_bootstrap:%{?_without_bootstrap');
 
-    foreach my $section ($jpp->get_sections()) {
-	if ($section->get_type() eq 'package') {
-	    $section->subst_if(qr'4.4','4.3','checkstyle4');
-	    $section->subst_if(qr'<\s*0:0.93','','fop');
-
+    $jpp->applied_block(
+	"checkstyle4.3 (until migration to checkstyle4.4 hook",
+	sub {
+	    foreach my $section ($jpp->get_sections()) {
+		if ($section->get_type() eq 'package') {
+		    $section->subst_if(qr'4.4','4.3','checkstyle4');
+		    $section->subst_if(qr'<\s*0:0.93','','fop');
+		}
+	    }
 	}
-    }
-
+	);
 
     $jpp->get_section('package','')->unshift_body('
 
@@ -49,9 +52,25 @@ BuildRequires: jakarta-commons-jelly-tags-http
 BuildRequires: jakarta-cactus eclipse
 !);
 
+    $jpp->get_section('install')->push_body('
+#Требует: /usr/share/maven/home/plugins/maven-changes-plugin-1.7.jar
+#Требует: /usr/share/maven/home/plugins/maven-jcoverage-plugin-1.1-SNAPSHOT.jar
+#broken symlinks (jpp 5.0 to report)
+#/usr/share/maven/repository/maven/jars/maven-changes-plugin-1.7.jar
+#/usr/share/maven/repository/maven/plugins/maven-jcoverage-plugin-1.0.9.jar
+pushd %buildroot/usr/share/maven
+ln -sf ../../../plugins/maven-changes-plugin-1.7.jar repository/maven/jars/maven-changes-plugin-1.7.jar
+ln -sf ../../../plugins/maven-jcoverage-plugin-1.1-SNAPSHOT.jar repository/maven/plugins/maven-jcoverage-plugin-1.0.9.jar
+popd
+');
+
 #Следующие пакеты имеют неудовлетворенные зависимости:
 #  maven: Требует: /etc/mavenrc но пакет не может быть установлен
     &add_missingok_config($jpp,'/etc/mavenrc');
+
+# hack, according to current policy :(
+#l ./share/maven/repository/javadoc/jars
+#lrwxrwxrwx 1 igor igor 37 Мар 19 20:57 tools.jar -> /usr/lib/jvm/java-1.5.0/lib/tools.jar
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist %_datadir/maven/repository/javadoc/jars/*'."\n");
 };
 

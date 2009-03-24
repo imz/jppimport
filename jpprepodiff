@@ -4,28 +4,29 @@ use Carp;
 use Getopt::Long;
 use strict;
 
-my ($verbose,$full);
+my ($verbose,$acl);
+#my @aclusers=('viy','@java');
+my $cmd='git.alt';
 my $PATH1='/var/ftp/pub/Linux/ALT/5.0/branch/files/SRPMS';
 my $PATH2='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
 
 my $result = GetOptions (
-			 "full" => \$full,
+			 "acl=s" => \$acl,
 			 "path1=s" => \$PATH1,
 			 "path2=s" => \$PATH2,
+			 "out=s"  => \$cmd,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
 
 sub usage {
     print "usage: $0 [ options ]
 options:
---full 
---verbose
+--acl   /path/to/acl/file 
 --path1 /path/to/oldrepo/SRPMS 
 --path2 /path/to/newrepo/SRPMS
+--verbose
 ";
 }
-
-
 
 unless (-d $PATH1) {
     print STDERR "path1 not found: $PATH1
@@ -38,6 +39,11 @@ unless (-d $PATH2) {
 ";
     exit (64);
 }
+
+if ($acl) {
+    die "not implemented";
+}
+
 
 my @newer;
 my @deprecated;
@@ -65,17 +71,23 @@ for my $name (@ARGV) {
     }
 }
 
+open (GITALT, ">$cmd") || die "can't open $cmd: $!";
+print GITALT "ssh git.alt task new 5.0\n";
+
 print "\nthe following packages are newer:\n";
 for my $rpm (@newer) {
 #    my $nvr=&get_rpm_nvr($rpm);
 #    print "".$nvr."\n";
+    print GITALT "ssh git.alt task add copy ",&get_rpm_name($rpm)."\n";
     print &get_rpm_nvr($rpm)."\n";
 }
 
 print "\nthe following packages are deprecated:\n";
 for my $rpm (@deprecated) {
+    print GITALT "ssh git.alt task add del ",&get_rpm_name($rpm)."\n";
     print &get_rpm_nvr($rpm)."\n";
 }
+print GITALT "ssh git.alt task run\n";
 
 #-------------------------------------------------------
 # stolen from jppmass #

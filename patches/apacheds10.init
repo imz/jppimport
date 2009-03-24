@@ -1,0 +1,228 @@
+#!/bin/bash
+#
+# chkconfig: - 91 35
+# description: Starts and stops apacheds server. 
+#
+# Shell script to start/stop apacheds 
+# If you want to change apacheds service settings please modify the server.xml
+# file.
+
+DISPLAY=:0.0
+export DISPLAY
+
+# Source function library.
+if [ -f /etc/init.d/functions ] ; then
+     . /etc/init.d/functions
+fi
+
+# Source networking configuration.
+if [ -f /etc/sysconfig/network ] ; then
+     . /etc/sysconfig/network
+fi
+
+# Check that networking is up.
+if [ ! -z "$NETWORKING" ] ; then
+      if [ "$NETWORKING" = "no" ] ; then
+           exit 0
+      fi
+fi
+
+unset SERVERARGS
+SERVERS=""
+[ -f /etc/sysconfig/apacheds10 ] && . /etc/sysconfig/apacheds10
+
+prog=$"apacheds server"
+
+if [ -z "$APACHEDS_HOME" ] ; then
+  # try to find install home 
+  if [ -d /usr/local/apacheds-1.0_RC4 ] ; then
+    APACHEDS_HOME=/usr/local/apacheds-1.0_RC4
+  elif [ -d "$HOME/apacheds-1.0-RC4" ] ; then
+    APACHEDS_HOME="$HOME/apacheds-1.0-RC4"
+  elif [ -d "/Applications/apacheds-1.0-RC4" ] ; then
+    APACHEDS_HOME=/Applications/apacheds-1.0-RC4
+  fi
+fi
+
+if [ -z "$JAVA_HOME" ] ; then
+  echo "Warning: JAVA_HOME environment variable is not set."
+  echo "  If scrip fails because sun.* classes could not be found"
+  echo "  you will need to set the JAVA_HOME environment variable"
+  echo "  to the installation directory of java."
+else
+  echo JAVA_HOME=$JAVA_HOME
+fi
+
+if [ -z "$APACHEDS_HOME" ] ; then
+  echo "Warning: APACHEDS_HOME environment variable is not set."
+  echo "  If script fails because classes could not be found"
+  echo "  you will need to set the APACHEDS_HOME environment variable"
+  echo "  to the installation directory of apacheds."
+else
+  echo APACHEDS_HOME=$APACHEDS_HOME
+fi
+CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/tools.jar
+
+SERVER_HOME=$APACHEDS_HOME
+DAEMON_HOME=$SERVER_HOME/bin
+CLASSPATH=$CLASSPATH:$DAEMON_HOME/bootstrapper.jar:$DAEMON_HOME/logger.jar:$DAEMON_HOME/daemon.jar
+echo CLASSPATH=$CLASSPATH
+APACHEDS_USER=$USER
+
+TMP_DIR=$SERVER_HOME/var/tmp
+PID_FILE=$SERVER_HOME/var/run/server.pid
+
+cd $SERVER_HOME
+
+build_jar_repository() {
+build-jar-repository $SERVER_HOME/var/lib/apacheds10/lib \
+antlr \
+apacheds10/core-shared \
+apacheds10/core \
+apacheds10/kerberos-shared \
+apacheds10/protocol-changepw \
+apacheds10/protocol-kerberos \
+apacheds10/protocol-ldap \
+apacheds10/protocol-shared \
+apacheds10/server-jndi \
+apacheds10/server-main \
+apacheds10/server-ssl \
+apacheds-shared-asn1-codec \
+apacheds-shared-asn1 \
+apacheds-shared-ldap \
+backport-util-concurrent \
+bcprov \
+commons-collections \
+commons-logging \
+jdbm \
+mina10/core \
+mina10/filter-ssl \
+spring/beans \
+spring/context \
+spring/core \
+2>&1
+}
+
+start()
+{
+    build_jar_repository
+    #
+    # Start apacheds
+    #
+    echo -n $"Starting $prog: "
+    ulimit -S -c 0 >/dev/null 2>&1
+    RETVAL=0
+    
+    $DAEMON_HOME/apacheds \
+    -user $APACHEDS_USER \
+    -home $JAVA_HOME \
+    -Djava.io.tmpdir=$TMP_DIR \
+    -Dlog4j.configuration=file://$SERVER_HOME/conf/log4j.properties\
+    -Xms384m -Xmx384m \
+    -pidfile $PID_FILE \
+    -outfile $SERVER_HOME/var/log/apacheds-stdout.log \
+    -errfile $SERVER_HOME/var/log/apacheds-stderr.log \
+    -cp $CLASSPATH \
+    org.apache.directory.daemon.JsvcBootstrapper \
+    $APACHEDS_HOME start
+
+    [ "$RETVAL" -eq 0 ] && success $"apacheds server startup" || \
+        failure $"apacheds server start"
+    echo
+    if [ -d /var/lock/subsys ] ; then
+        [ "$RETVAL" -eq 0 ] && touch $SERVER_HOME/var/apacheds.lock
+    fi
+    return $RETVAL
+}
+
+stop()
+{
+    #
+    # Stop apacheds
+    #
+    echo -n $"Shutting down $prog: "
+    RETVAL=0
+
+    $DAEMON_HOME/apacheds \
+    -stop \
+    -pidfile $PID_FILE \
+    -Dlog4j.configuration=file://$SERVER_HOME/conf/log4j.properties\
+    org.apache.directory.daemon.JsvcBootstrapper stop
+
+    [ "$RETVAL" -eq 0 ] && success $"apacheds server shutdown" || \
+        failure $"apacheds server shutdown"
+    echo
+    if [ -d /var/lock/subsys/apacheds ] ; then
+        [ "$RETVAL" -eq 0 ] && rm $SERVER_HOME/var/apacheds.lock
+    fi
+    return $RETVAL
+}
+
+restart()
+{
+	stop
+	start
+}
+
+
+case "$1" in
+    start)
+	start
+	;;
+    
+    stop)
+	stop
+	;;
+    restart)
+	restart
+	;;
+    condstop)
+	if [ -e "$LOCKFILE" ]; then
+	    stop
+	fi
+	;;
+    condrestart)
+	if [ -e "$LOCKFILE" ]; then
+	    restart
+	fi
+	;;
+    condreload)
+	if [ -e "$LOCKFILE" ]; then
+	    reload
+	fi
+	;;
+  debug)
+    #
+    # Debug apacheds
+    #
+    echo -n $"Starting $prog in debug mode: "
+    ulimit -S -c 0 >/dev/null 2>&1
+    RETVAL=0
+    
+    if [ -z "$2" ] ; then
+      echo
+      echo ========================================================
+      echo "Warning: the debug port is not set. Using 5005 default."
+      echo ========================================================
+      echo
+      DEBUG_PORT=5005
+    else
+      DEBUG_PORT="$2"
+    fi
+    
+    $JAVA_HOME/bin/java\
+    -Dlog4j.configuration=file://$SERVER_HOME/conf/log4j.properties\
+    -Xms384m -Xmx384m \
+    -Dcom.sun.management.jmxremote \
+    -Xdebug -Xnoagent -Djava.compiler=NONE\
+    -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$DEBUG_PORT\
+    -jar $DAEMON_HOME/bootstrapper.jar \
+    $APACHEDS_HOME start
+    ;;
+
+  *)
+    msg_usage "${0##*/} {start|stop|restart|condstop|condrestart|condreload|debug}"
+    RETVAL=1
+esac
+
+exit $RETVAL

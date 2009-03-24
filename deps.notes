@@ -18,6 +18,8 @@ Note: fix groups for Python, GUI, etc...
 # for PermGen error, running out of memory
 export MAVEN_OPTS=-XX:MaxPermSize=512m
 
+subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
+
 an example how to install missing jar file manually
 #--------------------------------------------------------------
 # Mock objects is sort of a special case since it does not reside in 
@@ -42,7 +44,6 @@ portals-pluto && portals-pluto10
 dups TODO:
 apacheds-daemon by apacheds10-daemon
 apacheds by apacheds10?
-mina mina10?
 jaxen-bootstrap jaxen
 #java_cup java-cup
 wadi by wadi2
@@ -58,51 +59,6 @@ so I pick manually docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xs
 objenesis is only place that use xsite -> use nanocontainer
 after kill site in objenesis both will be deprecated
 
-# deps:
-jetty6 -> wadi2 (wadi?)
-
-activeio3
-activemq4
-asn1
-bsf3
-buildmagic
-chainedoptions
-easymock-classextension2
-geronimo-txmanager
-glassfish-jsf
-glassfish-jstl
-gmaven
-jackrabbit
-jaxbintros
-jencks
-joramtests
-jradius
-jsr223-scripting-engines
-ldapsdk
-lingo
-maven-archetype2
-maven-doxia
-maven-jaxb2-plugin
-maven-jdocbook-plugin
-mg4j
-openqa-selenium-rc
-ops4j-pax
-portals-bridges
-portals-jetspeed2
-spring-ldap
-spring-osgi
-spring-webflow
-
-richfaces
-sun-jsf
-sysunit
-taglib-maven2-plugin
-tyrex
-wadi2
-wicket
-xwork
-
-
 # conflict with smc
 smc
 
@@ -112,7 +68,24 @@ easymock-classextension
 maven2-common-poms
 
 # wersiondown
+qdox(done,neccessary)
+itext(done)
 bcel
 wstx
-itext
+antlr
 
+##############
+problems caused jpp-ing:
+##############
+maven-model
+--------------------------------
+running
++ java org.codehaus.modello.ModelloCli src/main/mdo/maven.mdo java target/generated-sources 3.0.0 false 
+Exception in thread "main" org.codehaus.modello.ModelloException: Error while starting plexus.
+        at org.codehaus.modello.Modello.<init>(Modello.java:57)
+        at org.codehaus.modello.ModelloCli.main(ModelloCli.java:46)
+Caused by: java.lang.NullPointerException
+        at org.codehaus.plexus.DefaultPlexusContainer.lookup(DefaultPlexusContainer.java:299)
+        at org.codehaus.modello.Modello.<init>(Modello.java:53)
+--------------------------------
+plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream

@@ -1,4 +1,4 @@
-#require 'set_without_tests.pl';
+require 'set_without_tests.pl';
 
 __END__
 

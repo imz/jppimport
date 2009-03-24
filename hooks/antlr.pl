@@ -9,6 +9,9 @@ push @SPECHOOKS,
 
     $jpp->disable_package('jedit');
 
+
+    # native subpackage; let it be built from separate (older? rpm)
+    if (0) {
 # or ?
 #    $jpp->get_section('package','')->subst(qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 1');
 
@@ -20,11 +23,11 @@ push @SPECHOOKS,
 # if w/native w/o gcc should be arch!
     #$jpp->get_section('package','')->subst(qr'\%configure', 	'%configure --build=');
 
-    $jpp->get_section('package','')->subst(qr'BuildArch:\s*noarch', '##BuildArch: noarch');
-    $jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
-    $jpp->add_patch('antlr-2.7.7-alt-gcc43.patch', STRIP=>1);
-
-    $jpp->get_section('description','native')->push_body(q{
+	$jpp->get_section('package','')->subst(qr'BuildArch:\s*noarch', '##BuildArch: noarch');
+	$jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
+	$jpp->add_patch('antlr-2.7.7-alt-gcc43.patch', STRIP=>1);
+	
+	$jpp->get_section('description','native')->push_body(q{
 %package        native-devel
 Group:          Development/C++
 Summary:        ANother Tool for Language Recognition (native version)
@@ -39,17 +42,30 @@ native version of the antlr tool.
 
 });
     # non-documented
-    $jpp->_reset_speclist();
-    $jpp->get_section('package','native-devel')->unshift_body('
+	$jpp->_reset_speclist();
+	$jpp->get_section('package','native-devel')->unshift_body('
 # antlr.a vs antlr.so;
 Conflicts: kde4sdk-libs
 ');
+	$jpp->get_section('package','')->unshift_body('
+%define _with_native 1
+');
 
-    $jpp->get_section('files','')->subst(qr!\%{headers}!,'#%{headers}');
-    $jpp->get_section('files','')->subst(qr!\%{_libdir}!,'#%{_libdir}');
-    $jpp->add_section('files','native-devel')->push_body(q{
+	$jpp->get_section('install')->push_body('
+# C++ lib and headers, antlr-config
+%define headers %{_includedir}/%{name}
+
+mkdir -p $RPM_BUILD_ROOT{%{headers},%{_libdir}}
+install -m 644 lib/cpp/antlr/*.hpp $RPM_BUILD_ROOT%{headers}
+install -m 644 lib/cpp/src/libantlr.a $RPM_BUILD_ROOT%{_libdir}
+install -m 755 scripts/antlr-config $RPM_BUILD_ROOT%{_bindir}
+');
+	$jpp->get_section('files','')->subst(qr!\%{headers}!,'#%{headers}');
+	$jpp->get_section('files','')->subst(qr!\%{_libdir}!,'#%{_libdir}');
+	$jpp->add_section('files','native-devel')->push_body(q{
 %{headers}/*.hpp
 %{_libdir}/libantlr.a
 });
-
+    }
 }
+__END__

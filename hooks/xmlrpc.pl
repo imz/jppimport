@@ -7,23 +7,38 @@ sub {
 };
 
 __END__
-# info: hacks for xmlrpc3:
---- xmlrpc3.spec.0      2008-10-21 15:21:46 +0000
-+++ xmlrpc3.spec        2008-10-21 14:21:52 +0000
-@@ -173,11 +173,16 @@
- mkdir -p $MAVEN_REPO_LOCAL
- # The java.home is due to java-gcj and libgcj weirdness on 64-bit
- # systems
-+
-+# hack due to test skip
-+%__subst 's,<module>tests</module>,<!--<module>tests</module>-->,' pom.xml
-+
- mvn-jpp \
-   -e \
-   -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-   -Djava.home=%{_jvmdir}/java/jre \
-   -Dmaven2.jpp.depmap.file=%{SOURCE1} \
-+  -Dmaven.test.skip=true \
-   -Dmaven.test.failure.ignore=true \
-   install javadoc:javadoc
- 
+#============================================================= 
+# info; 2nd hacks for xmlrpc3
+3a4
+> BuildRequires: xmlrpc3-server xmlrpc3-client
+154a156,157
+> # hack due to test skip
+> subst 's,<module>tests</module>,,' pom.xml
+>
+158a162,185
+> mvn-jpp \
+>   -e \
+>   -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+>   -Djava.home=%{_jvmdir}/java/jre \
+>   -Dmaven2.jpp.depmap.file=%{SOURCE1} \
+>   install:install-file -DgroupId=org.apache.xmlrpc -DartifactId=xmlrpc-common \
+>   -Dversion=3.0 -Dpackaging=jar -Dfile=$(build-classpath xmlrpc3-common)
+>
+> mvn-jpp \
+>   -e \
+>   -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+>   -Djava.home=%{_jvmdir}/java/jre \
+>   -Dmaven2.jpp.depmap.file=%{SOURCE1} \
+>   install:install-file -DgroupId=org.apache.xmlrpc -DartifactId=xmlrpc-server \
+>   -Dversion=3.0 -Dpackaging=jar -Dfile=$(build-classpath xmlrpc3-server)
+>
+> mvn-jpp \
+>   -e \
+>   -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+>   -Djava.home=%{_jvmdir}/java/jre \
+>   -Dmaven2.jpp.depmap.file=%{SOURCE1} \
+>   install:install-file -DgroupId=org.apache.xmlrpc -DartifactId=xmlrpc-client \
+>   -Dversion=3.0 -Dpackaging=jar -Dfile=$(build-classpath xmlrpc3-client)
+>
+166a194
+>   -Dmaven.test.skip=true \

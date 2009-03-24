@@ -2,20 +2,45 @@
 
 PREFIX=/var/ftp/pub/Linux/ALT/Sisyphus
 NAME=java-alt-packages
+ACL=
+ACLPATTERN='(viy|@java)'
+DEST=`pwd`
 
 [ -n "$1" ] && PREFIX="$1" && shift;
 [ -n "$1" ] && NAME="$1" && shift;
+[ -n "$1" ] && ACL="$1" && shift;
 
-DEST=`pwd`
+[ -z "$ACL" ] || [ -e "$ACL" ] || exit 4;
+# todo:
+# add `pwd` to ACL if relative
+
 
 JAVA_PATTERN='/usr/(share/java|share/netbeans|share/eclipse|lib/eclipse|lib64/eclipse)'
 
 pushd $PREFIX/files/noarch/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done  | sort -u > $DEST/$NAME.noarch.src
+for i in *.rpm; do 
+    if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then 
+	SRCRPMNAME=`rpmquery --queryformat '%{SOURCERPM}\n' -p $i`;
+	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/$SRCRPMNAME`;
+	if [ -z "$ACL" ] || grep '^'$SRCNAME "$ACL" | egrep "$ACLPATTERN" >/dev/null; then
+	    echo $SRCNAME
+	fi; 
+    fi; 
+done  | sort -u > $DEST/$NAME.noarch.src
 popd
-echo jpackage-generic-compat jpackage-utils java-common java-javadoc java-stub-javadoc java-devel-default >> $DEST/$NAME.noarch.src
+for i in jpackage-generic-compat jpackage-utils java-common java-stub-javadoc java-devel-default; do
+    echo $i >> $DEST/$NAME.noarch.src
+done
 pushd $PREFIX/files/i586/RPMS/
-for i in *.rpm; do if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then  rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/`rpmquery --queryformat '%{SOURCERPM}\n' -p $i` ; fi; done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/$NAME.i586.src
+for i in *.rpm; do 
+    if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then 
+	SRCRPMNAME=`rpmquery --queryformat '%{SOURCERPM}\n' -p $i`;
+	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/$SRCRPMNAME`;
+	if [ -z "$ACL" ] || grep '^'$SRCNAME "$ACL" | egrep "$ACLPATTERN" >/dev/null; then
+	    echo $SRCNAME
+	fi; 
+    fi; 
+done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/$NAME.i586.src
 popd
 sort -u ./$NAME.i586.src ./$NAME.noarch.src > $NAME.src
 if [ -f $PREFIX/files/list/list.src.classic ]; then
