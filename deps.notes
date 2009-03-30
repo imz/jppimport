@@ -69,10 +69,11 @@ maven2-common-poms
 
 # wersiondown
 qdox(done,neccessary)
+antlr(manually-pick-repolib)
 itext(done)
-bcel
+bcel(done)
+bcf
 wstx
-antlr
 
 ##############
 problems caused jpp-ing:
