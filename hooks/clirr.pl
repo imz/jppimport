@@ -6,6 +6,12 @@ push @SPECHOOKS,
  sub {
     my ($jpp, $alt) = @_;
     # bugs to report
+
+    # TODO: get rid of 
+    # hack; bcel is 5.2 in 1.7, while in 5.0 it downgraded to 5.1
+    $jpp->add_patch('clirr-0.6-alt-bcel51.patch');
+
+
     # TODO: clirr manual is empty!!!
     # BUG; why it depends on maven!
     $jpp->get_section('package','')->subst(qr'^Requires:\s+maven','#Requires: maven');
@@ -59,14 +65,7 @@ EOF
 
 chmod 755 $RPM_BUILD_ROOT%_bindir/%name
 });
-    
+  
 
 }
 __END__
-    # is it really needed?
-    # bug to report: obsolete maven-javaapp-plugin version 1.3.1?
-    $jpp->get_section('prep')->push_body(q!%__subst s,1.3.1,1.4, %{SOURCE4}
-!);
-
-    $jpp->get_section('prep','')->push_body('
-%__subst s,maven-javaapp-plugin-1.3.1,maven-javaapp-plugin-1.4, core/project.xml'."\n");

@@ -15,21 +15,6 @@ sub {
 rm ./core/api/generic/src/test/java/org/codehaus/cargo/generic/deployable/DefaultDeployableFactoryTest.java
 find ./core/samples/java/src/test/java -name '*.java' -delete
 !."\n");
-
-    $jpp->get_section('build')->push_body(q!
-# hack to fix strange looking %{name}-core-uberjar (to the state of 1.7; 
-# maybe assembly:assembly plugin was misconfigured in 5.0?
-mkdir unjar1; pushd unjar1
-jar xvf ../core/uberjar/target/%{name}-core-uberjar-%{version}.jar
-popd
-mv core/uberjar/target/%{name}-core-uberjar-%{version}.jar \
-core/uberjar/target/%{name}-core-uberjar-%{version}.jar.bak
-mkdir unjar2; pushd unjar2
-cp -af ../unjar1/*.jar/* .
-jar cf ../core/uberjar/target/%{name}-core-uberjar-%{version}.jar *
-popd
-!);
-
 }
 
 __END__
