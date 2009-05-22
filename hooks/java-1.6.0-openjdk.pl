@@ -74,28 +74,16 @@ BuildRequires(pre): browser-plugins-npapi-devel
 
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
 
-    $jpp->copy_to_sources('java-1.6.0-openjdk-alt-ldflag.patch');
-    $jpp->copy_to_sources('java-1.6.0-openjdk-alt-as-needed1.patch');
     $jpp->add_patch('java-1.6.0-openjdk-b12-alt-as-needed-gcjwebplugin.patch',
 		    STRIP => 0,NUMBER => 35);
-    $jpp->get_section('package','')->unshift_body(q{
-Patch33: java-1.6.0-openjdk-alt-ldflag.patch
-Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
-});
 
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf
 !);
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
-    $jpp->get_section('build')->subst(qr'-Fedora-\%{fedora}','-ALTLinux');
-    # better to insert after stamps/patch-ecj.stamp + skip %endif, 
-    # but we insert here as we does not use %{gcjbootstrap}
-    $jpp->get_section('build')->unshift_body_after(q'
-make MEMORY_LIMIT=-J-Xmx512m stamps/patch.stamp
-patch -p1 < %{PATCH33}
-patch -p1 < %{PATCH34}
-',qr'with-pkgversion');
+    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm} --enable-liveconnect --disable-gcjwebplugin');
+    $jpp->get_section('build')->subst(qr'fedora-','ALTLinux-');
+
     # hack for sun-based build (i586) only!!!
     $jpp->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # builds end up randomly :(

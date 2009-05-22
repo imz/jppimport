@@ -9,29 +9,28 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jms-1.1-api'."\n");
 };
 __END__
-    # due to our ant that does not support 'OPT_JAR_LIST
-$ diff spring.spec.0  spring.spec
-523c525
-< ln -sf $(build-classpath ejb) .
----
-> ln -sf $(build-classpath ejb_2_1_api) .
+___STRUTS1.3__
++BuildRequires: struts-tiles struts-taglib
+--- spring.spec.0       2009-05-21 15:32:56 +0000
++++ spring.spec 2009-05-21 15:57:56 +0000
+@@ -2,6 +2,7 @@
+@@ -639,6 +640,9 @@
+ mkdir -p struts
+ pushd struts
+ ln -sf $(build-classpath struts) struts.jar
++ln -sf $(build-classpath struts-extras) struts-extras.jar
++ln -sf $(build-classpath struts-taglib) struts-taglib.jar
++ln -sf $(build-classpath struts-tiles) struts-tiles.jar
+ popd
 
+ mkdir -p velocity
+@@ -656,11 +660,14 @@
+ export OPT_JAR_LIST="ant-launcher ant/ant-junit junit xjavadoc commons-collections commons-attributes-compiler qdox"
+ #export ANT_OPTS="-Dmx4j.log.priority=debug"
++for i in `find . -name build.xml`; do subst 's,name="struts.jar",name="struts*.jar",' $i; done
 
-655,656c657,658
-< export JAVA_HOME=%{_jvmdir}/java-1.5.0
-< export OPT_JAR_LIST="ant-launcher ant/ant-junit junit xjavadoc commons-collections commons-attributes-compiler qdox"
----
-> #export JAVA_HOME=%{_jvmdir}/java-1.5.0
-> export OPT_JAR_LIST="ant-launcher ant/ant-junit junit xjavadoc commons-collections commons-attributes-compiler qdox ant"
-659,661c661,667
-< ant \
-<     -Djava.endorsed.dir=lib/endorsed \
-<     alljars tests
----
-> #ant \
-> #    -Djava.endorsed.dir=lib/endorsed \
-> #    alljars tests
->
-> java -Dant.home="/usr/share/ant" -cp $(build-classpath $OPT_JAR_LIST):"$JAVA_HOME"/lib/tools.jar \
->         org.apache.tools.ant.launch.Launcher -lib "$CLASSPATH" alljars tests
->
+ ant \
+     -Djava.endorsed.dir=lib/endorsed \
+-    alljars tests
++    alljars #tests
+

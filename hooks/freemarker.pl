@@ -2,6 +2,14 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    # for jpp 5.0
+    $jpp->get_section('install')->push_body(q!
+# fedora compatibility
+pushd %buildroot%_javadir
+ln -s freemarker-%version.jar freemarker-2.3.jar
+popd
+!);
+
 };
 
 1;

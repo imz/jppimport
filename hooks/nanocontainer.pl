@@ -14,7 +14,6 @@ push @SPECHOOKS, sub {
     $jpp->get_section('build')->subst(qr'install javadoc:javadoc site:site','install javadoc:javadoc');
 
     # upstream is dead, code does not complie with fresh rhino && jruby, etc
-    # TODO enable what is good
     #$jpp->disable_package('container-aop');
     #$jpp->disable_package('container-bsh');
     #$jpp->disable_package('container-groovy');
@@ -29,6 +28,8 @@ subst 's,<module>container-rhino</module>,,' pom.xml
 subst 's,<module>webcontainer</module>,,' pom.xml
 !);
 
+    # deciphering is below
+    $jpp->get_section('install')->exclude(qr'(-jruby|-rhino|webcontainer-|/webcontainer|target/site)');
 }
 
 __END__

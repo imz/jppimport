@@ -1,11 +1,12 @@
 diff -ru antlr-2.7.7.old/lib/cpp/antlr/CharScanner.hpp antlr-2.7.7/lib/cpp/antlr/CharScanner.hpp
 --- antlr-2.7.7.old/lib/cpp/antlr/CharScanner.hpp	2006-11-01 21:37:17 +0000
 +++ antlr-2.7.7/lib/cpp/antlr/CharScanner.hpp	2008-11-25 14:12:53 +0000
-@@ -11,6 +11,7 @@
+@@ -11,6 +11,8 @@
  #include <antlr/config.hpp>
  
  #include <map>
 +#include <cstring>
++#include <cstdio>
  
  #ifdef HAS_NOT_CCTYPE_H
  #include <ctype.h>

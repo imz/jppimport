@@ -2,6 +2,7 @@
 
 require 'set_fix_homedir_macro.pl';
 require 'add_missingok_config.pl';
+require 'set_target_15.pl';
 
 #TODO as a hook
 #require 'set_maven_test_skip.pl';
@@ -9,7 +10,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst_if(qr'< 0:1\.6\.2', '>= 1.6.1',qr'Requires:');
+#    $jpp->get_section('package','')->subst_if(qr'< 0:1\.6\.2', '>= 1.6.1',qr'Requires:');
     #$jpp->get_section('package','')->subst_if(qr'wadi2', 'wadi-core',qr'Requires:');
     #%define appdir /srv/jetty6
     $jpp->get_section('package','')->subst_if(qr'/srv/jetty6', '/var/lib/jetty6',qr'\%define');

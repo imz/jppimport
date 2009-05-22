@@ -27,7 +27,7 @@ push @SPECHOOKS,
 	$jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
 
 	$jpp->get_section('package','javadoc')->push_body("BuildArch: noarch\n");
-	$jpp->add_patch('antlr-2.7.7-alt-gcc43.patch', STRIP=>1);
+	$jpp->add_patch('antlr-2.7.7-alt-gcc44.patch', STRIP=>1);
 	
 	$jpp->get_section('description','native')->push_body(q{
 %package        native-devel

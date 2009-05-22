@@ -5,7 +5,14 @@
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
-#    $jpp->get_section('package','')->unshift_body('BuildRequires: xml-commons-jaxp-1.1-apis'."\n");
+# %post:
+# <13>May  8 02:17:52 rpmi: groovy-0:1.0-alt1_2jpp5 installed
+# /usr/bin/rebuild-jar-repository: error: Could not find commons-primitives Java extension for this JVM
+# /usr/bin/rebuild-jar-repository: error: Some detected jars were not found for this jvm
+#    $jpp->get_section('package','')->unshift_body('Requires: jakarta-commons-primitives'."\n");
+# no :( just disable rebuild jar
+    $jpp->get_section('post','')->subst(qr'rebuild-jar-repository','#rebuild-jar-repository');
+
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist /usr/share/groovy-1.0/lib/*junit*.jar'."\n");
 
     # bug ?

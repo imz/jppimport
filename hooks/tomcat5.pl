@@ -8,6 +8,9 @@ push @SPECHOOKS, sub {
 
     # due to ecj :(
     $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
+
+    # struts 1.3.9
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: struts-taglib'."\n");
     
     # hack against tomcat parent pom not installed by dependencies.
     # It may be made a subpackage, but let it be just file dup.
@@ -114,3 +117,31 @@ done || :
 }
 __DATA__
 todo: verify logrotate
+
+
+__fedora struts 1.3.9 adaptation__(no need for jpackage)
+144c144
+< #BuildRequires: struts-taglib >= 0:1.3.8
+---
+> BuildRequires: struts-taglib >= 0:1.3.8
+237c237
+< #Requires: struts-taglib >= 0:1.3.8
+---
+> Requires: struts-taglib >= 0:1.3.8
+245c245
+< #Requires(post): struts-taglib
+---
+> Requires(post): struts-taglib
+423a424,430
+> for i in container/webapps/admin/*.jsp container/webapps/admin/*/*.jsp; do
+>       subst 's,locale="true",lang="true",' $i
+> done
+>
+633c640
+<     export OPT_JAR_LIST="ant/ant-trax xalan-j2-serializer"
+---
+>     export OPT_JAR_LIST="ant/ant-trax xalan-j2-serializer struts-taglib"
+1033c1040
+<     commons-beanutils commons-collections commons-digester struts \
+---
+>     commons-beanutils commons-collections commons-digester struts struts-taglib \

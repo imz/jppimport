@@ -4,18 +4,24 @@ require 'set_bootstrap.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.5.0-sun-devel');
+    $jpp->add_section('package','aot-compile');
+    $jpp->get_section('package','aot-compile')->push_body(q!
+Summary: java jcj ahead-of-time compile python module
+Group: Development/Java
+BuildArch: noarch
+
+%description aot-compile
+java jcj ahead-of-time compile python module
+!);
+
     $jpp->get_section('package','')->subst_if(qr'openssl','ca-certificates',qr'BuildRequires:');
     $jpp->get_section('package','')->subst(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
-    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          4.1.2-alt2'."\n");
-    $jpp->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -4.1'."\n");
-    $jpp->get_section('package','')->unshift_body('%define gccrpmsuffix    4.1'."\n");
+    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          4.4-alt2'."\n");
+    $jpp->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -4.4'."\n");
+    $jpp->get_section('package','')->unshift_body('%define gccrpmsuffix    4.4'."\n");
     $jpp->get_section('package','')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
-    $jpp->get_section('package','')->subst(qr'^Requires(triggerin)','#Requires(triggerin)');
     $jpp->get_section('package','devel')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
-    $jpp->get_section('package','devel')->subst(qr'^Requires(triggerin)','#Requires(triggerin)');
     $jpp->get_section('package','src')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
-    $jpp->get_section('package','src')->subst(qr'^Requires(triggerin)','#Requires(triggerin)');
 
     foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'triggerin') {
@@ -24,7 +30,7 @@ push @SPECHOOKS, sub {
     }
 
 
-    $jpp->get_section('prep')->push_body('%__subst s,/etc/pki/tls/cert.pem,/usr/share/ca-certificates/ca-bundle.crt, generate-cacerts.pl
+    $jpp->get_section('prep')->push_body(q!%__subst s,/etc/pki/tls/cert.pem,/usr/share/ca-certificates/ca-bundle.crt, generate-cacerts.pl
 # hack: gcc4.1 seems to have no gjavah
 for i in Makefile*; do 
 %__subst s,gjavah,gjnih, $i
@@ -33,8 +39,16 @@ for i in Makefile*; do
 %__subst s,sinjdoc,gij, $i
 %endif
 done
-');
+
+for i in Makefile.am Makefile.in; do
+    subst 's,python setup.py install --prefix=\$\(DESTDIR\)\$\(prefix\),%__python setup.py install --root=%buildroot  --optimize=2 --record=INSTALLED_FILES,' $i
+done
+!);
+
     $jpp->get_section('install')->push_body('install -d -m755 %buildroot/usr/lib/jvm-exports/%{sdkdir}'."\n");
+
+    # ghosts. kill?
+    #$jpp->get_section('install')->subst(qr'^touch \$RPM_BUILD_ROOT','#touch $RPM_BUILD_ROOT');
 
     $jpp->get_section('files','')->subst(qr'#%ghost','%ghost');
     $jpp->get_section('files','devel')->subst(qr'#%ghost','%ghost');
@@ -42,8 +56,17 @@ done
     $jpp->get_section('files','')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
     $jpp->get_section('files','devel')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
     $jpp->get_section('files','devel')->subst(qr'%{python_sitelib}','#%{python_sitelib}');
-    $jpp->get_section('files','devel')->push_body('/usr/lib/python*/*'."\n");
+    $jpp->get_section('files','devel')->push_body('%exclude %_bindir/aot-compile*'."\n");
+
+    $jpp->add_section('files','aot-compile');
+    $jpp->get_section('files','aot-compile')->push_body('%_bindir/aot-compile*
+/usr/lib/python*/site-packages/*'."\n");
 
 #    my @sections=grep {$_->get_type() ne 'triggerin' && !($_->get_type() eq 'postun' && $_->get_package() eq 'plugin')} $jpp->get_sections();
 #    $jpp->set_sections(\@sections);
+
+
+    $jpp->disable_package('');
+    $jpp->disable_package('devel');
+    $jpp->disable_package('src');
 }

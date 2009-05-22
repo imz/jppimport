@@ -71,7 +71,7 @@ maven2-common-poms
 qdox(done,neccessary)
 antlr(manually-pick-repolib)
 itext(done)
-bcel(done)
+bcel(let be up)
 bcf
 wstx
 
@@ -90,3 +90,8 @@ Caused by: java.lang.NullPointerException
         at org.codehaus.modello.Modello.<init>(Modello.java:53)
 --------------------------------
 plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
+
+
+================== last update ================
+textmining && drools2 due to new jakarta-poi
+xfire-xmpp due to new smack
