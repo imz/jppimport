@@ -47,6 +47,7 @@ apacheds by apacheds10?
 jaxen-bootstrap jaxen
 #java_cup java-cup
 wadi by wadi2
+bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by bouncycastle
 ----------
 
 # TODO: geronimo-j2ee-1.4-apis should not provide ... because they do not have the corresponding symlinks!
@@ -93,5 +94,4 @@ plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 
 
 ================== last update ================
-textmining && drools2 due to new jakarta-poi
-xfire-xmpp due to new smack
+jbossws -> jbossas

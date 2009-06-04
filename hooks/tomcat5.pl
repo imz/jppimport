@@ -6,6 +6,11 @@ require 'windows-thumbnail-database-in-package.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    # hack against %post build-classpath
+    #$jpp->get_section('package','')->push_body('Requires(pre): jakarta-commons-collections-tomcat5'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires(pre): rpm-macros-alternatives'."\n");
+    $jpp->get_section('post','')->unshift_body('%force_update_alternatives'."\n");
+
     # due to ecj :(
     $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
 

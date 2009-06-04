@@ -6,21 +6,25 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->add_section('package','aot-compile');
     $jpp->get_section('package','aot-compile')->push_body(q!
-Summary: java jcj ahead-of-time compile python module
+Summary: java jcj ahead-of-time compile scripts
 Group: Development/Java
 BuildArch: noarch
 
 %description aot-compile
-java jcj ahead-of-time compile python module
+java jcj ahead-of-time compile scripts
 !);
+    # tmp hack due t obroken Sisyphus!!!
+    #$jpp->get_section('package','')->subst_if(qr'libssl-devel','ca-certificates',qr'BuildRequires:');
+
 
     $jpp->get_section('package','')->subst_if(qr'openssl','ca-certificates',qr'BuildRequires:');
     $jpp->get_section('package','')->subst(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
-    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          4.4-alt2'."\n");
+    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          4.4-alt1'."\n");
     $jpp->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -4.4'."\n");
     $jpp->get_section('package','')->unshift_body('%define gccrpmsuffix    4.4'."\n");
     $jpp->get_section('package','')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
     $jpp->get_section('package','devel')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
+    $jpp->get_section('package','devel')->push_body('Requires: %name-aot-compile = %version-%release'."\n");
     $jpp->get_section('package','src')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
 
     foreach my $section ($jpp->get_sections()) {
@@ -31,15 +35,6 @@ java jcj ahead-of-time compile python module
 
 
     $jpp->get_section('prep')->push_body(q!%__subst s,/etc/pki/tls/cert.pem,/usr/share/ca-certificates/ca-bundle.crt, generate-cacerts.pl
-# hack: gcc4.1 seems to have no gjavah
-for i in Makefile*; do 
-%__subst s,gjavah,gjnih, $i
-# bootstrap hack; sinjdoc not built yet
-%if %{bootstrap}
-%__subst s,sinjdoc,gij, $i
-%endif
-done
-
 for i in Makefile.am Makefile.in; do
     subst 's,python setup.py install --prefix=\$\(DESTDIR\)\$\(prefix\),%__python setup.py install --root=%buildroot  --optimize=2 --record=INSTALLED_FILES,' $i
 done
@@ -49,9 +44,10 @@ done
 
     # ghosts. kill?
     #$jpp->get_section('install')->subst(qr'^touch \$RPM_BUILD_ROOT','#touch $RPM_BUILD_ROOT');
-
+    # or
     $jpp->get_section('files','')->subst(qr'#%ghost','%ghost');
     $jpp->get_section('files','devel')->subst(qr'#%ghost','%ghost');
+    
     # why they intersect... it is better to fix
     $jpp->get_section('files','')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
     $jpp->get_section('files','devel')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
