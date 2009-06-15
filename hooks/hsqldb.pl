@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_exclude_repolib.pl';
+
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
@@ -17,8 +19,4 @@ push @SPECHOOKS,
     $jpp->get_section('post')->subst(qr'\$\(build-classpath hsqldb\)','/usr/share/java/hsqldb.jar');
     $jpp->get_section('post')->subst(qr'\$\(build-classpath servletapi5\)','/usr/share/java/servletapi5.jar');
 
-    $jpp->get_section('files')->push_body('# common w/-repolib
-%exclude %_javadir/repository.jboss.com/*
-%exclude %_javadir/repository.jboss.com
-');
 };

@@ -121,7 +121,7 @@ excalibur-thread-instrumented
 ;
 
 # crimson = crimson fields battle game
-our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
+our @ALTSKIPEXTRA=qw/jpackage-utils/;
 #jakarta-commons-cli-2.0-alt0.1.src.rpm
 #}
 

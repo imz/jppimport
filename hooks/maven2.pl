@@ -23,7 +23,14 @@ $M2_HOME/bin/mvn -s %{maven_settings_file} $MAVEN_OPTS \
 };
 
 __END__
-# 2.0.7
+
+
+
+
+
+
+__DATA__
+# 2.0.7; no more used
 @@ -1392,6 +1393,11 @@
  mkdir -p maven-assembly-plugin/target/generated-resources/plexus/META-INF/plexus/
  echo '<component-set/>' > maven-assembly-plugin/target/generated-resources/plexus/META-INF/plexus/components.xml

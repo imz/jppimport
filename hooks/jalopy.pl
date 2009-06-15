@@ -8,7 +8,7 @@ require 'set_manual_no_dereference.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # jpackage 5.0 compat
-    $jpp->get_section('package','')->subst_if(qr'docbook-xsl-java-saxon', 'docbook-xsl-saxon', qr'BuildRequires:');
+#    $jpp->get_section('package','')->subst_if(qr'docbook-xsl-java-saxon', 'docbook-xsl-saxon', qr'BuildRequires:');
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: docbook-style-xsl docbook-dtds'."\n");
     # xsl fix

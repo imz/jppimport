@@ -75,6 +75,12 @@ itext(done)
 bcel(let be up)
 bcf
 wstx
+snmptrapappender due to -repolib ?
+
+# bootstrap 
+jakarta-commons-httpclient-repolib
+jakarta-commons-beanutils-repolib
+...
 
 ##############
 problems caused jpp-ing:
@@ -94,4 +100,5 @@ plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 
 
 ================== last update ================
-jbossws -> jbossas
+jboss4 -> jbossws -> jbossas -> jboss-cache
+jboss-cache (nobootstrap) -> jbossas

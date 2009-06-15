@@ -3,13 +3,18 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath jakarta-commons-primitives'."\n");
     $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
 
+    $jpp->get_section('build')->push_body_after('# javacc
+mkdir -p $MAVEN_REPO_LOCAL/javacc
+ln -s $(build-classpath javacc) $MAVEN_REPO_LOCAL/javacc/javacc.jar
+', qr'/tanukisoft/wrapper-delta-pack.jar');
+
     # hacks for missing deps
-    $jpp->disable_package('-n mojo-maven2-plugin-findbugs');
+#    $jpp->disable_package('-n mojo-maven2-plugin-findbugs');
 #    $jpp->disable_package('-n mojo-maven2-plugin-hibernate2');
 #    $jpp->disable_package('-n mojo-maven2-plugin-springbeandoc');
 #    $jpp->disable_package('-n mojo-maven2-plugin-sysdeo-tomcat');
@@ -19,9 +24,9 @@ sub {
     $jpp->disable_package('-n mojo-maven2-plugin-jspc');
     $jpp->disable_package('-n mojo-maven2-jspc-compiler-tomcat5');
     $jpp->disable_package('-n mojo-maven2-jspc-compiler-tomcat6');
-    $jpp->disable_package('-n mojo-maven2-plugin-retrotranslator');
-    $jpp->disable_package('-n mojo-maven2-plugin-selenium');
-    $jpp->disable_package('-n mojo-maven2-plugin-shitty');
+#    $jpp->disable_package('-n mojo-maven2-plugin-retrotranslator');
+#    $jpp->disable_package('-n mojo-maven2-plugin-selenium');
+#    $jpp->disable_package('-n mojo-maven2-plugin-shitty');
 #    $jpp->disable_package('-n ');
 #    $jpp->disable_package('-n ');
 
@@ -32,7 +37,7 @@ sub {
 #    $jpp->get_section('package','')->subst(qr'BuildRequires: tomcat6','#BuildRequires: tomcat6');
 
     $jpp->get_section('package','')->subst(qr'BuildRequires: xfire','#BuildRequires: xfire');
-    $jpp->get_section('package','')->subst(qr'BuildRequires: gmaven','#BuildRequires: gmaven');
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: gmaven','#BuildRequires: gmaven');
 };
 
 __END__
@@ -42,13 +47,13 @@ mojo-maven2-plugin-cobertura
 Requires: cobertura
 
 
-subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
+#subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
 #subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml
 subst 's,<module>jasperreports-maven-plugin</module>,,' pom.xml # old jasperreports?
 subst 's,<module>jspc</module>,,' pom.xml #gmaven
-subst 's,<module>retrotranslator-maven-plugin</module>,,' pom.xml #gmaven
-subst 's,<module>selenium-maven-plugin</module>,,' pom.xml #gmaven
-subst 's,<module>shitty-maven-plugin</module>,,' pom.xml #gmaven
+#subst 's,<module>retrotranslator-maven-plugin</module>,,' pom.xml #gmaven
+#subst 's,<module>selenium-maven-plugin</module>,,' pom.xml #gmaven
+#subst 's,<module>shitty-maven-plugin</module>,,' pom.xml #gmaven
 #subst 's,<module>sysdeo-tomcat-maven-plugin</module>,,' pom.xml # tomcat5?
 #subst 's,<module>tomcat-maven-plugin</module>,,' pom.xml #tomcat5 can also be used?
 #subst 's,<module>maven-springbeandoc-plugin</module>,,' mojo-sandbox/pom.xml
