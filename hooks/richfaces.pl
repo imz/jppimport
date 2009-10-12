@@ -6,6 +6,4 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin'."\n");
 
     $jpp->get_section('prep')->subst(qr'/sgml/docbook/xsl-stylesheets','/xml/docbook/xsl-stylesheets');
-#    $jpp->get_section('build')->subst(qr'/sgml/docbook/xsl-stylesheets','/xml/docbook/xsl-stylesheets');
-#    $jpp->get_section('install')->subst(qr'/sgml/docbook/xsl-stylesheets','/xml/docbook/xsl-stylesheets');
 };

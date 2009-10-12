@@ -38,6 +38,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel
 BuildRequires(pre): browser-plugins-npapi-devel
+BuildRequires(pre): rpm-build-java
 
 %def_enable accessibility
 %def_enable visualvm
@@ -50,6 +51,23 @@ BuildRequires(pre): browser-plugins-npapi-devel
 %define altname %name
 %define label -%{name}
 %define javaws_ver      %{javaver}
+
+# it is needed for those apps which links with libjvm.so
+%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/server
+%ifnarch x86_64
+%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/client
+%endif
+
+%ifarch x86_64
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()(64bit)
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
+%endif
+%ifarch %ix86
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so()
+Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.1)
+%endif
 ');
 
     map {if ($_->get_type() eq 'package') {
@@ -173,7 +191,7 @@ with %{name} J2SE Runtime Environment.
 # HACK around find-requires
 %define __find_requires    $RPM_BUILD_ROOT/.find-requires
 cat > $RPM_BUILD_ROOT/.find-requires <<EOF
-(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | sed -e s,^/usr/lib64/lib,lib, | sed -e s,^/usr/lib/lib,lib,) || :
+(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | grep -v /usr/bin/java | sed -e s,^/usr/lib64/lib,lib, | sed -e s,^/usr/lib/lib,lib,) || :
 EOF
 chmod 755 $RPM_BUILD_ROOT/.find-requires
 # end HACK around find-requires

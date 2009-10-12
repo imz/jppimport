@@ -58,15 +58,10 @@ so I pick manually docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xs
 
 # deprecation:
 objenesis is only place that use xsite -> use nanocontainer
-after kill site in objenesis both will be deprecated
+after kill site in objenesis both can be deprecated
 
 # conflict with smc
 smc
-
-#up 
-dwr
-easymock-classextension
-maven2-common-poms
 
 # wersiondown
 qdox(done,neccessary)
@@ -100,5 +95,17 @@ plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 
 
 ================== last update ================
-jboss4 -> jbossws -> jbossas -> jboss-cache
+jboss4 -> jbossws -> jbossas -> jboss-jaxr
+#jboss-cache >='0:1.4.1-4.SP9'
 jboss-cache (nobootstrap) -> jbossas
+
+mysql-connector-java (nobootstrap) -> jbossas
+
+xstream-1.3-2.jpp5
+bsh-1.3.0-13.jpp5
+plexus-containers-1.0-0.a32.3.jpp5
+
+SRPMS/checkstyle-5.0-1.jpp5.src.rpm
+SRPMS/google-collections-1.0-0.rc2.1.jpp5.src.rpm
+deleting SRPMS/google-collections-0.7-1.jpp5.src.rpm
+deleting SRPMS/checkstyle-5.0-0.beta01.6.jpp5.src.rpm
