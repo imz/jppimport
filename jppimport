@@ -228,7 +228,7 @@ if ($altrpm || $altspec) {
 }
 
 if ($changelog) {
-    $jpp->set_changelog($changelog);
+    $jpp->set_default_changelog($changelog);
 }
 
 if ($packager eq 'auto') {
@@ -246,6 +246,8 @@ if ($packager) {
 if (defined $epoch) {
     $jpp->get_section('package','')->set_tag('Epoch',$epoch);
 }
+
+$jpp->add_changelog();
 
 print $jpp->get_spec() if $jppspec or $verbose>3;
 $jpp->write_rpm() if $jpprpm;

@@ -16,6 +16,9 @@ java jcj ahead-of-time compile scripts
     # tmp hack due t obroken Sisyphus!!!
     #$jpp->get_section('package','')->subst_if(qr'libssl-devel','ca-certificates',qr'BuildRequires:');
 
+    # ARM-friendly deps...
+    $jpp->get_section('package','')->exclude(qr'BuildRequires: jpackage-.*-compat');
+    $jpp->get_section('package','')->unshift_body('BuildRequires(pre): rpm-build-java'."\n");
 
     $jpp->get_section('package','')->subst_if(qr'openssl','ca-certificates',qr'BuildRequires:');
     $jpp->get_section('package','')->subst(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');

@@ -3,7 +3,11 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->add_patch('retroweaver-2.0.2-alt-no-svn.patch',STRIP=>1);
-    $jpp->get_section('package')->unshift_body('ExclusiveArch: %ix86'."\n");
+    $jpp->get_section('package')->unshift_body('
+# due to java-1.4.2-sun
+ExclusiveArch: %ix86
+BuildRequires: java-devel = 1.4.2
+');
     $jpp->get_section('package')->unshift_body('BuildRequires: jaxen jakarta-oro'."\n");
     $jpp->get_section('prep')->push_body('ln -sf $(build-classpath jaxen) lib/'."\n");
     $jpp->get_section('build')->unshift_body('export CLASSPATH=$(build-classpath jaxen oro)'."\n");

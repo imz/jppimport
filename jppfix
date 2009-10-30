@@ -96,7 +96,7 @@ if ($hook) {
 }
 
 if ($changelog) {
-    $jpp->set_changelog($changelog);
+    $jpp->set_default_changelog($changelog);
 }
 
 if ($packager eq 'auto') {
@@ -110,6 +110,8 @@ if ($packager) {
 	$jpp->get_section('package','')->clear_tag('Packager');
     }
 }
+
+$jpp->add_changelog();
 
 #print $jpp->get_spec() if $jppspec or $verbose>3;
 $jpp->write_rpm() if $jpprpm;
