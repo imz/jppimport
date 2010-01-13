@@ -65,14 +65,22 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
 
 $usemavenplugins=1 if $jpprpm and $jpprpm=~m!/1.7/generic/!;
 
+# all those hacks are just to have at hand the RPM::Source::Editor guts on crash.
+my $tmp_dirname=basename($jpprpm);
+$tmp_dirname=~s/.src.rpm//;
+my $tmp_pwd= `pwd`;
+chomp $tmp_pwd;
+$tmp_dirname="$tmp_pwd/$tmp_dirname.$$";
+
 $jpp=RPM::Source::Editor->new(
-    SOURCERPM => $jpprpm, 
+    SOURCERPM=>$jpprpm, 
     SPECFILE=> $jppspec, 
-    OUTPUTDIR=> $outputdir, 
+    OUTPUTDIR=>$outputdir, 
     PATCHDIR=>$patchdir, 
     VERBOSE=> $verbose,
     CLEANUP=> $cleanup,
     CHANGELOG=>'- converted from JPackage by jppimport script',
+    TMPDIR => $tmp_dirname,
     CONVERT::JPACKAGE::JVM=>$jvm,
     CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
     CONVERT::JPACKAGE::NOZIP=>$nozip, 
@@ -161,7 +169,10 @@ if ($altrpm || $altspec) {
     &RPM::Source::Convert::MergeALT::alt_generic_merge($jpp,$alt);
     print STDERR "done alt_generic_merge\n" if $verbose>1;
 
+    # cleanup is performed by default in destructor
     $alt->cleanup();
+    # but we still use $alt later
+    #$alt=undef;
 
     unless ($epoch) {
 	if (defined $altepoch) {
@@ -251,5 +262,6 @@ $jpp->add_changelog();
 
 print $jpp->get_spec() if $jppspec or $verbose>3;
 $jpp->write_rpm() if $jpprpm;
+
 $jpp->cleanup();
 
