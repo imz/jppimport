@@ -8,6 +8,24 @@ push @PREHOOKS, sub {
     $jpp->set_sections(\@newsec);
 };
 
+sub __subst_systemtap {
+    my ($section)=@_;
+    my @newbody;
+    my @oldbody=@{$section->get_body()};
+    my $i;
+    for ($i=0; $i<@oldbody;$i++) {
+	my $line=$oldbody[$i];
+	if ($line=~/\%ifarch\s+\%{jit_arches}/ && (
+		$i < $#oldbody &&
+		$oldbody[$i+1]=~/systemtap|\.stp|tapset/) &&
+	    $oldbody[$i+1]!~/Where to install systemtap tapset/) {
+	    $line=~s/\%ifarch\s+\%{jit_arches}/\%if_enabled systemtap/g;
+	}
+	push @newbody, $line;
+    }
+    $section->set_body(\@newbody);
+}
+
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # added in 16 - TODO - comment out
@@ -17,7 +35,8 @@ push @SPECHOOKS, sub {
     $jpp->del_section('post','javadoc');
     $jpp->del_section('postun','javadoc');
 
-    $jpp->get_section('package','javadoc')->push_body('BuildArch: noarch'."\n");
+    # remove ASAP! disabled patch7 due to the older xorg
+    $jpp->get_section('build','')->subst_if(qr'patch -l -p0','#patch -l -p0',qr'PATCH7');
 
     # TODO:
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
@@ -44,6 +63,7 @@ BuildRequires(pre): rpm-build-java
 %def_enable visualvm
 %def_enable javaws
 %def_enable moz_plugin
+%def_disable systemtap
 %def_disable desktop
 ');
     $jpp->get_section('package','')->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
@@ -76,8 +96,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 	 }
     } $jpp->get_sections();
 
-    # seems to be used no more
-    #$jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
+    $jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
 
     $jpp->get_section('package','plugin')->subst_if(qr'\%\{syslibdir\}/mozilla/plugins','browser-plugins-npapi',qr'^Requires:');
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
@@ -92,14 +111,12 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
 
-    $jpp->add_patch('java-1.6.0-openjdk-b12-alt-as-needed-gcjwebplugin.patch',
-		    STRIP => 0,NUMBER => 35);
-
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf
 !);
-    $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm} --enable-liveconnect --disable-gcjwebplugin');
+    # unrecognized option; TODO: check the list
+    #$jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
     $jpp->get_section('build')->subst(qr'fedora-','ALTLinux-');
 
     # hack for sun-based build (i586) only!!!
@@ -133,6 +150,12 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
     $jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
     $jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
+
+    # to disable --enable-systemtap
+    $jpp->get_section('package','')->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
+    &__subst_systemtap($jpp->get_section('package',''));
+    &__subst_systemtap($jpp->get_section('install'));
+    &__subst_systemtap($jpp->get_section('files','devel'));
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->raw_rename_section('plugin','-n mozilla-plugin-%name');
@@ -403,7 +426,7 @@ Provides: java-devel = 1.5.0
 %endif
 ');
     $jpp->get_section('install')->subst(qr'%ifarch %{ix86}','%ifarch %{ix86} ppc ppc64');
-}
+};
 
 
 __END__
