@@ -111,3 +111,10 @@ deleting SRPMS/google-collections-0.7-1.jpp5.src.rpm
 deleting SRPMS/checkstyle-5.0-0.beta01.6.jpp5.src.rpm
 SRPMS/checkstyle4-4.4-4.jpp5.src.rpm
 SRPMS/geronimo-txmanager-2.1.1-2.jpp5.src.rpm
+
+TODO: update
+eclipse-pydev -> piccolo2d -> maven-plugin-bundle
+
+# temporally hacked manually
+#eclipse-rse -> Requires(fc12): jakarta-commons-net >= 0:2.0
+

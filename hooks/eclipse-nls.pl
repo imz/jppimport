@@ -4,7 +4,8 @@ push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
     # macros body
     $jpp->get_section('description','')->exclude(qr'defattr');
-    $jpp->get_section('description','')->subst(qr'Development/Languages', 'System/Internationalization '."\\\nProvides: eclipse-i18n-\%1");
+    #$jpp->get_section('description','')->subst(qr'Development/Languages', 'System/Internationalization '."\\\nProvides: eclipse-i18n-\%1");
+    $jpp->get_section('files','')->subst(qr'Text Editors/Integrated Development Environments \(IDE\)', 'System/Internationalization '."\\\nProvides: eclipse-i18n-\%1");
 };
 
 push @SPECHOOKS, sub {

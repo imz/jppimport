@@ -103,7 +103,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
 
     # for M40; can(should?) be disabled on M41
-    $jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
+    #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'gecko-devel','firefox-devel');
