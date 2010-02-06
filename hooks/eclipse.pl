@@ -20,12 +20,9 @@ sub {
     # TODO: remove bootstrap
     $jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
 
+    $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
     # it does work...
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-devel-openjdk'."\n");
-
-    # hack around x86 - missing %{name}-swt.install
-    #$jpp->get_section('package','')->subst_if('1','0',qr'define initialize');
-    #$jpp->get_section('install')->unshift_body_after('echo -n "" > %{_builddir}/%{buildsubdir}/%{name}-swt.install;'."\n",qr!-platform.install;!);
 
     #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
     # X11/extensions/XInput.h
@@ -36,10 +33,9 @@ sub {
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
 
-    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
-    $jpp->get_section('package','')->subst(qr'xulrunner-devel-unstable','xulrunner-devel');
 
     # seamonkey provides mozilla too
     $jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
@@ -47,45 +43,26 @@ sub {
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors
 
+# TODO: is it valid for 3.5.1?
 # eclipse-pde quick hack against osgi provides
 #+ Требует: osgi(Cloudscape)
 #+ Требует: osgi(org.apache.derby)
 #+ Требует: osgi(org.apache.derby.core)
-    $jpp->get_section('package','pde')->unshift_body('Provides: osgi(Cloudscape) osgi(org.apache.derby) osgi(org.apache.derby.core)'."\n");
+#    $jpp->get_section('package','pde')->unshift_body('Provides: osgi(Cloudscape) osgi(org.apache.derby) osgi(org.apache.derby.core)'."\n");
     
-
-    # for 3.4.1-12
-    #$jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-javadoc','java-javadoc',qr'BuildRequires:');
-    #$jpp->get_section('package','')->subst(qr'BuildRequires: java-gcj-compat-devel','#BuildRequires: java-gcj-compat-devel');
-
-    # misplaced in requires
-    $jpp->get_section('package','')->unshift_body('
-# todo: remove this 
-#add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
-#add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
-#add_findreq_skiplist /usr/share/eclipse/plugins/org.junit_3.8.2.v200706111738/junit.jar
-');
+#    # misplaced in requires
+#    $jpp->get_section('package','')->unshift_body('
+## todo: remove this 
+##add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
+##add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
+#');
 
     # hack around #22839: built-in /usr/lib*/eclipse
-    $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
+    #$jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
 
     # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
-    # change from 3.3.2 (due to firefox 3.0?)
-    $jpp->get_section('package','')->subst('BuildRequires: gecko-devel','BuildRequires: xulrunner-devel');
-    $jpp->get_section('package','swt')->subst('Requires: gecko-libs >= 1.9','Requires: xulrunner');
-
-    # due to #18579
-    #$jpp->get_section('package','ecj')->subst(qr'Obsoletes:\s*ecj', '#Obsoletes:	ecj');
-    #$jpp->get_section('package','ecj')->subst(qr'Provides:\s*ecj', '#Provides:	ecj');
-
-    # ecj should not have osgi dependencies.
-    #$jpp->get_section('package','ecj')->push_body('
-#AutoReq: yes, noosgi
-#AutoProv: yes, noosgi
-#');
-
     # around jetty (after 3.3.0-7)
     #$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6');
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6');
@@ -100,34 +77,26 @@ sub {
 	});
     # end around jetty 
 
-    # TODO: kill or rediff
-    #$jpp->add_patch('eclipse-3.4.1-alt-as-needed.patch');
+    # TODO: upstream it.
+    # fixed linkage order with --as-needed
+    $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
     # patch was generated with
     0 && $jpp->get_section('prep')->push_body(q{
-# fixed linkage order with --as-needed
 ## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
 #        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
 find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
 });
 
-    # TODO kill unused
     if (1) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
     $jpp->get_section('prep')->push_body(q{
 #uname -p == unknown but exit code is 0 :( (alt feature :( )
-find . -name build.sh -exec %__subst 's,uname -p,uname -m,' {} \;
+# seems to be fixed upstream.
+#find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 
-%if 0
-# if enable make_xpcominit ...
-subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
-subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-# was used for build with firefox
-#subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-# used for build with xulrunner
-subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-%endif
+# due to our xulrunner
+# proper patching will touch patches/eclipse-swt-buildagainstxulrunner.patch
+find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
 
-# if disable awt
-# subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 });
     }################################################### end TODO MAKE AS PATCHES
 
@@ -143,7 +112,7 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
     $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.26-1.5','Requires: tomcat5-jasper-eclipse >= 5.5.26-alt1_1.1jpp');
 
-    if (1) {
+    if (0) {
     #support for alt feature
     $jpp->copy_to_sources('org.altlinux.ide.feature-1.0.0.zip');
     $jpp->copy_to_sources('org.altlinux.ide.platform-3.4.1.zip');
@@ -240,3 +209,18 @@ sub leave_built_in_lucene {
 
 __END__
 
+    $jpp->get_section('prep')->push_body(q{
+%if 0
+# if enable make_xpcominit ...
+subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+# was used for build with firefox
+#subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+# used for build with xulrunner
+subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
+%endif
+
+# if disable awt
+# subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
+});
+    }################################################### end TODO MAKE AS PATCHES
