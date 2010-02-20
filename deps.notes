@@ -105,6 +105,8 @@ xstream-1.3-2.jpp5
 bsh-1.3.0-13.jpp5
 plexus-containers-1.0-0.a32.3.jpp5
 
+tomcat6-6.0.24-2.jpp5.src.rpm
+
 SRPMS/checkstyle-5.0-1.jpp5.src.rpm
 SRPMS/google-collections-1.0-0.rc2.1.jpp5.src.rpm
 deleting SRPMS/google-collections-0.7-1.jpp5.src.rpm

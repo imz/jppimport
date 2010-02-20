@@ -32,6 +32,7 @@ sub {
 
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
+    $jpp->get_section('package','platform')->unshift_body('AutoReqProv: yes,nopython'."\n");
 
     #$jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");

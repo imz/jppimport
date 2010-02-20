@@ -28,7 +28,8 @@ for i in *.rpm; do
     fi; 
 done  | sort -u > $DEST/$NAME.noarch.src
 popd
-for i in jpackage-generic-compat jpackage-utils java-common java-stub-javadoc java-devel-default; do
+# jpackage-utils 
+for i in jpackage-generic-compat rpm-build-java java-common java-stub-javadoc java-devel-default; do
     echo $i >> $DEST/$NAME.noarch.src
 done
 pushd $PREFIX/files/i586/RPMS/

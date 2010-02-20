@@ -9,4 +9,8 @@ push @SPECHOOKS, sub {
 AutoReq: yes, noosgi
 AutoProv: yes, noosgi
 ');
+
+    # hack -- exclude pom as it breaks builds due 
+    # to strange deps on eclipse (moreover, eclipse does not have poms)
+    $jpp->get_section('files','')->exclude('maven');
 };
