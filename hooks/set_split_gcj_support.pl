@@ -5,7 +5,7 @@ push @SPECHOOKS, \&set_split_gcj_support;
 sub set_split_gcj_support {
     my ($jpp, $alt) = @_;
 	$jpp->applied_block(
-	"set_target_$target hook",
+	"set_split_gcj_support hook",
 	sub {
     $jpp->get_section('package','')->subst(qr'(?<=\?_without_gcj)\s$','');
     $jpp->get_section('package','')->subst(qr'(?<=\?_gcj_sup)\s$','');

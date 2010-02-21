@@ -93,6 +93,12 @@ Caused by: java.lang.NullPointerException
 --------------------------------
 plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 
+========= getting rid of 1.7 ====
+TODO:
+(KILL?)dwr -> webwork
+howl-logger
+wstx(DOWNGRADE)
+
 
 ================== last update ================
 jboss4 -> jbossws -> jbossas -> jboss-jaxr

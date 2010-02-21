@@ -4,7 +4,7 @@ push @SPECHOOKS,
  sub {
     my ($jpp, $alt) = @_;
     # hack around splitting on 2 packages
-    if ($alt->get_tag('Name') eq 'jsvc') {
+    if ($alt->get_section('package','')->get_tag('Name') eq 'jsvc') {
 	$jpp->get_section('package','')->unshift_body("\%define _with_native 1\n");
 	$jpp->raw_rename_section('jsvc','-n jakarta-commons-daemon-jsvc');
 	$jpp->get_section('package','')->subst(qr'%{name}-crosslink.patch','jakarta-commons-daemon-crosslink.patch');
