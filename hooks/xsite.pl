@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+push @SPECHOOKS, 
+sub {
+    my ($jpp, $alt) = @_;
+}
+__END__
+
 require 'set_excalibur_pom.pl';
 require 'set_xpp3_min_pom.pl';
 require 'set_target_14.pl';

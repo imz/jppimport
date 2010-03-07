@@ -38,14 +38,10 @@ mvn-jpp install:install-file \
 #--------------------------------------------------------------
 
 ==duplicate rpms to remove:==
-#mysql-connector-jdbc by mysql-connector-java
 ibatis by apache-ibatis
 portals-pluto && portals-pluto10
-dups TODO:
-apacheds-daemon by apacheds10-daemon
-apacheds by apacheds10?
+dups TODO
 jaxen-bootstrap jaxen
-#java_cup java-cup
 wadi by wadi2
 bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by bouncycastle
 ----------
@@ -54,19 +50,17 @@ bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by boun
 
 # to report:
 docbook-xsl-java-xalan is dead because of xalan-j 2.5 specific code (does not rebuild)
-so I pick manually docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xsl-saxon.
+so I manually created docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xsl-saxon.
 
 # deprecation:
 objenesis is only place that use xsite -> use nanocontainer
 after kill site in objenesis both can be deprecated
 
 # conflict with smc
-smc
+smc -> jsmc
 
 # wersiondown
-qdox(done,neccessary)
 antlr(manually-pick-repolib)
-itext(done)
 bcel(let be up)
 bcf
 wstx
@@ -93,32 +87,30 @@ Caused by: java.lang.NullPointerException
 --------------------------------
 plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 
-========= getting rid of 1.7 ====
-TODO:
-(KILL?)dwr -> webwork
-howl-logger
-wstx(DOWNGRADE)
 
+TODO: jbossws.diff shows that bcond_with's does not work and should be converted to %if_with
 
 ================== last update ================
-jboss4 -> jbossws -> jbossas -> jboss-jaxr
-#jboss-cache >='0:1.4.1-4.SP9'
-jboss-cache (nobootstrap) -> jbossas
-
+jbossas -> wstx-repolib
+bootstrap: jbossas
 mysql-connector-java (nobootstrap) -> jbossas
 
-xstream-1.3-2.jpp5
-bsh-1.3.0-13.jpp5
-plexus-containers-1.0-0.a32.3.jpp5
+TODO: up
+dwr -> 
+nanocontainer-nanowar -> 
+objenesis
+[test with new xsite]
+ldapsdk 
+lingo -> activemq4 -> asn1
+openqa-selenium-rc -<- [bug in maven2.0.7?]
+
+============
 
 tomcat6-6.0.24-2.jpp5.src.rpm
 
 SRPMS/checkstyle-5.0-1.jpp5.src.rpm
-SRPMS/google-collections-1.0-0.rc2.1.jpp5.src.rpm
-deleting SRPMS/google-collections-0.7-1.jpp5.src.rpm
 deleting SRPMS/checkstyle-5.0-0.beta01.6.jpp5.src.rpm
 SRPMS/checkstyle4-4.4-4.jpp5.src.rpm
-SRPMS/geronimo-txmanager-2.1.1-2.jpp5.src.rpm
 
 TODO: update
 eclipse-pydev -> piccolo2d -> maven-plugin-bundle

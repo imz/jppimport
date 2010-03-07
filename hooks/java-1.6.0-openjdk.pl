@@ -106,14 +106,15 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
-    $jpp->get_section('package','')->subst(qr'gecko-devel','firefox-devel');
+    $jpp->get_section('package','')->subst(qr'gecko-devel','xulrunner-devel');
     $jpp->get_section('package','')->subst(qr'xulrunner-devel-unstable','xulrunner-devel');
-
-    $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
-
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf
 !);
+    $jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac
+!);
+    $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
+
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
@@ -156,6 +157,9 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     &__subst_systemtap($jpp->get_section('package',''));
     &__subst_systemtap($jpp->get_section('install'));
     &__subst_systemtap($jpp->get_section('files','devel'));
+
+    # big changelog
+    $jpp->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->raw_rename_section('plugin','-n mozilla-plugin-%name');

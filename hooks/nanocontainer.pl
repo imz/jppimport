@@ -1,6 +1,15 @@
 #!/usr/bin/perl -w
 
-require 'set_excalibur_pom.pl';
+require 'set_maven_notests.pl';
+
+push @SPECHOOKS, sub {
+    my ($jpp, $alt) = @_;
+    # bug to report
+    $jpp->get_section('install')->subst(qr'ln -sf %{_javadir}/nanocontainer-booter.jar','ln -sf %{_javadir}/nanocontainer/booter.jar');
+}
+
+__END__
+
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
@@ -32,38 +41,3 @@ subst 's,<module>webcontainer</module>,,' pom.xml
     $jpp->get_section('install')->exclude(qr'(-jruby|-rhino|webcontainer-|/webcontainer|target/site)');
 }
 
-__END__
-341,342c351,352
-< install -pm 644 container-jruby/target/%{name}-jruby-%{version}.jar \
-<   $RPM_BUILD_ROOT%{_javadir}/%{name}/container-jruby-%{version}.jar
----
-> #install -pm 644 container-jruby/target/%{name}-jruby-%{version}.jar \
-> #  $RPM_BUILD_ROOT%{_javadir}/%{name}/container-jruby-%{version}.jar
-345,346c355,356
-< install -pm 644 container-rhino/target/%{name}-rhino-%{version}.jar \
-<   $RPM_BUILD_ROOT%{_javadir}/%{name}/container-rhino-%{version}.jar
----
-> #install -pm 644 container-rhino/target/%{name}-rhino-%{version}.jar \
-> #  $RPM_BUILD_ROOT%{_javadir}/%{name}/container-rhino-%{version}.jar
-353,354c363,364
-< install -pm 644 webcontainer/target/%{name}-webcontainer-%{version}.jar \
-<   $RPM_BUILD_ROOT%{_javadir}/%{name}/webcontainer-%{version}.jar
----
-> #install -pm 644 webcontainer/target/%{name}-webcontainer-%{version}.jar \
-> #  $RPM_BUILD_ROOT%{_javadir}/%{name}/webcontainer-%{version}.jar
-440c450
-< cp -pr container-jruby/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/container-jruby
----
-> #cp -pr container-jruby/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/container-jruby
-444c454
-< cp -pr container-rhino/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/container-rhino
----
-> #cp -pr container-rhino/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/container-rhino
-453c463
-< cp -pr webcontainer/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/webcontainer
----
-> #cp -pr webcontainer/target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/webcontainer
-461c471
-< cp -pr target/site $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
----
-> #cp -pr target/site $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
