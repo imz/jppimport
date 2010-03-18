@@ -52,15 +52,16 @@ bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by boun
 docbook-xsl-java-xalan is dead because of xalan-j 2.5 specific code (does not rebuild)
 so I manually created docbook-xsl-xalan-1.00-alt1_0jpp5.src.rpm based on docbook-xsl-saxon.
 
-# deprecation:
+# possible deprecation:
 objenesis is only place that use xsite -> use nanocontainer
 after kill site in objenesis both can be deprecated
 
 # conflict with smc
 smc -> jsmc
 
-# wersiondown
+# wersiondowns
 antlr(manually-pick-repolib)
+xerces-j2(let be up,manually-pick-repolib)
 bcel(let be up)
 bcf
 wstx
@@ -91,15 +92,12 @@ plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
 TODO: jbossws.diff shows that bcond_with's does not work and should be converted to %if_with
 
 ================== last update ================
-jbossas -> wstx-repolib
+jbossas -> xerces-j2-repolib
 bootstrap: jbossas
 mysql-connector-java (nobootstrap) -> jbossas
 
 TODO: up
-dwr -> 
-nanocontainer-nanowar -> 
-objenesis
-[test with new xsite]
+nanocontainer-nanowar -> (webwork1 jar; mv .no!)
 ldapsdk 
 lingo -> activemq4 -> asn1
 openqa-selenium-rc -<- [bug in maven2.0.7?]
