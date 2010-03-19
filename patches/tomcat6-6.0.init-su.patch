@@ -1,0 +1,38 @@
+diff --git a/patches/tomcat6-6.0.init b/patches/tomcat6-6.0.init
+index ec57948..b825ccf 100644
+--- a/patches/tomcat6-6.0.init
++++ b/patches/tomcat6-6.0.init
+@@ -30,9 +30,9 @@ fi
+ 
+ # For SELinux we need to use 'runuser' not 'su'
+ if [ -x "/sbin/runuser" ]; then
+-    SU="/sbin/runuser"
++    SU="/sbin/runuser -s /bin/sh"
+ else
+-    SU="/bin/su"
++    SU="/bin/su -s /bin/sh"
+ fi
+ 
+ # Get the tomcat config (use this for environment specific settings)
+@@ -194,10 +194,10 @@ function start() {
+             ${CATALINA_HOME}/conf/server.xml
+     fi
+     if [ "$SECURITY_MANAGER" = "true" ]; then
+-        $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT start-security" \
++        $SU $TOMCAT_USER -c "$TOMCAT_SCRIPT start-security" \
+             >> $TOMCAT_LOG 2>&1
+     else
+-        $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT start" >> $TOMCAT_LOG 2>&1
++        $SU $TOMCAT_USER -c "$TOMCAT_SCRIPT start" >> $TOMCAT_LOG 2>&1
+     fi
+     RETVAL="$?"
+     if [ "$RETVAL" -eq 0 ]; then 
+@@ -235,7 +235,7 @@ function status() {
+ function stop() {
+     echo -n "Stopping $TOMCAT_PROG: "
+     if [ -f "/var/lock/subsys/${NAME}" ]; then
+-        $SU - $TOMCAT_USER -c "$TOMCAT_SCRIPT stop" >> $TOMCAT_LOG 2>&1
++        $SU $TOMCAT_USER -c "$TOMCAT_SCRIPT stop" >> $TOMCAT_LOG 2>&1
+         RETVAL="$?"
+         if [ "$RETVAL" -eq "0" ]; then
+             count="0"
