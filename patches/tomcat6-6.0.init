@@ -301,12 +301,6 @@ case "$1" in
             stop
         fi
         ;;
-    condstop)
-        if [ -f "/var/run/${NAME}.pid" ]; then
-            parseOptions
-            stop
-        fi
-        ;;
     status)
         status
         ;;
