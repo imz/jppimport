@@ -13,6 +13,22 @@ push @SPECHOOKS, sub {
     # due to ecj :(
     $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
 
+
+    $jpp->get_section('prep')->push_body(q!
+for i in container/webapps/admin/*.jsp container/webapps/admin/*/*.jsp; do
+    subst 's,locale="true",lang="true",' $i
+done
+!);
+
+    #rpm-filesystem-conflict-file-file 	There are file conflicts with the package tomcat5-poms-5.5.27-alt4_6.2jpp5.noarch
+    $jpp->get_section('files')->subst_if(qr'^','%attr(0644,root,root) ',qr'/maven2/poms/JPP.tomcat5-catalina-');
+
+    if ($jpp->get_section('package','')->get_tag('Version') eq '5.5.27') {
+	$jpp->add_patch('tomcat5-CVE-2009-0033.patch');
+	$jpp->add_patch('tomcat5-CVE-2009-0580.patch');
+    } else {
+	warn "tomcat5-CVE-2009-*.patches are deprecated!\n";
+    }
     # struts 1.3.9
     #$jpp->get_section('package','')->unshift_body('BuildRequires: struts-taglib'."\n");
     
@@ -123,7 +139,7 @@ __DATA__
 todo: verify logrotate
 
 
-__fedora struts 1.3.9 adaptation__(no need for jpackage)
+__fedora 11,12 struts 1.3.9 adaptation__(no need for jpackage)
 144c144
 < #BuildRequires: struts-taglib >= 0:1.3.8
 ---
@@ -136,11 +152,6 @@ __fedora struts 1.3.9 adaptation__(no need for jpackage)
 < #Requires(post): struts-taglib
 ---
 > Requires(post): struts-taglib
-423a424,430
-> for i in container/webapps/admin/*.jsp container/webapps/admin/*/*.jsp; do
->       subst 's,locale="true",lang="true",' $i
-> done
->
 633c640
 <     export OPT_JAR_LIST="ant/ant-trax xalan-j2-serializer"
 ---
