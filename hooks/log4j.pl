@@ -5,6 +5,13 @@ require 'add_missingok_config.pl';
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('build')->subst(qr'jaxp.jaxp.jar.jar', 'jaxp.jaxp.jar');
+    &add_missingok_config($jpp,'/etc/chainsaw.conf');
+}
+__END__
+
+
+__DEPRECATED__
     # fixed missing org.apache.log4j.jmx
 
     if (1) {
@@ -21,8 +28,3 @@ sub {
 #subst s,HtmlAdaptorServer,AdaptorServerSocketFactory,g src/java/org/apache/log4j/jmx/Agent.java
 ');
     }
-
-
-    $jpp->get_section('build')->subst(qr'jaxp.jaxp.jar.jar', 'jaxp.jaxp.jar');
-    &add_missingok_config($jpp,'/etc/chainsaw.conf');
-}

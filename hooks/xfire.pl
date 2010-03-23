@@ -9,10 +9,14 @@ sub {
 
 # xfire-xmpp doesn't build with smack 3
     $jpp->get_section('package','')->subst_if(qr'smack','smack1', qr'BuildRequires:');
+    $jpp->get_section('package','xmpp')->subst_if(qr'smack','smack1', qr'Requires:');
+# TODO: depmap changed by hand :( stack -> stack1, stackx -> stack1x
 
 #        3) commons-primitives:commons-primitives:jar:1.0
 #1 required artifact is missing.
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: jakarta-commons-primitives'."\n");
+
+    $jpp->get_section('build')->subst(qr'build-classpath bouncycastle/bcprov','build-classpath bcprov');
 
 #      mvn install:install-file -DgroupId=net.sf.saxon -DartifactId=saxon \
 #          -Dversion=8.7 -Dpackaging=jar -Dfile=/path/to/file
