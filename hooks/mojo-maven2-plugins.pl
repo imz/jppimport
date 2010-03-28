@@ -4,9 +4,17 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath jakarta-commons-primitives'."\n");
-    $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
+
+    $jpp->add_patch('mojo-maven2-plugins-17-javancss-maven-plugin-alt-javancss-3x-alt.patch',
+		    STRIP=>0);#, NUMBER=>233);
+};
+
+__END__
+
+
+#    $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
 
     $jpp->get_section('build')->push_body_after('# javacc
 mkdir -p $MAVEN_REPO_LOCAL/javacc
@@ -42,10 +50,6 @@ ln -s $(build-classpath javacc) $MAVEN_REPO_LOCAL/javacc/javacc.jar
 
 __END__
 TODO:
-add
-mojo-maven2-plugin-cobertura 
-Requires: cobertura
-
 
 #subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
 #subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml

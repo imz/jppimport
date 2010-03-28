@@ -7,6 +7,7 @@ push @SPECHOOKS,
 
 sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jms-1.1-api geronimo-javamail-1.4-api'."\n");
     # TODO:
     # it looks like circular dependency; we need axis2-jaxws-2.0-api to be built with
     # and poms should be fixed accordingly.

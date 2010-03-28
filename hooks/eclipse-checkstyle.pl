@@ -2,8 +2,10 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst(qr' cs_ver 4.1',' cs_ver 4.3');
+    $jpp->get_section('package','')->subst(qr' cs_ver 4.1',' cs_ver 4.4');
     $jpp->get_section('package','')->subst_if(qr'checkstyle','checkstyle4',qr'Requires:');
-    # TODO: fix checkstyle5 issues!
+    foreach my $sec ($jpp->get_section('build'),$jpp->get_section('install')) {
+	$sec->subst(qr'checkstyle-optional-\%{cs_ver}','checkstyle4-optional-%{cs_ver}');
+	$sec->subst(qr'checkstyle-\%{cs_ver}','checkstyle4-%{cs_ver}');
+    }
 };
-

@@ -1,0 +1,17 @@
+diff -ru javancss-maven-plugin.old//src/main/java/org/codehaus/mojo/javancss/NcssExecuter.java javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/NcssExecuter.java
+--- javancss-maven-plugin.old//src/main/java/org/codehaus/mojo/javancss/NcssExecuter.java	2008-03-28 12:22:57.000000000 +0000
++++ javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/NcssExecuter.java	2010-03-23 15:22:24.091005067 +0000
+@@ -87,7 +87,12 @@
+      */
+     public void execute() throws MavenReportException
+     {
+-        Javancss javancss = new Javancss( getCommandLineArgument(), Main.S_RCS_HEADER );
++        Javancss javancss;
++	try {
++        javancss = new Javancss( getCommandLineArgument(), Main.S_RCS_HEADER );
++	} catch (java.io.IOException e) {
++		throw new MavenReportException( "Error while JavaNCSS was executing (IOException)", e );
++	}
+         Throwable ncssException = javancss.getLastError();
+         if ( ncssException != null )
+         {
