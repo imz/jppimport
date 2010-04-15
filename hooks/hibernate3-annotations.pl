@@ -6,5 +6,5 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: hsqldb'."\n");
-    $jpp->get_section('package','')->subst_if('lucene','lucene1',qr'Requires:');
+#    $jpp->get_section('package','')->subst_if('lucene','lucene1',qr'Requires:');
 };

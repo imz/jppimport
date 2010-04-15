@@ -3,6 +3,9 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # old jaxen?
+    $jpp->get_section('package','')->subst_if('lucene22','lucene2',qr'Requires');
+    $jpp->get_section('package','components')->subst_if('lucene22','lucene2',qr'Requires');
+
     $jpp->get_section('package','')->unshift_body('BuildRequires: rome'."\n");
     $jpp->get_section('build')->unshift_body_before(q!
 mvn-jpp -e \

@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 
 require 'set_bin_755.pl';
-require 'set_target_14.pl';
+#require 'set_target_14.pl';
+
+#2.7.6-brew/component-info.xm
 
 push @SPECHOOKS, 
  sub {
@@ -101,9 +103,9 @@ __END__
 > %if %{with_repolib}
 >        install -d -m 755 $RPM_BUILD_ROOT%{repodir}
 >        install -d -m 755 $RPM_BUILD_ROOT%{repodirlib}
->        install -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{repodir}/component-info.xm
+>        install -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{repodir}/component-info.xml
 > tag=`echo %{name}-%{version}-%{release} | sed 's|\.|_|g'`
-> sed -i "s/@TAG@/$tag/g" $RPM_BUILD_ROOT%{repodir}/component-info.xm
+> sed -i "s/@TAG@/$tag/g" $RPM_BUILD_ROOT%{repodir}/component-info.xml
 >
 >        install -d -m 755 $RPM_BUILD_ROOT%{repodirsrc}
 >        install -p -m 644 %{PATCH0} $RPM_BUILD_ROOT%{repodirsrc}

@@ -122,10 +122,11 @@ if ($altrpm || $altspec) {
     $altver = $alt->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
     chomp $vercmp;
-    if ($altrel=~/^alt([^_]+)_(.+)jpp(\d(?:\.\d)?)$/) {
+    if ($altrel=~/^alt([^_]+)_(.+)jpp(\d(?:\.\d)?)?$/) {
 	my $rel = $1;
 	my $jppfrom = $2;
 	my $java= $3;
+	$java||=0;
 	my $subrel='';
 	$subrel=$1 if ($rel=~s/(\.\d+)$//);
 	# hack -- cleanup (undefined in jpp) macro in alt release:

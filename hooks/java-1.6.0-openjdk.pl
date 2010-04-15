@@ -35,9 +35,6 @@ push @SPECHOOKS, sub {
     $jpp->del_section('post','javadoc');
     $jpp->del_section('postun','javadoc');
 
-    # remove ASAP! disabled patch7 due to the older xorg
-    $jpp->get_section('build','')->subst_if(qr'patch -l -p0','#patch -l -p0',qr'PATCH7');
-
     # TODO:
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/US_export_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/US_export_policy.jar not found under RPM_BUILD_ROOT
@@ -107,7 +104,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'gecko-devel','xulrunner-devel');
-    $jpp->get_section('package','')->subst(qr'xulrunner-devel-unstable','xulrunner-devel');
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf
 !);
