@@ -3,8 +3,8 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # old jaxen?
-    $jpp->get_section('package','')->subst_if('lucene22','lucene2',qr'Requires');
-    $jpp->get_section('package','components')->subst_if('lucene22','lucene2',qr'Requires');
+    $jpp->get_section('package','')->subst_if('lucene22','lucene',qr'Requires');
+    $jpp->get_section('package','components')->subst_if('lucene22','lucene',qr'Requires');
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: rome'."\n");
     $jpp->get_section('build')->unshift_body_before(q!
@@ -13,7 +13,13 @@ mvn-jpp -e \
          -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
          -Dmaven2.jpp.depmap.file=%{SOURCE2} \
        install:install-file -DgroupId=rome -DartifactId=rome \
-                 -Dversion=0.8 -Dpackaging=jar -Dfile=$(build-classpath rome-0.9)
+         -Dversion=0.8 -Dpackaging=jar -Dfile=$(build-classpath rome-0.9)
+mvn-jpp -e \
+         -s ${M2SETTINGS} \
+         -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+         -Dmaven2.jpp.depmap.file=%{SOURCE2} \
+       install:install-file -DgroupId=lucene -DartifactId=lucene-core \
+         -Dversion=2.0.0 -Dpackaging=jar -Dfile=$(build-classpath lucene)
 !,qr'mvn-jpp');
 
     #ln -s %{name}-api-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name} # ghost symlink

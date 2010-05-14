@@ -1,0 +1,11 @@
+--- build.xml	2010-05-12 20:21:16.215941136 +0000
++++ build.xml	2010-05-12 20:22:28.011970666 +0000
+@@ -70,7 +70,7 @@
+ 
+     <target name="checkJava">
+         <condition property="compatibleJRE">
+-            <equals arg1="${ant.java.version}" arg2="1.5"/>
++            <istrue value="true"/>
+         </condition>
+     </target>
+ 

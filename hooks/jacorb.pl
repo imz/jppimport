@@ -8,7 +8,8 @@ push @SPECHOOKS, sub {
     # is it not deprecated?
     $jpp->get_section('prep')->push_body('%__subst \'s,avalon-framework-[0-9\.]\+,avalon-framework-*,\' etc/common-xdoclet.xml'."\n");
 
-    $jpp->get_section('install')->subst('^cp -pr doc', 'cp -pr --no-dereference doc');
+    # jpp6 skip
+    #$jpp->get_section('install')->subst('^cp -pr doc', 'cp -pr --no-dereference doc');
 
     # common with jackorb
 
