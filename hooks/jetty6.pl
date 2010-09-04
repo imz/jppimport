@@ -2,6 +2,25 @@
 
 require 'set_fix_homedir_macro.pl';
 require 'add_missingok_config.pl';
+
+push @SPECHOOKS, sub {
+    my ($jpp, $alt) = @_;
+
+    #%define appdir /srv/jetty6
+    $jpp->get_section('package','')->subst_if(qr'/srv/jetty6', '/var/lib/jetty6',qr'\%define');
+
+    # requires from nanocontainer-webcontainer :(
+    $jpp->get_section('package','jsp-2.0')->push_body('Provides: jetty6-jsp-2.0-api = %version'."\n");
+
+    &add_missingok_config($jpp, '/etc/default/%{name}','');
+    &add_missingok_config($jpp, '/etc/default/jetty','');
+}
+
+
+
+__END__
+# 5.0 -- 6.1.18 hook
+
 # jsp-2.1 fails on JDK 1.6, but eclipse requires JDK 1.6 :(
 #require 'set_target_15.pl';
 

@@ -6,7 +6,7 @@ use strict;
 
 my $verbose;
 my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-my $JPPPATH='/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
+my $JPPPATH='/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
 
 
@@ -178,8 +178,10 @@ if ($strategy eq 'alt2jpp') {
     &alt2jpp();
 } elsif ($strategy eq 'altup') {
     &altup();
-} else {
+} elsif ($strategy eq 'jppskipalt') {
     &jppskipalt();
+} else {
+    &alt2jpp();
 }
 
 

@@ -12,7 +12,7 @@ use RPM::Source::Convert::JPackage2ALT;
 use RPM::Source::Convert::MergeALT;
 
 my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
-my $jvm=5;
+my $jvm;
 my $packager='auto';
 my $verbose=1;
 my $usemavenplugins=0;
@@ -87,6 +87,8 @@ $jpp=RPM::Source::Editor->new(
     CONVERT::JPACKAGE::USEMAVENPLAGINS=>$usemavenplugins,
 );
 
+$jvm||=6;
+
 my $jppepoch = $jpp->get_section('package','')->get_tag('Epoch');
 my $jpprel = $jpp->get_section('package','')->get_tag('Release');
 my $jppver = $jpp->get_section('package','')->get_tag('Version');
@@ -104,7 +106,7 @@ $jpprel=~s/jpp\d.\d$//;
 $jpprel=~s/.jpp5$//;
 $jpprel=~s/jpp//;
 
-my $newjava='5';
+my $newjava='6';
 if ($jvm and $jvm =~ /^4/) {
     $newjava = '1.7';
 } elsif ($jvm and $jvm =~ /^5/) {
