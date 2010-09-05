@@ -1,12 +1,18 @@
 #!/bin/bash
 GREPARG=$1
 shift
-hshS="hsh --apt-config=/etc/apt/apt.conf.SS --with-stuff --mountpoints=/proc"
+aptconfig=/etc/apt/apt.conf.SS
+if [ x"$1" == "x--apt-config" ]; then
+	aptconfig="$2"
+	shift;
+	shift;
+fi
+hshB="hsh --apt-config=$aptconfig --mountpoints=/proc"
 mkdir success failure
 for i in "$@"; do
     if rpmquery --requires -p $i | grep "$GREPARG" >/dev/null; then 
 	echo rebuilding $i
-	if $hshS $i > hsh.log 2>&1 ; then
+	if $hshB $i > hsh.log 2>&1 ; then
 	    mv hsh.log success/`basename $i`.log
 	else 
 	    mv hsh.log failure/`basename $i`.log
