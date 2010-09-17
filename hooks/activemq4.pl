@@ -5,6 +5,8 @@ sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jacc-1.0-api geronimo-jms-1.1-api geronimo-specs javacc3 rome jetty6-servlet-2.5-api'."\n");
     $jpp->get_section('package','')->subst(qr'Requires: smack','Requires: smack1');
+    $jpp->get_section('package','')->subst_if(qr'apacheds10','apacheds','Requires:');
+    # TODO + subst in activemq4-jpp-depmap.xml    
     $jpp->get_section('package','xmpp')->subst(qr'Requires: smack','Requires: smack1');
 
     $jpp->get_section('build')->unshift_body_before(q!

@@ -8,13 +8,23 @@ sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester18 jakarta-commons-parent'."\n");
-    # TODO: update maven-surefire;
-    # do not want to update(revert) plexus-archiver from a8 to a7.
-    # so disable maven2-plugins-catch-uncaught-exceptions.patch
-    $jpp->get_section('prep')->subst(qr'^\%patch4\s','#patch4 ');
-    # and make other similar patches
-    $jpp->add_patch('maven2-2.0.8-alt-plexus-archiver-a8.patch',STRIP=>1);
+    # maven2-plugin-javadoc reqs avalon-framework pom due to pom dependencies
+    $jpp->get_section('package','plugin-javadoc')->push_body('Requires: excalibur-avalon-framework'."\n");
+    # NO NEED: already in 6.0 common poms
+    #$jpp->get_section('package','plugin-javadoc')->push_body('Requires: excalibur'."\n");
+    $jpp->get_section('package','')->push_body('Provides: maven2-plugin-enforcer'."\n");
 
+    #unless ('revert to a7') {
+	# I do not want to update(revert) plexus-archiver from a8 to a7.
+	# so disable maven2-plugins-catch-uncaught-exceptions.patch
+	$jpp->get_section('prep')->subst(qr'^\%patch4\s','#patch4 ');
+	# and make other similar patches
+	$jpp->add_patch('maven2-2.0.8-alt-plexus-archiver-a8.patch',STRIP=>1);
+    #}
+    # TODO: update maven-surefire;
+
+    # tmp hack over sandbox error :(
+    $jpp->get_section('package','')->push_body('ExclusiveArch: %ix86'."\n");
 };
 
 __END__

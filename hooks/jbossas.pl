@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_jboss_ant18.pl';
+
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->subst(qr'antlr-repolib = 0:2.7.6','antlr-repolib >= 0:2.7.6');

@@ -5,6 +5,13 @@ push @SPECHOOKS, sub {
     # old jaxen?
     $jpp->get_section('package','')->subst_if('lucene22','lucene',qr'Requires');
     $jpp->get_section('package','components')->subst_if('lucene22','lucene',qr'Requires');
+    $jpp->get_section('package','')->subst_if('apacheds10-core','apacheds-core',qr'Requires');
+# TODO as a hook
+#    $jpp->get_section('prep')->unshift_body_before(q!
+#diff     portals-jetspeed2-maven-plugin-project.patch{~,}
+#27c27
+#< +            <jar>apacheds10/core.jar</jar>
+#> +            <jar>apacheds/core.jar</jar>
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: rome'."\n");
     $jpp->get_section('build')->unshift_body_before(q!
