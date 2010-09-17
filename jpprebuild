@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh 
 GREPARG=$1
 shift
 aptconfig=/etc/apt/apt.conf.SS
-if [ x"$1" == "x--apt-config" ]; then
+if [ "$1" = "--apt-config" ]; then
 	aptconfig="$2"
 	shift;
 	shift;

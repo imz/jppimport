@@ -3,6 +3,7 @@
 package RPM::SpecFile::Bootstrap;
 
 use Getopt::Long;
+use RPM::Source::Editor;
 use RPM::Source::Macros;
 use File::Path;
 use strict;
@@ -15,11 +16,12 @@ my $changelog='- bootstrap pack of jars created with jppbootstrap script
 - temporary package to satisfy circular dependencies';
 my (@skiprequires,@skipprovides);
 my (@addprovides,@addrequires,@addobsoletes);
-
+my ($altrpm,$altspec);
 my $result = GetOptions (
 		      "changelog=s"   => \$changelog,
 		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
+		      "alt=s"   => \$altrpm,
 		      "skip-requires=s"   => \@skiprequires,
 		      "skip-provides=s"   => \@skipprovides,
 		      "add-provides=s"   => \@addprovides,
@@ -137,6 +139,10 @@ print SPEC q!
 
 %changelog
 !;
+if ($altrpm || $altspec) {
+    my $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    print SPEC @{$alt->get_section('changelog')->get_body()};
+}
 
 system ('add_changelog', '-e',$changelog,$specfile);
 mkpath([$outdir]) unless -d $outdir;

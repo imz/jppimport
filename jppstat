@@ -17,33 +17,56 @@ DEST=`pwd`
 
 JAVA_PATTERN='/usr/(share/java|share/netbeans|share/eclipse|lib/eclipse|lib64/eclipse)'
 
-pushd $PREFIX/files/noarch/RPMS/
+[ -d $PREFIX/files/SRPMS ] && SOURCE_RPM_PATH="$PREFIX/files/SRPMS"
+[ -d $PREFIX/source/SRPMS ] && SOURCE_RPM_PATH="$PREFIX/source/SRPMS"
+[ -z "$SOURCE_RPM_PATH" ] && exit 2;
+
+get_arch_rpmdir()
+{
+    ARCH_RPMDIR=
+    [ -d "$PREFIX/files/$ARCH/RPMS" ] && ARCH_RPMDIR="$PREFIX/files/$ARCH/RPMS/" && return
+    [ -d "$PREFIX/$ARCH/os/Packages" ] && ARCH_RPMDIR="$PREFIX/$ARCH/os/Packages/" && return
+}
+
+list_java_src_rpm_names()
+{
 for i in *.rpm; do 
     if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then 
 	SRCRPMNAME=`rpmquery --queryformat '%{SOURCERPM}\n' -p $i`;
-	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/$SRCRPMNAME`;
+	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p $SOURCE_RPM_PATH/$SRCRPMNAME`;
 	if [ -z "$ACL" ] || grep '^'$SRCNAME "$ACL" | egrep "$ACLPATTERN" >/dev/null; then
 	    echo $SRCNAME
 	fi; 
     fi; 
-done  | sort -u > $DEST/$NAME.noarch.src
+done  | sort -u > $DEST/$NAME.$ARCH.src
+}
+
+ARCH=noarch
+get_arch_rpmdir
+if [ -n "$ARCH_RPMDIR" ]; then
+    pushd $ARCH_RPMDIR
+    list_java_src_rpm_names
+    popd
+    if [ "$NAME" = "java-alt-packages" ]; then
+    # jpackage-utils 
+	for i in jpackage-generic-compat rpm-build-java java-common java-stub-javadoc java-devel-default; do
+	    echo $i >> $DEST/$NAME.noarch.src
+	done
+    fi
+else
+    touch $DEST/$NAME.noarch.src
+fi
+ARCH=i586
+get_arch_rpmdir
+[ -z "$ARCH_RPMDIR" ] && ARCH=x86_64
+get_arch_rpmdir
+pushd $ARCH_RPMDIR
+list_java_src_rpm_names
 popd
-# jpackage-utils 
-for i in jpackage-generic-compat rpm-build-java java-common java-stub-javadoc java-devel-default; do
-    echo $i >> $DEST/$NAME.noarch.src
-done
-pushd $PREFIX/files/i586/RPMS/
-for i in *.rpm; do 
-    if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then 
-	SRCRPMNAME=`rpmquery --queryformat '%{SOURCERPM}\n' -p $i`;
-	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p ../../SRPMS/$SRCRPMNAME`;
-	if [ -z "$ACL" ] || grep '^'$SRCNAME "$ACL" | egrep "$ACLPATTERN" >/dev/null; then
-	    echo $SRCNAME
-	fi; 
-    fi; 
-done | grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' | sort -u > $DEST/$NAME.i586.src
-popd
-sort -u ./$NAME.i586.src ./$NAME.noarch.src > $NAME.src
+grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' $DEST/$NAME.$ARCH.src | sort -u > $DEST/$NAME.$ARCH.src.0
+mv $DEST/$NAME.$ARCH.src.0 $DEST/$NAME.$ARCH.src
+
+sort -u $DEST/$NAME.$ARCH.src $DEST/$NAME.noarch.src > $NAME.src
 if [ -f $PREFIX/files/list/list.src.classic ]; then
     for i in `cat ./$NAME.src`; do grep "^$i" $PREFIX/files/list/list.src.classic ; done | sort -u > $DEST/$NAME.owners
 fi

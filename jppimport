@@ -11,10 +11,11 @@ use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 use RPM::Source::Convert::MergeALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,$hook,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
+my ($jpprpm,$altrpm,$jppspec,$altspec,@hooks,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
 my $jvm;
 my $packager='auto';
 my $verbose=1;
+my $defaulthook=1;
 my $usemavenplugins=0;
 my $cleanup=0;
 my $outputdir='.';
@@ -27,7 +28,8 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "altspec=s"   => \$altspec,
 		      "outdir=s"   => \$outputdir,
 		      "packager=s"   => \$packager,
-		      "hook=s"   => \$hook,
+		      "hook=s"   => \@hooks,
+		      "defaulthook!"   => \$defaulthook,
 		      "changelog=s"   => \$changelog,
 		      "rename=s"   => \$rename,
 		      "cleanup!"   => \$cleanup,
@@ -191,25 +193,27 @@ our $jpptoolsdir=dirname($0);
 # for cross-references in hooks
 push @INC, $jpptoolsdir."/hooks", $jpptoolsdir."/common";
 
-if (not $hook) {
+if (0==@hooks or $defaulthook) {
     # looking for default hook
     my $name = $jpp->get_section('package','')->get_tag('Name');
     $name=$rename if $rename;
     my $defhook="$jpptoolsdir/hooks/$name.pl";
     # macro_expansion should be here
     #print "looking for default hook $defhook\n";
-    $hook = $defhook if (-e $defhook);
+    push @hooks, $defhook if (-e $defhook);
 }
 
 our @SPECHOOKS;
 our @PREHOOKS;
-if ($hook) {
-    require $hook;
-    die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS;
-    if (@PREHOOKS) {
-	$jpp->{WARN_NOTAPPLIED}++;
-	map {&$_($jpp,$alt)} @PREHOOKS;
-	$jpp->{WARN_NOTAPPLIED}--;
+if (@hooks) {
+    foreach my $hook (@hooks) {
+	require $hook;
+	die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS;
+	if (@PREHOOKS) {
+	    $jpp->{WARN_NOTAPPLIED}++;
+	    map {&$_($jpp,$alt)} @PREHOOKS;
+	    $jpp->{WARN_NOTAPPLIED}--;
+	}
     }
 }
 
@@ -229,7 +233,7 @@ my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
 $newrel=$release if ($release);
 $jpp->get_section('package','')->set_tag('Release',$newrel);
 
-if ($hook) {
+if (@hooks) {
     if (@SPECHOOKS) {
 	$jpp->{WARN_NOTAPPLIED}++;
 	map {&$_($jpp,$alt)} @SPECHOOKS;
