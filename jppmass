@@ -6,13 +6,13 @@ use strict;
 
 my $verbose;
 my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/Sisyphus/orphaned:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-my $JPPPATH='/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
+my $JPPPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
 
 
 
 my $OUTDIR="./OUT";
-my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks);
+my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks, $target);
 my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
@@ -26,6 +26,7 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "hook=s" => \@hooks,
 			 "rename=s"   => \$rename,
 			 "release=s"   => \$release,
+			 "target=s"   => \$target,
 			 "epoch=s"   => \$epoch,
 			 "verbose"  => \$verbose);
 my ($alt,$jpp);
@@ -256,7 +257,13 @@ sub run_jppimport {
 	return;
     }
 
-    foreach my $hook ("$jpptoolsdir/hooks/$name.pl", @hooks) {
+    my $hook;
+    if ($target) {
+	$hook="$jpptoolsdir/hooks/set_target_1$target.pl";
+	$importcmd.=" --hook $hook" if (-e $hook);
+    }
+
+    foreach $hook ("$jpptoolsdir/hooks/$name.pl", @hooks) {
 	$importcmd.=" --hook $hook" if (-e $hook);
     }
     print "$importcmd\n";

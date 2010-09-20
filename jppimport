@@ -88,7 +88,6 @@ $jpp=RPM::Source::Editor->new(
     CONVERT::JPACKAGE::NOZIP=>$nozip, 
     CONVERT::JPACKAGE::USEMAVENPLAGINS=>$usemavenplugins,
 );
-
 $jvm||=6;
 
 my $jppepoch = $jpp->get_section('package','')->get_tag('Epoch');
