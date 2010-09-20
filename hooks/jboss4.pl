@@ -3,6 +3,7 @@
 # done
 #require 'set_with_cor eonly.pl';
 #require 'set_with_basiconly.pl';
+require 'set_jboss_ant18.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
@@ -74,6 +75,8 @@ push @SPECHOOKS, sub {
 
     ###################################################
 
+    # TODO: add
+    #s,classpathx-jaf,sun-jaf,g
 }
 
 __END__

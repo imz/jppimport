@@ -12,7 +12,7 @@ sub set_target_15 {
 	sub {
     $jpp->get_section('prep')->subst(qr'^export JAVA_HOME=','#export JAVA_HOME=');
     $jpp->get_section('build')->subst(qr'^export JAVA_HOME=','#export JAVA_HOME=');
-    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
+#    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
     $jpp->clear_applied();
     $jpp->get_section('prep')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
     $jpp->get_section('build')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
