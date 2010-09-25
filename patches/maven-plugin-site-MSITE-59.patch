@@ -1,0 +1,14 @@
+diff -ru maven2-plugins/maven-site-plugin/src/main/java/org/apache/maven/plugins/site/SiteMojo.java maven2-plugins/maven-site-plugin/src/main/java/org/apache/maven/plugins/site/SiteMojo.java
+--- maven2-plugins/maven-site-plugin/src/main/java/org/apache/maven/plugins/site/SiteMojo.java	2006-02-28 01:16:22 +0200
++++ maven2-plugins/maven-site-plugin/src/main/java/org/apache/maven/plugins/site/SiteMojo.java	2010-09-25 23:46:15 +0300
+@@ -665,6 +665,10 @@
+             assembler.assembleModelInheritance( project.getName(), decoration, parent, project.getUrl(),
+                                                 parentProject.getUrl() );
+         }
++	else
++	{
++	    props.put( "parentProject", "" );
++	}
+ 
+         return decoration;
+     }

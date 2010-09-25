@@ -12,7 +12,6 @@ diff -ru maven2.0/maven2-plugins/maven-eclipse-plugin/src/main/java/org/apache/m
          }
      }
  
-Only in maven2.1/maven2-plugins/maven-eclipse-plugin/src/main/java/org/apache/maven/plugin/eclipse: InstallPluginsMojo.java~
 diff -ru maven2.0/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven/plugin/war/AbstractWarMojo.java maven2.1/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven/plugin/war/AbstractWarMojo.java
 --- maven2.0/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven/plugin/war/AbstractWarMojo.java	2007-03-17 14:07:48.000000000 +0000
 +++ maven2.1/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven/plugin/war/AbstractWarMojo.java	2010-09-05 20:06:50.565209015 +0000
@@ -27,4 +26,3 @@ diff -ru maven2.0/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven
          catch ( ArchiverException e )
          {
              throw new MojoExecutionException( "Error unpacking file: " + file + "to: " + location, e );
-Only in maven2.1/maven2-plugins/maven-war-plugin/src/main/java/org/apache/maven/plugin/war: AbstractWarMojo.java~
