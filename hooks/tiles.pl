@@ -4,6 +4,14 @@ sub {
     $jpp->get_section('package','')->unshift_body("BuildRequires: xpp3\n");
 };
 __END__
+# 208 hacks
+mkdir -p $MAVEN_REPO_LOCAL/org/apache/tiles/tiles-master/1/
+cp %{SOURCE5} .m2/repository/org/apache/tiles/tiles-master/1/tiles-master-1.pom
+mkdir -p $MAVEN_REPO_LOCAL/org/apache/tiles/tiles-{api,core,jsp}/%{version}/
+ln -sf ../org/apache/tiles/tiles-api/%{version}/tiles-api-%{version}.jar $MAVEN_REPO_LOCAL/org/apache/tiles/tiles-api/%{version}/
+ln -sf ../org/apache/tiles/tiles-core/%{version}/tiles-core-%{version}.jar $MAVEN_REPO_LOCAL/org/apache/tiles/tiles-core/%{version}/
+ln -sf ../org/apache/tiles/tiles-jsp/%{version}/tiles-jsp-%{version}.jar $MAVEN_REPO_LOCAL/org/apache/tiles/tiles-jsp/%{version}/
+# end 208 hacks
 --- tiles.spec	2009-02-13 15:08:04 +0000
 +++ tiles.spec	2009-02-13 15:14:59 +0000
 @@ -163,6 +164,14 @@

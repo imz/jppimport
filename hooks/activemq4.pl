@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jacc-1.0-api geronimo-jms-1.1-api geronimo-specs javacc3 rome jetty6-servlet-2.5-api'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jacc-1.0-api geronimo-jms-1.1-api geronimo-specs javacc3 rome tomcat5-servlet-2.5-api'."\n");
     $jpp->get_section('package','')->subst(qr'Requires: smack','Requires: smack1');
     $jpp->get_section('package','')->subst_if(qr'apacheds10','apacheds','Requires:');
     # TODO + subst in activemq4-jpp-depmap.xml    
@@ -33,6 +33,13 @@ mvn-jpp \
 
 }
 __END__
+# maven 208
+install -Dm644 %{SOURCE3} $MAVEN_REPO_LOCAL/org/apache/apache-jar-resource-bundle/1.4/apache-jar-resource-bundle-1.4.jar
+415a416,417
+>       -Dmaven.test.skip=true \
+>       -Dmaven.test.skip.exec=true \
+in install
+
 diff activemq4-jpp-depmap.xml.old activemq4-jpp-depmap.xml    
 453c453
 <      <artifactId>smackx</artifactId>

@@ -6,9 +6,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
+    $jpp->get_section('package','')->unshift_body('#define _without_bootstrap 1'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver plexus-containers-container-default plexus-containers plexus-classworlds maven-plugin-tools plexus-cli plexus-containers-component-annotations 
-BuildRequires: maven-enforcer maven2-plugin-war
+BuildRequires: maven-enforcer maven2-plugin-war geronimo-j2ee-1.4-apis
 # unbootstrap
 BuildRequires: maven2-plugin-ant
 BuildRequires: maven2-plugin-assembly
@@ -55,7 +55,14 @@ BuildRequires: plexus-mail-sender
 BuildRequires: plexus-resources
 '."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester18 jakarta-commons-parent excalibur-avalon-framework'."\n");
-    $jpp->add_patch('maven-2.0.x-MNG-3948.patch', STRIP=>5);
+
+    # it might break jpp patch and jpp local repository, so apply later; or remove;
+    #$jpp->add_patch('maven-2.0.x-MNG-3948.patch', STRIP=>1);
+
+    # instead try out revisions between 358877(MSITE-59 applied) and 591652(after strange revolution, bug might be fixed)
+    # also, the probability is the bug is related to plexus-cdc incompatibility
+    # TODO: and update patches
+    #$jpp->add_patch('maven-plugin-site-MSITE-59.patch', STRIP=>0);
 
     # maven2-plugin-javadoc reqs avalon-framework pom due to pom dependencies
     $jpp->get_section('package','plugin-javadoc')->push_body('Requires: excalibur-avalon-framework'."\n");
@@ -71,12 +78,12 @@ BuildRequires: plexus-resources
     #}
 
     # tmp hack over sandbox error :(
-    $jpp->get_section('package','')->push_body('#ExclusiveArch: %ix86'."\n");
+    $jpp->get_section('package','')->push_body('ExclusiveArch: %ix86'."\n");
 
     $jpp->get_section('prep')->push_body(q~
 cat > relink_bootstrap_maven_jars.sh << 'EOF'
 #!/bin/sh
-DUP='cp -a'
+DUP='cp -pL'
 pushd m2_repo/repository/JPP
 for i in `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]*  -type f -name '*.jar'`;do
     if [ -f /usr/share/java/$i ]; then
@@ -91,44 +98,19 @@ i=maven-enforcer-rule-api.jar; mv $i $i.no; $DUP /usr/share/java/maven-enforcer/
 #i=maven2-plugin-cobertura.jar; mv $i $i.no; $DUP  $i
 i=maven-shared/maven-plugin-testing-harness.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/plugin-testing-harness.jar $i
 i=maven-reporting/impl.jar; mv $i $i.no; $DUP maven-shared/reporting-impl.jar $i
+find . -name '*.jar.no' -delete
 popd
 EOF
 #%_sourcedir
 sh ./relink_bootstrap_maven_jars.sh
 ~."\n");
+
+    # we hack bootsrap repo at code above; tar xzf overwrites our hacks :(
+    $jpp->get_section('install')->unshift_body_after('sh ./relink_bootstrap_maven_jars.sh'."\n", qr'tar xzf \%{SOURCE4}');
 };
 
 __END__
-    #$jpp->get_section('package','')->push_body('Provides: maven2-plugin-enforcer'."\n");
-
-
-# 2.0.7
-#require 'set_bootstrap.pl';
-require 'set_target_14.pl';
-#require 'set_without_maven.pl';
-
-push @SPECHOOKS, 
-sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->push_body('BuildRequires: avalon-framework'."\n");
-    $jpp->get_section('package','plugin-idea')->subst('dom4j >= 1.6.1','dom4j >= 0:1.6.1');
-    # due to
-  # Requires: dom4j >= 1.6.1
-  # Requires: dom4j >= 0:1.6.1
-
-    $jpp->get_section('build')->unshift_body_before('
-# avalon hack
-$M2_HOME/bin/mvn -s %{maven_settings_file} $MAVEN_OPTS \
-      install:install-file -DgroupId=avalon-framework -DartifactId=avalon-framework \
-      -Dversion=4.1.3 -Dpackaging=jar -Dfile=$(build-classpath avalon-framework)
-
-',qr'# Build everything');
-};
-
-
-
 __DATA__
-# problems found: 1) modello (fixed)
 #2) some plexuses are missing components.xml (which ones?)
 are good
 m* plexus/[adr-x]* plexus/mail* plexus/c[ol]* 

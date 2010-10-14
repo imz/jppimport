@@ -19,9 +19,7 @@
 
 
 # Source function library.
-if [ -x /etc/rc.d/init.d/functions ]; then
-    . /etc/rc.d/init.d/functions
-fi
+. /etc/rc.d/init.d/functions
 
 [ -r /etc/java/java.conf ] && . /etc/java/java.conf
 export JAVA_HOME
@@ -77,11 +75,11 @@ start() {
 #	[ -x ${JETTY_HOME}/ext ] &&
 #	  	rebuild-jar-repository -s ${JETTY_HOME}/ext
 
-        if [ -x /etc/rc.d/init.d/functions ]; then
+##        if [ -e /etc/rc.d/init.d/functions ]; then
                 start_daemon --user $JETTY_USER $JETTY_SCRIPT
-        else
-                su - $JETTY_USER -c "$JETTY_SCRIPT start"
-        fi
+##        else
+##                su - $JETTY_USER -c "$JETTY_SCRIPT start"
+##        fi
 
         RETVAL=$?
         echo
@@ -94,11 +92,11 @@ stop() {
     echo -n "Stopping $JETTY_PROG: "
                                                                                                                                                              
     if [ -f /var/lock/subsys/jetty5 ] ; then
-      if [ -x /etc/rc.d/init.d/functions ]; then
+##      if [ -e /etc/rc.d/init.d/functions ]; then
           stop_daemon --user $JETTY_USER $JETTY_SCRIPT
-      else
-          su - $JETTY_USER -c "$JETTY_SCRIPT stop"
-      fi
+##      else
+##          su - $JETTY_USER -c "$JETTY_SCRIPT stop"
+##      fi
       RETVAL=$?
 
       if [ $RETVAL = 0 ]; then

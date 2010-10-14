@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
-# does we need it?
-#libgnomeui-2.so.0()(64bit)   is needed by libswt3-gtk2-3.3.0-alt1_5jpp1.7
+# (3.5.1; TODO: check 3.5.2) does we need it?
+#libgnomeui-2.so.0()(64bit) is needed by eclipse-swt-3.5.1-alt2_28jpp6
+
 
 push @SPECHOOKS, 
 sub {
@@ -10,6 +11,7 @@ sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
+    # TODO: check 3.5.2
     # hack -- unmet osgi dependency (recommends?)
     $jpp->get_section('package','platform')->unshift_body('Provides: osgi(org.eclipse.equinox.simpleconfigurator.manipulator) = 1.0.100'."\n");
 
@@ -18,7 +20,17 @@ sub {
     $jpp->del_section('postun','platform');
 
     # TODO: remove bootstrap
-    $jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
+    if (1) { # bootstrap
+	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
+	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene icu4j-eclipse jsch objectweb-asm sat4j
+BuildRequires: tomcat6-servlet-2.5-api jetty6-core
+#BuildRequires: junit >= 3.8.1
+#BuildRequires: junit4
+#BuildRequires: hamcrest >= 0:1.1-9.2
+
+'."\n");
+    }
+
 
     $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
     # it does work...
@@ -65,9 +77,10 @@ sub {
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
     # around jetty (after 3.3.0-7)
-    #$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6');
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6');
     $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6');
+    $jpp->get_section('prep')->push_body('sed -i -e s,jetty,jetty6,g ./dependencies.properties
+');
     $jpp->applied_block(
 	"around jetty",
 	sub {
@@ -80,7 +93,8 @@ sub {
 
     # TODO: upstream it.
     # fixed linkage order with --as-needed
-    $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
+    # todo: REMOVED
+    # $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
     # patch was generated with
     0 && $jpp->get_section('prep')->push_body(q{
 ## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
@@ -94,9 +108,10 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 # seems to be fixed upstream.
 #find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 
+# TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO:  DO WE NEED IT WOW?
 # due to our xulrunner
 # proper patching will touch patches/eclipse-swt-buildagainstxulrunner.patch
-find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
+# find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
 
 });
     }################################################### end TODO MAKE AS PATCHES
@@ -130,10 +145,10 @@ find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
     }
 
     &replace_built_in_ant($jpp);
-    &leave_built_in_lucene($jpp);
+    #&leave_built_in_lucene($jpp);
     # TODO: make the transition after 3.4.1 switch!
     #&leave_built_in_icu4j($jpp);
-    &leave_built_in_jetty($jpp);
+    #&leave_built_in_jetty($jpp);
 
     # let them be noarches - sorry, not in 3.4.x
     #$jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
@@ -143,69 +158,12 @@ sub replace_built_in_ant {
     my $jpp=shift;
     # ALT ant has extra packages, so enable them
     #################### ANT ####################
-    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf ant-stylebook'."\n", qr!BuildRequires: ant-!);
-    $jpp->get_section('package','platform')->push_body('Requires: ant-jai ant-jmf ant-stylebook'."\n");
-    $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
-    $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf|stylebook).jar');
+    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf'."\n", qr!BuildRequires: ant-!);
+    $jpp->get_section('package','platform')->push_body('Requires: ant-jai ant-jmf'."\n");
+    $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf).jar');
+    $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf).jar');
     ################ END ANT ####################
 }
-
-sub leave_built_in_icu4j {
-    my $jpp=shift;
-    $jpp->get_section('package','')->subst_if('BuildRequires','#BuildRequires', qr'icu4j-eclipse >= 3.8.1');
-    $jpp->get_section('package','rcp')->subst_if('Requires','#Requires',qr'icu4j-eclipse >= 3.8.1');
-    $jpp->get_section('package','rcp')->push_body('Conflicts: icu4j-eclipse < 3.8'."\n");
-
-    $jpp->get_section('package','')->unshift_body('%def_disable external_icu4j'."\n");
-    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_icu4j
-}, qr'# link to the icu4j stuff');
-    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_icu4j
-}, qr'ln -s \%{_libdir}/eclipse/plugins/com.ibm.icu_\*\.jar plugins/com.ibm.icu_\$ICUVERSION');
-    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_icu4j
-}, qr'# link to the icu4j stuff');
-    $jpp->get_section('install')->unshift_body_after(q{%endif # external_icu4j
-}, qr'rm plugins/com.ibm.icu_\*\.jar');
-#warning: Installed (but unpackaged) file(s) found:
-#    /usr/lib64/eclipse/plugins/com.ibm.icu_3.8.1.v20080530.jar
-    $jpp->get_section('files','rcp')->push_body('%{_libdir}/%{name}/plugins/com.ibm.icu_*');
-    # end icu4j
-}
-
-sub leave_built_in_jetty {
-   my $jpp=shift;
-    $jpp->get_section('package','')->unshift_body('%def_disable external_jetty'."\n");
-    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_jetty
-}, qr'JETTYPLUGINVERSION='); 
-    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_jetty
-}, qr'ln -s \%{_javadir}/jetty6/jetty6-util');
-    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_jetty
-}, qr'JETTYPLUGINVERSION=');
-    $jpp->get_section('install')->unshift_body_after(q{%endif # external_jetty
-}, qr'ln -s \%{_javadir}/jetty6/jetty6-util');
-}
-
-sub leave_built_in_lucene {
-    my $jpp=shift;
-    # lucene: let it leave eclipse version
-    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene >= 2.3.1', '#Requires: lucene >= 2.3.1');
-    $jpp->get_section('package','platform')->subst(qr'^Requires: lucene-contrib >= 2.3.1', '#Requires: lucene-contrib >= 2.3.1');
-    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene >= 2.3.1', '#BuildRequires: lucene >= 2.3.1');
-    $jpp->get_section('package','')->subst(qr'^BuildRequires: lucene-contrib >= 2.3.1', '#BuildRequires: lucene-contrib >= 2.3.1');
-    $jpp->get_section('package','')->unshift_body('%def_disable external_lucene'."\n");
-    $jpp->get_section('prep')->unshift_body_before(q{%if_enabled external_lucene
-}, qr'# link to lucene');
-    $jpp->get_section('prep')->unshift_body_after(q{%endif # external_lucene
-}, qr'plugins/org.apache.lucene.analysis_\$LUCENEVERSION');
-    $jpp->get_section('install')->unshift_body_before(q{%if_enabled external_lucene
-}, qr'# link to lucene');
-    $jpp->get_section('install')->unshift_body_after(q{%endif # external_lucene
-}, qr'plugins/org.apache.lucene.analysis_\$LUCENEVERSION');
-    # end lucene
-}
-
-
-
-
 
 
 __END__

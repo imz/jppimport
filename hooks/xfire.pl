@@ -35,6 +35,22 @@ qr'export DEPMAP'
 >         -Djava.awt.headless=true \
 >       install:install-file -DgroupId=net.sf.saxon -DartifactId=saxon \
 >       -Dversion=8.7 -Dpackaging=jar -Dfile=$(build-classpath saxon8)
+> mvn-jpp -Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5  -e \
+>         -s $SETTINGS \
+>         -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+>         -Dmaven.test.failure.ignore=true \
+>         -Dmaven2.jpp.depmap.file=$DEPMAP \
+>         -Djava.awt.headless=true \
+>       install:install-file -DgroupId=com.bea.xml -DartifactId=jsr173-ri -Dversion=1.0 -Dpackaging=jar -Dfile=/usr/share/java/bea-stax-ri.jar
+> 
+> mvn-jpp -Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5  -e \
+>         -s $SETTINGS \
+>         -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+>         -Dmaven.test.failure.ignore=true \
+>         -Dmaven2.jpp.depmap.file=$DEPMAP \
+>         -Djava.awt.headless=true \
+>       install:install-file -DgroupId=org.codehaus.xfire -DartifactId=bcprov-jdk15 -Dversion=133 -Dpackaging=jar -Dfile=/usr/share/java/bcprov.jar
+>
 
 With a keen eye for details, one truth will prevail!
 
