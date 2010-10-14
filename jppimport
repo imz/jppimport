@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Getopt::Long;
 use File::Basename;
+use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
 use RPM::Source::Editor;
 use RPM::Source::Convert::Generic2ALT;
@@ -83,6 +84,7 @@ $jpp=RPM::Source::Editor->new(
     CLEANUP=> $cleanup,
     CHANGELOG=>'- converted from JPackage by jppimport script',
     TMPDIR => $tmp_dirname,
+    CONVERT::GENERIC::NOINFO=>0,
     CONVERT::JPACKAGE::JVM=>$jvm,
     CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
     CONVERT::JPACKAGE::NOZIP=>$nozip, 
