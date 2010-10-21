@@ -2,6 +2,10 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    # TODO: update qdox in Sisyphus
+#    $jpp->get_section('package','')->subst('BuildRequires: qdox','BuildRequires: qdox >= 1.6.3');
+};
+__END__
     $jpp->get_section('package','')->unshift_body('BuildRequires: cyberdomo-upnp-stack'."\n");
     # 5.0 bug to report: brioken symlink:
     # felix-maven2: brioken symlink to /usr/share/java/felix/maven-ipojo-plugin.jar
@@ -14,5 +18,3 @@ push @SPECHOOKS, sub {
 #popd
 !,qr'add_to_maven_depmap org.apache.felix maven-ipojo-plugin');
 
-};
-__END__

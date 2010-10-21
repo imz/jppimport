@@ -36,6 +36,25 @@ sub {
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/log4j*jar'."\n");
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/tomcat6-el-2.1-api*jar'."\n");
     $jpp->get_section('package','lib')->push_body('Requires: tomcat6-el-2.1-api tomcat6-log4j'."\n");
+
+    # till ant 1.8 migration
+    $jpp->get_section('package','')->push_body('BuildRequires: ant-trax'."\n");
+    $jpp->get_section('build','')->subst_if(qr'ant/ant-nodeps','ant/ant-trax',qr'OPT_JAR_LIST');
+    #="ant/ant-trax"
+
+    # fedora tomcat misses those jpackage alternatives
+    $jpp->get_section('install')->push_body('
+install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/el_api_%{name}-el-1.0-api<<EOF
+%{_javadir}/el_api.jar	%{_javadir}/%{name}-el-%{elspec}-api.jar	10000
+EOF
+install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/el_1_0_api_%{name}-el-1.0-api<<EOF
+%{_javadir}/el_1_0_api.jar	%{_javadir}/%{name}-el-%{elspec}-api.jar	10000
+EOF
+');
+    $jpp->get_section('files','el-%{elspec}-api')->push_body('%_altdir/el_1_0_api_%{name}-el-1.0-api
+%_altdir/el_api_%{name}-el-1.0-api
+');
+
 }
 __DATA__
 drwxrwxr-x /usr/share/doc/tomcat6-6.0.26

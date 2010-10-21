@@ -3,7 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
 
+__END__
     # for newer version:
     # TODO: build an old repolib version and a new one w/o repolib.
 
@@ -13,8 +15,4 @@ sub {
     # implicit conflict with saxpath;
     # TODO: make an alternative?
     $jpp->get_section('install')->exclude(qr'saxpath');
-
-
-};
-
 

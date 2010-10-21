@@ -19,11 +19,12 @@ push @SPECHOOKS,
 # $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist /usr/share/jetty5/ext/jspapi.jar'."\n");
 
 
-# # TODO: subst in jelly.init
+# subst in jelly.init
 #    daemon --user $JETTY_USER $JETTY_SCRIPT start
 #    start_daemon --user $JETTY_USER $JETTY_SCRIPT
 #    daemon --user $JETTY_USER $JETTY_SCRIPT stop
 #    stop_daemon --user $JETTY_USER $JETTY_SCRIPT
+# fixed -x functions; added condstop
     $jpp->copy_to_sources('jetty5.init');
 
     # remove explicit group ids
