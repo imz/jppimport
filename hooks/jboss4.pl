@@ -75,11 +75,34 @@ push @SPECHOOKS, sub {
 
     ###################################################
 
-    # TODO: add
+    # TODO: add operation for
     #s,classpathx-jaf,sun-jaf,g
 }
 
 __END__
+#=============== bug: placeholders __ETC__, __VAR__ ======================
+--- jboss4.spec~        2010-10-23 12:26:06.000000000 +0000
++++ jboss4.spec 2010-10-23 13:15:11.362244134 +0000
+@@ -2389,10 +2389,12 @@
+ 
+ # @@@ TODO: use a find script to generate filelists for files section?
+ 
+-###sed -e 's;__VAR__;%{_localstatedir};g' \
+-###  -e 's;__INITDIR__;%_initdir;g' \
+-###  -e 's;__ETC__;%{_sysconfdir};g' \
+ install -m 0755 %{SOURCE1}  $RPM_BUILD_ROOT%_initdir/jboss4
++sed -e 's;__VAR__;%{_localstatedir};g' \
++  -e 's;__INITDIR__;%_initdir;g' \
++  -e 's;__ETC__;%{_sysconfdir};g' \
++< %{SOURCE1} > $RPM_BUILD_ROOT%_initdir/jboss4
++#install -m 0755 %{SOURCE1}  $RPM_BUILD_ROOT%_initdir/jboss4
+ 
+ #### sed -e 's;__JBOSS_HOME__;%{jbossdir};g' \
+ ####   < %{SOURCE2} > $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/jboss
+================================================
+
+
+
 #cannot find symbol  : class ClassPoolFactory location: package org.jboss.aop
 #import org.jboss.aop.ClassPoolFactory;
 --- jboss4.spec.0	2009-08-31 06:55:46 +0000
