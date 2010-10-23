@@ -7,7 +7,10 @@ push @SPECHOOKS,
     if ($jpp->get_section('install')->match('add_to_maven_depmap')) {
 	die "hook is deprecated!!! cleanup /patches!!!";
     } else {
-	$sourceid=$jpp->add_source('axion-1.0-M3-dev.pom');
+	# TODO
+	#$jpp->get_section('package')->subst(qr'jakarta-commons-primitives','apache-commons-primitives');
+
+	my $sourceid=$jpp->add_source('axion-1.0-M3-dev.pom');
 	$jpp->get_section('install')->push_body(q!
 # poms
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
@@ -16,4 +19,9 @@ install -m 644 %{SOURCE!.$sourceid.q!} \
 
 %add_to_maven_depmap %{name} %{name} %{version} JPP %{name}
 !);
+	$jpp->get_section('files','')->push_body(q!
+%{_mavendepmapfragdir}/*
+%{_datadir}/maven2/poms/*
+!);
+    }
 }

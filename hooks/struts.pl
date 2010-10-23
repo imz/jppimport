@@ -1,6 +1,8 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('package','')->subst_if(qr'tomcat6-el-1.0-api','tomcat6-el-2.1-api',qr'Requires');
+
     $jpp->get_section('package','')->push_body('BuildRequires: cssparser
 ');
 

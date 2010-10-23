@@ -28,3 +28,4 @@ popd
 }
 
 __END__
+skipped tests as there were missing deps in pom

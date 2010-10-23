@@ -5,6 +5,7 @@ Note: fix groups for Python, GUI, etc...
 #-Dmaven.javadoc.additionalparam=-J-Xmx256m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
+#-Dmaven.test.failure.ignore=true
 #-Dmaven.compile.target=1.5
 #-Dmaven.javadoc.source=1.5
 #http://maven.apache.org/maven-1.x/plugins/test/properties.html
@@ -14,6 +15,7 @@ Note: fix groups for Python, GUI, etc...
 ##-Dtestnotmatchpattern='*'
 ##-Dtestnotmatchpattern='Hey*,Joo*,??Kaa*'
 #ant -Dtest.failonerror=false 
+#-Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5
 
 # maven opt to avoid xvfb
 #-Djava.awt.headless=true
@@ -89,20 +91,6 @@ jakarta-commons-beanutils-repolib
 ##############
 problems caused jpp-ing:
 ##############
-maven-model
---------------------------------
-running
-+ java org.codehaus.modello.ModelloCli src/main/mdo/maven.mdo java target/generated-sources 3.0.0 false 
-Exception in thread "main" org.codehaus.modello.ModelloException: Error while starting plexus.
-        at org.codehaus.modello.Modello.<init>(Modello.java:57)
-        at org.codehaus.modello.ModelloCli.main(ModelloCli.java:46)
-Caused by: java.lang.NullPointerException
-        at org.codehaus.plexus.DefaultPlexusContainer.lookup(DefaultPlexusContainer.java:299)
-        at org.codehaus.modello.Modello.<init>(Modello.java:53)
---------------------------------
-plexus-jruby-factory: calls deprecated jruby.eval() methods, dead by upstream
-
-
 TODO: jbossws.diff shows that bcond_with's does not work and should be converted to %if_with?
 
 
@@ -128,48 +116,35 @@ eclipse-pydev -> piccolo2d -> maven-plugin-bundle
 #eclipse-rse -> Requires(fc12): jakarta-commons-net >= 0:2.0
 
 =========== maven 2.0.8 ==========================
-patch?
-http://jira.codehaus.org/browse/MSHARED-17
-TODO: rebuild maven-doxia + maven-doxia-sitetools
-due to:
-[INFO] Trace
-org.apache.maven.lifecycle.LifecycleExecutionException: Error during page generation
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:564)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalWithLifecycle(DefaultLifecycleExecutor.java:480)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoal(DefaultLifecycleExecutor.java:459)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalAndHandleFailures(DefaultLifecycleExecutor.java:311)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeTaskSegments(DefaultLifecycleExecutor.java:278)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.execute(DefaultLifecycleExecutor.java:143)
-        at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:333)
-        at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:126)
-        at org.apache.maven.cli.MavenCli.main(MavenCli.java:282)
-        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-        at java.lang.reflect.Method.invoke(Method.java:597)
-        at org.codehaus.classworlds.Launcher.launchEnhanced(Launcher.java:315)
-        at org.codehaus.classworlds.Launcher.launch(Launcher.java:255)
-        at org.codehaus.classworlds.Launcher.mainWithExitCode(Launcher.java:430)
-        at org.codehaus.classworlds.Launcher.main(Launcher.java:375)
-Caused by: org.apache.maven.plugin.MojoExecutionException: Error during page generation
-        at org.apache.maven.plugins.site.SiteMojo.execute(SiteMojo.java:102)
-        at org.apache.maven.plugin.DefaultPluginManager.executeMojo(DefaultPluginManager.java:447)
-        at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:539)
-        ... 16 more
-Caused by: org.apache.maven.doxia.siterenderer.RendererException: No method on class org.apache.maven.report.projectinfo.CimReport
-        at org.apache.maven.plugins.site.ReportDocumentRenderer.renderDocument(ReportDocumentRenderer.java:143)
-        at org.apache.maven.doxia.siterenderer.DefaultSiteRenderer.renderModule(DefaultSiteRenderer.java:269)
-        at org.apache.maven.doxia.siterenderer.DefaultSiteRenderer.render(DefaultSiteRenderer.java:101)
-        at org.apache.maven.plugins.site.SiteMojo.renderLocale(SiteMojo.java:130)
-        at org.apache.maven.plugins.site.SiteMojo.execute(SiteMojo.java:97)
-        ... 18 more
-Caused by: java.lang.NoSuchMethodError: org.apache.maven.reporting.MavenReport.generate(Lorg/codehaus/doxia/sink/Sink;Ljava/util/Locale;)V
-        at org.apache.maven.plugins.site.ReportDocumentRenderer.renderDocument(ReportDocumentRenderer.java:139)
-        ... 22 more
-Embedded error: No method on class org.apache.maven.report.projectinfo.ScmReport
-org.apache.maven.reporting.MavenReport.generate(Lorg/codehaus/doxia/sink/Sink;Lj
-ava/util/Locale;)V
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3 seconds
-[INFO] Finished at: Mon Sep 20 15:58:20 UTC 2010
-[INFO] Final Memory: 26M/360M
+========================================
+felix 1.0.3 seems to depend on qdox 1.6.3 (parse error).
+knopflerfish -> crimson 1.1.3 ,20 (devel) w/api added
+jetty6 --> terraconta-dso --> jruby update (can't find fileupload.rb)
+
+wicket and portals-* : it seems those dependent on portals-jetspeed2 can be safely deleted.
+
+
+### TODO: fedora translation (see jetty.spec:)
+maven-bundle-plugin -> felix (for poms)+felix-maven2
+TODO: delete maven-bundle-plugin
+TODO: upload apache-commons-net while keeping jakarta-commons-net
+do the same trick in jakarta-commons-lang24, jakarta-commons-lang
+and do not to amend set_apache_translation
+
+maven2-plugin-site: broken beh examples: apacheds, struts (remove ||:)
+xbean: strange maven-doxia-site+plexus-utils beh
+
+TODO: build wstx, test jbossas and remove old wstx31,wstx-repolib,wstx32.
+
+
+cometd-javascript:, jetty6:
+[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
+[INFO] [enforcer:enforce {execution: enforce-java}]
+[INFO] [source:jar {execution: attach-sources}]
+---
+
+UP:
+TODO: opensaml,nekohtml: warn: possible regression: jpp5 pom is missing in jpp6
+TODO: jakarta-oro: merge fedora manifest to jpackage version due to pom
+
+TODO: jcalendar, jgoodies-* ask msp

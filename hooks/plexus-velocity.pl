@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+# jpp 5
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;

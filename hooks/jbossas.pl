@@ -18,9 +18,14 @@ push @SPECHOOKS, sub {
     $jpp->copy_to_sources('jbossas.init');
 }
 __END__
+# does not help :(
+#< export ANT_OPTS="-Xms500m -Xmx1500m -Xss1m"
+#> export ANT_OPTS="-Xms800m -Xmx2000m -Xss2m"
+
 # commented out BR: bcel, as it used old repolibs anyway.
 
 # TODO: check and update to new wstx, as it builds with old one, but use the new one 
+# TODO: check and update to new bcel
 
 45a46,47
 # alt build hack
