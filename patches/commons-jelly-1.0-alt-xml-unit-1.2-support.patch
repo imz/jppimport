@@ -1,0 +1,21 @@
+--- commons-jelly-1.0-src/jelly-tags/xmlunit/src/java/org/apache/commons/jelly/tags/xmlunit/AssertDocumentsEqualTag.java	2005-02-26 13:06:03.000000000 +0000
++++ commons-jelly-1.0-src/jelly-tags/xmlunit/src/java/org/apache/commons/jelly/tags/xmlunit/AssertDocumentsEqualTag.java	2010-10-27 06:40:17.786207108 +0000
+@@ -76,7 +76,7 @@
+ 
+             Diff delta = null;
+             try {
+-                delta = XMLUnit.compare(
++                delta = new Diff(
+                     expectedDocument.asXML(),
+                     actualDocument.asXML());
+             }
+@@ -86,9 +86,6 @@
+             catch (IOException e) {
+                 throw new JellyTagException(e);
+             }
+-            catch (ParserConfigurationException e) {
+-                throw new JellyTagException(e);
+-            }
+ 
+             if (delta.identical()) {
+                 return;
