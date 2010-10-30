@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 require 'set_bin_755.pl';
-#require 'set_target_14.pl';
 
 #2.7.6-brew/component-info.xm
 

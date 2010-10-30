@@ -1,8 +1,5 @@
 #!/usr/bin/perl -w
 
-#does not applied :(
-#require 'set_target_15.pl';
-
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;

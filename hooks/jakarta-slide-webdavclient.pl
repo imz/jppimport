@@ -2,9 +2,11 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('install')->subst(qr's/\@VERSION\@/\%{version_full}-brew','s/@VERSION@/%{version}-brew');
+}
 
-#    $jpp->get_section('package','')->unshift_body('BuildRequires: commons-httpclient-contrib',"\n");
-
+__END__
+5.0
     $jpp->get_section('install')->unshift_body('
 [ -f $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.slide-webdavlib.pom ] && exit 1;
 mkdir -p $RPM_BUILD_ROOT%_datadir/maven2/poms/
@@ -54,4 +56,3 @@ popd
     $jpp->add_section('postun','')->unshift_body('%update_maven_depmap
 ');
 
-}

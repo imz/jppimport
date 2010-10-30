@@ -8,16 +8,22 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->subst(qr'bcel-repolib = 0:5.1','bcel-repolib >= 0:5.1');
     $jpp->get_section('package','')->subst(qr'bsf-repolib = 0:2.3.0','bsf-repolib >= 0:2.3.0');
     $jpp->get_section('package','')->subst(qr'junit-repolib = 0:3.8.2','junit-repolib = 1:3.8.2');
-    $jpp->get_section('package','')->subst(qr'qdox-repolib = 0:1.6.1','qdox-repolib = 1:1.6.1');
+    $jpp->get_section('package','')->subst(qr'qdox-repolib = 0:1.6.1','qdox-repolib >= 1:1.6.1');
     $jpp->get_section('package','')->subst(qr'xerces-j2-repolib = 0:2.7.1','xerces-j2-repolib = 0:2.9.0');
     $jpp->get_section('package','')->subst(qr'jakarta-commons-collections-repolib = 0:3.1','jakarta-commons-collections-repolib >= 0:3.1');
+    $jpp->get_section('package','')->subst(qr'jakarta-commons-digester-repolib = 0:1.7','jakarta-commons-digester-repolib >= 0:1.7');
     $jpp->get_section('package','')->subst(qr'xml-security-repolib = 0:1.3.0','xml-security-repolib >= 0:1.3.0');
     $jpp->get_section('package','')->subst(qr'wstx-repolib = 0:3.1.1','wstx-repolib >= 0:3.1.1');
+    $jpp->get_section('package','')->subst(qr'cglib-repolib = 0:2.1.3','cglib-repolib >= 0:2.1.3');
 
     # jbossas 4.2
     $jpp->copy_to_sources('jbossas.init');
+
+    $jpp->get_section('files','')->subst(qr'#\%ghost \%{_sysconfdir}/sgml/\%{name}-\%{version}-\%{release}.cat','%ghost %{_sysconfdir}/sgml/%{name}-%{version}-%{release}.cat');
 }
 __END__
+
+
 # does not help :(
 #< export ANT_OPTS="-Xms500m -Xmx1500m -Xss1m"
 #> export ANT_OPTS="-Xms800m -Xmx2000m -Xss2m"

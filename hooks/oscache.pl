@@ -1,4 +1,3 @@
-#require 'set_target_14.pl';
 
 push @SPECHOOKS, 
 sub {

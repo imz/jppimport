@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-# todo: whether it is really required?
-#require 'set_target_14.pl';
 require 'add_missingok_config.pl';
 
 # added aspectj

@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 
-#require 'set_without_maven.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->add_patch('maven-surefire-2.3.1-alt-null-project.patch');

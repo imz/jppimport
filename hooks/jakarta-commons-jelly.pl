@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-#require 'set_fix_jakarta_commons_cli.pl';
-
 push @SPECHOOKS, 
 sub  {
     my ($jpp, $alt) = @_;
@@ -13,4 +11,5 @@ rm -rf ant
 tar xf %{SOURCE'.$srcnum.'}
 popd
 ');
+    $jpp->add_patch('commons-jelly-1.0-alt-xml-unit-1.2-support.patch',STRIP=>1);
 }

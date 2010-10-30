@@ -1,8 +1,6 @@
 #!/usr/bin/perl -w
 
 require 'add_missingok_config.pl';
-# hack until get rid of java 1.4
-require 'set_target_14.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;

@@ -1,8 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_target_15.pl';
-# jvm6 due to eclipse
-
 push @SPECHOOKS, 
 
 sub {

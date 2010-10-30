@@ -1,4 +1,4 @@
-require 'set_java5.pl';
+require 'set_with_java5.pl';
 
 push @SPECHOOKS, 
 sub {

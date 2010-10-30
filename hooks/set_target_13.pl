@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, \&set_target_13;
-#$spechook = \&set_target_14;
 
 sub set_target_13 {
     my ($jpp, $alt) = @_;

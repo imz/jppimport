@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-#require 'set_without_maven.pl';
-
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # maven-release-4
@@ -29,3 +27,4 @@ popd
 
 __END__
 skipped tests as there were missing deps in pom
+-Dmaven.test.skip=true

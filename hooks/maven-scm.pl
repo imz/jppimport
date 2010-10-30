@@ -1,9 +1,11 @@
 #!/usr/bin/perl -w
 
-#require 'set_without_maven.pl';
-
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','',)->push_body('BuildRequires: modello-maven-plugin saxpath'."\n");
-    #$jpp->get_section('package')->subst(qr'^Requires: maven2-bootstrap','#Requires: maven2-bootstrap');
-}
+    # added symlink maven-scm.jar in %{_datadir}/maven2/plugins
+    $jpp->get_section('install')->unshift_body_after('(cd $RPM_BUILD_ROOT%{_datadir}/maven2/plugins && for jar in *-%{namedversion}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{namedversion}||g"`; done)'."\n",
+	qr'add_to_maven_depmap org.apache.maven.plugins maven-scm-plugin');
+
+};
+__END__

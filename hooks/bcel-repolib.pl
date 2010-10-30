@@ -1,8 +1,5 @@
 #!/usr/bin/perl -w
 
-# due to downgrade 1.7 -> 5.0
-#require 'set_epoch_1.pl';
-
 require 'set_repolib_only.pl';
 
 

@@ -2,7 +2,7 @@
 
 # strange; it just does not build under java-1.5.0-sun-17 :(
 # with eraser error
-require 'set_target_15.pl';
+# so use java6 
 
 push @SPECHOOKS, 
  sub {

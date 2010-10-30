@@ -1,8 +1,5 @@
 #!/usr/bin/perl -w
 
-# till migration
-require 'set_with_java5.pl';
-
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4\n");

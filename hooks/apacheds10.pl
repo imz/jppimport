@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-#require 'add_missingok_config.pl';
-
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->applied_block(

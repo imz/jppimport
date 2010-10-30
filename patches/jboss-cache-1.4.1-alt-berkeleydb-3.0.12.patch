@@ -1,0 +1,11 @@
+--- JBossCache-1.4.1.SP9-src/src/org/jboss/cache/loader/bdbje/BdbjeCacheLoader.java	2006-09-18 21:39:48.000000000 +0000
++++ JBossCache-1.4.1.SP9-src/src/org/jboss/cache/loader/bdbje/BdbjeCacheLoader.java	2010-10-27 21:49:28.013723037 +0000
+@@ -848,7 +848,7 @@
+    private void dumpDatabase(String dbName, PrintStream ps)
+       throws Exception {
+ 
+-      DbDump dumper = new DbDump(env, dbName, ps, false);
++      DbDump dumper = new DbDump(env, dbName, ps, null, false);
+       dumper.dump();
+    }
+ 

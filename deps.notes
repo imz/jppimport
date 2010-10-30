@@ -88,11 +88,6 @@ jakarta-commons-httpclient-repolib
 jakarta-commons-beanutils-repolib
 ...
 
-##############
-problems caused jpp-ing:
-##############
-TODO: jbossws.diff shows that bcond_with's does not work and should be converted to %if_with?
-
 
 ==== deprecation:
 activemq4,spring-ldap,acegi-security->apacheds10->apacheds-daemon10
@@ -109,9 +104,7 @@ ops4j-pax -> spring-osgi -<- [missing pom dep on felix/osgi.core?]
 
 ============
 
-TODO: update
-eclipse-pydev -> piccolo2d -> maven-plugin-bundle
-
+TODO:
 # temporally hacked manually
 #eclipse-rse -> Requires(fc12): jakarta-commons-net >= 0:2.0
 
@@ -126,7 +119,9 @@ wicket and portals-* : it seems those dependent on portals-jetspeed2 can be safe
 
 ### TODO: fedora translation (see jetty.spec:)
 maven-bundle-plugin -> felix (for poms)+felix-maven2
-TODO: delete maven-bundle-plugin
+# does not work well; fedora's maven-plugin-bundle work better
+in piccolo2d -> maven-plugin-bundle
+
 TODO: upload apache-commons-net while keeping jakarta-commons-net
 do the same trick in jakarta-commons-lang24, jakarta-commons-lang
 and do not to amend set_apache_translation
@@ -159,3 +154,20 @@ eclipse-subclipse#1.6.5-alt1_1jpp6	eclipse-svnkit >= 1.2.2
 eclipse-subclipse#1.6.5-alt1_1jpp6	osgi(org.tmatesoft.svnkit) < 1.4.0
 eclipse-subclipse#1.6.5-alt1_1jpp6	osgi(org.tmatesoft.svnkit) >= 1.3.0
 svnkit#0:1.3.0-alt1_3jpp6	/etc/svnkit.conf
+
+TODO: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8.1?)
+step1: remove deps on cargo in 
+myfaces-shared11-2.0.5-alt1_2jpp5.src|cargo
+myfaces-core11-impl-1.1.5-alt2_2jpp5.src|cargo
+myfaces-core12-impl-1.2.3-alt2_1jpp5.src|cargo
+myfaces-shared12-3.0.4-alt2_1jpp5.src|cargo
+# this seem to need cargo-maven2-plugin, leave it as is?
+myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo
+myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo-maven2-plugin
+# step 2: add dep on cargo09 to jakarta-cactus
+
+TODO: jmock/jmock2 are broken by cglib 2.2 update
+cglib-nodeps include objectweb-asm, hence objectweb-asm
+update broke them. note: cglib21 imclude new objectweb-asm too :(
+...net.sf.cglib.asm.ClassWriter
+
