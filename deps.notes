@@ -16,6 +16,7 @@ Note: fix groups for Python, GUI, etc...
 ##-Dtestnotmatchpattern='Hey*,Joo*,??Kaa*'
 #ant -Dtest.failonerror=false 
 #-Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5
+#-Dant.javadoc.maxmemory=64m
 
 # maven opt to avoid xvfb
 #-Djava.awt.headless=true
@@ -80,14 +81,16 @@ antlr(manually-pick-repolib)
 xerces-j2(let be up,manually-pick-repolib)
 bcel(let be up)
 bcf
-wstx
 snmptrapappender due to -repolib ?
 
 # bootstrap 
-jakarta-commons-httpclient-repolib
+bcel-repolib
 jakarta-commons-beanutils-repolib
-...
-
+jakarta-commons-digester17-repolib
+jakarta-commons-fileupload-repolib
+jakarta-commons-httpclient-repolib
+jakarta-commons-lang-repolib
+snmptrapappender-repolib
 
 ==== deprecation:
 activemq4,spring-ldap,acegi-security->apacheds10->apacheds-daemon10
@@ -129,10 +132,7 @@ and do not to amend set_apache_translation
 maven2-plugin-site: broken beh examples: apacheds, struts (remove ||:)
 xbean: strange maven-doxia-site+plexus-utils beh
 
-TODO: build wstx, test jbossas and remove old wstx31,wstx-repolib,wstx32.
-
-
-cometd-javascript:, jetty6:
+TODO: build jetty6 with webapps. jetty6:
 [WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
 [INFO] [enforcer:enforce {execution: enforce-java}]
 [INFO] [source:jar {execution: attach-sources}]
@@ -164,10 +164,13 @@ myfaces-shared12-3.0.4-alt2_1jpp5.src|cargo
 # this seem to need cargo-maven2-plugin, leave it as is?
 myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo
 myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo-maven2-plugin
-# step 2: add dep on cargo09 to jakarta-cactus
+# step 2: add dep on cargo0 to jakarta-cactus
 
 TODO: jmock/jmock2 are broken by cglib 2.2 update
 cglib-nodeps include objectweb-asm, hence objectweb-asm
 update broke them. note: cglib21 imclude new objectweb-asm too :(
 ...net.sf.cglib.asm.ClassWriter
 
+TODO: fedora tomcat: broken symlink /usr/share/java/tomcat6/tomcat-juli* -> /usr/share/tomcat6/bin/tomcat-juli*
+
+TODO: felix is built w/private qdox 1.6.3
