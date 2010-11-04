@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#use strict;
+use strict;
 use warnings;
 use Carp;
 use Getopt::Long;
@@ -12,7 +12,7 @@ use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 use RPM::Source::Convert::MergeALT;
 
-my ($jpprpm,$altrpm,$jppspec,$altspec,@hooks,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
+my ($inrpm,$parentrpm,$inspec,$parentspec,@hooks,$changelog,$release,$epoch,$rename,$nobz2,$nozip);
 my $jvm;
 my $packager='auto';
 my $verbose=1;
@@ -22,11 +22,11 @@ my $cleanup=0;
 my $outputdir='.';
 my $patchdir=dirname($0)."/patches";
 
-my $result = GetOptions ("jpp=s" => \$jpprpm,
-		      "alt=s"   => \$altrpm,
+my $result = GetOptions ("jpp=s" => \$inrpm,
+		      "alt=s"   => \$parentrpm,
 		      "jvm=s" => \$jvm,
-		      "jppspec=s" => \$jppspec,
-		      "altspec=s"   => \$altspec,
+		      "jppspec=s" => \$inspec,
+		      "altspec=s"   => \$parentspec,
 		      "outdir=s"   => \$outputdir,
 		      "packager=s"   => \$packager,
 		      "hook=s"   => \@hooks,
@@ -39,9 +39,9 @@ my $result = GetOptions ("jpp=s" => \$jpprpm,
 		      "nobz2"   => \$nobz2,
 		      "nozip"   => \$nozip,
 		      "verbose+"  => \$verbose);
-my ($alt,$jpp);
+my ($parent,$spec);
 
-if (! $jpprpm && ! $jppspec) {
+if (! $inrpm && ! $inspec) {
     print "ERROR: one of --jpp | --jppspec is required!\n";
     print "options:
 --jpp /path/to/jpackage.src.rpm
@@ -66,35 +66,35 @@ jppimport --altspec antlr.spec --jppspec jpackage/1.7/generic/free/SPECS/antlr.s
     exit (64);
 }
 
-$usemavenplugins=1 if $jpprpm and $jpprpm=~m!/1.7/generic/!;
+$usemavenplugins=1 if $inrpm and $inrpm=~m!/1.7/generic/!;
 
 # all those hacks are just to have at hand the RPM::Source::Editor guts on crash.
-my $tmp_dirname=basename($jpprpm);
+my $tmp_dirname=basename($inrpm);
 $tmp_dirname=~s/.src.rpm//;
 my $tmp_pwd= `pwd`;
 chomp $tmp_pwd;
 $tmp_dirname="$tmp_pwd/$tmp_dirname.$$";
 
-$jpp=RPM::Source::Editor->new(
-    SOURCERPM=>$jpprpm, 
-    SPECFILE=> $jppspec, 
+$spec=RPM::Source::Editor->new(
+    SOURCERPM=>$inrpm, 
+    SPECFILE=> $inspec, 
     OUTPUTDIR=>$outputdir, 
     PATCHDIR=>$patchdir, 
     VERBOSE=> $verbose,
     CLEANUP=> $cleanup,
     CHANGELOG=>'- converted from JPackage by jppimport script',
     TMPDIR => $tmp_dirname,
-    CONVERT::GENERIC::NOINFO=>0,
-    CONVERT::JPACKAGE::JVM=>$jvm,
-    CONVERT::JPACKAGE::NOBZ2=>$nobz2, 
-    CONVERT::JPACKAGE::NOZIP=>$nozip, 
-    CONVERT::JPACKAGE::USEMAVENPLAGINS=>$usemavenplugins,
+    'CONVERT::GENERIC::NOINFO'=>0,
+    'CONVERT::JPACKAGE::JVM'=>$jvm,
+    'CONVERT::JPACKAGE::NOBZ2'=>$nobz2, 
+    'CONVERT::JPACKAGE::NOZIP'=>$nozip, 
+    'CONVERT::JPACKAGE::USEMAVENPLAGINS'=>$usemavenplugins,
 );
 $jvm||=6;
 
-my $jppepoch = $jpp->get_section('package','')->get_tag('Epoch');
-my $jpprel = $jpp->get_section('package','')->get_tag('Release');
-my $jppver = $jpp->get_section('package','')->get_tag('Version');
+my $jppepoch = $spec->get_section('package','')->get_tag('Epoch');
+my $jpprel = $spec->get_section('package','')->get_tag('Release');
+my $jppver = $spec->get_section('package','')->get_tag('Version');
 # $jppsubrel is used to keep branch of fedora or mandriva
 my $jppsubrel='';
 # for new jpackage 5.0
@@ -118,29 +118,29 @@ if ($jvm and $jvm =~ /^4/) {
     $newjava = '6';
 }
 
-my $altepoch;
+my $parentepoch;
 my $altrel="alt1";
-if ($altrpm || $altspec) {
-    $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
-    $altepoch = $alt->get_section('package','')->get_tag('Epoch');
-    $altrel = $alt->get_section('package','')->get_tag('Release');
-    $altver = $alt->get_section('package','')->get_tag('Version');
+if ($parentrpm || $parentspec) {
+    $parent=RPM::Source::Editor->new(SOURCERPM => $parentrpm, SPECFILE => $parentspec, VERBOSE=> $verbose);
+    $parentepoch = $parent->get_section('package','')->get_tag('Epoch');
+    $altrel = $parent->get_section('package','')->get_tag('Release');
+    my $altver = $parent->get_section('package','')->get_tag('Version');
     my $vercmp = `rpmvercmp $altver $jppver`;
     chomp $vercmp;
     if ($altrel=~/^alt([^_]+)_(.+)jpp(\d(?:\.\d)?)?$/) {
-	my $rel = $1;
+	my $relcore = $1;
 	my $jppfrom = $2;
 	my $java= $3;
 	$java||=0;
 	my $subrel='';
-	$subrel=$1 if ($rel=~s/(\.\d+)$//);
+	$subrel=$1 if ($relcore=~s/(\.\d+)$//);
 	# hack -- cleanup (undefined in jpp) macro in alt release:
-	$rel=~s/.?\%\w+//g;
-	$rel=~s/.?\%\{\w+\}+//g;
-	print STDERR "new alt release: jpprel=$jpprel rel=$rel subrel=$subrel jppfrom=$jppfrom jppsubrel=$jppsubrel $java\n" if $verbose>1;
-	if ($rel=~/^0\./ or $vercmp != 0) {
+	$relcore=~s/.?\%\w+//g;
+	$relcore=~s/.?\%\{\w+\}+//g;
+	print STDERR "new alt release: jpprel=$jpprel rel=$relcore subrel=$subrel jppfrom=$jppfrom jppsubrel=$jppsubrel $java\n" if $verbose>1;
+	if ($relcore=~/^0\./ or $vercmp != 0) {
 	    print STDERR "set rel=1\n" if $verbose>1;
-	    $rel=1;
+	    $relcore=1;
 	} elsif (($jppfrom eq $jpprel) and $subrel and $jppsubrel and $subrel < $jppsubrel) {
 	    # nothing to do
 	    print STDERR "nothing to do: new subrel is higher\n" if $verbose>1;
@@ -151,11 +151,11 @@ if ($altrpm || $altspec) {
 	    # nothing to do
 	    print STDERR "nothing to do: new java is higher\n" if $verbose>1;
 	} else {
-	    $rel=~/^(\d+)/;
-	    $rel=$1+1;
-	    print STDERR "++rel=$rel\n" if $verbose>1;
+	    $relcore=~/^(\d+)/;
+	    $relcore=$1+1;
+	    print STDERR "++rel=$relcore\n" if $verbose>1;
 	}
-	$altrel='alt'.$rel;
+	$altrel='alt'.$relcore;
     } else {
 	print STDERR "first alt release $altrel\n" if $verbose>1;
 	$altrel=~s/.?\%\w+//g;
@@ -167,22 +167,22 @@ if ($altrpm || $altspec) {
 	}
     }
     if ($packager eq 'auto') {
-	my $altpackager=$alt->get_section('package','')->get_tag('Packager');
+	my $altpackager=$parent->get_section('package','')->get_tag('Packager');
 	$packager=$altpackager if $altpackager;
     }
 
     print STDERR "entering alt_generic_merge\n" if $verbose>1;
-    &RPM::Source::Convert::MergeALT::alt_generic_merge($jpp,$alt);
+    &RPM::Source::Convert::MergeALT::alt_generic_merge($spec,$parent);
     print STDERR "done alt_generic_merge\n" if $verbose>1;
 
     # cleanup is performed by default in destructor
-    $alt->cleanup();
-    # but we still use $alt later
-    #$alt=undef;
+    $parent->cleanup();
+    # but we still use $parent later
+    #$parent=undef;
 
     unless ($epoch) {
-	if (defined $altepoch) {
-	    $epoch=$altepoch if ! defined $jppepoch || $altepoch > $jppepoch;
+	if (defined $parentepoch) {
+	    $epoch=$parentepoch if ! defined $jppepoch || $parentepoch > $jppepoch;
 	}
     }
 }
@@ -196,7 +196,7 @@ push @INC, $jpptoolsdir."/hooks", $jpptoolsdir."/common";
 
 if (0==@hooks or $defaulthook) {
     # looking for default hook
-    my $name = $jpp->get_section('package','')->get_tag('Name');
+    my $name = $spec->get_section('package','')->get_tag('Name');
     $name=$rename if $rename;
     my $defhook="$jpptoolsdir/hooks/$name.pl";
     # macro_expansion should be here
@@ -211,65 +211,65 @@ if (@hooks) {
 	require $hook;
 	die "script $hook does not have a valid hook!\n" unless @PREHOOKS or @SPECHOOKS;
 	if (@PREHOOKS) {
-	    $jpp->{WARN_NOTAPPLIED}++;
-	    map {&$_($jpp,$alt)} @PREHOOKS;
-	    $jpp->{WARN_NOTAPPLIED}--;
+	    $spec->{WARN_NOTAPPLIED}++;
+	    map {&$_($spec,$parent)} @PREHOOKS;
+	    $spec->{WARN_NOTAPPLIED}--;
 	}
     }
 }
 
-$jpp->rename_package($rename) if $rename;
+$spec->rename_package($rename) if $rename;
 
-#map {print STDERR $_->describe(1)} $jpp->get_sections();
+#map {print STDERR $_->describe(1)} $spec->get_sections();
 print STDERR "entering alt_generic_fixes\n" if $verbose>1;
-&RPM::Source::Convert::Generic2ALT::alt_generic_fix($jpp);
+&RPM::Source::Convert::Generic2ALT::alt_generic_fix($spec);
 print STDERR "done alt_generic_fixes\n" if $verbose>1;
-#map {print STDERR $_->describe(1)} $jpp->get_sections();
-&RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($jpp);
+#map {print STDERR $_->describe(1)} $spec->get_sections();
+&RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($spec);
 print STDERR "done jpp_specific_fixes\n" if $verbose>1;
-#map {print STDERR $_->describe(1)} $jpp->get_sections();
+#map {print STDERR $_->describe(1)} $spec->get_sections();
 
 
 my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
 $newrel=$release if ($release);
-$jpp->get_section('package','')->set_tag('Release',$newrel);
+$spec->get_section('package','')->set_tag('Release',$newrel);
 
 if (@hooks) {
     if (@SPECHOOKS) {
-	$jpp->{WARN_NOTAPPLIED}++;
-	map {&$_($jpp,$alt)} @SPECHOOKS;
-	$jpp->{WARN_NOTAPPLIED}--;
+	$spec->{WARN_NOTAPPLIED}++;
+	map {&$_($spec,$parent)} @SPECHOOKS;
+	$spec->{WARN_NOTAPPLIED}--;
     }
 }
 
-if ($altrpm || $altspec) {
-    $jpp->get_section('changelog')->set_body($alt->get_section('changelog')->get_body());
+if ($parent) {
+    $spec->get_section('changelog')->set_body($parent->get_section('changelog')->get_body());
 }
 
 if ($changelog) {
-    $jpp->set_default_changelog($changelog);
+    $spec->set_default_changelog($changelog);
 }
 
 if ($packager eq 'auto') {
-    $packager=$jpp->macros()->macro_subst('%{packager}');
+    $packager=$spec->macros()->macro_subst('%{packager}');
 }
 
 if ($packager) {
     if ($packager ne 'none') {
-	$jpp->get_section('package','')->set_tag('Packager',$packager);
+	$spec->get_section('package','')->set_tag('Packager',$packager);
     } else {
-	$jpp->get_section('package','')->clear_tag('Packager');
+	$spec->get_section('package','')->clear_tag('Packager');
     }
 }
 
 if (defined $epoch) {
-    $jpp->get_section('package','')->set_tag('Epoch',$epoch);
+    $spec->get_section('package','')->set_tag('Epoch',$epoch);
 }
 
-$jpp->add_changelog();
+$spec->add_changelog();
 
-print $jpp->get_spec() if $jppspec or $verbose>3;
-$jpp->write_rpm() if $jpprpm;
+print $spec->get_spec() if $inspec or $verbose>3;
+$spec->write_rpm() if $inrpm;
 
-$jpp->cleanup();
+$spec->cleanup();
 
