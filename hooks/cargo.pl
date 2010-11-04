@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+require 'set_jetty6_servlet_25_api.pl';
 #
 push @SPECHOOKS, 
 sub {

@@ -20,6 +20,7 @@ push @SPECHOOKS, sub {
 		$section->subst_if(qr'apache-commons-io', 'jakarta-commons-io',qr'Requires');
 		$section->subst_if(qr'apache-commons-lang', 'jakarta-commons-lang',qr'Requires');
 		$section->subst_if(qr'apache-commons-validator', 'jakarta-commons-validator',qr'Requires');
+		$section->subst_if(qr'apache-commons-logging', 'jakarta-commons-logging',qr'Requires');
 #		$section->subst_if(qr'apache-commons-', 'jakarta-commons-',qr'Requires');
 	    }
 	}

@@ -13,7 +13,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body(q!BuildRequires: jetty6-core!."\n");
 
     # requires from nanocontainer-webcontainer :(
-    $jpp->get_section('package','jsp-2.0')->push_body('Provides: jetty6-jsp-2.0-api = %version'."\n");
+    #$jpp->get_section('package','jsp-2.0')->push_body('Provides: jetty6-jsp-2.0-api = %version'."\n");
 
     &add_missingok_config($jpp, '/etc/default/%{name}','');
     &add_missingok_config($jpp, '/etc/default/jetty','');

@@ -3,16 +3,17 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath jakarta-commons-primitives'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath jakarta-commons-primitives maven-doxia-sitetools plexus-containers-container-default plexus-component-annotations'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
 
     $jpp->add_patch('mojo-maven2-plugins-17-javancss-maven-plugin-alt-javancss-3x-alt.patch',
 		    STRIP=>0);#, NUMBER=>233);
+    $jpp->add_patch('mojo-maven2-plugins-mojo-antlr-plugin-alt-doxia-update.patch',
+		    STRIP=>1);#, NUMBER=>234);
 };
 
 __END__
-
 
 #    $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
 
@@ -20,6 +21,7 @@ __END__
 mkdir -p $MAVEN_REPO_LOCAL/javacc
 ln -s $(build-classpath javacc) $MAVEN_REPO_LOCAL/javacc/javacc.jar
 ', qr'/tanukisoft/wrapper-delta-pack.jar');
+
 
     # hacks for missing deps
 #    $jpp->disable_package('-n mojo-maven2-plugin-findbugs');
@@ -50,6 +52,9 @@ ln -s $(build-classpath javacc) $MAVEN_REPO_LOCAL/javacc/javacc.jar
 
 __END__
 TODO:
+#change packaging from tar.gz
+#/tanukisoft/wrapper-delta-pack/3.2.3/wrapper-delta-pack-3.2.3.tar.gz
+sed -i s,tar.gz,jar, appassembler/appassembler-maven-plugin/pom.xml
 
 #subst 's,<module>findbugs-maven-plugin</module>,,' pom.xml
 #subst 's,<module>hibernate2-maven-plugin</module>,,' pom.xml
@@ -64,6 +69,37 @@ subst 's,<module>jspc</module>,,' pom.xml #gmaven
 subst 's,<module>xfire-maven-plugin</module>,,' mojo-sandbox/pom.xml
 subst 's,,,' pom.xml
 subst 's,,,' pom.xml
+
+# maven 2.0.8
+subst 's,<module>dashboard-maven-plugin</module>,<!--2.0.8 nocompile<module>dashboard-maven-plugin</module>-->,' mojo-sandbox/pom.xml
+
+subst 's,<artifactId>plexus-component-api</artifactId>,<artifactId>containers-component-api</artifactId>' mojo-sandbox/maven-diagram-maker/connector-api/pom.xml
+subst 's,<artifactId>plexus-containers-container-default</artifactId>,<artifactId>containers-container-default</artifactId>' mojo-sandbox/maven-diagram-maker/connector-api/pom.xml
+
+#######################################################################
+
+# Remove dependencies on org.codehaus.doxia.* (it is now
+# org.apache.maven.doxia, and in the interest of maintaining just one
+# doxia jar, we substitute things accordingly)
+
+for i in \
+./antlr-maven-plugin/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java \
+./clirr-maven-plugin/src/main/java/org/codehaus/mojo/clirr/ClirrReport.java \
+./cobertura-maven-plugin/src/main/java/org/codehaus/mojo/cobertura/CoberturaReportMojo.java \
+./javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/AbstractNcssReportGenerator.java \
+./javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/NcssAggregateReportGenerator.java \
+./javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/NcssReportGenerator.java \
+./javancss-maven-plugin/src/main/java/org/codehaus/mojo/javancss/NcssReportMojo.java \
+./jdiff-maven-plugin/src/main/java/org/apache/maven/plugin/jdiff/JDiffMojo.java \
+./mojo-sandbox/simian-report-maven-plugin/src/main/java/org/codehaus/mojo/simian/SimianReportMojo.java \
+./mojo-sandbox/simian-report-maven-plugin/src/main/java/org/codehaus/mojo/simian/SimianReportMojo.java \
+./smc-maven-plugin/src/main/java/org/codehaus/mojo/smc/SmcReportMojo.java \
+./taglist-maven-plugin/src/main/java/org/codehaus/mojo/taglist/TagListReport.java \
+; do
+    sed -i -e s:org.codehaus.doxia.sink.Sink:org.apache.maven.doxia.sink.Sink:g $i
+    sed -i -e s:org.codehaus.doxia.site.renderer.SiteRenderer:org.apache.maven.doxia.siterenderer.Renderer:g $i
+    sed -i -r -e s:\(\\s+\)SiteRenderer\(\\s+\):\\1Renderer\\2:g $i
+done
 
 --- mojo-maven2-plugins.spec	2009-02-12 20:25:14 +0000
 +++ mojo-maven2-plugins.spec	2009-02-13 08:57:13 +0000
