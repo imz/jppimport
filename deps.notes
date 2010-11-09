@@ -129,7 +129,7 @@ TODO: upload apache-commons-net while keeping jakarta-commons-net
 do the same trick in jakarta-commons-lang24, jakarta-commons-lang
 and do not to amend set_apache_translation
 
-maven2-plugin-site: broken beh examples: apacheds, struts (remove ||:)
+maven2-plugin-site: broken beh examples: apacheds, tiles, struts (remove ||:)
 xbean: strange maven-doxia-site+plexus-utils beh
 
 TODO: build jetty6 with webapps. jetty6:
