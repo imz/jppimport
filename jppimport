@@ -76,9 +76,9 @@ chomp $tmp_pwd;
 $tmp_dirname="$tmp_pwd/$tmp_dirname.$$";
 
 $spec=RPM::Source::Editor->new(
-    SOURCERPM=>$inrpm, 
+    SOURCERPM => $inrpm, 
     SPECFILE=> $inspec, 
-    OUTPUTDIR=>$outputdir, 
+    OUTPUTDIR=> $outputdir, 
     PATCHDIR=>$patchdir, 
     VERBOSE=> $verbose,
     CLEANUP=> $cleanup,

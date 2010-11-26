@@ -155,22 +155,19 @@ eclipse-subclipse#1.6.5-alt1_1jpp6	osgi(org.tmatesoft.svnkit) < 1.4.0
 eclipse-subclipse#1.6.5-alt1_1jpp6	osgi(org.tmatesoft.svnkit) >= 1.3.0
 svnkit#0:1.3.0-alt1_3jpp6	/etc/svnkit.conf
 
-TODO: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8.1?)
-step1: remove deps on cargo in 
-myfaces-shared11-2.0.5-alt1_2jpp5.src|cargo
-myfaces-core11-impl-1.1.5-alt2_2jpp5.src|cargo
-myfaces-core12-impl-1.2.3-alt2_1jpp5.src|cargo
-myfaces-shared12-3.0.4-alt2_1jpp5.src|cargo
-# this seem to need cargo-maven2-plugin, leave it as is?
-myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo
-myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo-maven2-plugin
-# step 2: add dep on cargo0 to jakarta-cactus
+DONE-using-compat: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8.1?)
+#step1: remove deps on cargo in 
+#myfaces-shared11-2.0.5-alt1_2jpp5.src|cargo
+#myfaces-core11-impl-1.1.5-alt2_2jpp5.src|cargo
+#myfaces-core12-impl-1.2.3-alt2_1jpp5.src|cargo
+#myfaces-shared12-3.0.4-alt2_1jpp5.src|cargo
+## this seem to need cargo-maven2-plugin, leave it as is?
+#myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo
+#myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo-maven2-plugin
+## step 2: add dep on cargo0 to jakarta-cactus
 
-TODO: jmock/jmock2 are broken by cglib 2.2 update
-cglib-nodeps include objectweb-asm, hence objectweb-asm
-update broke them. note: cglib21 imclude new objectweb-asm too :(
-...net.sf.cglib.asm.ClassWriter
-
-TODO: fedora tomcat: broken symlink /usr/share/java/tomcat6/tomcat-juli* -> /usr/share/tomcat6/bin/tomcat-juli*
+DONE-using-compat: jmock/jmock2 are broken by cglib 2.2 update
+cglib-nodeps include objectweb-asm 3.2, hence objectweb-asm
+update broke them. ...net.sf.cglib.asm.ClassWriter
 
 TODO: felix is built w/private qdox 1.6.3

@@ -22,8 +22,8 @@ sub {
     # TODO: remove bootstrap
     if (1) { # bootstrap
 	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
-	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene icu4j-eclipse jsch objectweb-asm sat4j
-BuildRequires: tomcat6-servlet-2.5-api jetty6-core
+	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
+BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api ant-optional
 #BuildRequires: junit >= 3.8.1
 #BuildRequires: junit4
 #BuildRequires: hamcrest >= 0:1.1-9.2
@@ -46,7 +46,6 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
     $jpp->get_section('package','platform')->unshift_body('AutoReqProv: yes,nopython'."\n");
 
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-servlet-2.4-api tomcat5-jsp-2.0-api tomcat5-jasper'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
 
@@ -76,11 +75,16 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core
     # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
+
+    # tomcat5 jasper.jar; note: pure tomcat5-jasper can be used
+    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-jasper-eclipse'."\n");
+
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6');
     $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6');
-    $jpp->get_section('prep')->push_body('sed -i -e s,jetty,jetty6,g ./dependencies.properties
-');
+
+    $jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
+    $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
     $jpp->applied_block(
 	"around jetty",
 	sub {
