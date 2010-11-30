@@ -48,16 +48,16 @@ push @SPECHOOKS, sub {
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/ControlPanel for /usr/bin/ControlPanel not found under RPM_BUILD_ROOT
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/jcontrol for /usr/bin/jcontrol not found under RPM_BUILD_ROOT
 
-    # if disabled build of visualvm
-    #$jpp->get_section('package','')->subst(qr'BuildRequires: netbeans','#BuildRequires: netbeans');
+    # Sisyphus unmet
+    $jpp->get_section('package','')->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
+');
 
-%def_enable accessibility
-%def_enable visualvm
+    $jpp->get_section('package','')->unshift_body(q'%def_enable accessibility
 %def_enable javaws
 %def_enable moz_plugin
 %def_disable systemtap
@@ -92,10 +92,12 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 	 }
     } $jpp->get_sections();
+    
+    # no need; already 0
+    #$jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
 
-    $jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
+    $jpp->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
 
-    $jpp->get_section('package','plugin')->subst_if(qr'\%\{syslibdir\}/mozilla/plugins','browser-plugins-npapi',qr'^Requires:');
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
 
@@ -113,7 +115,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    $jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
     $jpp->get_section('build')->subst(qr'fedora-','ALTLinux-');
 
     # hack for sun-based build (i586) only!!!
@@ -139,14 +140,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('install')->unshift_body_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
-
-    # deprecated
-    #$jpp->get_section('files','')->subst(qr'#\%ghost \%{_jvmdir}/\%{jredir}/lib/security','%ghost %{_jvmdir}/%{jredir}/lib/security');
-
-    # to disable visualvm w/o netbeans
-    $jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
-    $jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
-    $jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
 
     # to disable --enable-systemtap
     $jpp->get_section('package','')->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
@@ -370,7 +363,7 @@ EOF
 # ----- end: JPackage compatibility alternatives ------
 %endif	# enabled javaws
 
-# hack (see #11383) to enshure that all man pages will be compressed
+# hack (see altbug #11383) to enshure that all man pages will be compressed
 for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
     [ -f $i ] && gzip -9 $i
 done
@@ -405,6 +398,19 @@ fi
 
     $jpp->_reset_speclist();
 
+    #ppc support
+    $jpp->get_section('package','devel')->push_body('
+# hack for missing java 1.5.0 on ppc
+%ifarch ppc ppc64
+Provides: java-devel = 1.5.0
+%endif
+');
+};
+
+
+__END__
+    # deprecated
+    unless ('old java w/visualvm') {
     $jpp->get_section('install')->push_body(q!
 # dirty, dirty hack :(
 pushd %buildroot%{_jvmdir}/%{sdkdir}/lib/visualvm/profiler3/lib/deployed
@@ -417,19 +423,14 @@ rm -rf jdk1?/linux
 %endif
 popd
 !);
+	$jpp->get_section('package','')->unshift_body(q'%def_enable visualvm'."\n");
+	$jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
+	# to disable visualvm w/o netbeans
+	$jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
+	$jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
+	$jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
+    }
 
-    #ppc support
-    $jpp->get_section('package','devel')->push_body('
-# hack for missing java 1.5.0 on ppc
-%ifarch ppc ppc64
-Provides: java-devel = 1.5.0
-%endif
-');
-    $jpp->get_section('install')->subst(qr'%ifarch %{ix86}','%ifarch %{ix86} ppc ppc64');
-};
-
-
-__END__
     # chrpath hack (disabled)
     if (0) {
 	$jpp->get_section('package','')->push_body(q'# hack :(

@@ -20,17 +20,12 @@ sub {
     $jpp->del_section('postun','platform');
 
     # TODO: remove bootstrap
-    if (1) { # bootstrap
+    if (0) { # bootstrap
 	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
 	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
-BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api ant-optional
-#BuildRequires: junit >= 3.8.1
-#BuildRequires: junit4
-#BuildRequires: hamcrest >= 0:1.1-9.2
-
+BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
 '."\n");
     }
-
 
     $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
     # it does work...
@@ -76,24 +71,16 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api ant-optio
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
-    # tomcat5 jasper.jar; note: pure tomcat5-jasper can be used
-    $jpp->get_section('package','')->unshift_body('BuildRequires: tomcat5-jasper-eclipse'."\n");
-
     # around jetty (after 3.3.0-7)
     $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6');
     $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6');
 
     $jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
-    $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
-    $jpp->applied_block(
-	"around jetty",
-	sub {
-    map {$_->subst('%{_javadir}/jetty/jetty','%{_javadir}/jetty6/jetty6')} 
-    $jpp->get_section('prep'), 
-    $jpp->get_section('build'), 
-    $jpp->get_section('install');
-	});
     # end around jetty 
+
+    # lucene
+    $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
+
 
     # TODO: upstream it.
     # fixed linkage order with --as-needed
@@ -115,7 +102,7 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 # TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO:  DO WE NEED IT WOW?
 # due to our xulrunner
 # proper patching will touch patches/eclipse-swt-buildagainstxulrunner.patch
-# find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
+find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
 
 });
     }################################################### end TODO MAKE AS PATCHES
@@ -130,7 +117,7 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
     $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.26-1.5','Requires: tomcat5-jasper-eclipse >= 5.5.26-alt1_1.1jpp');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
 
     if (0) {
     #support for alt feature
@@ -148,14 +135,7 @@ find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /
 !);
     }
 
-    &replace_built_in_ant($jpp);
-    #&leave_built_in_lucene($jpp);
-    # TODO: make the transition after 3.4.1 switch!
-    #&leave_built_in_icu4j($jpp);
-    #&leave_built_in_jetty($jpp);
-
-    # let them be noarches - sorry, not in 3.4.x
-    #$jpp->get_section('package','jdt')->push_body("BuildArch: noarch\n");
+    #&replace_built_in_ant($jpp);
 };
 
 sub replace_built_in_ant {
