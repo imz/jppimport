@@ -142,8 +142,8 @@ our @ALTSKIPEXTRA=qw/jpackage-utils/;
 #javamail sun-mail
 #jakarta-commons-cli-1 jakarta-commons-cli
 #xerces-j xerces-j2
+#jakarta-crimson crimson
 our %ALT2JPPMAP=qw/
-jakarta-crimson crimson
 jsmc smc
 sg-jal jal
 lucene2 lucene
@@ -246,12 +246,12 @@ sub run_jppimport {
     $importcmd.=" --release '$release'" if ($release);
     $importcmd.=" --rename '$rename'" if ($rename);
     $importcmd.=" --epoch '$epoch'" if (defined $epoch);
-    $importcmd.=" --alt $altrpm" if ($altrpm);
+    $importcmd.=" --parent-rpm $altrpm" if ($altrpm);
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);
     $importcmd.=" --nozip" if ($nozip);
     if ($jpprpm) {
-	$importcmd.=" --jpp $jpprpm";
+	$importcmd.=" --rpm $jpprpm";
     } else {
 	print STDERR "FATAL: jpp RPM $name not found.\n";
 	return;

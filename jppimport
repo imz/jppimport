@@ -22,12 +22,12 @@ my $cleanup=0;
 my $outputdir='.';
 my $patchdir=dirname($0)."/patches";
 
-my $result = GetOptions ("jpp=s" => \$inrpm,
-		      "alt=s"   => \$parentrpm,
-		      "jvm=s" => \$jvm,
-		      "jppspec=s" => \$inspec,
-		      "altspec=s"   => \$parentspec,
+my $result = GetOptions ("rpm=s" => \$inrpm,
+		      "spec=s" => \$inspec,
+		      "parent-spec=s"   => \$parentspec,
+		      "parent-rpm=s"   => \$parentrpm,
 		      "outdir=s"   => \$outputdir,
+		      "jvm=s" => \$jvm,
 		      "packager=s"   => \$packager,
 		      "hook=s"   => \@hooks,
 		      "defaulthook!"   => \$defaulthook,
