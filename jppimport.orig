@@ -171,10 +171,6 @@ if ($parentrpm || $parentspec) {
 	$packager=$altpackager if $altpackager;
     }
 
-    print STDERR "entering alt_generic_merge\n" if $verbose>1;
-    &RPM::Source::Convert::MergeALT::alt_generic_merge($spec,$parent);
-    print STDERR "done alt_generic_merge\n" if $verbose>1;
-
     # cleanup is performed by default in destructor
     $parent->cleanup();
     # but we still use $parent later
