@@ -40,16 +40,8 @@ if ($jvm and $jvm =~ /^4/) {
 }
 $usemavenplugins=1 if $RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm=~m!/1.7/generic/!;
 
-# all those hacks are just to have at hand the RPM::Source::Editor guts on crash.
-my $tmp_dirname=basename($RPM::Source::Transform::inrpm);
-$tmp_dirname=~s/.src.rpm//;
-my $tmp_pwd= `pwd`;
-chomp $tmp_pwd;
-$tmp_dirname="$tmp_pwd/$tmp_dirname.$$";
-
 $converter->transform(
     '-specargs' => [
-	TMPDIR => $tmp_dirname,
 	'CONVERT::GENERIC::NOINFO'=>0,
 	'CONVERT::JPACKAGE::JVM'=>$jvm,
 	'CONVERT::JPACKAGE::NOBZ2'=>$nobz2, 
@@ -67,16 +59,16 @@ sub usage {
 sub verify_options {
     my ($self)=@_;
     $self->SUPER::verify_options();
-#    if (!$backportver) {
-#	print "ERROR: -Mdistrover is required!\n";
-#	$self->usage();
-#	exit (5);
-#    }
+    if ($jvm and ($jvm <4 or $jvm > 7)) {
+	print "ERROR: invalid jvm option  $jvm\n";
+	$self->usage();
+	exit (5);
+    }
 }
 
 sub nextrel_jppimport {
     my ($rel,$spec,$parent)=@_;
-    my $jpprel = $spec->get_section('package','')->get_tag('Release');
+    my $jpprel=$rel;
     my $jppver = $spec->get_section('package','')->get_tag('Version');
 # $jppsubrel is used to keep branch of fedora or mandriva
     my $jppsubrel='';
@@ -137,9 +129,9 @@ sub nextrel_jppimport {
 		$altrel='alt'.($1+1);
 	    }
 	}
-	my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
-	return $newrel;
     }
+    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
+    return $newrel;
 }
 
 sub callback_hooks {
