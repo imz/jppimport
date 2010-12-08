@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'add_missingok_config.pl';
+require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
@@ -26,6 +27,13 @@ export ANT_OPTS="-Xmx512m"
 subst 's,maxmemory="128m",maxmemory="512m",' build.xml
 !);
 
+    $jpp->get_section('install')->push_body('pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
+    foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {
+	$jpp->get_section('install')->push_body("  ln -s $i.jar batik-$i.jar\n");
+	$jpp->get_section('files','')->push_body("%_javadir/xmlgraphics-batik/batik-$i.jar\n");
+    }
+    $jpp->get_section('install')->push_body('popd'."\n");
+
     $jpp->get_section('install')->push_body('
 pushd $RPM_BUILD_ROOT%_javadir
   ln -s xmlgraphics-batik batik
@@ -41,3 +49,5 @@ popd
     $jpp->get_section('files','')->push_body('%_javadir/batik
 ');
 }
+
+__END__

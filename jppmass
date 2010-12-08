@@ -57,8 +57,8 @@ mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/gnu.trove xerces-j2 maven-plugin-itest
-apache-axiom neethi burlap3 hessian3
+my %JPPSKIP=map {$_ => 1} qw/gnu.trove maven-plugin-itest
+apache-axiom neethi burlap3 hessian3 xml-commons-resolver12
 
 useless:
 daytrader
@@ -154,7 +154,7 @@ lucene2 lucene
 our %JPP2ALTMAP= reverse (%ALT2JPPMAP);
 
 our @ALTSKIPMULTISRPMS=qw/
-xml-commons-external xml-commons-resolver
+xml-commons-external 
 /;
 #jakarta-commons-jelly-tags-ant
 #jakarta-commons-jelly-tags-define
@@ -263,8 +263,11 @@ sub run_jppimport {
 	$importcmd.=" --hook $hook" if (-e $hook);
     }
 
-    foreach $hook ("$jpptoolsdir/hooks/$name.pl", @hooks) {
-	$importcmd.=" --hook $hook" if (-e $hook);
+    $hook="$jpptoolsdir/hooks/$name.pl";
+    $importcmd.=" --hook $hook" if (-e $hook);
+
+    foreach $hook (@hooks) {
+	$importcmd.=" --hook $hook";
     }
     print "$importcmd\n";
     print `$importcmd`,"---*---\n";

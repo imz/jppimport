@@ -2,7 +2,9 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4\n");
+    $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4 jakarta-commons-net14\n");
+    # test fails :(
+    $jpp->get_section('package','')->unshift_body("BuildRequires: jakarta-commons-net14\n");
     $jpp->applied_block(
 	"var lib",
 	sub {

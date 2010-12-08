@@ -1,0 +1,12 @@
+diff -ru apache-ant-1.7.1/src/main/org/apache/tools/ant/taskdefs/optional/net/FTP.java apache-ant-1.7.1.new/src/main/org/apache/tools/ant/taskdefs/optional/net/FTP.java
+--- apache-ant-1.7.1/src/main/org/apache/tools/ant/taskdefs/optional/net/FTP.java	2010-09-05 09:42:17 +0300
++++ apache-ant-1.7.1.new/src/main/org/apache/tools/ant/taskdefs/optional/net/FTP.java	2010-12-05 22:52:00 +0200
+@@ -2295,7 +2295,7 @@
+             log("login succeeded", Project.MSG_VERBOSE);
+ 
+             if (binary) {
+-                ftp.setFileType(org.apache.commons.net.ftp.FTP.IMAGE_FILE_TYPE);
++                ftp.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
+                 if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+                     throw new BuildException("could not set transfer type: "
+                         + ftp.getReplyString());

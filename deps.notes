@@ -27,21 +27,6 @@ export MAVEN_OPTS=-XX:MaxPermSize=512m
 
 subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
-an example how to install missing jar file manually
-#--------------------------------------------------------------
-# Mock objects is sort of a special case since it does not reside in 
-# /usr/share/java. So we install it manually via maven.
-
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mkdir -p $MAVEN_REPO_LOCAL
-
-mvn-jpp install:install-file \
-    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-    -DgroupId=mockobjects \
-    -DartifactId=mockobjects-jdk1.4-j2ee1.3 \
-    -Dversion=0.09 \
-    -Dpackaging=jar \
-    -Dfile=$(build-classpath mockobjects-jdk1.4-j2ee1.4)
 #--------------------------------------------------------------
 
 ### HOW TO ADD synonims in pom ###
@@ -89,7 +74,6 @@ jakarta-commons-beanutils-repolib
 jakarta-commons-digester17-repolib
 jakarta-commons-fileupload-repolib
 jakarta-commons-httpclient-repolib
-jakarta-commons-lang-repolib
 snmptrapappender-repolib
 
 ==== deprecation:
@@ -98,18 +82,12 @@ activemq4,spring-ldap,acegi-security->apacheds10->apacheds-daemon10
 
 ================== last 5.0 update ================
 TODO: up
-nanocontainer-nanowar -> (webwork1 jar; mv .no!)
 asn1
-openqa-selenium-rc -<- [bug in maven2.0.7 ant plugin]
 activesoap -- need fix for new stax-utils
 axis2
 ops4j-pax -> spring-osgi -<- [missing pom dep on felix/osgi.core?]
 
 ============
-
-TODO:
-# temporally hacked manually
-#eclipse-rse -> Requires(fc12): jakarta-commons-net >= 0:2.0
 
 =========== maven 2.0.8 ==========================
 ========================================
@@ -124,10 +102,6 @@ wicket and portals-* : it seems those dependent on portals-jetspeed2 can be safe
 maven-bundle-plugin -> felix (for poms)+felix-maven2
 # does not work well; fedora's maven-plugin-bundle work better
 in piccolo2d -> maven-plugin-bundle
-
-TODO: upload apache-commons-net while keeping jakarta-commons-net
-do the same trick in jakarta-commons-lang24, jakarta-commons-lang
-and do not to amend set_apache_translation
 
 maven2-plugin-site: broken beh examples: apacheds, tiles, struts (remove ||:)
 xbean: strange maven-doxia-site+plexus-utils beh
@@ -144,7 +118,7 @@ TODO: jakarta-oro: merge fedora manifest to jpackage version due to pom
 
 TODO: jcalendar, jgoodies-* ask msp
 
-TODO: jdom update:
+TODO: jdom update: should be OK
 eclipse-mylyn-3.2.1-alt2_2jpp6.src.rpm: build FAILED
 [eclipse.buildScript]   Unsatisfied import package org.jdom.xpath_1.0.0
 
@@ -171,3 +145,16 @@ cglib-nodeps include objectweb-asm 3.2, hence objectweb-asm
 update broke them. ...net.sf.cglib.asm.ClassWriter
 
 TODO: felix is built w/private qdox 1.6.3
+
+[INFO] Error during page generation
+
+TODO: 
+Embedded error: Error rendering Maven report: Error while generating the HTML source code of the projet.
+The specified class for ResourceManager (org.apache.velocity.runtime.resource.ResourceManagerImpl) does not implement org.apache.velocity.runtime.resource.ResourceManager; Velocity is not initialized correctly.
+
+TODO: 
+eclipse-findbugs -> findbugs up to 1.3.9 -> breaks mojo-maven2-* build
+findbugs(DONE): umnet pom gependency on findbugsGUI (split findbugs jar?)
+
+TODO: (robot?)
+eclipse-callgraph unmet on systemtap

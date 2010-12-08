@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-#require 'set_noarch.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
@@ -12,4 +11,7 @@ push @SPECHOOKS, sub {
 %dir %_datadir/eclipse/dropins/gef/eclipse/features
 %dir %_datadir/eclipse/dropins/gef/eclipse/plugins
 ');
+
+    # different noarches due to .qualifier in version (is replaced by timestamp)
+    $jpp->get_section('build')->subst(qr'pdebuild -f org.eclipse.gef.examples','pdebuild -f org.eclipse.gef.examples -a "-DforceContextQualifier=%{contextQualifier} -DJAVADOC14_HOME=%{java_home}/bin"');
 };

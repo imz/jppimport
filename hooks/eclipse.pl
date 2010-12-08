@@ -3,6 +3,7 @@
 # (3.5.1; TODO: check 3.5.2) does we need it?
 #libgnomeui-2.so.0()(64bit) is needed by eclipse-swt-3.5.1-alt2_28jpp6
 
+# TODO: update lpg when updating eclipse-cdt from 14
 
 push @SPECHOOKS, 
 sub {
@@ -13,7 +14,7 @@ sub {
 
     # TODO: check 3.5.2
     # hack -- unmet osgi dependency (recommends?)
-    $jpp->get_section('package','platform')->unshift_body('Provides: osgi(org.eclipse.equinox.simpleconfigurator.manipulator) = 1.0.100'."\n");
+    #$jpp->get_section('package','platform')->unshift_body('Provides: osgi(org.eclipse.equinox.simpleconfigurator.manipulator) = 1.0.100'."\n");
 
     # hack until gtk-update-icon-cache fix
     $jpp->del_section('post','platform');
@@ -26,6 +27,8 @@ sub {
 BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
 '."\n");
     }
+    # ant-bcel,... is missing in BR :(
+    $jpp->get_section('package','')->unshift_body('BuildRequires: ant-optional'."\n");
 
     $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
     # it does work...
@@ -50,30 +53,16 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-j
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors
 
-# TODO: is it valid for 3.5.1?
-# eclipse-pde quick hack against osgi provides
-#+ Требует: osgi(Cloudscape)
-#+ Требует: osgi(org.apache.derby)
-#+ Требует: osgi(org.apache.derby.core)
-#    $jpp->get_section('package','pde')->unshift_body('Provides: osgi(Cloudscape) osgi(org.apache.derby) osgi(org.apache.derby.core)'."\n");
-    
-#    # misplaced in requires
-#    $jpp->get_section('package','')->unshift_body('
-## todo: remove this 
-##add_findreq_skiplist /usr/share/eclipse/plugins/org.eclipse.tomcat_*.v20070531/lib/jspapi.jar
-##add_findreq_skiplist %_libdir/eclipse/swt-gtk-3.3.0.jar
-#');
-
     # hack around #22839: built-in /usr/lib*/eclipse
-    #$jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
+    # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
 
     # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
     # around jetty (after 3.3.0-7)
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6');
-    $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6');
+    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6-core');
+    $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','Requires: jetty6-core');
 
     $jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
     # end around jetty 
@@ -81,17 +70,6 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-j
     # lucene
     $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
 
-
-    # TODO: upstream it.
-    # fixed linkage order with --as-needed
-    # todo: REMOVED
-    # $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
-    # patch was generated with
-    0 && $jpp->get_section('prep')->push_body(q{
-## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
-#        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
-find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
-});
 
     if (1) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
     $jpp->get_section('prep')->push_body(q{
@@ -135,22 +113,22 @@ find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
 !);
     }
 
-    #&replace_built_in_ant($jpp);
 };
-
-sub replace_built_in_ant {
-    my $jpp=shift;
-    # ALT ant has extra packages, so enable them
-    #################### ANT ####################
-    $jpp->get_section('package','')->unshift_body_before('BuildRequires: ant-jai ant-jmf'."\n", qr!BuildRequires: ant-!);
-    $jpp->get_section('package','platform')->push_body('Requires: ant-jai ant-jmf'."\n");
-    $jpp->get_section('prep')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf).jar');
-    $jpp->get_section('install')->subst_if(qr'#ln -s %{_javadir}/ant/ant-','ln -s %{_javadir}/ant/ant-',qr'ant-(?:apache-bsf|commons-net|jai|jmf).jar');
-    ################ END ANT ####################
-}
 
 
 __END__
+    # DONE: upstream it.
+    # fixed linkage order with --as-needed
+    # todo: REMOVED
+    # $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
+    # patch was generated with
+    0 && $jpp->get_section('prep')->push_body(q{
+## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
+#        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
+find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
+});
+
+
 
     $jpp->get_section('prep')->push_body(q{
 %if 0

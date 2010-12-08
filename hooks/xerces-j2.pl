@@ -1,13 +1,11 @@
 #!/usr/bin/perl -w
 
-require 'set_target_14.pl';
 require 'set_bin_755.pl';
+require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    # hack; not needed
-    #$jpp->get_section('package','')->push_body("Provides: osgi(org.apache.xerces) = %version\n");
     $jpp->get_section('package','')->unshift_body("BuildRequires: xml-commons-resolver\n");
 
     $jpp->get_section('package','')->push_body("Provides: xerces-j = %version-%release\n");
@@ -20,22 +18,3 @@ sub {
 }
 
 __END__
-''
-51a62
-Source33:        xercesImpl-%{version}.pom
-build---
- ln -sf $(build-classpath xalan-j2) xalan.jar
-+ln -sf $(build-classpath xalan-j2-serializer) serializer.jar
-install---
-%add_to_maven_depmap xerces xercesImpl %{version} JPP %{name}
-
-# pom
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
-install -pm 644 %{SOURCE33} \
-    $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.%{name}.pom
-
-files ---
-%{_datadir}/maven2/poms/*
-%{_mavendepmapfragdir}
----files
-s.doc ISSUES LICENSE* NOTICE README STATUS TODO,doc LICENSE* NOTICE README,

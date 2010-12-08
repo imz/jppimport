@@ -32,6 +32,14 @@ push @SPECHOOKS, sub {
 	}
 	);
 
+    # remove explicit group ids
+    $jpp->get_section('pre','')->subst(qr'-[gu]\s+%\{jtuid\}','-r');
+    # set default shell to /dev/null (will it work ?)
+    #$jpp->get_section('pre','')->subst(qr'-s /bin/sh','/dev/null');
+    # hack to fix upgrade from -alt2 if rmuser/adduser to be applied
+    #$jpp->get_section('post','')->push_body('chown -R %{name}.%{name} %logdir'."\n");
+
+
 }
 
 

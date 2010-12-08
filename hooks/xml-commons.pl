@@ -1,15 +1,15 @@
 #!/usr/bin/perl -w
 
-require 'set_target_14.pl';
+require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
     # alt sppecific - removed ghosted alternatives symlink
-    $jpp->get_section('install')->subst(qr'ln -s %\{_sysconfdir\}/alternatives/%\{name\}-apis-javadoc \$RPM_BUILD_ROOT%\{_javadocdir\}/%\{name\}-apis # ghost symlink','#ln -s %{_sysconfdir}/alternatives/%{name}-apis-javadoc $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis # ghost symlink');
-    $jpp->get_section('files','jaxp-1.3-apis-javadoc')->subst(qr'%ghost %\{_javadocdir\}/\%\{name\}-apis','#%ghost %{_javadocdir}/%{name}-apis');
-    $jpp->get_section('files','jaxp-1.2-apis-javadoc')->subst(qr'%ghost %\{_javadocdir\}/\%\{name\}-apis','#%ghost %{_javadocdir}/%{name}-apis');
-    $jpp->get_section('files','jaxp-1.1-apis-javadoc')->subst(qr'%ghost %\{_javadocdir\}/\%\{name\}-apis','#%ghost %{_javadocdir}/%{name}-apis');
+    $jpp->get_section('install')->subst(qr'ln -s %\{_sysconfdir\}/alternatives/%\{name\}-apis-javadoc \$RPM_BUILD_ROOT%\{_javadocdir\}/%\{name\}-apis','#ln -s %{_sysconfdir}/alternatives/%{name}-apis-javadoc $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis');
+    $jpp->get_section('files','jaxp-1.1-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
+    $jpp->get_section('files','jaxp-1.2-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
+    $jpp->get_section('files','jaxp-1.3-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
 
     $jpp->applied_block(
 	"from %post to %install (not to break provides) hook",

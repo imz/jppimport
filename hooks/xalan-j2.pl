@@ -1,10 +1,19 @@
 #!/usr/bin/perl -w
 
-require 'set_target_14.pl';
 require 'set_manual_no_dereference.pl';
+require 'set_add_fc_osgi_manifest.pl';
+require 'set_dos2unix_scripts.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+
+    $jpp->get_section('prep')->push_body('# xerces-j2 2.9.1 in repolib
+if grep 2.7.1 %{SOURCE1}; then
+subst s,2.7.1,2.9.1, %{SOURCE1}
+else
+echo Hook is deprecated!!! delete it.
+fi
+');
 
     # ALT Compat provides
     if (not $jpp->get_section('package','')->match(qr'Provides: xalan-j = ')) {
@@ -22,14 +31,3 @@ push @SPECHOOKS, sub {
 };
 
 __END__
-    # 2 changelogs (jppbug, to be commited in bugzilla
-    my $count_changelogs=0;
-    my @newsec;
-    foreach my $sec ($jpp->get_sections()) {
-	if ($sec->get_type() eq 'changelog') {
-	    push @newsec, $sec unless $count_changelogs++;
-	} else {
-	    push @newsec, $sec;
-	}
-    }
-    $jpp->set_sections(\@newsec);
