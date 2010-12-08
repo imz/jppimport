@@ -1,0 +1,295 @@
+diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak
+--- build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2010-02-11 20:46:57.000000000 +0000
++++ build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2010-12-08 14:13:40.759725988 +0000
+@@ -50,7 +50,7 @@
+ 
+ CDE_LIBS = -L$(CDE_HOME)/lib -R$(CDE_HOME)/lib -lXt -lX11 -lDtSvc
+ 
+-AWT_LIBS = -L$(AWT_LIB_PATH) -ljawt -shared
++AWT_LIBS = -L$(AWT_LIB_PATH) -ljawt 
+ 
+ ATKCFLAGS = `pkg-config --cflags atk gtk+-2.0`
+ ATKLIBS = `pkg-config --libs-only-L atk gtk+-2.0` -latk-1.0 -lgtk-x11-2.0
+@@ -58,7 +58,7 @@
+ GNOMELIBS = `pkg-config --libs-only-L gnome-vfs-module-2.0 libgnome-2.0 libgnomeui-2.0` -lgnomevfs-2 -lgnome-2 -lgnomeui-2
+ 
+ GLXCFLAGS = 
+-GLXLIBS = -shared -fPIC -L/usr/X11R6/lib -lGL -lGLU -lm
++GLXLIBS = -L/usr/X11R6/lib -lGL -lGLU -lm
+ 
+ # Uncomment for Native Stats tool
+ #NATIVE_STATS = -DNATIVE_STATS
+@@ -77,7 +77,7 @@
+ 	-I$(JAVA_HOME)/include \
+ 	-I$(JAVA_HOME)/include/linux \
+ 	${SWT_PTR_CFLAGS}
+-MOZILLALIBS = -shared -Wl,--version-script=mozilla_exports -Bsymbolic
++MOZILLALIBCFLAGS = -shared -Wl,--version-script=mozilla_exports -Bsymbolic
+ MOZILLAEXCLUDES = -DNO__1XPCOMGlueShutdown \
+ 	-DNO__1XPCOMGlueStartup \
+ 	-DNO__1XPCOMGlueLoadXULFunctions \
+@@ -109,12 +109,12 @@
+ 		-I$(JAVA_HOME)/include/linux \
+ 		-fPIC \
+ 		${SWT_PTR_CFLAGS}
+-LIBS = -shared -fPIC
++LIBS = 
++LIBCFLAGS = -shared -fPIC
+ 
+ ifndef NO_STRIP
+-	AWT_LIBS := $(AWT_LIBS) -s
+-	MOZILLALIBS := $(MOZILLALIBS) -s
+-	LIBS := $(LIBS) -s
++	MOZILLALIBCFLAGS := $(MOZILLALIBCFLAGS) -s
++	LIBCFLAGS := $(LIBCFLAGS) -s
+ endif
+ 
+ all: make_swt make_atk make_gnome make_glx
+@@ -125,13 +125,13 @@
+ make_swt: $(SWT_LIB) $(SWTPI_LIB)
+ 
+ $(SWT_LIB): $(SWT_OBJECTS)
+-	$(CC) $(LIBS) -o $(SWT_LIB) $(SWT_OBJECTS)
++	$(CC) $(LIBCFLAGS) -o $(SWT_LIB) $(SWT_OBJECTS) $(LIBS)
+ 
+ callback.o: callback.c callback.h
+ 	$(CC) $(CFLAGS) -DUSE_ASSEMBLER -c callback.c
+ 
+ $(SWTPI_LIB): $(SWTPI_OBJECTS)
+-	$(CC) $(LIBS) $(GTKLIBS) -o $(SWTPI_LIB) $(SWTPI_OBJECTS)
++	$(CC) $(LIBCFLAGS) -o $(SWTPI_LIB) $(SWTPI_OBJECTS) $(LIBS) $(GTKLIBS)
+ 
+ swt.o: swt.c swt.h
+ 	$(CC) $(CFLAGS) -c swt.c
+@@ -150,7 +150,7 @@
+ make_cairo: $(CAIRO_LIB)
+ 
+ $(CAIRO_LIB): $(CAIRO_OBJECTS)
+-	$(CC) $(LIBS) $(CAIROLIBS) -o $(CAIRO_LIB) $(CAIRO_OBJECTS)
++	$(CC) $(LIBCFLAGS) $(CAIROLIBS) -o $(CAIRO_LIB) $(CAIRO_OBJECTS) $(LIBS) $(CAIROLIBS)
+ 
+ cairo.o: cairo.c cairo.h swt.h
+ 	$(CC) $(CFLAGS) $(CAIROCFLAGS) -c cairo.c
+@@ -166,7 +166,7 @@
+ make_cde: $(CDE_LIB)
+ 
+ $(CDE_LIB): $(CDE_OBJECTS)
+-	$(CC) $(LIBS) $(CDE_LIBS) -o $(CDE_LIB) $(CDE_OBJECTS)
++	$(CC) $(LIBCFLAGS) -o $(CDE_LIB) $(CDE_OBJECTS) $(LIBS) $(CDE_LIBS)
+ 
+ #
+ # AWT lib
+@@ -174,7 +174,7 @@
+ make_awt:$(AWT_LIB)
+ 
+ $(AWT_LIB): $(AWT_OBJECTS)
+-	$(CC) $(AWT_LIBS) -o $(AWT_LIB) $(AWT_OBJECTS)
++	$(CC) $(LIBCFLAGS) -o $(AWT_LIB) $(AWT_OBJECTS) $(AWT_LIBS)
+ 
+ #
+ # Atk lib
+@@ -182,7 +182,7 @@
+ make_atk: $(ATK_LIB)
+ 
+ $(ATK_LIB): $(ATK_OBJECTS)
+-	$(CC) $(LIBS) $(ATKLIBS) -o $(ATK_LIB) $(ATK_OBJECTS)
++	$(CC) $(LIBCFLAGS) $(ATKLIBS) -o $(ATK_LIB) $(ATK_OBJECTS) $(LIBS)
+ 
+ atk.o: atk.c atk.h
+ 	$(CC) $(CFLAGS) $(ATKCFLAGS) -c atk.c
+@@ -199,7 +199,7 @@
+ make_gnome: $(GNOME_LIB)
+ 
+ $(GNOME_LIB): $(GNOME_OBJECTS)
+-	$(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
++	$(CC) $(LIBCFLAGS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS) $(LIBS)
+ 
+ gnome.o: gnome.c 
+ 	$(CC) $(CFLAGS) $(GNOMECFLAGS) -c gnome.c
+@@ -216,7 +216,7 @@
+ make_mozilla:$(MOZILLA_LIB)
+ 
+ $(MOZILLA_LIB): $(MOZILLA_OBJECTS)
+-	$(CXX) -o $(MOZILLA_LIB) $(MOZILLA_OBJECTS) $(MOZILLALIBS) ${MOZILLA_LIBS}
++	$(CXX) $(MOZILLALIBCFLAGS) -o $(MOZILLA_LIB) $(MOZILLA_OBJECTS) ${MOZILLA_LIBS}
+ 
+ xpcom.o: xpcom.cpp
+ 	$(CXX) $(MOZILLACFLAGS) $(MOZILLAEXCLUDES) ${MOZILLA_INCLUDES} -c xpcom.cpp
+@@ -236,7 +236,7 @@
+ make_xulrunner:$(XULRUNNER_LIB)
+ 
+ $(XULRUNNER_LIB): $(XULRUNNER_OBJECTS)
+-	$(CXX) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLACFLAGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
+ 
+ xpcomxul.o: xpcom.cpp
+ 	$(CXX) -o xpcomxul.o $(MOZILLACFLAGS) $(XULRUNNEREXCLUDES) ${XULRUNNER_INCLUDES} -c xpcom.cpp
+@@ -256,7 +256,7 @@
+ make_xpcominit:$(XPCOMINIT_LIB)
+ 
+ $(XPCOMINIT_LIB): $(XPCOMINIT_OBJECTS)
+-	$(CXX) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLALIBCFLAGS) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) ${XULRUNNER_LIBS}
+ 
+ xpcominit.o: xpcominit.cpp
+ 	$(CXX) $(MOZILLACFLAGS) ${XULRUNNER_INCLUDES} -c xpcominit.cpp
+@@ -273,7 +273,7 @@
+ make_glx: $(GLX_LIB)
+ 
+ $(GLX_LIB): $(GLX_OBJECTS)
+-	$(CC) $(LIBS) $(GLXLIBS) -o $(GLX_LIB) $(GLX_OBJECTS)
++	$(CC) $(LIBCFLAGS) -o $(GLX_LIB) $(GLX_OBJECTS) $(LIBS) $(GLXLIBS)
+ 
+ glx.o: glx.c 
+ 	$(CC) $(CFLAGS) $(GLXCFLAGS) -c glx.c
+diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt//Eclipse SWT PI/motif/library/make_linux.mak eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/motif/library/make_linux.mak
+--- build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/motif/library/make_linux.mak	2010-02-11 20:49:26.000000000 +0000
++++ build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/motif/library/make_linux.mak	2010-12-08 14:25:14.695237934 +0000
+@@ -26,7 +26,8 @@
+ SWT_LIB = lib$(SWT_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ SWT_OBJS = swt.o c.o c_stats.o callback.o os.o os_structs.o os_custom.o os_stats.o
+ SWT_LIBS = -L$(MOTIF_HOME)/lib -lXm -L/usr/lib -L/usr/X11R6/lib \
+-	           -rpath . -x -shared -lX11 -lm -lXext -lXt -lXp -ldl -lXinerama -lXtst
++	           -lX11 -lm -lXext -lXt -lXp -ldl -lXinerama -lXtst
++SWT_CFLAGS= -x -shared 
+ 
+ # Uncomment for Native Stats tool
+ #NATIVE_STATS = -DNATIVE_STATS
+@@ -39,24 +40,28 @@
+ GNOME_LIB = lib$(GNOME_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ GNOME_OBJECTS = swt.o gnome.o gnome_structs.o gnome_stats.o
+ GNOME_CFLAGS = -O -Wall -DSWT_VERSION=$(SWT_VERSION) $(NATIVE_STATS) -DLINUX -DGTK -I$(JAVA_HOME)/include `pkg-config --cflags gnome-vfs-module-2.0 libgnome-2.0 libgnomeui-2.0`
+-GNOME_LIBS = -shared -fpic -fPIC `pkg-config --libs-only-L gnome-vfs-module-2.0 libgnome-2.0 libgnomeui-2.0` -lgnomevfs-2 -lgnome-2 -lgnomeui-2
++GNOME_LIBCFLAGS = -shared -fpic -fPIC
++GNOME_LIBS = `pkg-config --libs-only-L gnome-vfs-module-2.0 libgnome-2.0 libgnomeui-2.0` -lgnomevfs-2 -lgnome-2 -lgnomeui-2
+ 
+ AWT_PREFIX = swt-awt
+ AWT_LIB = lib$(AWT_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ AWT_OBJS = swt_awt.o
+-AWT_LIBS = -L$(JAVA_HOME)/jre/bin -ljawt -shared
++AWT_LIBS = -L$(JAVA_HOME)/jre/bin -ljawt 
++AWT_LIBCFLAGS = -shared
+ 
+ GTK_PREFIX = swt-gtk
+ GTK_LIB = lib$(GTK_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ GTK_OBJS = swt.o gtk.o
+ GTK_CFLAGS = `pkg-config --cflags gtk+-2.0`
+-GTK_LIBS = -x -shared `pkg-config --libs-only-L gtk+-2.0` -lgtk-x11-2.0
++GTK_LIBS = `pkg-config --libs-only-L gtk+-2.0` -lgtk-x11-2.0
++GTK_LIBCFLAGS = -x -shared
+ 
+ CAIRO_PREFIX = swt-cairo
+ CAIRO_LIB = lib$(CAIRO_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ CAIRO_OBJECTS = swt.o cairo.o cairo_structs.o cairo_stats.o
+ CAIROCFLAGS = `pkg-config --cflags cairo`
+-CAIROLIBS = -shared -fpic -fPIC `pkg-config --libs-only-L cairo` -lcairo
++CAIROLIBS = `pkg-config --libs-only-L cairo` -lcairo
++CAIROLIBCFLAGS = -shared -fpic -fPIC
+ 
+ MOZILLA_PREFIX = swt-mozilla$(GCC_VERSION)
+ MOZILLA_LIB = lib$(MOZILLA_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+@@ -73,7 +78,7 @@
+ 	-I$(JAVA_HOME)/include \
+ 	-I$(JAVA_HOME)/include/linux \
+ 	${SWT_PTR_CFLAGS}
+-MOZILLALIBS = -shared -Wl,--version-script=mozilla_exports -Bsymbolic
++MOZILLALIBCFLAGS = -shared -Wl,--version-script=mozilla_exports -Bsymbolic
+ MOZILLAEXCLUDES = -DNO__1XPCOMGlueShutdown \
+ 	-DNO__1XPCOMGlueStartup \
+ 	-DNO__1XPCOMGlueLoadXULFunctions \
+@@ -95,12 +100,13 @@
+ GLX_LIB = lib$(GLX_PREFIX)-$(WS_PREFIX)-$(SWT_VERSION).so
+ GLX_OBJECTS = swt.o glx.o glx_structs.o glx_stats.o
+ GLXCFLAGS = 
+-GLXLIBS = -shared -fpic -fPIC -L/usr/X11R6/lib -lGL -lGLU -lm
++GLXLIBS = -L/usr/X11R6/lib -lGL -lGLU -lm
++GLXLIBCFLGS = -shared -fpic -fPIC
+ 
+ ifndef NO_STRIP
+ 	CFLAGS := $(CFLAGS) -s
+-	CAIROLIBS := $(CAIROLIBS) -s
+-	MOZILLALIBS := $(MOZILLALIBS) -s
++	CAIROLIBCFLAGS := $(CAIROLIBS) -s
++	MOZILLALIBCFLAGS := $(MOZILLALIBCFLAGS) -s
+ endif
+ 
+ all: make_swt make_awt make_gnome make_gtk make_glx
+@@ -108,7 +114,7 @@
+ make_swt: $(SWT_LIB)
+ 
+ $(SWT_LIB): $(SWT_OBJS)
+-	$(LD) -o $@ $(SWT_OBJS) $(SWT_LIBS)
++	$(LD) $(SWT_CFLAGS) -o $@ $(SWT_OBJS) $(SWT_LIBS)
+ 
+ swt.o: swt.c swt.h
+ 	$(CC) $(CFLAGS) -c swt.c
+@@ -122,7 +128,7 @@
+ make_gnome: $(GNOME_LIB)
+ 
+ $(GNOME_LIB): $(GNOME_OBJECTS)
+-	gcc -o $@ $(GNOME_OBJECTS) $(GNOME_LIBS)
++	gcc $(GNOME_LIBCFLAGS) -o $@ $(GNOME_OBJECTS) $(GNOME_LIBS)
+ 
+ gnome.o: gnome.c
+ 	gcc $(GNOME_CFLAGS) -c -o gnome.o gnome.c
+@@ -136,12 +142,12 @@
+ make_awt: $(AWT_LIB)
+ 
+ $(AWT_LIB): $(AWT_OBJS)
+-	ld -o $@ $(AWT_OBJS) $(AWT_LIBS)
++	ld $(AWT_LIBCFLAGS) -o $@ $(AWT_OBJS) $(AWT_LIBS)
+ 
+ make_gtk: $(GTK_LIB)
+ 
+ $(GTK_LIB): $(GTK_OBJS)
+-	ld -o $@ $(GTK_OBJS) $(GTK_LIBS)
++	ld $(GTK_LIBCFLAGS) -o $@ $(GTK_OBJS) $(GTK_LIBS)
+ 
+ gtk.o: gtk.c
+ 	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o gtk.o gtk.c
+@@ -149,7 +155,7 @@
+ make_cairo: $(CAIRO_LIB)
+ 
+ $(CAIRO_LIB): $(CAIRO_OBJECTS)
+-	$(LD) $(CAIROLIBS) -o $(CAIRO_LIB) $(CAIRO_OBJECTS)
++	$(LD) $(CAIROLIBCFLAGS) -o $(CAIRO_LIB) $(CAIRO_OBJECTS) $(CAIROLIBS)
+ 
+ cairo.o: cairo.c cairo.h swt.h
+ 	$(CC) $(CFLAGS) $(CAIROCFLAGS) -c cairo.c
+@@ -163,7 +169,7 @@
+ make_mozilla:$(MOZILLA_LIB)
+ 
+ $(MOZILLA_LIB): $(MOZILLA_OBJECTS)
+-	$(CXX) -o $(MOZILLA_LIB) $(MOZILLA_OBJECTS) $(MOZILLALIBS) ${MOZILLA_LIBS}
++	$(CXX) -o $(MOZILLA_LIBCFLGS) $(MOZILLA_OBJECTS) ${MOZILLA_LIBS}
+ 
+ xpcom.o: xpcom.cpp
+ 	$(CXX) $(MOZILLACFLAGS) $(MOZILLAEXCLUDES) ${MOZILLA_INCLUDES} -c xpcom.cpp
+@@ -180,7 +186,7 @@
+ make_xulrunner:$(XULRUNNER_LIB)
+ 
+ $(XULRUNNER_LIB): $(XULRUNNER_OBJECTS)
+-	$(CXX) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLA_LIBCFLGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
+ 
+ xpcomxul.o: xpcom.cpp
+ 	$(CXX) -o xpcomxul.o $(MOZILLACFLAGS) $(XULRUNNEREXCLUDES) ${XULRUNNER_INCLUDES} -c xpcom.cpp
+@@ -201,7 +207,7 @@
+ make_xpcominit:$(XPCOMINIT_LIB)
+ 
+ $(XPCOMINIT_LIB): $(XPCOMINIT_OBJECTS)
+-	$(CXX) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLA_LIBCFLGS) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) ${XULRUNNER_LIBS}
+ 
+ xpcominit.o: xpcominit.cpp
+ 	$(CXX) $(MOZILLACFLAGS) ${XULRUNNER_INCLUDES} -c xpcominit.cpp
+@@ -215,7 +221,7 @@
+ make_glx: $(GLX_LIB)
+ 
+ $(GLX_LIB): $(GLX_OBJECTS)
+-	$(LD) $(LIBS) $(GLXLIBS) -o $(GLX_LIB) $(GLX_OBJECTS)
++	$(LD) $(GLXLIBCFLAGS) -o $(GLX_LIB) $(GLX_OBJECTS) $(LIBS) $(GLXLIBS)
+ 
+ glx.o: glx.c 
+ 	$(CC) $(CFLAGS) $(GLXCFLAGS) -c glx.c
+diff -ru tmp1/g/make_linux.mak tmp/g/make_linux.mak
