@@ -120,7 +120,7 @@ diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/libr
  
  $(XULRUNNER_LIB): $(XULRUNNER_OBJECTS)
 -	$(CXX) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
-+	$(CXX) $(MOZILLACFLAGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLALIBCFLAGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
  
  xpcomxul.o: xpcom.cpp
  	$(CXX) -o xpcomxul.o $(MOZILLACFLAGS) $(XULRUNNEREXCLUDES) ${XULRUNNER_INCLUDES} -c xpcom.cpp
@@ -261,7 +261,7 @@ diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt//Eclipse SWT PI/motif/l
  
  $(MOZILLA_LIB): $(MOZILLA_OBJECTS)
 -	$(CXX) -o $(MOZILLA_LIB) $(MOZILLA_OBJECTS) $(MOZILLALIBS) ${MOZILLA_LIBS}
-+	$(CXX) -o $(MOZILLA_LIBCFLGS) $(MOZILLA_OBJECTS) ${MOZILLA_LIBS}
++	$(CXX) -o $(MOZILLALIBCFLAGS) $(MOZILLA_OBJECTS) ${MOZILLA_LIBS}
  
  xpcom.o: xpcom.cpp
  	$(CXX) $(MOZILLACFLAGS) $(MOZILLAEXCLUDES) ${MOZILLA_INCLUDES} -c xpcom.cpp
@@ -270,7 +270,7 @@ diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt//Eclipse SWT PI/motif/l
  
  $(XULRUNNER_LIB): $(XULRUNNER_OBJECTS)
 -	$(CXX) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
-+	$(CXX) $(MOZILLA_LIBCFLGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLALIBCFLAGS) -o $(XULRUNNER_LIB) $(XULRUNNER_OBJECTS) ${XULRUNNER_LIBS}
  
  xpcomxul.o: xpcom.cpp
  	$(CXX) -o xpcomxul.o $(MOZILLACFLAGS) $(XULRUNNEREXCLUDES) ${XULRUNNER_INCLUDES} -c xpcom.cpp
@@ -279,7 +279,7 @@ diff -ru build/eclipse-3.5.2-src/plugins/org.eclipse.swt//Eclipse SWT PI/motif/l
  
  $(XPCOMINIT_LIB): $(XPCOMINIT_OBJECTS)
 -	$(CXX) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) $(MOZILLALIBS) ${XULRUNNER_LIBS}
-+	$(CXX) $(MOZILLA_LIBCFLGS) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) ${XULRUNNER_LIBS}
++	$(CXX) $(MOZILLALIBCFLAGS) -o $(XPCOMINIT_LIB) $(XPCOMINIT_OBJECTS) ${XULRUNNER_LIBS}
  
  xpcominit.o: xpcominit.cpp
  	$(CXX) $(MOZILLACFLAGS) ${XULRUNNER_INCLUDES} -c xpcominit.cpp
