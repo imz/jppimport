@@ -16,17 +16,15 @@ sub {
     # hack -- unmet osgi dependency (recommends?)
     #$jpp->get_section('package','platform')->unshift_body('Provides: osgi(org.eclipse.equinox.simpleconfigurator.manipulator) = 1.0.100'."\n");
 
+    # TODO: upstream it.
+    # fixed linkage order with --as-needed
+    # pushd build/eclipse-3.5.2-src; find ./plugins -name 'make_linux.mak'
+    $jpp->add_patch('eclipse-3.5.2-alt-swt-linux-as-needed.patch', STRIP=>0);
+
     # hack until gtk-update-icon-cache fix
     $jpp->del_section('post','platform');
     $jpp->del_section('postun','platform');
 
-    # TODO: remove bootstrap
-    if (0) { # bootstrap
-	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
-	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
-BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
-'."\n");
-    }
     # ant-bcel,... is missing in BR :(
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-optional'."\n");
 
@@ -36,7 +34,9 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-j
 
     #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
     # X11/extensions/XInput.h
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: xorg-xextproto-devel xorg-inputproto-devel'."\n");
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: xorg-inputproto-devel xorg-xextproto-devel'."\n");
+#xorg-dmxproto-devel xorg-dri2proto-devel xorg-kbproto-devel xorg-renderproto-devel xorg-videoproto-devel xorg-xf86dgaproto-devel xorg-xf86vidmodeproto-devel xorg-xineramaproto-devel xorg-fontcacheproto-devel xorg-glproto-devel xorg-bigreqsproto-devel xorg-compositeproto-devel xorg-damageproto-devel xorg-evieproto-devel xorg-fixesproto-devel xorg-fontsproto-devel xorg-pmproto-devel xorg-printproto-devel xorg-proto-devel xorg-randrproto-devel xorg-recordproto-devel xorg-resourceproto-devel xorg-scrnsaverproto-devel xorg-trapproto-devel xorg-xcbproto-devel xorg-xcmiscproto-devel xorg-xf86bigfontproto-devel xorg-xf86driproto-devel xorg-xf86miscproto-devel xorg-xf86rushproto-devel xorg-xproto-devel
+
     # I was lazy to search for the whole list of xorg-*proto-devel :(
     $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-devel'."\n");
 
@@ -52,9 +52,6 @@ BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-j
 
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors
-
-    # hack around #22839: built-in /usr/lib*/eclipse
-    # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
 
     # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
@@ -113,22 +110,33 @@ find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
 !);
     }
 
+
+    $jpp->get_section('install')->push_body(q!# check for undefined symbols
+if find %buildroot%_libdir/eclipse -type f -name '*.so' -print0 \
+ | xargs -0 ldd -r 2>&1 \
+ | grep -v SUNWprivate \
+ | grep 'undefined symbol'; then
+    echo "JPP robo-check for undefined symbols failed."
+    exit 1;
+fi
+!);
+
+#warning: file /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/111/1/.cp/libswt-atk-gtk-3557.so is packaged into both eclipse-swt and eclipse-rcp
+    $jpp->get_section('files','rcp')->push_body(q!# duplicates of swt
+%exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
+!);
+
 };
 
 
 __END__
-    # DONE: upstream it.
-    # fixed linkage order with --as-needed
-    # todo: REMOVED
-    # $jpp->add_patch('eclipse-3.5.1-alt-gtk-as-needed.patch');
-    # patch was generated with
-    0 && $jpp->get_section('prep')->push_body(q{
-## /usr/lib/jvm/java/jre/bin/java: symbol lookup error: /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/140/1/.cp/libswt-atk-gtk-3346.so: undefined symbol: atk_object_ref_relation_set
-#        $(CC) $(LIBS) $(GNOMELIBS) -o $(GNOME_LIB) $(GNOME_OBJECTS)
-find ./plugins -name 'make_linux.mak' -exec perl -i -npe 'chomp;$_=$1.$3.$2 if /^(\s+\$\(CC\))((?: \$\(.*LIBS\))+)(.+)$/;$_.="\n"' {} \;
-});
-
-
+    # TODO: remove bootstrap
+    if (0) { # bootstrap
+	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
+	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
+BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
+'."\n");
+    }
 
     $jpp->get_section('prep')->push_body(q{
 %if 0
@@ -145,3 +153,7 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
 # subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
 });
     }################################################### end TODO MAKE AS PATCHES
+
+    # hack around #22839: built-in /usr/lib*/eclipse
+    # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
+
