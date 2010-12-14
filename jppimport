@@ -68,8 +68,10 @@ sub verify_options {
 
 sub nextrel_jppimport {
     my ($rel,$spec,$parent)=@_;
-    my $jpprel=$rel;
-    my $jppver = $spec->get_section('package','')->get_tag('Version');
+    my $jppmain= $spec->get_section('package','');
+    my $jppver = $jppmain->get_tag('Version');
+    my $jpprel = $jppmain->get_tag('Release');
+    die "jpp release is undefined" unless defined $jpprel;
 # $jppsubrel is used to keep branch of fedora or mandriva
     my $jppsubrel='';
 # for new jpackage 5.0

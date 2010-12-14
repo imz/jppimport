@@ -8,6 +8,8 @@ push @SPECHOOKS, sub {
 rm -rf junit org/junit org/hamcrest
 # end alt
 ',qr'rm -rf META-INF');
+
+    $jpp->get_section('package','')->subst_if('jakarta-commons-collections32','jakarta-commons-collections',qr'Requires:');
 };
 
 __END__
@@ -15,3 +17,4 @@ __END__
 install -Dm644 directory-project-12/pom.xml $MAVEN_REPO_LOCAL/org/apache/directory/project/project/12/project-12.pom
 install -Dm644  %{SOURCE4} $MAVEN_REPO_LOCAL/org/apache/apache-jar-resource-bundle/1.4/apache-jar-resource-bundle-1.4.jar
 
+# jpp depmap fix commons-collections32 -> commons-collections

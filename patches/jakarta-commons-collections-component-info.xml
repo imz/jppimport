@@ -1,0 +1,15 @@
+<project name="apache-commons-collections">
+   <component id="apache-collections"
+              licenseType="apache-2.0"
+              version="@VERSION@"
+              projectHome="http://jakarta.apache.org/commons/collections/"
+              description='Extensions to java.util type of collections'
+              scm=":ext:cvs.devel.redhat.com:/cvs/jakarta-commons-collections"
+              tag="@TAG@">
+      <!-- Built using JDK 1.4 -->
+      <artifact id="commons-collections.jar"/>
+      <export>
+         <include input="commons-collections.jar"/>
+      </export>
+   </component>
+</project>

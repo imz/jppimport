@@ -5,6 +5,10 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4 jakarta-commons-net14\n");
     # test fails :(
     $jpp->get_section('package','')->unshift_body("BuildRequires: jakarta-commons-net14\n");
+    # for build-classpath nlog4j
+    $jpp->get_section('package','')->unshift_body("BuildRequires: nlog4j\n");
+    $jpp->get_section('package','core')->subst_if('jakarta-commons-collections32','jakarta-commons-collections',qr'Requires:');
+
     $jpp->applied_block(
 	"var lib",
 	sub {
@@ -37,3 +41,12 @@ SOURCES:
        </jpp>
     </dependency>
     <dependency>
+@@ -35,7 +35,7 @@
+       </maven>
+       <jpp>
+          <groupId>JPP</groupId>
+-         <artifactId>commons-collections32</artifactId>
++         <artifactId>commons-collections</artifactId>
+          <version>3.2</version>
+       </jpp>
+    </dependency>

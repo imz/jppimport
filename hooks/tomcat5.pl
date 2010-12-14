@@ -6,13 +6,16 @@ require 'windows-thumbnail-database-in-package.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    $jpp->get_section('package','')->unshift_body('BuildRequires: ant-trax'."\n");
+    $jpp->get_section('prep')->subst(qr'^jar xf /usr/share/java/apache-commons-launcher.jar','jar xf /usr/share/java/commons-launcher.jar');
+
+    # hack against
+    #ошибка: line 185: Dependency tokens must not contain '%<=>' symbols: Requires: tomcat5-common-lib = 0:5.5.31-2%{dist}
+    $jpp->get_section('package','')->unshift_body('%define dist %nil'."\n");
+
     # hack against %post build-classpath
     $jpp->get_section('package','')->unshift_body('BuildRequires(pre): rpm-macros-alternatives'."\n");
     $jpp->get_section('post','')->unshift_body('%force_update_alternatives'."\n");
-
-    # due to ecj :(
-    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat');
-
 
     $jpp->get_section('prep')->push_body(q!
 for i in container/webapps/admin/*.jsp container/webapps/admin/*/*.jsp; do
@@ -21,7 +24,7 @@ done
 !);
 
     #rpm-filesystem-conflict-file-file 	There are file conflicts with the package tomcat5-poms-5.5.27-alt4_6.2jpp5.noarch
-    $jpp->get_section('files')->subst_if(qr'^','%attr(0644,root,root) ',qr'/maven2/poms/JPP.tomcat5-catalina-');
+    #$jpp->get_section('files')->subst_if(qr'^','%attr(0644,root,root) ',qr'/maven2/poms/JPP.tomcat5-catalina-');
 
     if ($jpp->get_section('package','')->get_tag('Version') eq '5.5.27') {
 	$jpp->add_patch('tomcat5-CVE-2009-0033.patch');
@@ -59,7 +62,6 @@ Apache Tomcat poms for maven2
     # TODO: write proper tomcat5-5.5.init!
     # as a hack, an old version is taken
     $jpp->copy_to_sources('tomcat5-5.5.init');
-    $jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
 
 #warning: file /usr/bin/jasper5-setclasspath.sh is packaged into both tomcat5 and tomcat5-jasper
 #warning: file /usr/bin/jasper5.sh is packaged into both tomcat5 and tomcat5-jasper
@@ -75,7 +77,7 @@ Apache Tomcat poms for maven2
 
     # fedora specific (5.5.25 1-fc9)
     $jpp->get_section('package','')->push_body('BuildRequires: zip'."\n");
-
+    if (0) {
     # to make them 1.4, not 1.5
     $jpp->get_section('build')->subst(qr'ant\s+-Dservletapi.build="build"','ant -Dant.build.javac.source=1.4 -Dant.build.javac.target=1.4 -Dservletapi.build="build"');
 
@@ -84,7 +86,7 @@ Apache Tomcat poms for maven2
     $jpp->get_section('build')->subst(qr'java_home}" build','java_home}" -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 build', qr'ant ');
     $jpp->get_section('install')->subst(qr'ant\s+-D','ant -Dant.build.javac.source=1.4 -D');
     # end fedora specific 
-
+    }
     $jpp->get_section('package','server-lib')->push_body('Requires: jaf javamail'."\n");
 
     $jpp->get_section('package','')->push_body('Provides: %{name}-server = %{version}-%{release}'."\n");
