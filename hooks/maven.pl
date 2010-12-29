@@ -10,6 +10,9 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
 
+    $jpp->add_patch('maven-1.1-plugin-checkstyle-alt-add-collections-dep.patch', 
+		    STRIP=>0, PRE=>'pushd ../maven-plugins'."\n", POST=>'popd'."\n");
+
     # TODO: report against 1.1 -2jpp -- split macro; as always :(
 #:0}%{!?_without_bootstrap:%{?_bootstrap:%{_bootstrap}}%{!?_bootstrap:0}}}
     $jpp->get_section('package','')->subst(qr'%define bootstrap %{\?_with_bootstrap:1}%{!\?_with_bootstrap:%{\?_without_bootstrap\s*','%define bootstrap %{?_with_bootstrap:1}%{!?_with_bootstrap:%{?_without_bootstrap');

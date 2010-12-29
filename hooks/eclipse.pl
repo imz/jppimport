@@ -12,10 +12,6 @@ sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
-    # TODO: check 3.5.2
-    # hack -- unmet osgi dependency (recommends?)
-    #$jpp->get_section('package','platform')->unshift_body('Provides: osgi(org.eclipse.equinox.simpleconfigurator.manipulator) = 1.0.100'."\n");
-
     # TODO: upstream it.
     # fixed linkage order with --as-needed
     # pushd build/eclipse-3.5.2-src; find ./plugins -name 'make_linux.mak'
@@ -31,6 +27,9 @@ sub {
     $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
     # it does work...
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-devel-openjdk'."\n");
+
+    # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
+    $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
 
     #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
     # X11/extensions/XInput.h

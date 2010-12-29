@@ -14,8 +14,12 @@ subst 's,excalibur/avalon-framework-api,excalibur/avalon-framework-api excalibur
 subst 's,xmlgraphics-batik/util,xmlgraphics-batik,' %buildroot%_bindir/%name
 !);
     $jpp->get_section('install')->push_body(q!# add xmlgraphics-commons to classpath
-grep xmlgraphics-commons %buildroot%_bindir/xmlgraphics-fop || sed -i 's,xmlgraphics-fop xmlgraphics-batik,xmlgraphics-fop xmlgraphics-batik xmlgraphics-commons,' %buildroot%_bindir/xmlgraphics-fop
+grep xmlgraphics-commons %buildroot%_bindir/xmlgraphics-fop || sed -i 's,xmlgraphics-fop xmlgraphics-batik,xmlgraphics-fop xmlgraphics-batik-all xmlgraphics-commons commons-io commons-logging,' %buildroot%_bindir/xmlgraphics-fop
 !);
+    $jpp->get_section('package','')->push_body(q!Requires: commons-io commons-logging xmlgraphics-commons
+!);
+# fedora 14 jars
+#commons-io batik-all avalon-framework xmlgraphics-commons commons-logging fop
 
     $jpp->get_section('install')->push_body(q!
 # fop compat symlinks

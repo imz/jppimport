@@ -1,0 +1,17 @@
+--- checkstyle/project.xml	2010-12-25 22:04:59.647211018 +0000
++++ checkstyle/project.xml	2010-12-25 22:07:07.283743280 +0000
+@@ -182,5 +182,14 @@
+         <classloader>root</classloader>
+       </properties>
+     </dependency>
++    <dependency>
++      <groupId>JPP</groupId>
++      <artifactId>commons-collections</artifactId>
++      <version>3.1</version>
++      <jar>commons-collections.jar</jar>
++      <properties>
++        <classloader>root</classloader>
++      </properties>
++    </dependency>
+   </dependencies>
+ </project>

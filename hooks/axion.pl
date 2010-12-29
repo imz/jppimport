@@ -3,7 +3,9 @@
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: log4j'."\n");
+}
+__END__
+
     if ($jpp->get_section('install')->match('add_to_maven_depmap')) {
 	die "hook is deprecated!!! cleanup /patches!!!";
     } else {

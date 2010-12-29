@@ -1,0 +1,11 @@
+--- ./jelly-tags/velocity/src/java/org/apache/commons/jelly/tags/velocity/VelocityTagSupport.java	2005-02-26 13:06:03.000000000 +0000
++++ ./jelly-tags/velocity/src/java/org/apache/commons/jelly/tags/velocity/VelocityTagSupport.java	2010-12-17 22:47:03.867335895 +0000
+@@ -51,7 +51,7 @@
+         if ( ve == null )
+         {
+             ve = new VelocityEngine();
+-            ve.setProperty( VelocityEngine.RUNTIME_LOG_LOGSYSTEM, this );
++            ve.setProperty( VelocityEngine.RUNTIME_LOG_LOGSYSTEM, null );
+             ve.setProperty( VelocityEngine.FILE_RESOURCE_LOADER_PATH, basedir );
+ 
+             try {

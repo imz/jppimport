@@ -20,7 +20,11 @@ sub set_target_15 {
     $jpp->get_section('build')->subst(qr'^\s*mvn(?=\s|$)',"mvn -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
     $jpp->get_section('prep')->subst(qr'^\s*(?:\%{_bindir}/)?mvn-jpp(?=\s|$)',"mvn-jpp -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
     $jpp->get_section('build')->subst(qr'^\s*(?:\%{_bindir}/)?mvn-jpp(?=\s|$)',"mvn-jpp -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
+    $jpp->get_section('prep')->subst(qr'^\s*(?:\%{_bindir}/)?maven(?=\s|$)',"maven -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
+    $jpp->get_section('build')->subst(qr'^\s*(?:\%{_bindir}/)?maven(?=\s|$)',"maven -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
     $jpp->get_section('prep')->subst(qr'bin/javac ',"bin/javac  -target $target -source $target ");
     $jpp->get_section('build')->subst(qr'bin/javac ',"bin/javac  -target $target -source $target ");
+    $jpp->get_section('prep')->subst(qr'%{javac} ',"%{javac}  -target $target -source $target ");
+    $jpp->get_section('build')->subst(qr'%{javac} ',"%{javac}  -target $target -source $target ");
 	    });
 }

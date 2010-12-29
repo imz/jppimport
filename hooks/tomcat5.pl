@@ -6,7 +6,10 @@ require 'windows-thumbnail-database-in-package.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    # ant 1.7 support
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-trax'."\n");
+    $jpp->get_section('install')->subst(qr'ant/ant-nodeps','ant/ant-nodeps ant/ant-trax');
+
     $jpp->get_section('prep')->subst(qr'^jar xf /usr/share/java/apache-commons-launcher.jar','jar xf /usr/share/java/commons-launcher.jar');
 
     # hack against

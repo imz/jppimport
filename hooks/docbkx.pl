@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
+};
+__END__
+
     $jpp->get_section('package','')->unshift_body('BuildRequires: saxpath xmlgraphics-batik-svgpp xmlgraphics-batik-rasterizer xmlgraphics-batik-slideshow xmlgraphics-batik-squiggle xmlgraphics-batik-ttf2svg'."\n");
     $jpp->get_section('build')->unshift_body_before(q!
 mvn-jpp install:install-file \

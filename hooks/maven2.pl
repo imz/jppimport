@@ -75,7 +75,7 @@ BuildRequires: plexus-resources
     #}
 
     # tmp hack over sandbox error :(
-    $jpp->get_section('package','')->push_body('ExclusiveArch: %ix86'."\n");
+    #$jpp->get_section('package','')->push_body('ExclusiveArch: %ix86'."\n");
 
     $jpp->get_section('prep')->push_body(q~
 cat > relink_bootstrap_maven_jars.sh << 'EOF'

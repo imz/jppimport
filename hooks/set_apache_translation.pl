@@ -21,6 +21,8 @@ push @SPECHOOKS, sub {
 		$section->subst_if(qr'apache-commons-logging', 'jakarta-commons-logging',qr'Requires');
 		$section->subst_if(qr'apache-commons-net', 'jakarta-commons-net',qr'Requires');
 		$section->subst_if(qr'apache-commons-validator', 'jakarta-commons-validator',qr'Requires');
+		$section->subst_if(qr'apache-commons-dbcp', 'jakarta-commons-dbcp',qr'Requires');
+		$section->subst_if(qr'apache-commons-pool', 'jakarta-commons-pool',qr'Requires');
 #		$section->subst_if(qr'apache-commons-', 'jakarta-commons-',qr'Requires');
 	    }
 	}
