@@ -12,7 +12,7 @@ my $JPPPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Lin
 
 
 my $OUTDIR="./OUT";
-my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks, $target);
+my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks, $target, $parent);
 my $strategy = 'alt2jpp';
 
 my $result = GetOptions ("jpp=s" => \$JPPPATH,
@@ -24,6 +24,7 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "nobz2" => \$nobz2,
 			 "nozip" => \$nozip,
 			 "hook=s" => \@hooks,
+			 "parent=s"   => \$parent,
 			 "rename=s"   => \$rename,
 			 "release=s"   => \$release,
 			 "target=s"   => \$target,
@@ -246,7 +247,11 @@ sub run_jppimport {
     $importcmd.=" --release '$release'" if ($release);
     $importcmd.=" --rename '$rename'" if ($rename);
     $importcmd.=" --epoch '$epoch'" if (defined $epoch);
-    $importcmd.=" --parent-rpm $altrpm" if ($altrpm);
+    if ($parent) {
+	$importcmd.=" --parent $parent";
+    } else {
+	$importcmd.=" --parent-rpm $altrpm" if ($altrpm);
+    }
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);
     $importcmd.=" --nozip" if ($nozip);

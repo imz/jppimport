@@ -1,0 +1,12 @@
+diff -ru gmaven-runtime/gmaven-runtime-1.5/src/main/java/org/codehaus/groovy/maven/runtime/v15/stubgen/ParserFactoryImpl.java gmaven-runtime/gmaven-runtime-1.5/src/main/java/org/codehaus/groovy/maven/runtime/v15/stubgen/ParserFactoryImpl.java
+--- gmaven-runtime/gmaven-runtime-1.5/src/main/java/org/codehaus/groovy/maven/runtime/v15/stubgen/ParserFactoryImpl.java	2008-08-10 14:56:44 +0300
++++ gmaven-runtime/gmaven-runtime-1.5/src/main/java/org/codehaus/groovy/maven/runtime/v15/stubgen/ParserFactoryImpl.java	2010-12-30 23:28:19 +0200
+@@ -215,7 +215,7 @@
+             AntlrASTProcessor processor;
+ 
+             // Decorate the AST w/line+col information
+-            processor = new AntlrASTProcessSnippets(sourceBuffer);
++            processor = new AntlrASTProcessSnippets();
+             ast = processor.process(ast);
+ 
+             return node(ast);

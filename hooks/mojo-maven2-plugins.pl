@@ -11,6 +11,8 @@ sub {
 		    STRIP=>0);#, NUMBER=>233);
     $jpp->add_patch('mojo-maven2-plugins-mojo-antlr-plugin-alt-doxia-update.patch',
 		    STRIP=>1);#, NUMBER=>234);
+    $jpp->add_patch('mojo-maven2-plugins-17-alt-delicious-maven-plugin-add-log4j-dep.patch',
+		    STRIP=>1);#, NUMBER=>235);
 };
 
 __END__

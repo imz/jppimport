@@ -23,6 +23,12 @@ push @SPECHOOKS,
     } elsif ($name eq 'jakarta-commons-lang') {
 	&unpack_fc_rpm($jpp,$fcpath13.'jakarta-commons-lang-2.4-1.fc13.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-lang.jar','/usr/share/java/jakarta-commons-lang-2.4.jar');
+    } elsif ($name eq 'jakarta-oro') {
+	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-oro-2.0.8-6.3.fc12.x86_64.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/jakarta-oro.jar','/usr/share/java/jakarta-oro-2.0.8.jar');
+    } elsif ($name eq 'jdom') {
+	&unpack_fc_rpm($jpp,$fcpath14.'jdom-1.1.1-1.fc13.x86_64.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom-1.1.1.jar');
     } elsif ($name eq 'wsdl4j') {
 	&unpack_fc_rpm($jpp,$fcpath14.'wsdl4j-1.5.2-7.6.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/wsdl4j.jar','/usr/share/java/wsdl4j-1.5.2.jar');
@@ -48,6 +54,7 @@ push @SPECHOOKS,
 	foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {
 	    &merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-batik/'.$i.'.jar','/usr/share/java/batik/batik-'.$i.'-1.7.jar');
 	}
+
     }
 
 };

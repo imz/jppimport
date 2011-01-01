@@ -5,7 +5,7 @@
          {
              ve = new VelocityEngine();
 -            ve.setProperty( VelocityEngine.RUNTIME_LOG_LOGSYSTEM, this );
-+            ve.setProperty( VelocityEngine.RUNTIME_LOG_LOGSYSTEM, null );
++            ve.setProperty( VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new org.apache.velocity.runtime.log.JdkLogChute() );
              ve.setProperty( VelocityEngine.FILE_RESOURCE_LOADER_PATH, basedir );
  
              try {
