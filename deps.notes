@@ -79,8 +79,6 @@ bcf
 
 # bootstrap 
 bcel-repolib
-jakarta-commons-fileupload-repolib
-jakarta-commons-httpclient-repolib
 snmptrapappender-repolib
 
 ==== deprecation:
@@ -169,6 +167,8 @@ TODO: compats for ???
 =apache-commons-daemon-1.0.2
 =apache-commons-collections-3.2.1
 
+TODO: incorrect obsoletes in apache-commons-*
+
 #--------------------------------------
 SRPMS/ant-1.8.1-4.jpp6.src.rpm
 SRPMS/cargo-1.0-3.jpp6.src.rpm
@@ -184,21 +184,13 @@ SRPMS/maven-release-5-2.jpp6.src.rpm
 SRPMS/maven-scm-1.1-1.jpp6.src.rpm
 SRPMS/maven-shared-8-0.p8.6.jpp6.src.rpm
 SRPMS/maven2-2.0.8-28.jpp6.src.rpm
-SRPMS/plexus-ant-factory-1.0-0.a2.1.1.jpp6.src.rpm
-SRPMS/plexus-bsh-factory-1.0-0.a7s.5.jpp6.src.rpm
 SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
 SRPMS/plexus-maven-plugin-1.3.5-7.jpp6.src.rpm
 SRPMS/plexus-tools-1.0.10-3.jpp6.src.rpm
 SRPMS/plexus-utils-1.5.8-1.jpp6.src.rpm
 SRPMS/xbean-3.4.3-1.jpp6.src.rpm
 #--------------------------------------
-SRPMS/apache-commons-beanutils-1.8.3-4.jpp6.src.rpm
-SRPMS/apache-commons-cli-1.2-6.jpp6.src.rpm
-SRPMS/apache-commons-codec-1.4-5.jpp6.src.rpm
-SRPMS/apache-commons-collections-3.2.1-5.jpp6.src.rpm
-SRPMS/apache-commons-daemon-1.0.2-0.r831676.4.jpp6.src.rpm
 SRPMS/apache-commons-digester-1.8.1-11.jpp6.src.rpm
-SRPMS/apache-commons-el-1.0.1-0.r936225.4.jpp6.src.rpm
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
 SRPMS/apache-commons-lang-2.4-7.jpp6.src.rpm
 SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
@@ -207,7 +199,6 @@ SRPMS/apache-commons-net-2.0-6.jpp6.src.rpm
 SRPMS/apache-commons-validator-1.4-0.r832761.5.jpp6.src.rpm
 SRPMS/apache-commons-vfs-2.0-0.r834424.5.jpp6.src.rpm
 SRPMS/apache-mime4j-0.6-2.jpp6.src.rpm
-SRPMS/axion-1.0-0.M3.5.jpp6.src.rpm
 SRPMS/ehcache-core-2.3.1-1.jpp6.src.rpm
 SRPMS/ehcache-parent-2.2-2.jpp6.src.rpm
 SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm
@@ -241,7 +232,6 @@ deleting SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
 deleting SRPMS/htmlunit-core-js-2.4-2.jpp6.src.rpm
 deleting SRPMS/hc-httpcore-4.1-0.r962551.1.jpp6.src.rpm
 deleting SRPMS/hc-httpclient-4.1-0.r962552.2.jpp6.src.rpm
-deleting SRPMS/axion-1.0-0.M3.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-vfs-2.0-0.r834424.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-validator-1.4-0.r832761.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-net-2.0-5.jpp6.src.rpm
@@ -249,13 +239,7 @@ deleting SRPMS/apache-commons-logging-1.1.1-5.jpp6.src.rpm
 deleting SRPMS/apache-commons-launcher-1.2-0.r832060.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-lang-2.4-6.jpp6.src.rpm
 deleting SRPMS/apache-commons-httpclient-3.1-5.jpp6.src.rpm
-deleting SRPMS/apache-commons-el-1.0.1-0.r936225.3.jpp6.src.rpm
 deleting SRPMS/apache-commons-digester-1.8.1-10.jpp6.src.rpm
-deleting SRPMS/apache-commons-daemon-1.0.2-0.r831676.3.jpp6.src.rpm
-deleting SRPMS/apache-commons-collections-3.2.1-4.jpp6.src.rpm
-deleting SRPMS/apache-commons-codec-1.4-4.jpp6.src.rpm
-deleting SRPMS/apache-commons-cli-1.2-5.jpp6.src.rpm
-deleting SRPMS/apache-commons-beanutils-1.8.3-3.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/atinject-1-2.20100611svn86.jpp6.src.rpm
