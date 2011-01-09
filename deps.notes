@@ -75,7 +75,6 @@ smc -> jsmc
 # wersiondowns
 antlr(manually-pick-repolib)
 bcel(let be up)
-bcf
 
 # bootstrap 
 bcel-repolib
@@ -163,6 +162,25 @@ due to: both velocity and velocity15 are installed
 Embedded error: Error rendering Maven report: Error while generating the HTML source code of the projet.
 The specified class for ResourceManager (org.apache.velocity.runtime.resource.ResourceManagerImpl) does not implement org.apache.velocity.runtime.resource.ResourceManager; Velocity is not initialized correctly.
 
+NOTE: plexus-archiver: a8 in jpp5, a7 in jpp6.
+when tried to downgrade, mojo-maven2-plugins was broken. fixes:
+[mojo-maven2-plugins-17-alt-plexus-archiver-a7-support.patch; disable patch10]
+I guess let it be a8.
+but a8 has a bug [at apache-abderra]
+[INFO] [jar:jar]
+[WARNING] JAR will be empty - no content was marked for inclusion!
+[INFO] Building jar: /usr/src/RPM/BUILD/apache-abdera-0.4.0/bundle/target/abdera-bundle-0.4.0-incubating.jar
+[INFO] Preparing source:jar
+[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
+[INFO] No goals needed for project - skipping
+[INFO] [source:jar {execution: attach-sources}]
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD ERROR
+[INFO] ------------------------------------------------------------------------
+[INFO] Error creating source archive: You must set at least one file.
+
+TODO: update ws-commons-XmlSchema: xfire, ... patch to catch an extra exception
+
 TODO: compats for ???
 =apache-commons-daemon-1.0.2
 =apache-commons-collections-3.2.1
@@ -190,9 +208,7 @@ SRPMS/plexus-tools-1.0.10-3.jpp6.src.rpm
 SRPMS/plexus-utils-1.5.8-1.jpp6.src.rpm
 SRPMS/xbean-3.4.3-1.jpp6.src.rpm
 #--------------------------------------
-SRPMS/apache-commons-digester-1.8.1-11.jpp6.src.rpm
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
-SRPMS/apache-commons-lang-2.4-7.jpp6.src.rpm
 SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
 SRPMS/apache-commons-logging-1.1.1-6.jpp6.src.rpm
 SRPMS/apache-commons-net-2.0-6.jpp6.src.rpm
@@ -234,12 +250,9 @@ deleting SRPMS/hc-httpcore-4.1-0.r962551.1.jpp6.src.rpm
 deleting SRPMS/hc-httpclient-4.1-0.r962552.2.jpp6.src.rpm
 deleting SRPMS/apache-commons-vfs-2.0-0.r834424.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-validator-1.4-0.r832761.4.jpp6.src.rpm
-deleting SRPMS/apache-commons-net-2.0-5.jpp6.src.rpm
 deleting SRPMS/apache-commons-logging-1.1.1-5.jpp6.src.rpm
 deleting SRPMS/apache-commons-launcher-1.2-0.r832060.4.jpp6.src.rpm
-deleting SRPMS/apache-commons-lang-2.4-6.jpp6.src.rpm
 deleting SRPMS/apache-commons-httpclient-3.1-5.jpp6.src.rpm
-deleting SRPMS/apache-commons-digester-1.8.1-10.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/atinject-1-2.20100611svn86.jpp6.src.rpm

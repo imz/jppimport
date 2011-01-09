@@ -20,9 +20,13 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.24.jar');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.24.jar');
-    } elsif ($name eq 'jakarta-commons-lang') {
-	&unpack_fc_rpm($jpp,$fcpath13.'jakarta-commons-lang-2.4-1.fc13.x86_64.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/commons-lang.jar','/usr/share/java/jakarta-commons-lang-2.4.jar');
+    } elsif ($name eq 'apache-commons-httpclient' or $name eq 'jakarta-commons-httpclient') {
+	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-commons-httpclient-3.1-1.fc14.src.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/commons-httpclient.jar','/usr/share/java/jakarta-commons-httpclient-3.1.jar');
+# no need; it contains
+#    } elsif ($name eq 'apache-commons-lang') {
+#	&unpack_fc_rpm($jpp,$fcpath13.'jakarta-commons-lang-2.4-1.fc13.x86_64.rpm');
+#	&merge_osgi_manifest($jpp,'/usr/share/java/commons-lang.jar','/usr/share/java/jakarta-commons-lang-2.4.jar');
     } elsif ($name eq 'jakarta-oro') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-oro-2.0.8-6.3.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jakarta-oro.jar','/usr/share/java/jakarta-oro-2.0.8.jar');
