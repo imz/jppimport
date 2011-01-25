@@ -11,7 +11,7 @@ sub {
     my ($jpp, $alt) = @_;
 
     $jpp->add_patch('maven-1.1-plugin-checkstyle-alt-add-collections-dep.patch', 
-		    STRIP=>0, PRE=>'pushd ../maven-plugins'."\n", POST=>'popd'."\n");
+		    STRIP=>0, PREP_HEADER=>'pushd ../maven-plugins'."\n", PREP_FOOTER=>'popd'."\n");
 
     # TODO: report against 1.1 -2jpp -- split macro; as always :(
 #:0}%{!?_without_bootstrap:%{?_bootstrap:%{_bootstrap}}%{!?_bootstrap:0}}}

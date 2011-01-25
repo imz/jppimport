@@ -2,6 +2,8 @@
 
 require 'set_jetty6_servlet_25_api.pl';
 
+# TODO: enable patch9 for plexus-archiver-a8+ 
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;

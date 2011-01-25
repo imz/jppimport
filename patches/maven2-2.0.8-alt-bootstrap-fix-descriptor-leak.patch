@@ -1,0 +1,13 @@
+--- maven2/bootstrap/bootstrap-mini/src/main/java/org/apache/maven/bootstrap/util/AbstractReader.java	2006-07-10 06:31:52 +0300
++++ maven2/bootstrap/bootstrap-mini/src/main/java/org/apache/maven/bootstrap/util/AbstractReader.java	2011-01-25 20:30:22 +0200
+@@ -49,7 +49,9 @@
+ 
+         // Cheap and cheerful. Please add more to skip if the parser chokes (or use the actual
+         ByteArrayOutputStream output = new ByteArrayOutputStream();
+-        IOUtil.copy( new FileInputStream( file ), output );
++        java.io.FileInputStream fis = new FileInputStream( file );
++        IOUtil.copy( fis, output );
++        fis.close();
+         String out = output.toString( "UTF-8" );
+         out = StringUtils.replace( out, "&oslash;", "\u00f8" );
+ 

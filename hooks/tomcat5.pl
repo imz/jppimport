@@ -6,6 +6,13 @@ require 'windows-thumbnail-database-in-package.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    # 5.5.27-5.5.31 do not compile with commons-el 1.0.1
+    # properly subst s,commons-el,commons-el10
+    $jpp->get_section('package','')->subst(qr'^BuildRequires: jakarta-commons-el','BuildRequires: jakarta-commons-el10');
+    $jpp->get_section('package','common-lib')->subst_if(qr'commons-el','commons-el10',qr'^Requires');
+    $jpp->get_section('build')->subst(qr'build-classpath commons-el','build-classpath commons-el10');
+    $jpp->get_section('post','')->subst(qr'commons-el ','commons-el10 ');
+
     # ant 1.7 support
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-trax'."\n");
     $jpp->get_section('install')->subst(qr'ant/ant-nodeps','ant/ant-nodeps ant/ant-trax');
@@ -26,42 +33,36 @@ for i in container/webapps/admin/*.jsp container/webapps/admin/*/*.jsp; do
 done
 !);
 
-    #rpm-filesystem-conflict-file-file 	There are file conflicts with the package tomcat5-poms-5.5.27-alt4_6.2jpp5.noarch
-    #$jpp->get_section('files')->subst_if(qr'^','%attr(0644,root,root) ',qr'/maven2/poms/JPP.tomcat5-catalina-');
+    # __fedora 11-15 struts 1.3.9 adaptation__(no need for jpackage)
+    $jpp->get_section('package','')->subst(qr'^#BuildRequires: struts-taglib','BuildRequires: struts-taglib');
+    $jpp->get_section('package','admin-webapps')->subst(qr'^#Requires: struts-taglib','Requires: struts-taglib');
+    $jpp->get_section('package','admin-webapps')->subst(qr'^#Requires\(post\): struts-taglib','Requires(post): struts-taglib');
+    $jpp->get_section('install')->subst(qr'ant/ant-trax xalan-j2-serializer"','ant/ant-trax xalan-j2-serializer struts-taglib"',qr'^export OPT_JAR_LIST');
+    $jpp->get_section('post','admin-webapps')->subst(qr'commons-beanutils commons-collections commons-digester struts','commons-beanutils commons-collections commons-digester struts struts-taglib');
 
-    if ($jpp->get_section('package','')->get_tag('Version') eq '5.5.27') {
-	$jpp->add_patch('tomcat5-CVE-2009-0033.patch');
-	$jpp->add_patch('tomcat5-CVE-2009-0580.patch');
-    } else {
-	warn "tomcat5-CVE-2009-*.patches are deprecated!\n";
-    }
-    # struts 1.3.9
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: struts-taglib'."\n");
-    
     # hack against tomcat parent pom not installed by dependencies.
-    # It may be made a subpackage, but let it be just file dup.
-#    my $addpomline=q!#hack for pom closure
-#%_datadir/maven2/poms/JPP.tomcat5-parent.pom!."\n";
-    my $addpomline=q!#hack for poms cause conflicts :(
-%exclude %_datadir/maven2/poms/*!."\n";
-    $jpp->get_section('files','jasper')->push_body($addpomline);
-    $jpp->get_section('files','jsp-2.0-api')->push_body($addpomline);
-    $jpp->get_section('files','servlet-2.4-api')->push_body($addpomline);
-    $jpp->get_section('files','common-lib')->push_body($addpomline);
+    my $addpomline=q!Requires: %name-parent = %{epoch}:%{version}-%{release}!."\n";
+    $jpp->get_section('package','jasper')->push_body($addpomline);
+    $jpp->get_section('package','jsp-2.0-api')->push_body($addpomline);
+    $jpp->get_section('package','servlet-2.4-api')->push_body($addpomline);
+    $jpp->get_section('package','common-lib')->push_body($addpomline);
+    $jpp->get_section('package','server-lib')->push_body($addpomline);
+    $jpp->get_section('package','admin-webapps')->push_body($addpomline);
+    $jpp->get_section('package','')->push_body($addpomline);
+    $jpp->add_section('package','parent')->push_body(q!Group: Development/Java
+Summary: Apache Tomcat parent pom for maven2
+Obsoletes: tomcat5-poms < %{epoch}:%{version}
 
-    # moreover, old packages as jetty6-core mojo-maven2-plugins nanocontainer plexus-service-jetty
-    # just breaks with new poms installed due to their depmap (TODO: edit it and use tomcat5-poms)
-    $jpp->add_section('package','poms')->push_body(q!Group: Development/Java
-Summary: Apache Tomcat poms for maven2
-
-%description poms
-Apache Tomcat poms for maven2
+%description parent
+Apache Tomcat parent pom for maven2
 
 !);
-    $jpp->add_section('files','poms')->push_body(q!%_datadir/maven2/poms/*
+    $jpp->get_section('files','')->exclude('mavendepmapfragdir');
+    $jpp->get_section('files','')->exclude(qr'/maven2/poms/JPP.tomcat5-parent.pom');
+    $jpp->add_section('files','parent')->push_body(q!%{_mavendepmapfragdir}/*
+%{_datadir}/maven2/poms/JPP.tomcat5-parent.pom
 !);
-
-
+    
     # TODO: write proper tomcat5-5.5.init!
     # as a hack, an old version is taken
     $jpp->copy_to_sources('tomcat5-5.5.init');
@@ -143,25 +144,23 @@ done || :
 __DATA__
 todo: verify logrotate
 
+__END__
+#     # hack against tomcat parent pom not installed by dependencies.
+#     # It may be made a subpackage, but let it be just file dup.
+# #    my $addpomline=q!#hack for pom closure
+# #%_datadir/maven2/poms/JPP.tomcat5-parent.pom!."\n";
+# #    $jpp->get_section('files','jasper')->push_body($addpomline);
+# #    $jpp->get_section('files','servlet-2.4-api')->push_body($addpomline);
+# #    $jpp->get_section('files','common-lib')->push_body($addpomline);
 
-__fedora 11,12 struts 1.3.9 adaptation__(no need for jpackage)
-144c144
-< #BuildRequires: struts-taglib >= 0:1.3.8
----
-> BuildRequires: struts-taglib >= 0:1.3.8
-237c237
-< #Requires: struts-taglib >= 0:1.3.8
----
-> Requires: struts-taglib >= 0:1.3.8
-245c245
-< #Requires(post): struts-taglib
----
-> Requires(post): struts-taglib
-633c640
-<     export OPT_JAR_LIST="ant/ant-trax xalan-j2-serializer"
----
->     export OPT_JAR_LIST="ant/ant-trax xalan-j2-serializer struts-taglib"
-1033c1040
-<     commons-beanutils commons-collections commons-digester struts \
----
->     commons-beanutils commons-collections commons-digester struts struts-taglib \
+#     # moreover, old packages as jetty6-core mojo-maven2-plugins nanocontainer
+#     # just breaks with new poms installed due to their depmap (TODO: edit it 
+#     $jpp->add_section('package','poms')->push_body(q!Group: Development/Java
+# Summary: Apache Tomcat poms for maven2
+
+# %description poms
+# Apache Tomcat poms for maven2
+
+# !);
+#     $jpp->add_section('files','poms')->push_body(q!%_datadir/maven2/poms/*
+# !);

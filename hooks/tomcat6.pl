@@ -4,6 +4,11 @@ require 'set_fix_homedir_macro.pl';
 require 'windows-thumbnail-database-in-package.pl';
 require 'set_target_15.pl';
 
+# TODO: missing caused trouble
+#BuildRequires: jakarta-commons-collections-tomcat5
+#BuildRequires: jakarta-commons-dbcp-tomcat5
+#BuildRequires: jakarta-commons-pool-tomcat5
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
@@ -12,13 +17,26 @@ sub {
 #    $jpp->get_section('package','')->subst(qr'tempdir %{_var}/tmp/%{name}','tempdir %{_var}/cache/%{name}/temp');
 #    %{__ln_s} %{tempdir} temp
 
+    $jpp->get_section('package','el-2.1-api')->push_body('Obsoletes: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
+Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
+');
+
+    # TODO: posttrans is not supported, so hack around
+    my $posttrans=$jpp->get_section('posttrans','');
+    $posttrans->set_body([map {"# ".$_} map {s!\%posttrans!\%\%posttrans!,$_}  @{$posttrans->get_body()}]);
+    my $presection=$jpp->get_section('pre','');
+    my @new_body;
+    foreach my $line (@{$presection->get_body()}) {
+	push @new_body, $line;
+	last if $line=~/^# Save the conf, app, and lib dirs/;
+    }
+    $presection->set_body(\@new_body);
+    $jpp->get_section('preun','')->subst(qr'\%{__rm} -rf \%{workdir}','#%{__rm} -rf %{workdir}');
+
     # TODO: write proper tomcat6-6.0.init!
     # as a hack, an old version is taken
     $jpp->copy_to_sources('tomcat6-6.0.init');
     $jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
-
-#Requires(post): %{_javadir}/ecj.jar
-    $jpp->get_section('package','lib')->subst_if('Requires','#Requires',qr'ecj.jar');
 
     $jpp->get_section('pre')->subst(qr'-[gu] %\{tcuid\}','');
 
@@ -26,8 +44,6 @@ sub {
     # condrestart on upgrade 
     $jpp->get_section('post')->push_body('/sbin/service %name condrestart'."\n");
 
-    # fedora-specific
-    $jpp->get_section('install')->subst(qr'\%{__ln_s} log4j log4j-\%{version}.jar','%{__ln_s} log4j.jar log4j-%{version}.jar');
     $jpp->get_section('files','el-%{elspec}-api')->subst(qr'\%defattr\(0665,root,root','#defattr(0665,root,root');
     $jpp->get_section('files','')->push_body('%dir %{bindir}'."\n");
     $jpp->get_section('files','')->subst(qr'\%defattr\(0644,root','#defattr(0644,root');
@@ -36,6 +52,8 @@ sub {
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/log4j*jar'."\n");
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/tomcat6-el-2.1-api*jar'."\n");
     $jpp->get_section('package','lib')->push_body('Requires: tomcat6-el-2.1-api tomcat6-log4j'."\n");
+
+    $jpp->get_section('files','')->push_body('%exclude /etc/tomcat6/log4j.properties'."\n");
 
     # broken symlink
     $jpp->get_section('install')->subst(qr'\%{bindir}/tomcat-juli\* \.','%{bindir}/tomcat-juli.jar %{bindir}/tomcat-juli-%{version}.jar .',qr'__ln_s');
@@ -60,7 +78,10 @@ EOF
     $jpp->get_section('files','')->subst(qr'^\%attr\(0765,','%attr(0775,');
 }
 __DATA__
-drwxrwxr-x /usr/share/doc/tomcat6-6.0.26
-drwxrwxr-x /usr/share/tomcat6
-/.out/tomcat6-6.0.26-alt1_8jpp6.noarch.rpm: writable files in /usr/
-sisyphus_check: check-perms ERROR: file permissions violation
+
+__END__
+# jpp stuff ?
+#Requires(post): %{_javadir}/ecj.jar
+    $jpp->get_section('package','lib')->subst_if('Requires','#Requires',qr'ecj.jar');
+
+

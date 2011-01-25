@@ -51,7 +51,7 @@ BuildRequires: plexus-maven-plugin >= 1.3.5
 BuildRequires: plexus-mail-sender
 BuildRequires: plexus-resources
 '."\n");
-    $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester18 jakarta-commons-parent excalibur-avalon-framework'."\n");
+    $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester jakarta-commons-parent excalibur-avalon-framework'."\n");
 
     # it might break jpp patch and jpp local repository, so apply later; or remove;
     #$jpp->add_patch('maven-2.0.x-MNG-3948.patch', STRIP=>1);
@@ -66,16 +66,17 @@ BuildRequires: plexus-resources
     # NO NEED: already in 6.0 common poms
     #$jpp->get_section('package','plugin-javadoc')->push_body('Requires: excalibur'."\n");
 
-    #unless ('revert to a7') {
+    unless ('revert to a7') {
 	# I do not want to update(revert) plexus-archiver from a8 to a7.
 	# so disable maven2-plugins-catch-uncaught-exceptions.patch
 	$jpp->get_section('prep')->subst(qr'^\%patch4\s','#patch4 ');
 	# and make other similar patches
 	$jpp->add_patch('maven2-2.0.8-alt-plexus-archiver-a8.patch',STRIP=>1);
-    #}
+    }
 
     # tmp hack over sandbox error :(
-    #$jpp->get_section('package','')->push_body('ExclusiveArch: %ix86'."\n");
+    #$jpp->get_section('package','')->push_body('ExclusiveArch: x86_64'."\n");
+    $jpp->add_patch('maven2-2.0.8-alt-bootstrap-fix-descriptor-leak.patch',STRIP=>0);
 
     $jpp->get_section('prep')->push_body(q~
 cat > relink_bootstrap_maven_jars.sh << 'EOF'

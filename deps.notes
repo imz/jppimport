@@ -46,6 +46,8 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
 #--------------------------------------------------------------
 
+DONE: added myfaces-core-api-parent and added Obsoletes:myfaces-core11-api-parent to myfaces-core12-api
+
 [ERROR] org.apache.velocity.exception.ParseErrorException: Encountered "/" at
 +org/apache/maven/doxia/siterenderer/resources/default-site.vm[line 23, column
 +51]
@@ -59,7 +61,6 @@ indicate that velocity15 should be used.
 ibatis by apache-ibatis
 portals-pluto && portals-pluto10
 dups TODO
-wadi by wadi2
 bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by bouncycastle
 ----------
 
@@ -165,8 +166,8 @@ The specified class for ResourceManager (org.apache.velocity.runtime.resource.Re
 NOTE: plexus-archiver: a8 in jpp5, a7 in jpp6.
 when tried to downgrade, mojo-maven2-plugins was broken. fixes:
 [mojo-maven2-plugins-17-alt-plexus-archiver-a7-support.patch; disable patch10]
-I guess let it be a8.
-but a8 has a bug [at apache-abderra]
+extra exception is thrown
+downgrade because a8 has a bug [at apache-abderra]
 [INFO] [jar:jar]
 [WARNING] JAR will be empty - no content was marked for inclusion!
 [INFO] Building jar: /usr/src/RPM/BUILD/apache-abdera-0.4.0/bundle/target/abdera-bundle-0.4.0-incubating.jar
@@ -312,3 +313,87 @@ deleting SRPMS/jboss-ejb3-security-1.0.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-proxy-impl-1.0.2-3.jpp6.src.rpm
 deleting SRPMS/javacc-4.0-5.jpp6.src.rpm
 deleting SRPMS/apache-commons-parent-12-2.jpp6.src.rpm
+----------------------------------------------------
+SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
+SRPMS/asm2-2.2.3-8.jpp6.src.rpm
+SRPMS/felix-framework-2.0.5-3.jpp6.src.rpm
+SRPMS/felix-main-2.0.5-6.jpp6.src.rpm
+SRPMS/felix-osgi-compendium-1.4.0-3.jpp6.src.rpm
+SRPMS/felix-osgi-foundation-1.2.0-4.jpp6.src.rpm
+SRPMS/felix-parent-1.2.1-4.jpp6.src.rpm
+SRPMS/felix-shell-1.4.2-3.jpp6.src.rpm
+SRPMS/fest-1.0.2-2.jpp6.src.rpm
+SRPMS/fontbox-0.1.0-2.jpp6.src.rpm
+SRPMS/gmaven-1.3-2.jpp6.src.rpm
+SRPMS/gnu-getopt-1.0.13-4.jpp6.src.rpm
+SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
+SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
+SRPMS/gshell-2.6.2-1.jpp6.src.rpm
+SRPMS/h2database-1.2.145-2.jpp6.src.rpm
+SRPMS/hivemind-1.1.1-4.jpp6.src.rpm
+SRPMS/htmlunit2-2.8-2.jpp6.src.rpm
+SRPMS/jakarta-commons-httpclient-3.1-2.jpp6.src.rpm
+SRPMS/jarjar-1.0-3.jpp6.src.rpm
+SRPMS/jboss-aop2-2.1.1-6.jpp6.src.rpm
+SRPMS/jboss-bootstrap-1.0.0-0.3.Beta3.jpp6.src.rpm
+SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
+SRPMS/jboss-cl-2.0.6-3.jpp6.src.rpm
+SRPMS/jboss-ejb3-proxy-spi-1.0.0-5.jpp6.src.rpm
+SRPMS/jboss-ejb3-test-1.0.0-3.jpp6.src.rpm
+SRPMS/jboss-ejb3-test-remote-1.0.0-4.jpp6.src.rpm
+SRPMS/jboss-ejb3-transactions-1.0.1-3.jpp6.src.rpm
+SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
+SRPMS/jbossorg-docbook-xslt-1.1.0-2.jpp6.src.rpm
+SRPMS/jfreechart-1.0.13-3.jpp6.src.rpm
+SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
+SRPMS/logback-0.9.27-1.jpp6.src.rpm
+SRPMS/maven-1.1-9.jpp6.src.rpm
+SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
+SRPMS/maven-plugin-bundle-2.0.0-8.jpp6.src.rpm
+SRPMS/maven2-2.0.8-31.jpp6.src.rpm
+SRPMS/nekohtml0-0.9.5-2.jpp6.src.rpm
+SRPMS/objectweb-anttask-1.3.2-5.jpp6.src.rpm
+SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
+SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
+SRPMS/qdox-1.12-2.jpp6.src.rpm
+SRPMS/qdox161-1.6.1-7.jpp6.src.rpm
+SRPMS/sisu-1.4.3.2-1.jpp6.src.rpm
+SRPMS/sisu-guice-2.9.2-2.jpp6.src.rpm
+SRPMS/slf4j-1.6.1-4.jpp6.src.rpm
+SRPMS/texen-1.0-2.jpp6.src.rpm
+SRPMS/textmining-1.0-1.jpp6.src.rpm
+SRPMS/tiles-2.0.7-1.jpp6.src.rpm
+SRPMS/tl-netty2-1.9.2-4.jpp6.src.rpm
+SRPMS/vafer-dependency-0.4-4.jpp6.src.rpm
+SRPMS/velocity-dvsl-1.0-3.jpp6.src.rpm
+SRPMS/ws-scout0-0.7-0.rc2.6.jpp6.src.rpm
+SRPMS/xalan-j2-2.7.1-2.jpp6.src.rpm
+SRPMS/xml-commons-resolver12-1.2-1.2.jpp6.src.rpm
+SRPMS/xmlgraphics-fop-1.0-3.jpp6.src.rpm
+deleting SRPMS/xmlgraphics-fop-0.95-7.jpp6.src.rpm
+deleting SRPMS/xml-commons-resolver12-1.2-1.1.jpp6.src.rpm
+deleting SRPMS/xalan-j2-2.7.1-1.jpp6.src.rpm
+deleting SRPMS/ws-scout0-0.7-0.rc2.5.jpp6.src.rpm
+deleting SRPMS/slf4j-1.6.1-3.jpp6.src.rpm
+deleting SRPMS/sisu-guice-2.9.2-1.jpp6.src.rpm
+deleting SRPMS/maven2-2.0.8-29.jpp6.src.rpm
+deleting SRPMS/maven-1.1-8.jpp6.src.rpm
+deleting SRPMS/logback-0.9.14-2.jpp6.src.rpm
+deleting SRPMS/jpackage-utils-5.0.0-2.jpp6.src.rpm
+deleting SRPMS/jfreechart-1.0.13-2.jpp6.src.rpm
+deleting SRPMS/jboss-metadata-1.0.1-5.jpp6.src.rpm
+deleting SRPMS/jboss-ejb3-transactions-1.0.1-2.jpp6.src.rpm
+deleting SRPMS/jboss-ejb3-test-remote-1.0.0-3.jpp6.src.rpm
+deleting SRPMS/jboss-ejb3-test-1.0.0-2.jpp6.src.rpm
+deleting SRPMS/jboss-ejb3-proxy-spi-1.0.0-4.jpp6.src.rpm
+deleting SRPMS/jboss-cl-2.0.6-2.jpp6.src.rpm
+deleting SRPMS/jboss-cache-core-3.1.0-3.jpp6.src.rpm
+deleting SRPMS/jboss-bootstrap-1.0.0-0.2.Beta3.jpp6.src.rpm
+deleting SRPMS/jboss-aop2-2.1.1-4.jpp6.src.rpm
+deleting SRPMS/jakarta-commons-httpclient-3.1-1.jpp6.src.rpm
+deleting SRPMS/htmlunit2-2.8-1.jpp6.src.rpm
+deleting SRPMS/h2database-1.2.145-1.jpp6.src.rpm
+deleting SRPMS/groovy17-1.7.6-1.jpp6.src.rpm
+deleting SRPMS/gnu-getopt-1.0.13-3.jpp6.src.rpm
+deleting SRPMS/felix-parent-1.2.1-3.jpp6.src.rpm
+deleting SRPMS/apache-resource-bundles-2-1.jpp6.src.rpm

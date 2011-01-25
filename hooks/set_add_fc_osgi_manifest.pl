@@ -3,7 +3,7 @@
 #use strict;
 use warnings;
 use File::Basename;
-
+use lib $ENV{'HOME'}.'/src/repo/jppimport.git/hooks';
 require 'set_osgi.pl';
 
 push @SPECHOOKS, 
@@ -21,7 +21,7 @@ push @SPECHOOKS,
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.24.jar');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.24.jar');
     } elsif ($name eq 'apache-commons-httpclient' or $name eq 'jakarta-commons-httpclient') {
-	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-commons-httpclient-3.1-1.fc14.src.rpm');
+	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-commons-httpclient-3.1-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-httpclient.jar','/usr/share/java/jakarta-commons-httpclient-3.1.jar');
 # no need; it contains
 #    } elsif ($name eq 'apache-commons-lang') {
