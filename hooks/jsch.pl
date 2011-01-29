@@ -1,1 +1,3 @@
-set_target_14.pl
+#!/usr/bin/perl -w
+
+require 'set_osgi.pl';

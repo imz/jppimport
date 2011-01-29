@@ -20,6 +20,7 @@ $RPM::Source::Transform::cleanup=0;
 $RPM::Source::Transform::packager='auto';
 $RPM::Source::Transform::nextrel='jppimport';
 $RPM::Source::Transform::NEXTREL_METHOD{'jppimport'}=\&nextrel_jppimport;
+$RPM::Source::Transform::INITREL_METHOD{'jppimport'}=\&initrel_jppimport;
 push @RPM::Source::Transform::DEFAULT_OPTIONS,
     "jvm=s" => \$jvm,
     "nobz2"   => \$nobz2,
@@ -64,6 +65,29 @@ sub verify_options {
 	$self->usage();
 	exit (5);
     }
+}
+
+sub initrel_jppimport {
+    my ($spec,$parent)=@_;
+    my $jpprel = $spec->get_section('package','')->get_tag('Release');
+    die "jpp release is undefined" unless defined $jpprel;
+# $jppsubrel is used to keep branch of fedora or mandriva
+    my $jppsubrel='';
+# for new jpackage 5.0
+    $jpprel=~s/\%\{dist\}//;
+# for fedora-based imports (hack :()
+    if ($jpprel=~/\%\{\?dist\}/) {
+	$jpprel=~s/\%\{\?dist\}//;
+	$jpprel=~s/jpp(\.\d+)?//;
+	$jppsubrel=$1 if $1;
+    }
+    $jpprel=~s/jpp\d.\d$//;
+    $jpprel=~s/.jpp5$//;
+    $jpprel=~s/jpp//;
+    
+    my $altrel="alt1";
+    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
+    return $newrel;
 }
 
 sub nextrel_jppimport {

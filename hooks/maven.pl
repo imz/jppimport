@@ -2,10 +2,6 @@
 
 require 'add_missingok_config.pl';
 
-# added aspectj
-
-# new:
-
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;

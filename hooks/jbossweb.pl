@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#require 'set_target_15.pl';
+require 'set_fix_repolib_project.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;

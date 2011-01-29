@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-require 'set_epoch_1.pl';
-require 'set_target_14.pl';
+#require 'set_target_14.pl';
+require 'set_fix_repolib_project.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;

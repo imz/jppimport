@@ -3,7 +3,8 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst('velocity14','velocity');
+    #$jpp->get_section('package','')->subst('velocity14','velocity');
+    $jpp->get_section('package','')->push_body('BuildRequires: velocity14');
 };
 
 __END__

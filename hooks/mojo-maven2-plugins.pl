@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: modello-maven-plugin saxpath jakarta-commons-primitives maven-doxia-sitetools plexus-containers-container-default plexus-component-annotations'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: saxpath jakarta-commons-primitives maven-doxia-sitetools plexus-containers-container-default plexus-component-annotations'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
 

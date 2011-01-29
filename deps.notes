@@ -108,8 +108,7 @@ maven-bundle-plugin -> felix (for poms)+felix-maven2
 # does not work well; fedora's maven-plugin-bundle work better
 in piccolo2d -> maven-plugin-bundle
 
-maven2-plugin-site: broken beh examples: apacheds, tiles, struts (remove ||:)
-xbean: strange maven-doxia-site+plexus-utils beh
+maven2-plugin-site: broken beh examples: apacheds, tiles, struts 1.3.8 (remove ||:)
 
 TODO: build jetty6 with webapps. jetty6:
 [WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
@@ -180,34 +179,27 @@ downgrade because a8 has a bug [at apache-abderra]
 [INFO] ------------------------------------------------------------------------
 [INFO] Error creating source archive: You must set at least one file.
 
-TODO: update ws-commons-XmlSchema: xfire, ... patch to catch an extra exception
-
-TODO: compats for ???
-=apache-commons-daemon-1.0.2
-=apache-commons-collections-3.2.1
-
 TODO: incorrect obsoletes in apache-commons-*
+
+TODO: maven-plugin-modello -> modello-maven-plugin
+maven-doxia-1.0-alt6_0.3.a10.8jpp6.src
+maven-doxia-sitetools-1.0-alt1_0.1.a10.2jpp6.src
+cargo-1.0-alt2_2jpp6.src
+
+TODO: PLZ,fix: spring-beandoc pom refers to old aspectj group. aspectj -> org.aspectj
 
 #--------------------------------------
 SRPMS/ant-1.8.1-4.jpp6.src.rpm
-SRPMS/cargo-1.0-3.jpp6.src.rpm
+SRPMS/cargo-1.0-3.jpp6.src.rpm -> next maven?
 SRPMS/commons-build-plugin-1.2-1.jpp6.src.rpm
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
-SRPMS/modello-1.3-1.jpp6.src.rpm
-SRPMS/maven-archetype2-2.0-0.a3.2.jpp6.src.rpm
 SRPMS/maven-doxia-1.0-2.jpp6.src.rpm
 SRPMS/maven-doxia-sitetools-1.0-2.jpp6.src.rpm
 SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
-SRPMS/maven-model-3.0.2-7.jpp6.src.rpm
-SRPMS/maven-release-5-2.jpp6.src.rpm
+SRPMS/maven-release-5-2.jpp6.src.rpm -> maven-scm 1.1
 SRPMS/maven-scm-1.1-1.jpp6.src.rpm
-SRPMS/maven-shared-8-0.p8.6.jpp6.src.rpm
 SRPMS/maven2-2.0.8-28.jpp6.src.rpm
 SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
-SRPMS/plexus-maven-plugin-1.3.5-7.jpp6.src.rpm
-SRPMS/plexus-tools-1.0.10-3.jpp6.src.rpm
-SRPMS/plexus-utils-1.5.8-1.jpp6.src.rpm
-SRPMS/xbean-3.4.3-1.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
 SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
@@ -229,22 +221,19 @@ SRPMS/jflex-1.4.3-1.jpp6.src.rpm
 SRPMS/junit4-4.8.2-4.jpp6.src.rpm
 SRPMS/maven-jxr-2.2-2.jpp6.src.rpm
 SRPMS/maven-notice-plugin-0.0.2-1.jpp6.src.rpm
-SRPMS/maven-shared-8-0.p8.8.jpp6.src.rpm
+DONE#SRPMS/maven-shared-8-0.p8.8.jpp6.src.rpm
 SRPMS/maven2-2.0.8-29.jpp6.src.rpm
 SRPMS/nekohtml-1.9.14-1.jpp6.src.rpm
 SRPMS/paranamer-1.5-1.jpp6.src.rpm
 SRPMS/picocontainer-script-2.0-1.jpp6.src.rpm
 SRPMS/picocontainer-site-resources-2.0-1.jpp6.src.rpm
 SRPMS/picocontainer2-2.4-2.jpp6.src.rpm
-SRPMS/plexus-build-api-0.0.4-2.jpp6.src.rpm
 SRPMS/plexus-i18n-1.0-0.b10.1.jpp6.src.rpm
 SRPMS/plexus-interactivity-1.0-0.a6.1.jpp6.src.rpm
-SRPMS/plexus-interpolation-1.12-1.jpp6.src.rpm
 SRPMS/ws-commons-util-1.0.2-3.jpp6.src.rpm
 SRPMS/xsite-1.1-2.jpp6.src.rpm
 deleting SRPMS/nekohtml-1.9.11-2.jpp6.src.rpm
 deleting SRPMS/maven2-2.0.8-28.jpp6.src.rpm
-deleting SRPMS/maven-shared-8-0.p8.6.jpp6.src.rpm
 deleting SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
 deleting SRPMS/htmlunit-core-js-2.4-2.jpp6.src.rpm
 deleting SRPMS/hc-httpcore-4.1-0.r962551.1.jpp6.src.rpm
@@ -290,19 +279,15 @@ SRPMS/sisu-guice-2.9.2-1.jpp6.src.rpm
 SRPMS/slf4j-1.6.1-3.jpp6.src.rpm
 SRPMS/velocity-tools-1.4-2.jpp6.src.rpm
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
-SRPMS/wadi2-2.1.1-1.jpp6.src.rpm
 SRPMS/werkz-1.0-0.b10.8.jpp6.src.rpm
-SRPMS/ws-woden-1.0-0.m8.2.jpp6.src.rpm
 SRPMS/wsdl4j-1.6.2-7.jpp6.src.rpm
 SRPMS/wss4j-1.5.8-7.jpp6.src.rpm
 SRPMS/xapool-1.5.0-3.jpp6.src.rpm
-SRPMS/xbean-3.4.3-2.jpp6.src.rpm
 SRPMS/xmldb-api-0.1-0.20041010.5.jpp6.src.rpm
 SRPMS/xmlgraphics-commons-1.4-1.jpp6.src.rpm
 SRPMS/xmlgraphics-fop-0.95-7.jpp6.src.rpm
 SRPMS/xmlrpc-3.1.3-3.jpp6.src.rpm
 SRPMS/xmlrpc2-2.0.1-6.jpp6.src.rpm
-deleting SRPMS/xbean-3.4.3-1.jpp6.src.rpm
 deleting SRPMS/wss4j-1.5.8-6.jpp6.src.rpm
 deleting SRPMS/wsdl4j-1.6.2-5.jpp6.src.rpm
 deleting SRPMS/slf4j-1.5.8-1.jpp6.src.rpm
@@ -356,7 +341,6 @@ SRPMS/objectweb-anttask-1.3.2-5.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 SRPMS/qdox-1.12-2.jpp6.src.rpm
-SRPMS/qdox161-1.6.1-7.jpp6.src.rpm
 SRPMS/sisu-1.4.3.2-1.jpp6.src.rpm
 SRPMS/sisu-guice-2.9.2-2.jpp6.src.rpm
 SRPMS/slf4j-1.6.1-4.jpp6.src.rpm
@@ -397,3 +381,12 @@ deleting SRPMS/groovy17-1.7.6-1.jpp6.src.rpm
 deleting SRPMS/gnu-getopt-1.0.13-3.jpp6.src.rpm
 deleting SRPMS/felix-parent-1.2.1-3.jpp6.src.rpm
 deleting SRPMS/apache-resource-bundles-2-1.jpp6.src.rpm
+-------------------------------------
+SRPMS/hibernate-beanvalidation-api-1.0.0-4.jpp6.src.rpm
+SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
+SRPMS/jacorb-jboss-2.3.1-7.jpp6.src.rpm
+SRPMS/ognl-2.7.3-1.jpp6.src.rpm
+deleting SRPMS/jacorb-jboss-2.3.1-6.jpp6.src.rpm
+deleting SRPMS/hibernate3-annotations-3.4.0-1.4.jpp6.src.rpm
+deleting SRPMS/hibernate-beanvalidation-api-1.0.0-3.CR2.1.jpp6.src.rpm
+------------

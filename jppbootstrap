@@ -22,6 +22,7 @@ my $result = GetOptions (
 		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
 		      "alt=s"   => \$altrpm,
+		      "parent=s"   => \$altrpm,
 		      "skip-requires=s"   => \@skiprequires,
 		      "skip-provides=s"   => \@skipprovides,
 		      "add-provides=s"   => \@addprovides,
