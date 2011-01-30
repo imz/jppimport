@@ -46,6 +46,7 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
 #--------------------------------------------------------------
 
+DONE: with old modello, -Dmodel=path/to/file.mdo will help
 DONE: added myfaces-core-api-parent and added Obsoletes:myfaces-core11-api-parent to myfaces-core12-api
 
 [ERROR] org.apache.velocity.exception.ParseErrorException: Encountered "/" at
@@ -181,25 +182,23 @@ downgrade because a8 has a bug [at apache-abderra]
 
 TODO: incorrect obsoletes in apache-commons-*
 
-TODO: maven-plugin-modello -> modello-maven-plugin
-maven-doxia-1.0-alt6_0.3.a10.8jpp6.src
-maven-doxia-sitetools-1.0-alt1_0.1.a10.2jpp6.src
-cargo-1.0-alt2_2jpp6.src
+TODO: apache-jar-resource-bundle kicked  apache-resource-bundles
+and NEW unmet dependencies detected:
+apache-jar-resource-bundle#0:1.4-alt1_1jpp6     apache-resource-bundles >= 0:2
 
-TODO: PLZ,fix: spring-beandoc pom refers to old aspectj group. aspectj -> org.aspectj
+DONE:renameBR: maven-plugin-modello(conflicts with maven1) -> modello-maven-plugin
+DONE:aspectj group. aspectj -> org.aspectj
+
+TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
 
 #--------------------------------------
 SRPMS/ant-1.8.1-4.jpp6.src.rpm
-SRPMS/cargo-1.0-3.jpp6.src.rpm -> next maven?
+SRPMS/cargo-1.0-3.jpp6.src.rpm -> next maven? cargo-1.0-2 is done :)
 SRPMS/commons-build-plugin-1.2-1.jpp6.src.rpm
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
-SRPMS/maven-doxia-1.0-2.jpp6.src.rpm
-SRPMS/maven-doxia-sitetools-1.0-2.jpp6.src.rpm
 SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
 SRPMS/maven-release-5-2.jpp6.src.rpm -> maven-scm 1.1
-SRPMS/maven-scm-1.1-1.jpp6.src.rpm
 SRPMS/maven2-2.0.8-28.jpp6.src.rpm
-SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
 SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
@@ -214,7 +213,6 @@ SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm
 SRPMS/hc-httpcore-4.1-1.jpp6.src.rpm
 SRPMS/htmlunit-core-js-2.8-3.jpp6.src.rpm
 SRPMS/htmlunit2-2.8-1.jpp6.src.rpm
-SRPMS/james-parent-1.1-2.jpp6.src.rpm
 SRPMS/james-project-1.2-2.jpp6.src.rpm
 SRPMS/javacc3-3.2-6.jpp6.src.rpm
 SRPMS/jflex-1.4.3-1.jpp6.src.rpm
@@ -245,10 +243,7 @@ deleting SRPMS/apache-commons-launcher-1.2-0.r832060.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-httpclient-3.1-5.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
-SRPMS/atinject-1-2.20100611svn86.jpp6.src.rpm
-SRPMS/cal10n-0.7.4-5.jpp6.src.rpm
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
-SRPMS/codehaus-parent-3-1.jpp6.src.rpm
 SRPMS/derby-10.6.2.1-2.jpp6.src.rpm
 SRPMS/felix-osgi-core-1.4.0-6.jpp6.src.rpm
 SRPMS/felix-osgi-obr-1.0.2-4.jpp6.src.rpm

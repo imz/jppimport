@@ -24,8 +24,6 @@ push @SPECHOOKS, sub {
 
 __END__
 #1.0.2
-    #$jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-plugin mojo-maven2-plugin-antlr maven2-plugin-plugin maven2-plugins maven-shared-archiver\n");
-
 SOURCES:
 --- apacheds-jpp-depmap.xml.orig        2009-02-11 20:57:27 +0000
 +++ apacheds-jpp-depmap.xml     2009-02-11 20:58:54 +0000

@@ -2,6 +2,9 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('build')->unshift_body('export MAVEN_OPTS="-Xmx256m"'."\n");
+
+
     $jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
     $jpp->get_section('package','',)->push_body('BuildRequires: maven-shared-downloader'."\n");
     #$jpp->get_section('package','',)->push_body('BuildRequires: saxpath'."\n");
