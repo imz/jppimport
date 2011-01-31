@@ -188,6 +188,9 @@ apache-jar-resource-bundle#0:1.4-alt1_1jpp6     apache-resource-bundles >= 0:2
 
 DONE:renameBR: maven-plugin-modello(conflicts with maven1) -> modello-maven-plugin
 DONE:aspectj group. aspectj -> org.aspectj
+# alt; aspectj 1.5.4
+sed -i 's,<groupId>aspectj</groupId>,<groupId>org.aspectj</groupId>,' 
+
 
 TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
 
@@ -197,7 +200,6 @@ SRPMS/cargo-1.0-3.jpp6.src.rpm -> next maven? cargo-1.0-2 is done :)
 SRPMS/commons-build-plugin-1.2-1.jpp6.src.rpm
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
-SRPMS/maven-release-5-2.jpp6.src.rpm -> maven-scm 1.1
 SRPMS/maven2-2.0.8-28.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
@@ -213,7 +215,6 @@ SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm
 SRPMS/hc-httpcore-4.1-1.jpp6.src.rpm
 SRPMS/htmlunit-core-js-2.8-3.jpp6.src.rpm
 SRPMS/htmlunit2-2.8-1.jpp6.src.rpm
-SRPMS/james-project-1.2-2.jpp6.src.rpm
 SRPMS/javacc3-3.2-6.jpp6.src.rpm
 SRPMS/jflex-1.4.3-1.jpp6.src.rpm
 SRPMS/junit4-4.8.2-4.jpp6.src.rpm

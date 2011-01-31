@@ -12,6 +12,8 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: jbossretro spring-all'."\n");
 
     $jpp->add_patch('jboss-4.0.3SP1-alt-ant17support.patch');
+    $jpp->add_patch('jboss4-4.0.4-alt-tomcat5.5.31.patch',STRIP=>1);
+
 
     # otherwise Depends: /lib/lsb/init-functions but it is not installable
     $jpp->copy_to_sources('jboss4.init');

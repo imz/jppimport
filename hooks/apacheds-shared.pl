@@ -3,6 +3,8 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+# ?
+#    $jpp->get_section('package','')->push_body('BuildRequires: maven2-plugin-shade'."\n");
     # to fix apacheds build due to shadowed junit
     $jpp->get_section('build')->unshift_body_after('# alt; remove embedded junit
 rm -rf junit org/junit org/hamcrest

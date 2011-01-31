@@ -1,0 +1,11 @@
+--- jboss-4.0.4.GA-src/tomcat/src/main/org/jboss/web/tomcat/tc5/session/JBossCacheManager.java	2006-05-09 04:37:10.000000000 +0000
++++ jboss-4.0.4.GA-src/tomcat/src/main/org/jboss/web/tomcat/tc5/session/JBossCacheManager.java	2011-01-31 15:36:18.315254761 +0000
+@@ -225,6 +225,8 @@
+       return snapshotInterval_;
+    }
+ 
++   public void changeSessionId(Session session) {}
++
+    /**
+     * Sets how often session changes should be replicated to other nodes.
+     *

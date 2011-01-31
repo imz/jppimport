@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+    my $bootstrap=1;
+
+    $jpp->get_section('package','plugin-remote-resources')->push_body('Requires: maven-shared-downloader'."\n") if $bootstrap;
     #TODO:(...-28 only?) 
     $jpp->add_patch('maven2-2.0.8-alt-plugin-assembly-ValueSource.patch', STRIP=>0);
 
