@@ -2,6 +2,10 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+
+    $jpp->add_patch('apacheds-1.5.4-alt-pom-use-maven2-plugin-shade.patch',STRIP=>1);
+    $jpp->get_section('package','')->subst_if('mojo-maven2-plugin-shade','maven2-plugin-shade',qr'Requires:');
+
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4 jakarta-commons-net14\n");
     # test fails :(
     $jpp->get_section('package','')->unshift_body("BuildRequires: jakarta-commons-net14\n");

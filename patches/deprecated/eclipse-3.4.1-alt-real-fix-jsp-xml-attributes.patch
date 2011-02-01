@@ -1,0 +1,36 @@
+diff --git a/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/searchToolbar.jsp b/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/searchToolbar.jsp
+index 75b0eef..3f10d2e 100644
+--- a/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/searchToolbar.jsp
++++ b/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/searchToolbar.jsp
+@@ -27,13 +27,13 @@
+ 	<jsp:param name="image"    value="show_categories.gif"/>
+ 	<jsp:param name="action"   value="toggleShowCategories"/>
+ 	<jsp:param name="param"    value=""/>
+-	<jsp:param name="state"    value="<%=((new SearchData(application, request, response)).isShowCategories() ? "on" : "off")%>"/>
++	<jsp:param name="state"    value='<%=((new SearchData(application, request, response)).isShowCategories() ? "on" : "off")%>'/>
+ 
+ 	<jsp:param name="name"     value="show_descriptions"/>
+ 	<jsp:param name="tooltip"  value='show_descriptions'/>
+ 	<jsp:param name="image"    value="show_descriptions.gif"/>
+ 	<jsp:param name="action"   value="toggleShowDescriptions"/>
+ 	<jsp:param name="param"    value=""/>
+-	<jsp:param name="state"    value="<%=((new SearchData(application, request, response)).isShowDescriptions() ? "on" : "off")%>"/>
++	<jsp:param name="state"    value='<%=((new SearchData(application, request, response)).isShowDescriptions() ? "on" : "off")%>'/>
+ 
+-</jsp:include>
+\ No newline at end of file
++</jsp:include>
+diff --git a/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/tocToolbar.jsp b/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/tocToolbar.jsp
+index a06325a..6dfa658 100644
+--- a/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/tocToolbar.jsp
++++ b/eclipse-sourceBuild-srcIncluded/plugins/org.eclipse.help.webapp/advanced/tocToolbar.jsp
+@@ -54,6 +54,6 @@
+ 	<jsp:param name="image"    value="auto_synch_toc.gif"/>
+ 	<jsp:param name="action"   value="toggleAutosynch"/>
+ 	<jsp:param name="param"    value=""/>	
+-	<jsp:param name="state"    value="<%=((new CookiesData(application, request, response)).isSynchToc() ? "on" : "off")%>"/>
++	<jsp:param name="state"    value='<%=((new CookiesData(application, request, response)).isSynchToc() ? "on" : "off")%>'/>
+ 	
+-</jsp:include>
+\ No newline at end of file
++</jsp:include>

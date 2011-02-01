@@ -1,0 +1,52 @@
+diff -ru activemq-4.1.2/activemq-all/pom.xml activemq-4.1.2/activemq-all/pom.xml
+--- activemq-4.1.2/activemq-all/pom.xml	2011-02-01 18:08:05.583973058 +0000
++++ activemq-4.1.2/activemq-all/pom.xml	2011-02-01 18:14:41.632473914 +0000
+@@ -52,8 +52,8 @@
+     <plugins>
+ 
+       <plugin>
+-        <groupId>org.codehaus.mojo</groupId>
+-        <artifactId>shade-maven-plugin</artifactId>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-shade-plugin</artifactId>
+         <version>1.0</version>
+         <executions>
+           <execution>
+@@ -79,19 +79,19 @@
+                 </includes>
+               </artifactSet>
+               <transformers>
+-                <transformer implementation="org.codehaus.mojo.shade.resource.ApacheNoticeResourceTransformer">
++                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                   <projectName>Apache ActiveMQ</projectName>
+                 </transformer>
+ 
+-                <transformer implementation="org.codehaus.mojo.shade.resource.AppendingTransformer">
++                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                   <resource>META-INF/spring.handlers</resource>
+                 </transformer>
+ 
+-                <transformer implementation="org.codehaus.mojo.shade.resource.AppendingTransformer">
++                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                   <resource>META-INF/services/com.sun.tools.xjc.Plugin</resource>
+                 </transformer>
+ 
+-                <transformer implementation="org.codehaus.mojo.shade.resource.AppendingTransformer">
++                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                   <resource>META-INF/spring.schemas</resource>
+                 </transformer>
+               </transformers>
+diff -ru activemq-4.1.2/activemq-run/pom.xml activemq-4.1.2/activemq-run/pom.xml
+--- activemq-4.1.2/activemq-run/pom.xml	2011-02-01 18:08:05.587982778 +0000
++++ activemq-4.1.2/activemq-run/pom.xml	2011-02-01 18:12:43.423999105 +0000
+@@ -54,8 +54,8 @@
+         </configuration>
+       </plugin>
+       <plugin>
+-        <groupId>org.codehaus.mojo</groupId>
+-        <artifactId>shade-maven-plugin</artifactId>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-shade-plugin</artifactId>
+         <version>1.0</version>
+         <executions>
+           <execution>

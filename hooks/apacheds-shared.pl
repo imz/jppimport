@@ -3,6 +3,9 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    $jpp->add_patch('apacheds-shared-0.9.12-alt-use-maven2-plugin-shade.patch',STRIP=>1);
+    $jpp->get_section('package','')->subst_if('mojo-maven2-plugin-shade','maven2-plugin-shade',qr'Requires:');
+
 # ?
 #    $jpp->get_section('package','')->push_body('BuildRequires: maven2-plugin-shade'."\n");
     # to fix apacheds build due to shadowed junit

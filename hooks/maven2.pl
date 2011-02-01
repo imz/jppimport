@@ -5,11 +5,15 @@ sub {
     my ($jpp, $alt) = @_;
     my $bootstrap=1;
 
-    $jpp->get_section('package','plugin-remote-resources')->push_body('Requires: maven-shared-downloader'."\n") if $bootstrap;
-    #TODO:(...-28 only?) 
-    $jpp->add_patch('maven2-2.0.8-alt-plugin-assembly-ValueSource.patch', STRIP=>0);
+    # for 28 only
+    #$jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
+    #$jpp->add_patch('maven2-2.0.8-alt-plugin-assembly-ValueSource.patch', STRIP=>0);
+    # for 29
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api'."\n");
 
-#    $jpp->get_section('package','')->unshift_body('#define _without_bootstrap 1'."\n");
+    $jpp->get_section('package','plugin-remote-resources')->push_body('Requires: maven-shared-downloader'."\n") if $bootstrap;
+
+#    $jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver plexus-containers-container-default plexus-containers plexus-classworlds maven-plugin-tools plexus-cli plexus-containers-component-annotations 
 BuildRequires: maven-enforcer maven2-plugin-war geronimo-j2ee-1.4-apis
 # unbootstrap
@@ -57,7 +61,6 @@ BuildRequires: plexus-maven-plugin >= 1.3.5
 BuildRequires: plexus-mail-sender
 BuildRequires: plexus-resources
 '."\n");
-    $jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
     $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester jakarta-commons-parent excalibur-avalon-framework'."\n");
 
     # maven2-plugin-javadoc reqs avalon-framework pom due to pom dependencies

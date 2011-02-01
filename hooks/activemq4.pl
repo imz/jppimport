@@ -3,6 +3,8 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+    $jpp->add_patch('activemq4-4.1.2-alt-pom-use-maven2-plugin-shade.patch',STRIP=>1);
+    $jpp->get_section('package','')->subst_if('mojo-maven2-plugin-shade','maven2-plugin-shade',qr'Requires:');
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jacc-1.0-api geronimo-jms-1.1-api geronimo-specs javacc3 rome tomcat5-servlet-2.5-api'."\n");
     $jpp->get_section('package','')->subst(qr'Requires: smack','Requires: smack1');
     $jpp->get_section('package','')->subst_if(qr'apacheds10','apacheds','Requires:');
