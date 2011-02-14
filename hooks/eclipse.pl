@@ -13,9 +13,8 @@ sub {
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
     # TODO: upstream it.
-    # fixed linkage order with --as-needed
-    # pushd build/eclipse-3.5.2-src; find ./plugins -name 'make_linux.mak'
-    $jpp->add_patch('eclipse-3.5.2-alt-swt-linux-as-needed.patch', STRIP=>0);
+    # missing symbol (underlinkage)
+    $jpp->add_patch('eclipse-3.6.1-alt-swt-linux-as-needed.patch', STRIP=>0);
 
     # hack until gtk-update-icon-cache fix
     $jpp->del_section('post','platform');
@@ -56,12 +55,14 @@ sub {
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
-    # around jetty (after 3.3.0-7)
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6-core');
-    $jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','Requires: jetty6-core');
-
-    $jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
-    # end around jetty 
+    if (0) {
+	# around jetty (after 3.3.0-7)
+	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6-core');
+	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','Requires: jetty6-core');
+	
+	$jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
+	# end around jetty 
+    }
 
     # lucene
     $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");

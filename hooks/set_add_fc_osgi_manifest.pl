@@ -33,6 +33,9 @@ push @SPECHOOKS,
     } elsif ($name eq 'jdom') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jdom-1.1.1-1.fc13.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom-1.1.1.jar');
+    } elsif ($name eq 'objectweb-asm') {
+	&unpack_fc_rpm($jpp,$fcpath14.'objectweb-asm-3.2-2.fc14.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all-3.2.jar');
     } elsif ($name eq 'wsdl4j') {
 	&unpack_fc_rpm($jpp,$fcpath14.'wsdl4j-1.5.2-7.6.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/wsdl4j.jar','/usr/share/java/wsdl4j-1.5.2.jar');
@@ -93,7 +96,9 @@ sub merge_osgi_manifest {
 rm -rf META-INF
 mkdir -p META-INF
 cp %{SOURCE'.$srcid.'} META-INF/MANIFEST.MF
-zip -u %buildroot'.$jppjar.' META-INF/MANIFEST.MF
+# update even MANIFEST.MF already exists
+# touch META-INF/MANIFEST.MF
+zip -v %buildroot'.$jppjar.' META-INF/MANIFEST.MF
 # end inject OSGi manifest '.$manifestname.'
 ');
 }

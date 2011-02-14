@@ -78,25 +78,27 @@ BuildRequires: plexus-resources
     #$jpp->get_section('package','')->push_body('ExclusiveArch: x86_64'."\n");
     $jpp->add_patch('maven2-2.0.8-alt-bootstrap-fix-descriptor-leak.patch',STRIP=>0);
 
-    if (0) {
+    if (1) { # for 28
     $jpp->get_section('prep')->push_body(q~
 cat > relink_bootstrap_maven_jars.sh << 'EOF'
 #!/bin/sh
 DUP='cp -pL'
+# old 26: `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]* -type f -name '*.jar'` 
 pushd m2_repo/repository/JPP
-for i in `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]*  -type f -name '*.jar'`;do
+for i in maven-surefire/api.jar maven-surefire/booter.jar maven-surefire/maven-plugin.jar ;do
     if [ -f /usr/share/java/$i ]; then
     mv $i $i.no;
     $DUP /usr/share/java/$i $i
     fi
 done
-i=maven-archiver.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/archiver.jar $i
-i=maven-embedder.jar; mv $i $i.no; $DUP /usr/share/java/maven2/embedder.jar $i
-i=maven-enforcer-rule-api.jar; mv $i $i.no; $DUP /usr/share/java/maven-enforcer/enforcer-api.jar $i
-# TODO
+# old 26:
+#i=maven-archiver.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/archiver.jar $i
+#i=maven-embedder.jar; mv $i $i.no; $DUP /usr/share/java/maven2/embedder.jar $i
+#i=maven-enforcer-rule-api.jar; mv $i $i.no; $DUP /usr/share/java/maven-enforcer/enforcer-api.jar $i
+# 
 #i=maven2-plugin-cobertura.jar; mv $i $i.no; $DUP  $i
-i=maven-shared/maven-plugin-testing-harness.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/plugin-testing-harness.jar $i
-i=maven-reporting/impl.jar; mv $i $i.no; $DUP maven-shared/reporting-impl.jar $i
+#i=maven-shared/maven-plugin-testing-harness.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/plugin-testing-harness.jar $i
+#i=maven-reporting/impl.jar; mv $i $i.no; $DUP maven-shared/reporting-impl.jar $i
 find . -name '*.jar.no' -delete
 popd
 EOF

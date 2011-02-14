@@ -36,7 +36,7 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
     # TODO: write proper tomcat6-6.0.init!
     # as a hack, an old version is taken
     $jpp->copy_to_sources('tomcat6-6.0.init');
-    $jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
+    #$jpp->get_section('package','')->subst_if('Requires','#Requires',qr'/lib/lsb/init-functions');
 
     $jpp->get_section('pre')->subst(qr'-[gu] %\{tcuid\}','');
 
@@ -44,23 +44,18 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
     # condrestart on upgrade 
     $jpp->get_section('post')->push_body('/sbin/service %name condrestart'."\n");
 
-    $jpp->get_section('files','el-%{elspec}-api')->subst(qr'\%defattr\(0665,root,root','#defattr(0665,root,root');
     $jpp->get_section('files','')->push_body('%dir %{bindir}'."\n");
-    $jpp->get_section('files','')->subst(qr'\%defattr\(0644,root','#defattr(0644,root');
-    $jpp->get_section('files','log4j')->subst(qr'\%defattr','#defattr');
+    #$jpp->get_section('files','el-%{elspec}-api')->subst(qr'\%defattr\(0665,root,root','#defattr(0665,root,root');
+    #$jpp->get_section('files','')->subst(qr'\%defattr\(0644,root','#defattr(0644,root');
 
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/log4j*jar'."\n");
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/tomcat6-el-2.1-api*jar'."\n");
-    $jpp->get_section('package','lib')->push_body('Requires: tomcat6-el-2.1-api tomcat6-log4j'."\n");
 
     $jpp->get_section('files','')->push_body('%exclude /etc/tomcat6/log4j.properties'."\n");
 
-    # broken symlink
-    $jpp->get_section('install')->subst(qr'\%{bindir}/tomcat-juli\* \.','%{bindir}/tomcat-juli.jar %{bindir}/tomcat-juli-%{version}.jar .',qr'__ln_s');
-
     # till ant 1.8 migration
     $jpp->get_section('package','')->push_body('BuildRequires: ant-trax'."\n");
-    $jpp->get_section('build','')->subst_if(qr'ant/ant-nodeps','ant/ant-trax',qr'OPT_JAR_LIST');
+    $jpp->get_section('build','')->subst_if(qr'xalan-j2-serializer','xalan-j2-serializer ant/ant-trax',qr'OPT_JAR_LIST');
     #="ant/ant-trax"
 
     # fedora tomcat misses those jpackage alternatives
@@ -80,6 +75,15 @@ EOF
 __DATA__
 
 __END__
+# fedora
+    # log4j no more exists
+    #$jpp->get_section('files','log4j')->subst(qr'\%defattr','#defattr');
+    #$jpp->get_section('package','lib')->push_body('Requires: tomcat6-el-2.1-api tomcat6-log4j'."\n");
+
+    # broken symlink
+    $jpp->get_section('install')->subst(qr'\%{bindir}/tomcat-juli\* \.','%{bindir}/tomcat-juli.jar %{bindir}/tomcat-juli-%{version}.jar .',qr'__ln_s');
+
+
 # jpp stuff ?
 #Requires(post): %{_javadir}/ecj.jar
     $jpp->get_section('package','lib')->subst_if('Requires','#Requires',qr'ecj.jar');

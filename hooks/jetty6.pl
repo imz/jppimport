@@ -2,7 +2,6 @@
 
 require 'set_fix_homedir_macro.pl';
 require 'add_missingok_config.pl';
-require 'set_apache_translation.pl';
 require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, sub {
