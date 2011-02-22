@@ -9,10 +9,13 @@ sub {
     #$jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
     #$jpp->add_patch('maven2-2.0.8-alt-plugin-assembly-ValueSource.patch', STRIP=>0);
     # for 29
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
 
-    $jpp->get_section('package','plugin-remote-resources')->push_body('Requires: maven-shared-downloader'."\n") if $bootstrap;
-
+    if ($bootstrap) {
+	$jpp->get_section('package','plugin-site')->push_body('Requires: maven-shared-downloader maven-shared-doxia-tools'."\n") ;
+	$jpp->get_section('package','plugin-remote-resources')->push_body('Requires:  maven-shared-doxia-tools'."\n") ;
+	$jpp->get_section('package','plugin-resources')->push_body('Requires:  maven-shared-filtering'."\n") ;
+    }
 #    $jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver plexus-containers-container-default plexus-containers plexus-classworlds maven-plugin-tools plexus-cli plexus-containers-component-annotations 
 BuildRequires: maven-enforcer maven2-plugin-war geronimo-j2ee-1.4-apis

@@ -3,7 +3,8 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst_if(qr'java_cup','java-cup',qr'Requires:');
+    # 6.0
+    $jpp->get_section('package','')->unshift_body('BuildRequires: maven2-plugin-resources maven2-plugin-plugin'."\n");
     $jpp->get_section('install')->push_body(q!
 %__subst 's,java_cup,java-cup,' $RPM_BUILD_ROOT/%_bindir/jflex
 !);
@@ -12,8 +13,4 @@ push @SPECHOOKS, sub {
 
 __END__
 5.0
-#require 'set_bcond_convert.pl';
-    # bug, reported to 5.0 as #309
-    $jpp->get_section('install')->push_body(q!
-%__subst 's,BASE_JARS="jflex",BASE_JARS="jflex java-cup",' $RPM_BUILD_ROOT/%_bindir/jflex
-!);
+    $jpp->get_section('package','')->subst_if(qr'java_cup','java-cup',qr'Requires:');

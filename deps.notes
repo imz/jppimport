@@ -151,8 +151,6 @@ findbugs(DONE): umnet pom gependency on findbugsGUI (split findbugs jar?)
 TODO: (robot?)
 eclipse-callgraph unmet on systemtap
 
-TODO: apache-commons-vfs 2 -> jackrabbit (problem with javacc generated code?)
-
 TODO: merge pom and berkeleydb package to berkeleydb-je3
 
 TODO: gmaven blocks update to groovy15
@@ -223,7 +221,7 @@ SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
 SRPMS/apache-commons-logging-1.1.1-6.jpp6.src.rpm
 SRPMS/apache-commons-net-2.0-6.jpp6.src.rpm
 SRPMS/apache-commons-validator-1.4-0.r832761.5.jpp6.src.rpm
-SRPMS/apache-commons-vfs-2.0-0.r834424.5.jpp6.src.rpm -> jackrabbit
+SRPMS/apache-commons-vfs-2.0-0.r834424.5.jpp6.src.rpm -> !ready?!
 SRPMS/ehcache-core-2.3.1-1.jpp6.src.rpm
 SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm -> ehcache-core
 SRPMS/hc-httpcore-4.1-1.jpp6.src.rpm
@@ -248,8 +246,6 @@ deleting SRPMS/apache-commons-httpclient-3.1-5.jpp6.src.rpm
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
 SRPMS/derby-10.6.2.1-2.jpp6.src.rpm
-SRPMS/felix-osgi-core-1.4.0-6.jpp6.src.rpm
-SRPMS/felix-osgi-obr-1.0.2-4.jpp6.src.rpm
 SRPMS/gnu-regexp-1.1.4-14.jpp6.src.rpm
 SRPMS/google-collections-1.0-3.jpp6.src.rpm
 SRPMS/google-guice-2.0-1.jpp6.src.rpm
@@ -297,7 +293,6 @@ SRPMS/asm2-2.2.3-8.jpp6.src.rpm
 SRPMS/felix-framework-2.0.5-3.jpp6.src.rpm
 SRPMS/felix-main-2.0.5-6.jpp6.src.rpm
 SRPMS/felix-osgi-compendium-1.4.0-3.jpp6.src.rpm
-SRPMS/felix-osgi-foundation-1.2.0-4.jpp6.src.rpm
 SRPMS/felix-parent-1.2.1-4.jpp6.src.rpm
 SRPMS/felix-shell-1.4.2-3.jpp6.src.rpm
 SRPMS/fest-1.0.2-2.jpp6.src.rpm
@@ -328,7 +323,6 @@ SRPMS/logback-0.9.27-1.jpp6.src.rpm
 SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
 SRPMS/maven-plugin-bundle-2.0.0-8.jpp6.src.rpm
 SRPMS/maven2-2.0.8-31.jpp6.src.rpm
-SRPMS/nekohtml0-0.9.5-2.jpp6.src.rpm
 SRPMS/objectweb-anttask-1.3.2-5.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
@@ -391,15 +385,11 @@ deleting SRPMS/apache-commons-collections-3.2.1-5.jpp6.src.rpm
 -----------
 SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 -----------
-SRPMS/apache-commons-transaction-1.3-0.r832456.5.jpp6.src.rpm
-SRPMS/berkeleydb-je33-3.3.98-2.jpp6.src.rpm
 SRPMS/bsf-2.4.0-3.jpp6.src.rpm
 SRPMS/dtdparser-1.21-8.jpp6.src.rpm
 SRPMS/findbugs-1.3.9-4.jpp6.src.rpm
 SRPMS/hsqldb-1.8.0.10-3.jpp6.src.rpm
 SRPMS/jakarta-commons-logging-jboss-1.1-6.jpp6.src.rpm
-SRPMS/jakarta-commons-transaction11-1.1-10.jpp6.src.rpm
-SRPMS/jakarta-slide-webdavclient-2.1-13.jpp6.src.rpm
 SRPMS/jboss-cache-core-3.1.0-8.jpp6.src.rpm
 SRPMS/jboss-cache-pojo-3.0.0-7.jpp6.src.rpm
 SRPMS/jboss-common-logging-log4j-2.1.0-4.jpp6.src.rpm
@@ -408,7 +398,6 @@ SRPMS/jboss-profiler-1.0.0-0.1.CR5.6.jpp6.src.rpm
 SRPMS/jboss-seam-int-5.1.0-0.CR1.1.6.jpp6.src.rpm
 SRPMS/jboss-security-spi-2.0.3-2.SP1.2.jpp6.src.rpm
 SRPMS/jboss-webbeans-1.0.0-0.2.PREVIEW1.jpp6.src.rpm
-SRPMS/jbosscache-support-1.6-2.jpp6.src.rpm
 SRPMS/jms-integration-tests-1.0.1-2.jpp6.src.rpm
 SRPMS/juddi-0.9-0.rc4.8.jpp6.src.rpm
 SRPMS/maven2-2.0.8-34.jpp6.src.rpm
@@ -427,10 +416,54 @@ deleting SRPMS/jboss-man-2.1.0-2.SP1.1.jpp6.src.rpm
 deleting SRPMS/jboss-common-logging-log4j-2.1.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-cache-pojo-3.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
-deleting SRPMS/jakarta-slide-webdavclient-2.1-10.jpp6.src.rpm
 deleting SRPMS/jakarta-commons-logging-jboss-1.1-5.jpp6.src.rpm
 deleting SRPMS/hsqldb-1.8.0.10-2.jpp6.src.rpm
 deleting SRPMS/findbugs-1.3.9-2.jpp6.src.rpm
 deleting SRPMS/dtdparser-1.21-7.jpp6.src.rpm
 deleting SRPMS/bsf-2.4.0-2.jpp6.src.rpm
-deleting SRPMS/apache-commons-transaction-1.3-0.r832456.4.jpp6.src.rpm
+------------
+SRPMS/ant-1.8.2-1.jpp6.src.rpm
+SRPMS/apache-commons-pool-1.5.3-6.jpp6.src.rpm
+SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
+SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
+SRPMS/gmaven-1.3-3.jpp6.src.rpm
+SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
+SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
+SRPMS/log4j-1.2.16-1.jpp6.src.rpm
+deleting SRPMS/log4j-1.2.15-7.jpp6.src.rpm
+deleting SRPMS/jbossas-tp-5.1.0-5.jpp6.src.rpm
+deleting SRPMS/jbossas-5.1.0-25.jpp6.src.rpm
+deleting SRPMS/gmaven-1.3-2.jpp6.src.rpm
+deleting SRPMS/cobertura-1.9.3-2.jpp6.src.rpm
+deleting SRPMS/apache-commons-pool-1.5.3-5.jpp6.src.rpm
+deleting SRPMS/ant-1.8.1-4.jpp6.src.rpm
+------------
+SRPMS/ant-1.8.2-3.jpp6.src.rpm
+SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
+SRPMS/build-helper-maven-plugin-1.5-1.jpp6.src.rpm
+SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
+SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
+SRPMS/findbugs-1.3.9-5.jpp6.src.rpm
+SRPMS/findbugs-maven-plugin-2.3.2-0.3.SNAPSHOT.jpp6.src.rpm
+SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
+SRPMS/jdepend-maven-plugin-2.0-1.beta_3_SNAPSHOT.jpp6.src.rpm
+SRPMS/log4j-1.2.16-3.jpp6.src.rpm
+SRPMS/maven-plugin-tools-2.4.3-4.jpp6.src.rpm
+SRPMS/maven-skins-5-2.1.jpp6.src.rpm
+SRPMS/maven2-2.0.8-35.jpp6.src.rpm
+SRPMS/rat-maven-plugin-1.0-1.alpha_3.jpp6.src.rpm
+SRPMS/taglist-maven-plugin-2.4-1.jpp6.src.rpm
+deleting SRPMS/maven2-2.0.8-34.jpp6.src.rpm
+deleting SRPMS/maven-plugin-tools-2.1-2.jpp6.src.rpm
+deleting SRPMS/log4j-1.2.16-1.jpp6.src.rpm
+deleting SRPMS/hibernate3-validator-3.1.0-2.jpp6.src.rpm
+deleting SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
+deleting SRPMS/findbugs-1.3.9-4.jpp6.src.rpm
+deleting SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
+deleting SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
+deleting SRPMS/ant-1.8.2-1.jpp6.src.rpm
+----------------------------
+SRPMS/jboss-aspects-build-1.0.1-1.CR5.jpp6.src.rpm
+SRPMS/jboss-aspects-common-1.0.0-1.Beta1.jpp6.src.rpm
+deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
+----------------------------

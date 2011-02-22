@@ -26,6 +26,10 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
 	$jpp->get_section('package','-n '.$new)->push_body('Obsoletes: '.$old.' < 1.1'."\n");
 #	$jpp->get_section('package','-n '.$new)->push_body('Provides: '.$old.' = 1.1'."\n");
     }
+
+    # maven2-208-29+jpp5
+    $jpp->get_section('package','')->unshift_body('BuildRequires: maven2-plugin-site'."\n");
+
 }
 __END__
 # TODO:
