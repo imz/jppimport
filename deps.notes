@@ -197,8 +197,8 @@ Requires: jboss4-naming
 Requires: jbossas
 %endif
 %if %with bootstrap
-ln -sf $(build-classpath jboss4/jnpserver.jar) .
 ln -sf $(build-classpath jboss4/jboss-jmx.jar) .
+ln -sf $(build-classpath jboss4/jnpserver.jar) .
 %else
 ln -sf $(build-classpath jbossas/jboss-jmx) .
 ln -sf $(build-classpath jbossas/jnpserver) .
@@ -209,6 +209,11 @@ TODO: jpp hibernate3-annotations-3.4.0-2 is broken! do not update!
 TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
 
 TODO: %{_libdir}/*: generic fix (at least, exclude debug)
+TODO: throw away velocity15 (safe to use velocity14)
+
+TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
+TODO: rebuild all packages with BR: 
+pattern jakarta-commons-(net? pool)
 
 #--------------------------------------
 SRPMS/ant-1.8.1-4.jpp6.src.rpm
@@ -219,25 +224,20 @@ SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
 SRPMS/apache-commons-httpclient-3.1-6.jpp6.src.rpm
 SRPMS/apache-commons-launcher-1.2-0.r832060.5.jpp6.src.rpm
 SRPMS/apache-commons-logging-1.1.1-6.jpp6.src.rpm
-SRPMS/apache-commons-net-2.0-6.jpp6.src.rpm
 SRPMS/apache-commons-validator-1.4-0.r832761.5.jpp6.src.rpm
-SRPMS/apache-commons-vfs-2.0-0.r834424.5.jpp6.src.rpm -> !ready?!
-SRPMS/ehcache-core-2.3.1-1.jpp6.src.rpm
-SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm -> ehcache-core
+SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm -> !ready?!
 SRPMS/hc-httpcore-4.1-1.jpp6.src.rpm
 SRPMS/htmlunit2-2.8-1.jpp6.src.rpm -> hc-httpclient
 SRPMS/javacc3-3.2-6.jpp6.src.rpm
 SRPMS/junit4-4.8.2-4.jpp6.src.rpm
 SRPMS/maven-jxr-2.2-2.jpp6.src.rpm
 DONE#SRPMS/maven-shared-8-0.p8.8.jpp6.src.rpm
-SRPMS/maven2-2.0.8-29.jpp6.src.rpm
+DONE#SRPMS/maven2-2.0.8-29.jpp6.src.rpm
 SRPMS/nekohtml-1.9.14-1.jpp6.src.rpm
 SRPMS/plexus-i18n-1.0-0.b10.1.jpp6.src.rpm
 SRPMS/plexus-interactivity-1.0-0.a6.1.jpp6.src.rpm
 deleting SRPMS/nekohtml-1.9.11-2.jpp6.src.rpm
-deleting SRPMS/maven2-2.0.8-28.jpp6.src.rpm
 deleting SRPMS/maven-jxr-2.2-1.jpp6.src.rpm
-deleting SRPMS/apache-commons-vfs-2.0-0.r834424.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-validator-1.4-0.r832761.4.jpp6.src.rpm
 deleting SRPMS/apache-commons-logging-1.1.1-5.jpp6.src.rpm
 deleting SRPMS/apache-commons-launcher-1.2-0.r832060.4.jpp6.src.rpm
@@ -256,7 +256,6 @@ SRPMS/jboss-ejb3-proxy-impl-1.0.2-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-security-1.0.0-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-timerservice-spi-1.0.0-4.jpp6.src.rpm
 SRPMS/jline-0.9.94-2.jpp6.src.rpm
-SRPMS/jline2-2.5-2.jpp6.src.rpm
 SRPMS/jsr-305-0.1-3.jpp6.src.rpm
 SRPMS/junit44-4.4-1.jpp6.src.rpm
 SRPMS/jzlib-1.0.7-5.jpp6.src.rpm
@@ -423,7 +422,6 @@ deleting SRPMS/dtdparser-1.21-7.jpp6.src.rpm
 deleting SRPMS/bsf-2.4.0-2.jpp6.src.rpm
 ------------
 SRPMS/ant-1.8.2-1.jpp6.src.rpm
-SRPMS/apache-commons-pool-1.5.3-6.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
 SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
 SRPMS/gmaven-1.3-3.jpp6.src.rpm
@@ -435,7 +433,6 @@ deleting SRPMS/jbossas-tp-5.1.0-5.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-25.jpp6.src.rpm
 deleting SRPMS/gmaven-1.3-2.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.3-2.jpp6.src.rpm
-deleting SRPMS/apache-commons-pool-1.5.3-5.jpp6.src.rpm
 deleting SRPMS/ant-1.8.1-4.jpp6.src.rpm
 ------------
 SRPMS/ant-1.8.2-3.jpp6.src.rpm
@@ -448,13 +445,11 @@ SRPMS/findbugs-maven-plugin-2.3.2-0.3.SNAPSHOT.jpp6.src.rpm
 SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
 SRPMS/jdepend-maven-plugin-2.0-1.beta_3_SNAPSHOT.jpp6.src.rpm
 SRPMS/log4j-1.2.16-3.jpp6.src.rpm
-SRPMS/maven-plugin-tools-2.4.3-4.jpp6.src.rpm
 SRPMS/maven-skins-5-2.1.jpp6.src.rpm
 SRPMS/maven2-2.0.8-35.jpp6.src.rpm
 SRPMS/rat-maven-plugin-1.0-1.alpha_3.jpp6.src.rpm
 SRPMS/taglist-maven-plugin-2.4-1.jpp6.src.rpm
 deleting SRPMS/maven2-2.0.8-34.jpp6.src.rpm
-deleting SRPMS/maven-plugin-tools-2.1-2.jpp6.src.rpm
 deleting SRPMS/log4j-1.2.16-1.jpp6.src.rpm
 deleting SRPMS/hibernate3-validator-3.1.0-2.jpp6.src.rpm
 deleting SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
@@ -467,3 +462,56 @@ SRPMS/jboss-aspects-build-1.0.1-1.CR5.jpp6.src.rpm
 SRPMS/jboss-aspects-common-1.0.0-1.Beta1.jpp6.src.rpm
 deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
 ----------------------------
+SRPMS/cobertura-maven-plugin-2.4-3.jpp6.src.rpm
+SRPMS/codehaus-stax-1.2.0-1.jpp6.src.rpm
+SRPMS/excalibur-1.0-0.r508111.16.jpp6.src.rpm
+SRPMS/felix-parent-1.2.1-5.jpp6.src.rpm
+SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
+SRPMS/hibernate3-annotations-3.4.0-3.jpp6.src.rpm
+SRPMS/hibernate3-commons-annotations-3.1.0-4.jpp6.src.rpm
+SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-6.jpp6.src.rpm
+SRPMS/hibernate3-entitymanager-3.4.0-2.8.jpp6.src.rpm
+SRPMS/hibernate3-validator-3.1.0-4.jpp6.src.rpm
+SRPMS/jacorb-jboss-2.3.1-8.jpp6.src.rpm
+SRPMS/jboss-metadata-1.0.1-9.jpp6.src.rpm
+SRPMS/jboss-security-xacml-2.0.4-5.jpp6.src.rpm
+SRPMS/jbossas-tp-5.1.0-8.jpp6.src.rpm
+SRPMS/jbosssx2-2.0.3.1-5.jpp6.src.rpm
+SRPMS/jbossws-parent-1.0.2-4.jpp6.src.rpm
+SRPMS/maven2-2.0.8-37.jpp6.src.rpm
+SRPMS/mojo-parent-28-1.jpp6.src.rpm
+SRPMS/slf4j-jboss-logging-1.0.2-5.jpp6.src.rpm
+SRPMS/velocity14-1.4-11.jpp6.src.rpm
+SRPMS/webbeans-jboss-int-5.2.0-0.2.Beta2.jpp6.src.rpm
+SRPMS/werken-xpath-0.9.4-0.beta.15.jpp6.src.rpm
+deleting SRPMS/werken-xpath-0.9.4-0.beta.14.jpp6.src.rpm
+deleting SRPMS/velocity14-1.4-9.jpp6.src.rpm
+deleting SRPMS/slf4j-jboss-logging-1.0.2-4.jpp6.src.rpm
+deleting SRPMS/mojo-parent-20-3.jpp6.src.rpm
+deleting SRPMS/maven2-2.0.8-35.jpp6.src.rpm
+deleting SRPMS/jbossws-parent-1.0.2-3.jpp6.src.rpm
+deleting SRPMS/jbosssx2-2.0.3.1-4.jpp6.src.rpm
+deleting SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
+deleting SRPMS/jboss-security-xacml-2.0.4-4.jpp6.src.rpm
+deleting SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
+deleting SRPMS/jacorb-jboss-2.3.1-7.jpp6.src.rpm
+deleting SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
+deleting SRPMS/hibernate3-entitymanager-3.4.0-2.7.jpp6.src.rpm
+deleting SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-5.jpp6.src.rpm
+deleting SRPMS/hibernate3-commons-annotations-3.1.0-3.jpp6.src.rpm
+deleting SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
+deleting SRPMS/geronimo-specs-1.2-14.jpp6.src.rpm
+deleting SRPMS/felix-parent-1.2.1-4.jpp6.src.rpm
+deleting SRPMS/excalibur-1.0-0.r508111.14.jpp6.src.rpm
+deleting SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
+-----------------------------------
+SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
+deleting SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
+-----------------------------------
+SRPMS/ccl-util-32.69-4.jpp6.src.rpm
+SRPMS/javahelp2-2.0.05-3.jpp6.src.rpm
+SRPMS/jbossas-5.1.0-29.jpp6.src.rpm
+SRPMS/tomcat6-6.0.29-1.jpp6.src.rpm
+deleting SRPMS/tomcat6-6.0.18-10.jpp6.src.rpm
+deleting SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
+-----------------------------------

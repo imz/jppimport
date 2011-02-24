@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body("BuildRequires: maven-scm\n");
+    $jpp->get_section('package','')->unshift_body("BuildRequires: maven-scm maven2-plugin-site\n");
 
     # maven 2.0.8 support
     $jpp->get_section('prep')->unshift_body_after('# maven 2.0.8 support 

@@ -9,14 +9,10 @@ require 'set_osgi.pl';
 push @SPECHOOKS, 
  sub {
     my ($jpp, $alt) = @_;
-    my $fcpath13='/var/ftp/pub/Linux/fedora/linux/releases/13/Everything/x86_64/os/Packages/';
     my $fcpath14='/var/ftp/pub/Linux/fedora/linux/releases/14/Everything/x86_64/os/Packages/';
 
     my $name=$jpp->get_section('package','')->get_tag('Name');
     if ($name eq 'jetty6') {
-	#&unpack_fc_rpm($jpp,$fcpath13.'jetty-6.1.21-4.fc13.noarch.rpm');
-	#&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.21.jar');
-	#&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.21.jar');
 	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.24.jar');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.24.jar');
@@ -25,8 +21,12 @@ push @SPECHOOKS,
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-httpclient.jar','/usr/share/java/jakarta-commons-httpclient-3.1.jar');
 # no need; it contains
 #    } elsif ($name eq 'apache-commons-lang') {
-#	&unpack_fc_rpm($jpp,$fcpath13.'jakarta-commons-lang-2.4-1.fc13.x86_64.rpm');
+#	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-lang-2.4-1.fc14.x86_64.rpm');
 #	&merge_osgi_manifest($jpp,'/usr/share/java/commons-lang.jar','/usr/share/java/jakarta-commons-lang-2.4.jar');
+# no need; it contains
+#    } elsif ($name eq 'apache-commons-net') {
+#	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-net-2.0-6.fc14.noarch.rpm');
+#	&merge_osgi_manifest($jpp,'/usr/share/java/commons-net.jar','/usr/share/java/apache-commons-net-2.0.jar');
     } elsif ($name eq 'jakarta-oro') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-oro-2.0.8-6.3.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jakarta-oro.jar','/usr/share/java/jakarta-oro-2.0.8.jar');
@@ -61,7 +61,8 @@ push @SPECHOOKS,
 	foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {
 	    &merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-batik/'.$i.'.jar','/usr/share/java/batik/batik-'.$i.'-1.7.jar');
 	}
-
+    } else {
+	warn "no need for OSGi MANIFEST or not found.";
     }
 
 };
