@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+package RPM::Source::Convert::JPPMass;
+
 use strict;
 use warnings;
 use Carp;
@@ -8,62 +10,13 @@ use File::Basename;
 use RPM qw/evrcmp/;
 
 use RPM::Source::Convert::MassCommon;
+use RPM::Source::Convert::Mass;
+our @ISA = qw/RPM::Source::Convert::Mass/;
 
-my $verbose;
-my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-my $ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
+$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
+$ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
-
-
-
-my $OUTDIR="./OUT";
-my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks, $target, $parent);
-my $strategy = 'alt2origin';
-
-my $result = GetOptions ("jpp=s" => \$ORIGINPATH,
-			 "alt=s"   => \$ALTPATH,
-			 "out=s" => \$OUTDIR,
-			 "changelog=s"   => \$changelog,
-			 "strategy=s" => \$strategy,
-			 "jvm=s" => \$jvm,
-			 "nobz2" => \$nobz2,
-			 "nozip" => \$nozip,
-			 "hook=s" => \@hooks,
-			 "parent=s"   => \$parent,
-			 "rename=s"   => \$rename,
-			 "release=s"   => \$release,
-			 "target=s"   => \$target,
-			 "epoch=s"   => \$epoch,
-			 "verbose"  => \$verbose);
-my ($alt,$origin);
-
-if (! &is_valid_pathspec($ALTPATH) || ! &is_valid_pathspec($ORIGINPATH)) {
-    print "usage [ options ] [ list of rpms/names ]
-options:
---origin /path/to/jpackage/src/RPMS:/other/path
---alt /path/to/altlinux/src/RPMS:/other/path1:/other/path2
---out /path/to/output_dir (default is $OUTDIR)
---changelog '- changelog entry'
---strategy 'strategy' of mass operations (default is $strategy)
-
-usage examples:
-upgrade all alt java packages using jpackage
-jppmass --alt /var/ftp/pub/Sisyphus/files/SRPMS --origin /var/ftp/pub/jpackage/1.7/generic/free/SRPMS
-";
-    exit (64);
-}
-
-my @ALTPATH=&path_to_array($ALTPATH);
-my @ORIGINPATH=&path_to_array($ORIGINPATH);
-
-my $origintoolsdir=dirname($0);
-my $originimport="$origintoolsdir/jppimport";
-
-mkdir $OUTDIR unless -e $OUTDIR;
-
-my @packages = @ARGV;
-
-my %ORIGINSKIP=map {$_ => 1} qw/gnu.trove maven-plugin-itest
+@ORIGINSKIP=qw/gnu.trove maven-plugin-itest
 apache-axiom neethi burlap3 hessian3 xml-commons-resolver12
 
 useless:
@@ -127,51 +80,15 @@ excalibur-thread-instrumented
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi
 ;
-
-# crimson = crimson fields battle game
-our @ALTSKIPEXTRA=qw/jpackage-utils/;
-#jakarta-commons-cli-2.0-alt0.1.src.rpm
-#}
-
-#asm asm2
-#jakarta-commons-beanutils-16 jakarta-commons-beanutils16
-#jakarta-regexp regexp
-#owanttask objectweb-anttask
-#stylebook xml-stylebook
-#xalan-j xalan-j2
-#excalibur-logkit excalibur-avalon-logkit
-#stax-bea bea-stax
-#jakarta-servletapi4 servletapi4
-#wagon maven-wagon
-#beanshell bsh2
-#jaf sun-jaf
-#javamail sun-mail
-#jakarta-commons-cli-1 jakarta-commons-cli
-#xerces-j xerces-j2
-#jakarta-crimson crimson
-our %ALT2ORIGINMAP=qw/
+my %DEST2ORIGINMAP=qw/
 jsmc smc
 sg-jal jal
 lucene2 lucene
 /;
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
-
-our %ORIGIN2ALTMAP= reverse (%ALT2ORIGINMAP);
-
-our @ALTSKIPMULTISRPMS=qw/
-xml-commons-external 
-/;
-#jakarta-commons-jelly-tags-ant
-#jakarta-commons-jelly-tags-define
-#jakarta-commons-jelly-tags-util
-#jakarta-commons-jelly-tags-xml
-#xml-commons xml-commons #xml-commons-external #xml-commons-resolver
-##epoch+1
-#xmldb-api
-#isorelax
-
-our @ALTSKIPNOORIGIN=qw/
+my @DESTSKIPEXTRA=qw/jpackage-utils/;
+my @DESTSKIPNOORIGIN=qw/
 drawswf
 eclipse-build-utils
 je
@@ -180,96 +97,45 @@ jikes
 xsdlib
 /;
 
-our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOORIGIN, @ALTSKIPEXTRA;
+@DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);
 
-if ($strategy eq 'alt2origin') {
-    &alt2origin();
-} elsif ($strategy eq 'altup') {
-    &altup();
-} elsif ($strategy eq 'originskipalt') {
-    &originskipalt();
-} else {
-    &alt2origin();
-}
+my ($jvm, $nobz2, $nozip,$target);
+my $origintoolsdir=dirname($0);
+$RPM::Source::Convert::Mass::originimport="$origintoolsdir/jppimport";
 
+my $convert=RPM::Source::Convert::JPPMass->new(
+'-cliargs' => [
+	"jpp=s" => \$ORIGINPATH,
+	"alt=s"   => \$DESTPATH,
+	"jvm=s" => \$jvm,
+	"nobz2" => \$nobz2,
+	"nozip" => \$nozip,
+	"target=s"=> \$target,
+]);
+my $verbose=0;
+$convert->run();
 
-
-sub alt2origin {
-    foreach my $name (@packages) {
-	next if $ORIGINSKIP{$name};
-	next if $ALTSKIP{$name};
-	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
-	print STDERR "WARNING: alt RPM $altname not found.\n" unless $altrpm;
-	$name=$ALT2ORIGINMAP{$altname} if $ALT2ORIGINMAP{$altname};
-	my $originrpm = &find_rpm($name, @ORIGINPATH);
-#	print STDERR "found RPM $originrpm for $name.\n";
-	&run_originimport($name,$originrpm,$altrpm);
-    }
-}
-
-sub altup {
-    foreach my $name (@packages) {
-	next if $ALTSKIP{$name};
-	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
-	print STDERR "note: alt RPM $altname not found.\n" unless $altrpm;
-	next unless $altrpm;
-	$name=$ALT2ORIGINMAP{$altname} if $ALT2ORIGINMAP{$altname};
-	my $originrpm = &find_rpm($name, @ORIGINPATH);
-#	print STDERR "found RPM $originrpm for $name.\n";
-	&run_originimport($name,$originrpm,$altrpm) if &alt_jpp_rpmvercmp($altrpm, $originrpm) <0;
-    }
-}
-
-sub originskipalt {
-    foreach my $name (@packages) {
-	next if $ORIGINSKIP{$name};
-	next if $ORIGIN2ALTMAP{$name};
-	my $altrpm = &find_rpm($name, @ALTPATH);
-	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
-	next if $altrpm and $altrpm!~/orphaned/;
-	my $originrpm = &find_rpm($name, @ORIGINPATH);
-#	print STDERR "found RPM $originrpm for $name.\n";
-	&run_originimport($name,$originrpm,$altrpm);
-    }
-}
-
-sub run_originimport {
-    my ($name, $originrpm, $altrpm)=@_;
-    my $importcmd="$originimport --outdir $OUTDIR";
-    $importcmd.=" --changelog '$changelog'" if ($changelog);
-    $importcmd.=" --release '$release'" if ($release);
-    $importcmd.=" --rename '$rename'" if ($rename);
-    $importcmd.=" --epoch '$epoch'" if (defined $epoch);
-    if ($parent) {
-	$importcmd.=" --parent $parent";
-    } else {
-	$importcmd.=" --parent-rpm $altrpm" if ($altrpm);
-    }
+sub run_originimport_hook {
+    my ($self,$importcmdptr)=@_;
+    my $importcmd=$$importcmdptr;
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);
     $importcmd.=" --nozip" if ($nozip);
-    if ($originrpm) {
-	$importcmd.=" --rpm $originrpm";
-    } else {
-	print STDERR "FATAL: origin RPM $name not found.\n";
-	return;
-    }
-
     my $hook;
     if ($target) {
 	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
 	$importcmd.=" --hook $hook" if (-e $hook);
     }
-
-    $hook="$origintoolsdir/hooks/$name.pl";
-    $importcmd.=" --hook $hook" if (-e $hook);
-
-    foreach $hook (@hooks) {
-	$importcmd.=" --hook $hook";
-    }
-    print "$importcmd\n";
-    print `$importcmd`,"---*---\n";
+    $$importcmdptr=$importcmd;
 }
+
+sub is_origin_up {
+    my ($self, $originrpm, $destrpm)=@_;
+    return 1 unless $destrpm;
+    return 0 unless $originrpm;
+    return &alt_jpp_rpmvercmp($destrpm, $originrpm) <0;
+}
+
 
 sub alt_jpp_rpmvercmp {
     my ($altrpm, $originrpm) =@_;
@@ -292,3 +158,4 @@ sub alt_jpp_rpmvercmp {
     return -1;
 }
 
+1;
