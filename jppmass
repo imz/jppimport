@@ -1,21 +1,26 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
 use Carp;
 use Getopt::Long;
-use strict;
+use File::Basename;
+use RPM qw/evrcmp/;
+
+use RPM::Source::Convert::MassCommon;
 
 my $verbose;
 my $ALTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-my $JPPPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
+my $ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
 
 
 
 my $OUTDIR="./OUT";
 my ($changelog, $jvm, $nobz2, $nozip, $release,$epoch, $rename, @hooks, $target, $parent);
-my $strategy = 'alt2jpp';
+my $strategy = 'alt2origin';
 
-my $result = GetOptions ("jpp=s" => \$JPPPATH,
+my $result = GetOptions ("jpp=s" => \$ORIGINPATH,
 			 "alt=s"   => \$ALTPATH,
 			 "out=s" => \$OUTDIR,
 			 "changelog=s"   => \$changelog,
@@ -30,12 +35,12 @@ my $result = GetOptions ("jpp=s" => \$JPPPATH,
 			 "target=s"   => \$target,
 			 "epoch=s"   => \$epoch,
 			 "verbose"  => \$verbose);
-my ($alt,$jpp);
+my ($alt,$origin);
 
-if (! &is_valid_pathspec($ALTPATH) || ! &is_valid_pathspec($JPPPATH)) {
+if (! &is_valid_pathspec($ALTPATH) || ! &is_valid_pathspec($ORIGINPATH)) {
     print "usage [ options ] [ list of rpms/names ]
 options:
---jpp /path/to/jpackage/src/RPMS:/other/path
+--origin /path/to/jpackage/src/RPMS:/other/path
 --alt /path/to/altlinux/src/RPMS:/other/path1:/other/path2
 --out /path/to/output_dir (default is $OUTDIR)
 --changelog '- changelog entry'
@@ -43,22 +48,22 @@ options:
 
 usage examples:
 upgrade all alt java packages using jpackage
-jppmass --alt /var/ftp/pub/Sisyphus/files/SRPMS --jpp /var/ftp/pub/jpackage/1.7/generic/free/SRPMS
+jppmass --alt /var/ftp/pub/Sisyphus/files/SRPMS --origin /var/ftp/pub/jpackage/1.7/generic/free/SRPMS
 ";
     exit (64);
 }
 
 my @ALTPATH=&path_to_array($ALTPATH);
-my @JPPPATH=&path_to_array($JPPPATH);
+my @ORIGINPATH=&path_to_array($ORIGINPATH);
 
-my $jpptoolsdir=&dirname($0);
-my $jppimport="$jpptoolsdir/jppimport";
+my $origintoolsdir=dirname($0);
+my $originimport="$origintoolsdir/jppimport";
 
 mkdir $OUTDIR unless -e $OUTDIR;
 
 my @packages = @ARGV;
 
-my %JPPSKIP=map {$_ => 1} qw/gnu.trove maven-plugin-itest
+my %ORIGINSKIP=map {$_ => 1} qw/gnu.trove maven-plugin-itest
 apache-axiom neethi burlap3 hessian3 xml-commons-resolver12
 
 useless:
@@ -144,7 +149,7 @@ our @ALTSKIPEXTRA=qw/jpackage-utils/;
 #jakarta-commons-cli-1 jakarta-commons-cli
 #xerces-j xerces-j2
 #jakarta-crimson crimson
-our %ALT2JPPMAP=qw/
+our %ALT2ORIGINMAP=qw/
 jsmc smc
 sg-jal jal
 lucene2 lucene
@@ -152,7 +157,7 @@ lucene2 lucene
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
 
-our %JPP2ALTMAP= reverse (%ALT2JPPMAP);
+our %ORIGIN2ALTMAP= reverse (%ALT2ORIGINMAP);
 
 our @ALTSKIPMULTISRPMS=qw/
 xml-commons-external 
@@ -166,7 +171,7 @@ xml-commons-external
 #xmldb-api
 #isorelax
 
-our @ALTSKIPNOJPP=qw/
+our @ALTSKIPNOORIGIN=qw/
 drawswf
 eclipse-build-utils
 je
@@ -175,30 +180,30 @@ jikes
 xsdlib
 /;
 
-our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOJPP, @ALTSKIPEXTRA;
+our %ALTSKIP = map {$_=>1} @ALTSKIPMULTISRPMS, @ALTSKIPNOORIGIN, @ALTSKIPEXTRA;
 
-if ($strategy eq 'alt2jpp') {
-    &alt2jpp();
+if ($strategy eq 'alt2origin') {
+    &alt2origin();
 } elsif ($strategy eq 'altup') {
     &altup();
-} elsif ($strategy eq 'jppskipalt') {
-    &jppskipalt();
+} elsif ($strategy eq 'originskipalt') {
+    &originskipalt();
 } else {
-    &alt2jpp();
+    &alt2origin();
 }
 
 
 
-sub alt2jpp {
+sub alt2origin {
     foreach my $name (@packages) {
-	next if $JPPSKIP{$name};
+	next if $ORIGINSKIP{$name};
 	next if $ALTSKIP{$name};
 	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
 	print STDERR "WARNING: alt RPM $altname not found.\n" unless $altrpm;
-	$name=$ALT2JPPMAP{$altname} if $ALT2JPPMAP{$altname};
-	my $jpprpm = &find_rpm($name, @JPPPATH);
-#	print STDERR "found RPM $jpprpm for $name.\n";
-	&run_jppimport($name,$jpprpm,$altrpm);
+	$name=$ALT2ORIGINMAP{$altname} if $ALT2ORIGINMAP{$altname};
+	my $originrpm = &find_rpm($name, @ORIGINPATH);
+#	print STDERR "found RPM $originrpm for $name.\n";
+	&run_originimport($name,$originrpm,$altrpm);
     }
 }
 
@@ -208,41 +213,29 @@ sub altup {
 	my ($altname,$altrpm)=&get_name_and_rpm($name,\@ALTPATH);
 	print STDERR "note: alt RPM $altname not found.\n" unless $altrpm;
 	next unless $altrpm;
-	$name=$ALT2JPPMAP{$altname} if $ALT2JPPMAP{$altname};
-	my $jpprpm = &find_rpm($name, @JPPPATH);
-#	print STDERR "found RPM $jpprpm for $name.\n";
-	&run_jppimport($name,$jpprpm,$altrpm) if &alt_jpp_rpmvercmp($altrpm, $jpprpm) <0;
+	$name=$ALT2ORIGINMAP{$altname} if $ALT2ORIGINMAP{$altname};
+	my $originrpm = &find_rpm($name, @ORIGINPATH);
+#	print STDERR "found RPM $originrpm for $name.\n";
+	&run_originimport($name,$originrpm,$altrpm) if &alt_jpp_rpmvercmp($altrpm, $originrpm) <0;
     }
 }
 
-sub jppskipalt {
+sub originskipalt {
     foreach my $name (@packages) {
-	next if $JPPSKIP{$name};
-	next if $JPP2ALTMAP{$name};
+	next if $ORIGINSKIP{$name};
+	next if $ORIGIN2ALTMAP{$name};
 	my $altrpm = &find_rpm($name, @ALTPATH);
 	print STDERR "found alt RPM $altrpm for $name.\n" if $altrpm;
 	next if $altrpm and $altrpm!~/orphaned/;
-	my $jpprpm = &find_rpm($name, @JPPPATH);
-#	print STDERR "found RPM $jpprpm for $name.\n";
-	&run_jppimport($name,$jpprpm,$altrpm);
+	my $originrpm = &find_rpm($name, @ORIGINPATH);
+#	print STDERR "found RPM $originrpm for $name.\n";
+	&run_originimport($name,$originrpm,$altrpm);
     }
 }
 
-sub get_name_and_rpm {
-    my $name=shift;
-    my $PATHPtr=shift;
-    my $rpm=$name;
-    if ($name=~/.src.rpm$/) {
-	$name=&get_rpm_name($rpm);
-    } else {
-	$rpm = &find_rpm($name, @$PATHPtr);
-    }
-    return $name, $rpm;
-}
-
-sub run_jppimport {
-    my ($name, $jpprpm, $altrpm)=@_;
-    my $importcmd="$jppimport --outdir $OUTDIR";
+sub run_originimport {
+    my ($name, $originrpm, $altrpm)=@_;
+    my $importcmd="$originimport --outdir $OUTDIR";
     $importcmd.=" --changelog '$changelog'" if ($changelog);
     $importcmd.=" --release '$release'" if ($release);
     $importcmd.=" --rename '$rename'" if ($rename);
@@ -255,20 +248,20 @@ sub run_jppimport {
     $importcmd.=" --jvm $jvm" if ($jvm);
     $importcmd.=" --nobz2" if ($nobz2);
     $importcmd.=" --nozip" if ($nozip);
-    if ($jpprpm) {
-	$importcmd.=" --rpm $jpprpm";
+    if ($originrpm) {
+	$importcmd.=" --rpm $originrpm";
     } else {
-	print STDERR "FATAL: jpp RPM $name not found.\n";
+	print STDERR "FATAL: origin RPM $name not found.\n";
 	return;
     }
 
     my $hook;
     if ($target) {
-	$hook="$jpptoolsdir/hooks/set_target_1$target.pl";
+	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
 	$importcmd.=" --hook $hook" if (-e $hook);
     }
 
-    $hook="$jpptoolsdir/hooks/$name.pl";
+    $hook="$origintoolsdir/hooks/$name.pl";
     $importcmd.=" --hook $hook" if (-e $hook);
 
     foreach $hook (@hooks) {
@@ -278,87 +271,24 @@ sub run_jppimport {
     print `$importcmd`,"---*---\n";
 }
 
-sub path_to_array {
-    my $paths=shift;
-    my @path;
-    foreach (split(':',$paths)) {
-	if ($_ eq '') {
-	    $_ = '.';
-	} elsif (/^~/) {
-	    s/^~/$ENV{HOME}/;
-	}
-	push @path, $_ if -d $_;
-    }
-    return @path;
-}
-
-sub is_valid_pathspec {
-    return scalar &path_to_array(shift());
-}
-
-sub get_rpm_name {
-    my $rpm=shift;
-    my $name=`rpmquery --queryformat '\%{NAME}' -p $rpm`;
-    chomp $name;
-    return $name;
-}
-
 sub alt_jpp_rpmvercmp {
-    my ($altrpm, $jpprpm) =@_;
+    my ($altrpm, $originrpm) =@_;
     return -1 unless $altrpm;
-    return 1 unless $jpprpm;
-    my $altversion=&get_rpm_version($altrpm);
-    my $altrelease=&get_rpm_release($altrpm);
-    my $jppversion=&get_rpm_version($jpprpm);
-    my $jpprelease=&get_rpm_release($jpprpm);
-    my $cmp = $altversion cmp $jppversion;
+    return 1 unless $originrpm;
+    my ($altversion,$altrelease)=&get_rpm_version_release($altrpm);
+    my ($originversion,$originrelease)=&get_rpm_version_release($originrpm);
+    my $cmp = $altversion cmp $originversion;
     if ($cmp!=0) {
-	$cmp=&rpmvercmp($altversion, $jppversion);
-	print STDERR "$altversion rpmcmp $jppversion = $cmp\n" if $verbose;
+	$cmp=evrcmp($altversion, $originversion);
+	print STDERR "$altversion rpmcmp $originversion = $cmp\n" if $verbose;
     }
     return $cmp if $cmp !=0;
     if ($altrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
 	my $altjppsubrel=$2;
-	$cmp=&rpmvercmp($altjppsubrel, $jpprelease);
-	print STDERR "$altjppsubrel cmp $jpprelease = $cmp\n" if $verbose;
+	$cmp=evrcmp($altjppsubrel, $originrelease);
+	print STDERR "$altjppsubrel cmp $originrelease = $cmp\n" if $verbose;
 	return $cmp;
     }
     return -1;
 }
 
-sub get_rpm_version {
-    my $rpm=shift;
-    my $name=`rpmquery --queryformat '\%{VERSION}' -p $rpm`;
-    chomp $name;
-    return $name;
-}
-
-sub get_rpm_release {
-    my $rpm=shift;
-    my $name=`rpmquery --queryformat '\%{RELEASE}' -p $rpm`;
-    chomp $name;
-    return $name;
-}
-
-sub rpmvercmp {
-    my $cmp = `rpmvercmp $_[0] $_[1]`;
-    chomp $cmp;
-    return $cmp;
-}
-
-sub find_rpm {
-    my $name=shift;
-    for my $path (@_) {
-	for my $rpm (reverse(glob "$path/$name-*.src.rpm")) {
-#	print STDERR "trying $rpm for $name\n";
-	    return $rpm if ($name eq &get_rpm_name($rpm));
-	}
-    }
-    return;
-}
-
-sub dirname {
-    my @path= split('/',$_[0]);
-    pop @path;
-    return join('/',@path);
-}
