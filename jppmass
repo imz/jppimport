@@ -9,8 +9,8 @@ use Getopt::Long;
 use File::Basename;
 use RPM qw/evrcmp/;
 
-use RPM::Source::Convert::MassCommon;
 use RPM::Source::Convert::Mass;
+
 our @ISA = qw/RPM::Source::Convert::Mass/;
 
 $DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
@@ -130,26 +130,27 @@ sub run_originimport_hook {
 }
 
 sub is_origin_up {
-    my ($self, $originrpm, $destrpm)=@_;
-    return 1 unless $destrpm;
-    return 0 unless $originrpm;
-    return &alt_jpp_rpmvercmp($destrpm, $originrpm) <0;
+    my ($self, $origin_rh, $dest_rh)=@_;
+    return 1 unless $dest_rh;
+    return 0 unless $origin_rh;
+    return &alt_jpp_rpmvercmp($dest_rh, $origin_rh) <0;
 }
 
-
 sub alt_jpp_rpmvercmp {
-    my ($altrpm, $originrpm) =@_;
-    return -1 unless $altrpm;
-    return 1 unless $originrpm;
-    my ($altversion,$altrelease)=&get_rpm_version_release($altrpm);
-    my ($originversion,$originrelease)=&get_rpm_version_release($originrpm);
-    my $cmp = $altversion cmp $originversion;
+    my ($dest_rh, $origin_rh) =@_;
+    return -1 unless $dest_rh;
+    return 1 unless $origin_rh;
+    my $originversion=$origin_rh->{VERSION};
+    my $originrelease=$origin_rh->{RELEASE};
+    my $destversion=$dest_rh->{VERSION};
+    my $destrelease=$dest_rh->{RELEASE};
+    my $cmp = $destversion cmp $originversion;
     if ($cmp!=0) {
-	$cmp=evrcmp($altversion, $originversion);
-	print STDERR "$altversion rpmcmp $originversion = $cmp\n" if $verbose;
+	$cmp=evrcmp($destversion, $originversion);
+	print STDERR "$destversion rpmcmp $originversion = $cmp\n" if $verbose;
     }
     return $cmp if $cmp !=0;
-    if ($altrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+    if ($destrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
 	my $altjppsubrel=$2;
 	$cmp=evrcmp($altjppsubrel, $originrelease);
 	print STDERR "$altjppsubrel cmp $originrelease = $cmp\n" if $verbose;
