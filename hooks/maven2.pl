@@ -1,15 +1,18 @@
 #!/usr/bin/perl -w
 
+require 'add_missingok_config.pl';
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
     my $bootstrap=1;
 
-    # for 28 only
-    #$jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
-    #$jpp->add_patch('maven2-2.0.8-alt-plugin-assembly-ValueSource.patch', STRIP=>0);
     # for 29
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
+
+    # Следующие пакеты имеют неудовлетворенные зависимости:
+    # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
+    &add_missingok_config($jpp,'/etc/mavenrc');
 
     if ($bootstrap) {
 	$jpp->get_section('package','plugin-site')->push_body('Requires: maven-shared-downloader maven-shared-doxia-tools'."\n") ;

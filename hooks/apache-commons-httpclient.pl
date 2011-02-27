@@ -5,6 +5,7 @@ require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('package','')->unshift_body('BuildRequires: velocity14'."\n");
 }
 
 __END__
