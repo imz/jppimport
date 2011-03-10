@@ -108,18 +108,11 @@ maven-bundle-plugin -> felix (for poms)+felix-maven2
 # does not work well; fedora's maven-plugin-bundle work better
 in piccolo2d -> maven-plugin-bundle
 
-maven2-plugin-site: broken beh examples: apacheds, tiles
-
-TODO: build jetty6 with webapps. jetty6:
-[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
-[INFO] [enforcer:enforce {execution: enforce-java}]
-[INFO] [source:jar {execution: attach-sources}]
 ---
-
 UP:
 TODO: opensaml: warn: possible regression: jpp5 pom is missing in jpp6
 
-TODO: jcalendar, jgoodies-* ask msp
+TODO: jcalendar, jgoodies-* asked msp, no need to rush
 
 TODO: svnkit update: update from fedora 14 or devel
 
@@ -219,8 +212,10 @@ TODO: detect maven1 plugin dependencies (if any)
 
 TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
 
+TODO: qdox upgrade
+TODO: (slf4j upgrade) eclipse-shelled -> eclipse-dltk -> h2database -> slf4j >= 1.6.1
+
 #--------------------------------------
-SRPMS/ant-1.8.1-4.jpp6.src.rpm
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
 SRPMS/hc-httpclient-4.1-0.r1041655.1.jpp6.src.rpm -> easymock up
@@ -228,7 +223,6 @@ SRPMS/htmlunit2-2.8-1.jpp6.src.rpm -> hc-httpclient
 #--------------------------------------
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
-SRPMS/derby-10.6.2.1-2.jpp6.src.rpm
 SRPMS/gnu-regexp-1.1.4-14.jpp6.src.rpm
 SRPMS/google-collections-1.0-3.jpp6.src.rpm
 SRPMS/google-guice-2.0-1.jpp6.src.rpm
@@ -302,7 +296,6 @@ SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
 SRPMS/logback-0.9.27-1.jpp6.src.rpm
 SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
 SRPMS/maven-plugin-bundle-2.0.0-8.jpp6.src.rpm
-SRPMS/maven2-2.0.8-31.jpp6.src.rpm
 SRPMS/objectweb-anttask-1.3.2-5.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
@@ -326,7 +319,6 @@ deleting SRPMS/xalan-j2-2.7.1-1.jpp6.src.rpm
 deleting SRPMS/ws-scout0-0.7-0.rc2.5.jpp6.src.rpm
 deleting SRPMS/slf4j-1.6.1-3.jpp6.src.rpm
 deleting SRPMS/sisu-guice-2.9.2-1.jpp6.src.rpm
-deleting SRPMS/maven2-2.0.8-29.jpp6.src.rpm
 deleting SRPMS/logback-0.9.14-2.jpp6.src.rpm
 deleting SRPMS/jpackage-utils-5.0.0-2.jpp6.src.rpm
 deleting SRPMS/jfreechart-1.0.13-2.jpp6.src.rpm
@@ -379,14 +371,12 @@ SRPMS/jboss-security-spi-2.0.3-2.SP1.2.jpp6.src.rpm
 SRPMS/jboss-webbeans-1.0.0-0.2.PREVIEW1.jpp6.src.rpm
 SRPMS/jms-integration-tests-1.0.1-2.jpp6.src.rpm
 SRPMS/juddi-0.9-0.rc4.8.jpp6.src.rpm
-SRPMS/maven2-2.0.8-34.jpp6.src.rpm
 SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 SRPMS/slf4j-jboss-logging-1.0.2-4.jpp6.src.rpm
 SRPMS/xml-commons-1.3.04-10.jpp6.src.rpm
 deleting SRPMS/xml-commons-1.3.04-9.jpp6.src.rpm
 deleting SRPMS/slf4j-jboss-logging-1.0.2-3.jpp6.src.rpm
 deleting SRPMS/objectweb-asm-3.2-2.jpp6.src.rpm
-deleting SRPMS/maven2-2.0.8-31.jpp6.src.rpm
 deleting SRPMS/juddi-0.9-0.rc4.7.jpp6.src.rpm
 deleting SRPMS/jboss-security-spi-2.0.3-2.SP1.1.jpp6.src.rpm
 deleting SRPMS/jboss-seam-int-5.1.0-0.CR1.1.5.jpp6.src.rpm
@@ -401,7 +391,6 @@ deleting SRPMS/findbugs-1.3.9-2.jpp6.src.rpm
 deleting SRPMS/dtdparser-1.21-7.jpp6.src.rpm
 deleting SRPMS/bsf-2.4.0-2.jpp6.src.rpm
 ------------
-SRPMS/ant-1.8.2-1.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
 SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
 SRPMS/gmaven-1.3-3.jpp6.src.rpm
@@ -413,9 +402,7 @@ deleting SRPMS/jbossas-tp-5.1.0-5.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-25.jpp6.src.rpm
 deleting SRPMS/gmaven-1.3-2.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.3-2.jpp6.src.rpm
-deleting SRPMS/ant-1.8.1-4.jpp6.src.rpm
 ------------
-SRPMS/ant-1.8.2-3.jpp6.src.rpm
 SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
 SRPMS/build-helper-maven-plugin-1.5-1.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
@@ -426,17 +413,14 @@ SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
 SRPMS/jdepend-maven-plugin-2.0-1.beta_3_SNAPSHOT.jpp6.src.rpm
 SRPMS/log4j-1.2.16-3.jpp6.src.rpm
 SRPMS/maven-skins-5-2.1.jpp6.src.rpm
-SRPMS/maven2-2.0.8-35.jpp6.src.rpm
 SRPMS/rat-maven-plugin-1.0-1.alpha_3.jpp6.src.rpm
 SRPMS/taglist-maven-plugin-2.4-1.jpp6.src.rpm
-deleting SRPMS/maven2-2.0.8-34.jpp6.src.rpm
 deleting SRPMS/log4j-1.2.16-1.jpp6.src.rpm
 deleting SRPMS/hibernate3-validator-3.1.0-2.jpp6.src.rpm
 deleting SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
 deleting SRPMS/findbugs-1.3.9-4.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
 deleting SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
-deleting SRPMS/ant-1.8.2-1.jpp6.src.rpm
 ----------------------------
 SRPMS/jboss-aspects-build-1.0.1-1.CR5.jpp6.src.rpm
 SRPMS/jboss-aspects-common-1.0.0-1.Beta1.jpp6.src.rpm
@@ -458,7 +442,6 @@ SRPMS/jboss-security-xacml-2.0.4-5.jpp6.src.rpm
 SRPMS/jbossas-tp-5.1.0-8.jpp6.src.rpm
 SRPMS/jbosssx2-2.0.3.1-5.jpp6.src.rpm
 SRPMS/jbossws-parent-1.0.2-4.jpp6.src.rpm
-SRPMS/maven2-2.0.8-37.jpp6.src.rpm
 SRPMS/mojo-parent-28-1.jpp6.src.rpm
 SRPMS/slf4j-jboss-logging-1.0.2-5.jpp6.src.rpm
 SRPMS/velocity14-1.4-11.jpp6.src.rpm
@@ -468,7 +451,6 @@ deleting SRPMS/werken-xpath-0.9.4-0.beta.14.jpp6.src.rpm
 deleting SRPMS/velocity14-1.4-9.jpp6.src.rpm
 deleting SRPMS/slf4j-jboss-logging-1.0.2-4.jpp6.src.rpm
 deleting SRPMS/mojo-parent-20-3.jpp6.src.rpm
-deleting SRPMS/maven2-2.0.8-35.jpp6.src.rpm
 deleting SRPMS/jbossws-parent-1.0.2-3.jpp6.src.rpm
 deleting SRPMS/jbosssx2-2.0.3.1-4.jpp6.src.rpm
 deleting SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
@@ -491,8 +473,6 @@ deleting SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
 SRPMS/ccl-util-32.69-4.jpp6.src.rpm
 SRPMS/javahelp2-2.0.05-3.jpp6.src.rpm
 SRPMS/jbossas-5.1.0-29.jpp6.src.rpm
-SRPMS/tomcat6-6.0.29-1.jpp6.src.rpm
-deleting SRPMS/tomcat6-6.0.18-10.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
 -----------------------------------
 SRPMS/ccl-util-32.69-5.jpp6.src.rpm
@@ -504,3 +484,15 @@ SRPMS/jboss-packaging-maven-plugin-2.2-2.jpp6.src.rpm
 deleting SRPMS/javahelp2-2.0.05-3.jpp6.src.rpm
 deleting SRPMS/ccl-util-32.69-4.jpp6.src.rpm
 -----------------------------------
+SRPMS/antlr-maven-plugin-2.2-1.jpp6.src.rpm
+SRPMS/exec-maven-plugin-1.2-1.jpp6.src.rpm
+-----------------------------------
+SRPMS/antlr-2.7.7-1.jpp6.src.rpm
+SRPMS/checkstyle-5.3-2.jpp6.src.rpm
+SRPMS/oss-parent-6-1.jpp6.src.rpm
+deleting SRPMS/oss-parent-3-0.1.jpp6.src.rpm
+deleting SRPMS/antlr-2.7.6-8.jpp6.src.rpm
+-----------------------------------
+SRPMS/dtddoc-1.1.0-3.jpp6.src.rpm
+SRPMS/dtddoc-maven2-plugin-1.1-2.jpp6.src.rpm
+SRPMS/freemarker-2.3.16-2.jpp6.src.rpm

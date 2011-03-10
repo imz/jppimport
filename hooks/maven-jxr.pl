@@ -4,13 +4,9 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     #$jpp->get_section('package','')->subst('velocity14','velocity');
-    $jpp->get_section('package','')->push_body('BuildRequires: velocity14');
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: velocity14');
+    # TODO: enable if this req will cause trouble
+    #$jpp->get_section('package','')->subst(qr'^Requires:\s+velocity14','#Requires: velocity14');
 };
 
 __END__
-#bug to report
-#%post javadoc
-#rm -f %{_javadocdir}/%{name}
-#ln -s %{name}-%{namedversion} %{_javadocdir}/%{name}
-    $jpp->get_section('post','javadoc')->subst('namedversion',"version");
-

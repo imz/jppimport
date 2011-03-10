@@ -12,9 +12,12 @@ sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
-    # TODO: upstream it.
+    # upstreamed as https://bugs.eclipse.org/bugs/show_bug.cgi?id=338360
     # missing symbol (underlinkage)
+    $jpp->add_patch('eclipse-3.6.1-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>0);
+    # just -lX11 added
     $jpp->add_patch('eclipse-3.6.1-alt-swt-linux-as-needed.patch', STRIP=>0);
+
 
     # hack until gtk-update-icon-cache fix
     $jpp->del_section('post','platform');
