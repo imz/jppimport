@@ -115,18 +115,16 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 my $verbose=0;
 $convert->run();
 
-sub run_originimport_hook {
-    my ($self,$importcmdptr)=@_;
-    my $importcmd=$$importcmdptr;
-    $importcmd.=" --jvm $jvm" if ($jvm);
-    $importcmd.=" --nobz2" if ($nobz2);
-    $importcmd.=" --nozip" if ($nozip);
+sub origin_import_hook {
+    my ($self,$argsptr)=@_;
+    push @$argsptr, '--jvm', $jvm if ($jvm);
+    push @$argsptr, '--nobz2' if ($nobz2);
+    push @$argsptr, '--nozip' if ($nozip);
     my $hook;
     if ($target) {
 	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
-	$importcmd.=" --hook $hook" if (-e $hook);
+	push @$argsptr, '--hook', $hook if (-e $hook);
     }
-    $$importcmdptr=$importcmd;
 }
 
 sub is_origin_up {
