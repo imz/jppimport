@@ -1,0 +1,10 @@
+--- com.agical.rdoc/pom.xml	2011-03-15 13:58:16.483743900 +0000
++++ com.agical.rdoc/pom.xml	2011-03-15 13:59:05.223300644 +0000
+@@ -75,6 +75,7 @@
+ 			      <configuration>
+ 			        <outputDirectory>${basedir}/src/gen/java</outputDirectory>
+ 			        <packageName>com.agical.rdoc.core.parser</packageName >
++				<jdkVersion>1.4</jdkVersion>
+ 			      </configuration>
+                     <executions>
+                     <execution>

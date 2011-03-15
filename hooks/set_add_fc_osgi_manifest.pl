@@ -10,7 +10,6 @@ push @SPECHOOKS,
  sub {
     my ($jpp, $alt) = @_;
     my $fcpath14='/var/ftp/pub/Linux/fedora/linux/releases/14/Everything/x86_64/os/Packages/';
-
     my $name=$jpp->get_section('package','')->get_tag('Name');
     if ($name eq 'jetty6') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
@@ -30,6 +29,9 @@ push @SPECHOOKS,
 #    } elsif ($name eq 'apache-commons-net') {
 #	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-net-2.0-6.fc14.noarch.rpm');
 #	&merge_osgi_manifest($jpp,'/usr/share/java/commons-net.jar','/usr/share/java/apache-commons-net-2.0.jar');
+    } elsif ($name eq 'h2database') {
+	&unpack_fc_rpm($jpp,'/var/ftp/pub/Linux/fedora/linux/development/15/x86_64/os/Packages/h2-1.2.145-4.fc15.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/h2database.jar','/usr/share/java/h2.jar');
     } elsif ($name eq 'jakarta-oro') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-oro-2.0.8-6.3.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jakarta-oro.jar','/usr/share/java/jakarta-oro-2.0.8.jar');

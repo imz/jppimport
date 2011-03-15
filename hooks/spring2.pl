@@ -16,3 +16,14 @@ http://jira.springframework.org/secure/attachment/14674/junit4.5.patch
 ---
 > #ln -sf $(build-classpath junit4) lib/junit/junit-4.4.jar
 > mv lib/junit/junit-4.4.jar.no lib/junit/junit-4.4.jar
+
+# slf4j 1.6
+1136c1136
+< ln -sf $(build-classpath slf4j/api) lib/slf4j/slf4j-api-1.5.0.jar
+---
+> ln -sf $(build-classpath slf4j/slf4j-api) lib/slf4j/slf4j-api-1.5.0.jar
+1138c1138
+< ln -sf $(build-classpath slf4j/log4j12) lib/slf4j/slf4j-log4j12-1.5.0.jar
+---
+> ln -sf $(build-classpath slf4j/slf4j-log4j12) lib/slf4j/slf4j-log4j12-1.5.0.jar
+

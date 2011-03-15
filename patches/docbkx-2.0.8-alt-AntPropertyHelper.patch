@@ -1,0 +1,24 @@
+--- docbkx-2.0.8/docbkx-maven-base/src/main/java/com/agilejava/docbkx/maven/AbstractTransformerMojo.java	2011-03-15 12:19:37.247757418 +0000
++++ docbkx-2.0.8/docbkx-maven-base/src/main/java/com/agilejava/docbkx/maven/AbstractTransformerMojo.java	2011-03-15 12:21:32.751778413 +0000
+@@ -51,7 +51,7 @@
+ import org.apache.maven.plugin.AbstractMojo;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.MojoFailureException;
+-import org.apache.maven.plugin.antrun.AntPropertyHelper;
++import org.apache.maven.shared.ant.AntPropertyHelper;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.tools.ant.DefaultLogger;
+ import org.apache.tools.ant.Project;
+--- docbkx-2.0.8/docbkx-maven-base/pom.xml	2008-01-08 19:58:23.000000000 +0000
++++ docbkx-2.0.8/docbkx-maven-base/pom.xml	2011-03-15 12:24:20.451280677 +0000
+@@ -82,5 +82,10 @@
+       <artifactId>maven-antrun-plugin</artifactId>
+       <version>1.1</version>
+     </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-ant</artifactId>
++      <version>1.0</version>
++    </dependency>
+   </dependencies>
+ </project>
