@@ -100,6 +100,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
+    $jpp->get_section('package','')->push_body('Requires: java-common'."\n");
 
     # for M40; can(should?) be disabled on M41
     #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
@@ -139,6 +140,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('install')->unshift_body_after('install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n",qr'for e in jconsole policytool');
     $jpp->get_section('install')->unshift_body_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
+
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
 
     # to disable --enable-systemtap
@@ -197,7 +199,7 @@ with %{name} J2SE Runtime Environment.
 
     $jpp->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
-%__subst 's,^Categories=.*,Categories=Profiling;Monitor;Development;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/jconsole.desktop
+%__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/jconsole.desktop
 
 %__subst 's,^Encoding,#Encoding,' %buildroot/usr/share/applications/javaws.desktop
 %__subst 's,.png$,,' %buildroot/usr/share/applications/javaws.desktop

@@ -4,6 +4,7 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
     $jpp->add_patch('apacheds-1.5.4-alt-pom-use-maven2-plugin-shade.patch',STRIP=>1);
+    $jpp->add_patch('apacheds-1.5.4-alt-pom-slf4j16.patch',STRIP=>0);
     $jpp->get_section('package','')->subst_if('mojo-maven2-plugin-shade','maven2-plugin-shade',qr'Requires:');
 
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-surefire-provider-junit4 jakarta-commons-net14\n");
@@ -28,27 +29,3 @@ push @SPECHOOKS, sub {
 
 __END__
 #1.0.2
-SOURCES:
---- apacheds-jpp-depmap.xml.orig        2009-02-11 20:57:27 +0000
-+++ apacheds-jpp-depmap.xml     2009-02-11 20:58:54 +0000
-@@ -30,9 +30,9 @@
-          <version>2.0.1</version>
-       </maven>
-       <jpp>
--         <groupId>JPP/maven2</groupId>
-+         <groupId>JPP/maven-shared</groupId>
-          <artifactId>archiver</artifactId>
--         <version>2.0.1</version>
-+         <version>2.1</version>
-       </jpp>
-    </dependency>
-    <dependency>
-@@ -35,7 +35,7 @@
-       </maven>
-       <jpp>
-          <groupId>JPP</groupId>
--         <artifactId>commons-collections32</artifactId>
-+         <artifactId>commons-collections</artifactId>
-          <version>3.2</version>
-       </jpp>
-    </dependency>

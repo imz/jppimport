@@ -14,14 +14,13 @@ sub {
 
     # upstreamed as https://bugs.eclipse.org/bugs/show_bug.cgi?id=338360
     # missing symbol (underlinkage)
-    $jpp->add_patch('eclipse-3.6.1-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>0);
+    $jpp->add_patch('eclipse-3.6.2-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>0);
     # just -lX11 added
-    $jpp->add_patch('eclipse-3.6.1-alt-swt-linux-as-needed.patch', STRIP=>0);
-
+    $jpp->add_patch('eclipse-3.6.2-alt-swt-linux-as-needed.patch', STRIP=>0);
 
     # hack until gtk-update-icon-cache fix
-    $jpp->del_section('post','platform');
-    $jpp->del_section('postun','platform');
+    #$jpp->del_section('post','platform');
+    #$jpp->del_section('postun','platform');
 
     # ant-bcel,... is missing in BR :(
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-optional'."\n");
@@ -33,13 +32,8 @@ sub {
     # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
     $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
 
-    #[exec] os.h:83:34: error: X11/extensions/XTest.h: No such file or directory
-    # X11/extensions/XInput.h
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: xorg-inputproto-devel xorg-xextproto-devel'."\n");
-#xorg-dmxproto-devel xorg-dri2proto-devel xorg-kbproto-devel xorg-renderproto-devel xorg-videoproto-devel xorg-xf86dgaproto-devel xorg-xf86vidmodeproto-devel xorg-xineramaproto-devel xorg-fontcacheproto-devel xorg-glproto-devel xorg-bigreqsproto-devel xorg-compositeproto-devel xorg-damageproto-devel xorg-evieproto-devel xorg-fixesproto-devel xorg-fontsproto-devel xorg-pmproto-devel xorg-printproto-devel xorg-proto-devel xorg-randrproto-devel xorg-recordproto-devel xorg-resourceproto-devel xorg-scrnsaverproto-devel xorg-trapproto-devel xorg-xcbproto-devel xorg-xcmiscproto-devel xorg-xf86bigfontproto-devel xorg-xf86driproto-devel xorg-xf86miscproto-devel xorg-xf86rushproto-devel xorg-xproto-devel
-
-    # I was lazy to search for the whole list of xorg-*proto-devel :(
-    $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-devel'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-proto-devel libGLU-devel'."\n");
+    $jpp->get_section('package','')->subst_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
 
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
