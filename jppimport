@@ -71,6 +71,9 @@ sub initrel_jppimport {
     my ($spec,$parent)=@_;
     my $jpprel = $spec->get_section('package','')->get_tag('Release');
     die "jpp release is undefined" unless defined $jpprel;
+    warn "initrel_jppimport:alt_ found! wrong tool is used? " if $jpprel=~/^alt/;
+    return 'alt'.($1+1).$2 if $jpprel=~/^alt(\d+)[^_]*(_.+jpp.*)$/;
+
 # $jppsubrel is used to keep branch of fedora or mandriva
     my $jppsubrel='';
 # for new jpackage 5.0
@@ -84,7 +87,7 @@ sub initrel_jppimport {
     $jpprel=~s/jpp\d.\d$//;
     $jpprel=~s/.jpp5$//;
     $jpprel=~s/jpp//;
-    
+  
     my $altrel="alt1";
     my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
     return $newrel;
@@ -95,6 +98,7 @@ sub nextrel_jppimport {
     my $jppmain= $spec->get_section('package','');
     my $jppver = $jppmain->get_tag('Version');
     my $jpprel = $jppmain->get_tag('Release');
+    warn "nextrel_jppimport:alt_ found! wrong tool is used? " if $jpprel=~/^alt/;
     die "jpp release is undefined" unless defined $jpprel;
 # $jppsubrel is used to keep branch of fedora or mandriva
     my $jppsubrel='';

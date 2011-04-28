@@ -7,11 +7,18 @@ if [ "$1" = "--apt-config" ]; then
 	shift;
 	shift;
 fi
-hshB="hsh --apt-config=$aptconfig --mountpoints=/proc"
+number=1
+hasherdir=$TMPDIR/hasher$number
+if ! [ -e $hasherdir ]; then
+    mkdir -p $hasherdir/chroot
+    chgrp -R igor_a$number $hasherdir/chroot
+fi
+hshB="hsh --apt-config=$aptconfig --mountpoints=/proc --number=$number $hasherdir"
 mkdir success failure
 for i in "$@"; do
     if rpmquery --requires -p $i | egrep "$EGREPARG" >/dev/null; then 
 	echo rebuilding $i
+	#echo $hshB $i
 	if $hshB $i > hsh.log 2>&1 ; then
 	    mv hsh.log success/`basename $i`.log
 	else 
@@ -19,5 +26,5 @@ for i in "$@"; do
 	    echo FAILED: $i
 	fi
     fi
-    rm -f ~/hasher/repo/SRPMS.hasher/*.src.rpm ~/hasher/repo/x86_64/RPMS.hasher/*.rpm
+    rm -f $hasherdir/repo/SRPMS.hasher/*.src.rpm $hasherdir/repo/x86_64/RPMS.hasher/*.rpm
 done
