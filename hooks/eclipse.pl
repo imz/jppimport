@@ -18,6 +18,10 @@ sub {
     # just -lX11 added
     $jpp->add_patch('eclipse-3.6.2-alt-swt-linux-as-needed.patch', STRIP=>0);
 
+    # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
+    # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
+    $jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
+
     # hack until gtk-update-icon-cache fix
     #$jpp->del_section('post','platform');
     #$jpp->del_section('postun','platform');
@@ -63,6 +67,18 @@ sub {
 	# embed jetty and apply the patch below
 	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6-core');
 	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
+	$jpp->add_source('jetty-6.1.26.jar', NUMBER => 33);
+	$jpp->add_source('jetty-util-6.1.26.jar', NUMBER => 34);
+	$jpp->get_section('prep')->push_body('sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
+sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties'."\n");
+	$jpp->get_section('install')->push_body('
+jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.util*`
+rm -f $jetty
+install -m 644 %{SOURCE34} $jetty
+jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.server*`
+rm -f $jetty
+install -m 644 %{SOURCE33} $jetty
+');
     }
 
     # lucene
@@ -158,47 +174,3 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
 
     # hack around #22839: built-in /usr/lib*/eclipse
     # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
-
-### jetty embedding patch for eclipse-3.6.1 (just apply as it is ;)
---- eclipse.spec	2011-02-27 22:26:07 +0200
-+++ eclipse.spec	2011-02-27 23:33:22 +0200
-@@ -50,6 +50,9 @@
- Source19:       %{name}-filenamepatterns.txt
- # This script copies the platform sub-set of the SDK for generating metadata
- Source28:       %{name}-mv-Platform.sh
-+Source33: jetty-6.1.24.jar 
-+Source34: jetty-util-6.1.24.jar 
-+
- 
- # Make sure the shipped target platform templates are looking in the
- # correct location for source bundles (see RHBZ # 521969). This does not
-@@ -260,6 +263,8 @@
- popd
- %patch33 -p0
- sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties
-+sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
-+sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties
- 
- #uname -p == unknown but exit code is 0 :( (alt feature :( )
- # seems to be fixed upstream.
-@@ -630,13 +635,13 @@
- ln -s %{_javadir}/hamcrest/core.jar \
-   dropins/jdt/plugins/org.hamcrest.core_$HAMCRESTCOREVERSION
- 
--JETTYPLUGINVERSION=$(ls plugins | grep org.mortbay.jetty.server_6 | sed 's/org.mortbay.jetty.server_//')
--rm plugins/org.mortbay.jetty.server_$JETTYPLUGINVERSION
--ln -s %{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty.server_$JETTYPLUGINVERSION
--
--JETTYUTILVERSION=$(ls plugins | grep org.mortbay.jetty.util_6 | sed 's/org.mortbay.jetty.util_//')
--rm plugins/org.mortbay.jetty.util_$JETTYUTILVERSION
--ln -s %{_javadir}/jetty/jetty-util.jar plugins/org.mortbay.jetty.util_$JETTYUTILVERSION
-+#JETTYPLUGINVERSION=$(ls plugins | grep org.mortbay.jetty.server_6 | sed 's/org.mortbay.jetty.server_//')
-+#rm plugins/org.mortbay.jetty.server_$JETTYPLUGINVERSION
-+#ln -s %{_javadir}/jetty/jetty.jar plugins/org.mortbay.jetty.server_$JETTYPLUGINVERSION
-+
-+#JETTYUTILVERSION=$(ls plugins | grep org.mortbay.jetty.util_6 | sed 's/org.mortbay.jetty.util_//')
-+#rm plugins/org.mortbay.jetty.util_$JETTYUTILVERSION
-+#ln -s %{_javadir}/jetty/jetty-util.jar plugins/org.mortbay.jetty.util_$JETTYUTILVERSION
- 
- JSCHVERSION=$(ls plugins | grep com.jcraft.jsch_ | sed 's/com.jcraft.jsch_//')
- rm plugins/com.jcraft.jsch_$JSCHVERSION

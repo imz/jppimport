@@ -2,6 +2,8 @@ Note: fix groups for Python, GUI, etc...
 ###########export ANT_OPTS="-mx256m" against blackdown
 #export ANT_OPTS="-Xmx256m" against blackdown (compat)
 #export MAVEN_OPTS="-Xmx256m"
+# for PermGen error, running out of memory #-XX:MaxPermSize=256m
+export MAVEN_OPTS=-XX:MaxPermSize=512m
 #-Dmaven.javadoc.additionalparam=-J-Xmx256m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
@@ -22,8 +24,6 @@ Note: fix groups for Python, GUI, etc...
 #-Djava.awt.headless=true
 
 
-# for PermGen error, running out of memory
-export MAVEN_OPTS=-XX:MaxPermSize=512m
 
 subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
@@ -457,4 +457,13 @@ SRPMS/dtddoc-maven2-plugin-1.1-2.jpp6.src.rpm
 SRPMS/freemarker-2.3.16-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/struts-master-4-2.jpp6.src.rpm
+-----------------------------------
+SRPMS/myfaces-core11-api-1.1.5-4.jpp6.src.rpm
+SRPMS/myfaces-maven-1.0.5-2.jpp6.src.rpm
+-----------------------------------
+SRPMS/easymock-classextension-1.2.1-1.jpp6.src.rpm
+deleting SRPMS/easymock-classextension-1.2-3.jpp6.src.rpm
+-----------------------------------
+SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
+deleting SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 -----------------------------------

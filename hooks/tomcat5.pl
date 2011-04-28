@@ -2,9 +2,17 @@
 
 require 'set_fix_homedir_macro.pl';
 require 'windows-thumbnail-database-in-package.pl';
+require 'set_osgi.pl';
+
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    # tmp hack for fedora 31-3
+    $jpp->get_section('package','admin-webapps')->push_body('Requires(post): commons-fileupload'."\n");
+
+#    foreach my $sec ($jpp->get_sections()) {
+#	$sec->unshift_body('AutoProv: yes,noosgi'."\n") unless $sec->get_package_expanded() eq 'tomcat5-jasper-eclipse';
+#    }
 
     # 5.5.27-5.5.31 do not compile with commons-el 1.0.1
     # properly subst s,commons-el,commons-el10

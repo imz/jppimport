@@ -10,6 +10,7 @@ push @SPECHOOKS,
  sub {
     my ($jpp, $alt) = @_;
     my $fcpath14='/var/ftp/pub/Linux/fedora/linux/releases/14/Everything/x86_64/os/Packages/';
+    my $fcpath15='/var/ftp/pub/Linux/fedora/linux/development/15/x86_64/os/Packages/';
     my $name=$jpp->get_section('package','')->get_tag('Name');
     if ($name eq 'jetty6') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
@@ -18,6 +19,9 @@ push @SPECHOOKS,
     } elsif ($name eq 'apache-commons-httpclient' or $name eq 'jakarta-commons-httpclient') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-commons-httpclient-3.1-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-httpclient.jar','/usr/share/java/jakarta-commons-httpclient-3.1.jar');
+    } elsif ($name eq 'apache-commons-el') {
+	&unpack_fc_rpm($jpp,$fcpath15.'apache-commons-el-1.0-22.fc15.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/commons-el.jar','/usr/share/java/apache-commons-el-1.0.jar');
     } elsif ($name eq 'apache-commons-logging') {
 	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-logging-1.1.1-11.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-logging.jar','/usr/share/java/apache-commons-logging-1.1.1.jar');
