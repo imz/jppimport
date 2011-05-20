@@ -467,3 +467,21 @@ deleting SRPMS/easymock-classextension-1.2-3.jpp6.src.rpm
 SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
 deleting SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 -----------------------------------
+SRPMS/apache-resource-bundles-3-2.jpp6.src.rpm
+SRPMS/guava-05-6.jpp6.src.rpm
+SRPMS/junit4-4.8.2-5.jpp6.src.rpm
+deleting SRPMS/junit4-4.8.2-4.jpp6.src.rpm
+deleting SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
+-----------------------------------
+SRPMS/ant-1.8.2-5.jpp6.src.rpm
+SRPMS/bouncycastle-1.46-3.jpp6.src.rpm
+deleting SRPMS/ant-1.8.2-3.jpp6.src.rpm
+deleting SRPMS/bouncycastle-1.45-3.jpp6.src.rpm
+-----------------------------------
+SRPMS/apache-ivy-2.2.0-1.jpp6.src.rpm
+SRPMS/codenarc-0.13-1.jpp6.src.rpm
+SRPMS/gmetrics-0.3-1.jpp6.src.rpm
+SRPMS/maven-wagon-1.0-0.7.b7.2.jpp6.src.rpm
+deleting SRPMS/maven-wagon-1.0-0.7.b7.1.jpp6.src.rpm
+deleting SRPMS/apache-ivy-2.0.0-2.jpp6.src.rpm
+-----------------------------------
