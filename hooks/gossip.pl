@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->rename_package('sonatype-gossip');
+#    $jpp->rename_package('sonatype-gossip');
 
     # TODO: integrate in rename
     # %{_mavendepmapfragdir}/%{oldname}

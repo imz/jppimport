@@ -1,9 +1,6 @@
-require 'set_rename_package.pl';
-
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-#    &rename_package ($jpp, $alt, 'lucene', 'lucene2');
     $jpp->get_section('package','')->push_body(q!
 Provides: lucene2 = %{epoch}:%{version}-%{release}
 Obsoletes: lucene2 < 2.4.1
