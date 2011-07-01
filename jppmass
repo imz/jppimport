@@ -80,11 +80,10 @@ excalibur-thread-instrumented
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi
 ;
-%DEST2ORIGINMAP=qw/
-jsmc smc
-sg-jal jal
-lucene2 lucene
-sonatype-gossip gossip
+%ORIGIN2DESTMAP=qw/
+jal sg-jal
+smc jsmc
+gossip sonatype-gossip
 /;
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
