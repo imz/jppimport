@@ -485,3 +485,140 @@ SRPMS/maven-wagon-1.0-0.7.b7.2.jpp6.src.rpm
 deleting SRPMS/maven-wagon-1.0-0.7.b7.1.jpp6.src.rpm
 deleting SRPMS/apache-ivy-2.0.0-2.jpp6.src.rpm
 -----------------------------------
+SRPMS/ezmorph-1.0.6-1.jpp6.src.rpm
+SRPMS/jakarta-slide-webdavclient-2.1-14.jpp6.src.rpm
+SRPMS/json-lib-2.3-1.jpp6.src.rpm
+SRPMS/jsontools-1.5-1.jpp6.src.rpm
+SRPMS/validator-htmlparser-1.0.7-1.jpp6.src.rpm
+deleting SRPMS/jakarta-slide-webdavclient-2.1-13.jpp6.src.rpm
+-----------------------------------
+TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
+      build build-helper-maven-plugin-1.5-1.jpp6.src.rpm
+      until then, fix felix-osgi-foundation-1.2.0-alt1_4jpp6.src BR: felix-parent
+-----------------------------------
+SRPMS/apache-abdera-0.4.0-4.jpp6.src.rpm
+SRPMS/google-guice-2.0-2.jpp6.src.rpm
+SRPMS/mock-javamail-1.7-1.jpp6.src.rpm
+deleting SRPMS/google-guice-2.0-1.jpp6.src.rpm
+deleting SRPMS/apache-abdera-0.4.0-3.jpp6.src.rpm
+-----------------------------------
+SRPMS/activeio3-3.0.1-2.jpp6.src.rpm
+SRPMS/activemq-protobuf-1.0-1.jpp6.src.rpm
+SRPMS/fest-1.0.2-3.jpp6.src.rpm
+SRPMS/groovy-module-gram-1.2-2.jpp6.src.rpm
+SRPMS/jbossas-5.1.0-30.jpp6.src.rpm
+SRPMS/joda-time-1.6.2-2.jpp6.src.rpm
+SRPMS/l10n-maven-plugin-1.0-1.alpha_2.jpp6.src.rpm
+SRPMS/maven-plugin-tools-2.4.3-5.jpp6.src.rpm
+SRPMS/mina-ftpserver-1.0.0-0.rc2.1.jpp6.src.rpm
+SRPMS/rmic-maven-plugin-1.1-1.jpp6.src.rpm
+SRPMS/xmltool-3.3-2.jpp6.src.rpm
+deleting SRPMS/maven-plugin-tools-2.4.3-4.jpp6.src.rpm
+deleting SRPMS/joda-time-1.5.2-2.jpp6.src.rpm
+deleting SRPMS/jbossas-5.1.0-29.jpp6.src.rpm
+deleting SRPMS/fest-1.0.2-2.jpp6.src.rpm
+-----------------------------------
+SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
+SRPMS/josql-2.2-1.jpp6.src.rpm
+SRPMS/plugin-support-1.0-1.alpha_1.jpp6.src.rpm
+deleting SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
+-----------------------------------
+_____________________
+
+6.0/generic/devel
+_____________________
+SRPMS/apache-felix-1-4.jpp6.src.rpm
+SRPMS/apache-sshd-0.5.0-1.jpp6.src.rpm
+SRPMS/aries-blueprint-0.3-1.jpp6.src.rpm
+SRPMS/aries-parent-0.3-1.jpp6.src.rpm
+SRPMS/aries-proxy-0.3-1.jpp6.src.rpm
+SRPMS/aries-quiesce-0.3-1.jpp6.src.rpm
+SRPMS/aries-testsupport-0.3-1.jpp6.src.rpm
+SRPMS/aries-util-0.3-1.jpp6.src.rpm
+SRPMS/bnd1-1.16.0-1.jpp6.src.rpm
+SRPMS/geronimo-genesis2-2.0-1.jpp6.src.rpm
+SRPMS/glassfish-jaf111-1.1.1-2.jpp6.src.rpm
+SRPMS/jackson-1.4.2-1.jpp6.src.rpm
+SRPMS/jasypt-1.7-1.jpp6.src.rpm
+SRPMS/java-xmlbuilder-0.4-1.jpp6.src.rpm
+SRPMS/jets3t-0.8.1-1.jpp6.src.rpm
+SRPMS/jetty-artifact-remote-resources-1.0-1.jpp6.src.rpm
+SRPMS/jetty-assembly-descriptors-1.0-1.jpp6.src.rpm
+SRPMS/jetty-build-support-1.0-1.jpp6.src.rpm
+SRPMS/jetty-servlet-3.0-api-3.0-0.20100224.3.jpp6.src.rpm
+SRPMS/jetty7-7.2.2-0.20101205.1.jpp6.src.rpm
+SRPMS/jpam-1.1-1.jpp6.src.rpm
+SRPMS/jwebunit-2.5-1.jpp6.src.rpm
+SRPMS/karaf-2.2.0-1.jpp6.src.rpm
+SRPMS/mojo-maven-failsafe-plugin-2.4.3-0.a1.1.jpp6.src.rpm
+SRPMS/openid4java-0.9.6-2.jpp6.src.rpm
+SRPMS/openxri-1.2.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-construct-1.1-1.jpp6.src.rpm
+SRPMS/ops4j-pax-exam-1.2.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-logging-1.6.1-1.jpp6.src.rpm
+SRPMS/ops4j-pax-master-1.9-1.jpp6.src.rpm
+SRPMS/ops4j-pax-runner-1.5.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-scanner-1.1.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-swissbox-1.3.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-url-1.1.3-1.jpp6.src.rpm
+SRPMS/ops4j-pax-web-1.0.1-1.jpp6.src.rpm
+SRPMS/org.osgi.compendium-4.2.0-1.jpp6.src.rpm
+SRPMS/org.osgi.enterprise-4.2.0-1.jpp6.src.rpm
+SRPMS/servicemix-build-maven-plugin-1.0-1.jpp6.src.rpm
+SRPMS/servicemix-depends-maven-plugin-1.2-1.jpp6.src.rpm
+SRPMS/spring-build-aws-ant-3.0.4-1.jpp6.src.rpm
+SRPMS/spring-build-aws-ivy-1.0.9-1.jpp6.src.rpm
+SRPMS/spring-build-aws-maven-3.0.0-1.jpp6.src.rpm
+SRPMS/spring-ldap-1.3.0-1.jpp6.src.rpm
+SRPMS/spring-security2-2.0.5-1.jpp6.src.rpm
+SRPMS/springsource-bundlor-1.0.0-1.jpp6.src.rpm
+deleting SRPMS/glassfish-jaf111-1.1.1-1.jpp6.src.rpm
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+SRPMS/animal-sniffer-1.6-8.1.jpp6.src.rpm
+SRPMS/axis2-1.4.1-2.jpp6.src.rpm
+SRPMS/cas-client-3.1.6-1.jpp6.src.rpm
+SRPMS/castor-1.3.0.1-1.jpp6.src.rpm
+SRPMS/cobertura-1.9.4.1-4.jpp6.src.rpm
+SRPMS/ehcache-1.3.0-4.jpp6.src.rpm
+SRPMS/felix-1.0.3-4.jpp6.src.rpm
+SRPMS/geronimo-genesis-1.3-2.jpp6.src.rpm
+SRPMS/geronimo-specs-1.6-1.jpp6.src.rpm
+SRPMS/groovy17-1.7.10-2.jpp6.src.rpm
+SRPMS/groovy18-1.8.0-1.jpp6.src.rpm
+SRPMS/httpunit-1.7-4.jpp6.src.rpm
+SRPMS/jakarta-slide-webdavclient-2.1-16.jpp6.src.rpm
+SRPMS/jline2-2.5-3.jpp6.src.rpm
+SRPMS/maven-plugin-bundle-2.0.0-11.jpp6.src.rpm
+SRPMS/maven-shared-8-0.p8.9.jpp6.src.rpm
+SRPMS/mojo-maven2-plugins-17-8.jpp6.src.rpm
+SRPMS/objectweb-asm-3.3.1-4.jpp6.src.rpm
+SRPMS/ops4j-base-1.2.2-1.jpp6.src.rpm
+SRPMS/oss-parent-6-2.jpp6.src.rpm
+SRPMS/plexus-cdc-1.0-0.4.a11.1.jpp6.src.rpm
+SRPMS/plexus-utils-1.5.15-2.jpp6.src.rpm
+SRPMS/spring-osgi-1.2.0-0.m1.1.jpp6.src.rpm
+SRPMS/tomcat6-6.0.32-2.jpp6.src.rpm
+SRPMS/xbean-3.7-2.jpp6.src.rpm
+SRPMS/xmlrpc-3.1.3-4.jpp6.src.rpm
+deleting SRPMS/xmlrpc-3.1.3-3.jpp6.src.rpm
+deleting SRPMS/xbean-3.7-1.jpp6.src.rpm
+deleting SRPMS/tomcat6-6.0.29-1.jpp6.src.rpm
+deleting SRPMS/plexus-utils-1.5.8-1.jpp6.src.rpm
+deleting SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
+deleting SRPMS/oss-parent-6-1.jpp6.src.rpm
+deleting SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
+deleting SRPMS/mojo-maven2-plugins-17-7.jpp6.src.rpm
+deleting SRPMS/maven-shared-8-0.p8.8.jpp6.src.rpm
+deleting SRPMS/maven-plugin-bundle-2.0.0-8.jpp6.src.rpm
+deleting SRPMS/jline2-2.5-2.jpp6.src.rpm
+deleting SRPMS/jakarta-slide-webdavclient-2.1-14.jpp6.src.rpm
+deleting SRPMS/httpunit-1.7-3.jpp6.src.rpm
+deleting SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
+deleting SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
+deleting SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
+deleting SRPMS/felix-1.0.3-1.jpp6.src.rpm
+deleting SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
+deleting SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm

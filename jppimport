@@ -8,6 +8,7 @@ use Getopt::Long;
 use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
 use RPM::Source::Transform;
+use RPM::Source::Convert;
 use RPM::Source::Convert::Generic2ALT;
 use RPM::Source::Convert::JPackage2ALT;
 
@@ -168,11 +169,20 @@ sub callback_hooks {
     my ($self,$spec,$parent)=@_;
     #map {print STDERR $_->describe(1)} $spec->get_sections();
     print STDERR "entering alt_generic_fixes\n" if $RPM::Source::Transform::verbose>1;
-    &RPM::Source::Convert::Generic2ALT::alt_generic_fix($spec);
+    &RPM::Source::Convert::Generic2ALT::alt_generic_fix($self,$spec,$parent);
     print STDERR "done alt_generic_fixes\n" if $RPM::Source::Transform::verbose>1;
     #map {print STDERR $_->describe(1)} $spec->get_sections();
-    &RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($spec);
+    &RPM::Source::Convert::JPackage2ALT::jpp_specific_fix($self,$spec,$parent);
     print STDERR "done jpp_specific_fixes\n" if $RPM::Source::Transform::verbose>1;
+    #map {print STDERR $_->describe(1)} $spec->get_sections();
+}
+
+sub callback_posthooks {
+    my ($self,$spec,$parent)=@_;
+    #map {print STDERR $_->describe(1)} $spec->get_sections();
+    print STDERR "entering alt_generic_posthook fixes\n" if $RPM::Source::Transform::verbose>1;
+    &RPM::Source::Convert::Generic2ALT::alt_generic_posthook_fix($self,$spec,$parent);
+    print STDERR "done alt_generic_posthook fixes\n" if $RPM::Source::Transform::verbose>1;
     #map {print STDERR $_->describe(1)} $spec->get_sections();
 }
 
