@@ -622,3 +622,60 @@ deleting SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
 deleting SRPMS/felix-1.0.3-1.jpp6.src.rpm
 deleting SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
+----------------------------------------------
+
+6.0/generic/devel
+_____________________
+receiving file list ... done
+SRPMS/apache-commons-csv-1.0-0.r1086196.1.jpp6.src.rpm
+SRPMS/apache-commons-messenger-1.0-7.jpp6.src.rpm
+SRPMS/ldap-client-api-0.1-1.jpp6.src.rpm
+SRPMS/servicemix-specs-1.7.0-2.jpp6.src.rpm
+SRPMS/spring-security-3.0.3-1.jpp6.src.rpm
+SRPMS/spring-ws-1.5.3-1.jpp6.src.rpm
+SRPMS/spring3-3.0.5-2.jpp6.src.rpm
+SRPMS/tiles-2.1.3-1.jpp6.src.rpm
+SRPMS/xws-security-2.0-1.jpp6.src.rpm
+
+sent 275278 bytes  received 160528848 bytes  826756.43 bytes/sec
+total size is 1801592178  speedup is 11.20
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+receiving file list ... done
+SRPMS/
+SRPMS/activemq5-5.3.1-1.jpp6.src.rpm
+SRPMS/apacheds-1.5.7-1.jpp6.src.rpm
+SRPMS/apacheds-shared-0.9.19-1.jpp6.src.rpm
+SRPMS/gmaven-1.3-4.jpp6.src.rpm
+SRPMS/jain-sip-1.2.118-3.jpp6.src.rpm
+SRPMS/jaxws-2.0-api-1.3-1.jpp6.src.rpm
+SRPMS/jmock2-2.5.1-1.jpp6.src.rpm
+SRPMS/maven-wagon-1.0-0.7.b7.3.jpp6.src.rpm
+SRPMS/plexus-io-1.0-0.a1.2.jpp6.src.rpm
+SRPMS/plexus-maven-plugin-1.3.8-1.jpp6.src.rpm
+SRPMS/plexus-tools-1.0.10-4.jpp6.src.rpm
+deleting SRPMS/plexus-tools-1.0.10-3.jpp6.src.rpm
+deleting SRPMS/plexus-maven-plugin-1.3.5-7.jpp6.src.rpm
+deleting SRPMS/maven-wagon-1.0-0.7.b7.2.jpp6.src.rpm
+deleting SRPMS/gmaven-1.3-3.jpp6.src.rpm
+_____________________
+
+6.0/generic/devel
+_____________________
+receiving file list ... done
+SRPMS/activesoap-1.0-3.jpp6.src.rpm
+SRPMS/servicemix-utils-1.2.1-2.jpp6.src.rpm
+SRPMS/smack2-2.2.1-1.jpp6.src.rpm
+SRPMS/tranql-connector-generic-1.7-1.jpp6.src.rpm
+SRPMS/ws-soap-2.3.1-6.jpp6.src.rpm
+SRPMS/ws-wsif-2.1.0-0.rc1.2.jpp6.src.rpm
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+SRPMS/jgoodies-common-1.2.0-3.jpp6.src.rpm
+SRPMS/jgoodies-forms-1.4.1-2.jpp6.src.rpm
+deleting SRPMS/jgoodies-forms-1.3.0-1.jpp6.src.rpm
+_____________________
