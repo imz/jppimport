@@ -3,7 +3,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package')->unshift_body('BuildRequires: maven-shared-verifier'."\n");
-    $jpp->add_patch('maven-surefire-2.3.1-alt-null-project.patch');
+    $jpp->add_patch('maven-surefire-2.3.1-alt-null-project.patch',STRIP=>1);
 }
 
 __END__
@@ -20,14 +20,3 @@ __END__
 >       mvn-jpp  -e -s settings.xml install:install-file -DgroupId=org.testng -DartifactId=testng -Dversion=5.7 -Dclassifier=jdk15 -Dpackaging=jar -Dfile=/usr/share/java/testng-jdk15.jar
 
 
-
-# jpp 5.0
-require 'set_without_maven.pl';
-
-push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-#    $jpp->get_section('package')->subst(qr'^Requires: maven2-bootstrap','#Requires: maven2');
-    $jpp->get_section('package')->unshift_body('BuildRequires: plexus-archiver'."\n");
-    $jpp->add_patch('maven-surefire-2.3.1-alt-null-project.patch');
-
-}

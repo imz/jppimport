@@ -679,3 +679,85 @@ SRPMS/jgoodies-common-1.2.0-3.jpp6.src.rpm
 SRPMS/jgoodies-forms-1.4.1-2.jpp6.src.rpm
 deleting SRPMS/jgoodies-forms-1.3.0-1.jpp6.src.rpm
 _____________________
+_____________________
+
+6.0/generic/devel
+_____________________
+receiving file list ... done
+SRPMS/apache-commons-jexl2-2.0.1-1.jpp6.src.rpm
+SRPMS/apache-cxf20-2.0.13-1.jpp6.src.rpm
+SRPMS/apache-cxf21-2.1.10-1.jpp6.src.rpm
+SRPMS/apache-cxf22-2.2.12-1.jpp6.src.rpm
+SRPMS/grizzly17-1.7.3.3-2.jpp6.src.rpm
+SRPMS/isorelax-jaxp-bridge-1.0-1.jpp6.src.rpm
+SRPMS/istack-commons-maven-plugin-0.1-1.jpp6.src.rpm
+SRPMS/jdependency-0.6-2.jpp6.src.rpm
+SRPMS/jsendnsca-core-1.3.1-1.jpp6.src.rpm
+SRPMS/jsr311-1.0-api-1.0-4.jpp6.src.rpm
+SRPMS/maven-shared-artifact-resolver-1.0-1.jpp6.src.rpm
+SRPMS/maven2-plugin-shade-1.4-1.jpp6.src.rpm
+SRPMS/netty3-3.2.4-1.jpp6.src.rpm
+SRPMS/openejb-javaee-5.0-apis-3-1.jpp6.src.rpm
+SRPMS/openejb30-3.0.3-1.jpp6.src.rpm
+SRPMS/quickfixj-1.5.0-1.jpp6.src.rpm
+SRPMS/servicemix-specs-1.7.0-3.jpp6.src.rpm
+SRPMS/servicemix3-3.3.2-2.jpp6.src.rpm
+SRPMS/snmp4j-1.11.3-1.jpp6.src.rpm
+SRPMS/swizzle-dependency-report-plugin-1.0.3-1.jpp6.src.rpm
+SRPMS/swizzle-stream-1.0.3-1.jpp6.src.rpm
+deleting RPMS/servicemix-specs-javadoc-1.7.0-2.jpp6.noarch.rpm
+deleting RPMS/servicemix-specs-1.7.0-2.jpp6.noarch.rpm
+deleting SRPMS/servicemix-specs-1.7.0-2.jpp6.src.rpm
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+receiving file list ... done
+SRPMS/antlr-2.7.7-13.jpp6.src.rpm
+SRPMS/aopalliance-1.0-7.jpp6.src.rpm
+SRPMS/apache-commons-io-1.4-13.jpp6.src.rpm
+SRPMS/async-http-client-1.6.1-2.jpp6.src.rpm
+SRPMS/ecj3-3.7-1.jpp6.src.rpm
+SRPMS/jcifs-1.3.16-1.jpp6.src.rpm
+SRPMS/jdom-1.1.1-4.jpp6.src.rpm
+SRPMS/jetty6-6.1.26-1.jpp6.src.rpm
+SRPMS/jline-1.0-2.jpp6.src.rpm
+SRPMS/maven-plugin-bundle-2.0.0-12.jpp6.src.rpm
+SRPMS/mojo-signatures-1.1-0.5.svn11457.1.jpp6.src.rpm
+SRPMS/netty-3.2.4-1.jpp6.src.rpm
+SRPMS/plexus-interpolation-1.14-1.jpp6.src.rpm
+SRPMS/plexus-tools-1.0.10-5.jpp6.src.rpm
+SRPMS/plexus-utils-1.5.15-3.jpp6.src.rpm
+SRPMS/protobuf-java-2.3.0-5.jpp6.src.rpm
+SRPMS/proxool-0.9.1-1.jpp6.src.rpm
+SRPMS/slf4j-1.6.1-5.jpp6.src.rpm
+SRPMS/sun-istack-commons-1.0-3.jpp6.src.rpm
+SRPMS/sun-jaxb-2.1-impl-2.1.13-1.jpp6.src.rpm
+SRPMS/ws-commons-XmlSchema-1.4.7-1.jpp6.src.rpm
+SRPMS/wss4j-1.5.10-1.jpp6.src.rpm
+SRPMS/xbean-3.7-3.jpp6.src.rpm
+deleting SRPMS/xbean-3.7-2.jpp6.src.rpm
+deleting SRPMS/wss4j-1.5.8-7.jpp6.src.rpm
+deleting SRPMS/ws-commons-XmlSchema-1.4.5-2.jpp6.src.rpm
+deleting SRPMS/slf4j-1.6.1-4.jpp6.src.rpm
+deleting SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
+deleting SRPMS/plexus-utils-1.5.15-2.jpp6.src.rpm
+deleting SRPMS/plexus-tools-1.0.10-4.jpp6.src.rpm
+deleting SRPMS/plexus-interpolation-1.12-1.jpp6.src.rpm
+deleting SRPMS/maven-plugin-bundle-2.0.0-11.jpp6.src.rpm
+deleting SRPMS/jline-0.9.94-2.jpp6.src.rpm
+deleting SRPMS/jetty6-6.1.22-2.jpp6.src.rpm
+deleting SRPMS/jdom-1.1.1-2.jpp6.src.rpm
+deleting SRPMS/ecj3-3.6-2.jpp6.src.rpm
+deleting SRPMS/apache-commons-io-1.4-12.jpp6.src.rpm
+deleting SRPMS/aopalliance-1.0-5.jpp6.src.rpm
+deleting SRPMS/antlr-2.7.7-1.jpp6.src.rpm
+-----------------------------------------
+SRPMS/jackrabbit-parent-5-1.jpp6.src.rpm
+SRPMS/pdfbox-0.7.3-3.jpp6.src.rpm
+SRPMS/plexus-compiler-1.8.2-1.jpp6.src.rpm
+deleting SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
+-----------------------------------------
+SRPMS/jboss-servlet-api_3.0_spec-1.0.0-6.jpp6.src.rpm
+SRPMS/jboss-specs-parent-1.0.0-1.Beta2.jpp6.src.rpm
+-----------------------------------------

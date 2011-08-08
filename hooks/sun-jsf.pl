@@ -3,8 +3,8 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: jetty6-core'."\n");
-    $jpp->add_patch('sun-jsf-alt-add-jetty6.patch');
-    $jpp->add_patch('sun-jsf-1.2.04-alt-fix-build-with-jetty6.1.14.patch');
+    $jpp->add_patch('sun-jsf-alt-add-jetty6.patch',STRIP=>1);
+    $jpp->add_patch('sun-jsf-1.2.04-alt-fix-build-with-jetty6.1.14.patch',STRIP=>1);
 }
 
 1;

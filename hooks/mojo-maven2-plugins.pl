@@ -7,12 +7,9 @@ sub {
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
     $jpp->get_section('package','-n mojo-maven2-plugin-cobertura')->push_body('Requires: cobertura'."\n");
 
-    $jpp->add_patch('mojo-maven2-plugins-17-javancss-maven-plugin-alt-javancss-3x-alt.patch',
-		    STRIP=>0);#, NUMBER=>233);
-    $jpp->add_patch('mojo-maven2-plugins-mojo-antlr-plugin-alt-doxia-update.patch',
-		    STRIP=>1);#, NUMBER=>234);
-    $jpp->add_patch('mojo-maven2-plugins-17-alt-delicious-maven-plugin-add-log4j-dep.patch',
-		    STRIP=>1);#, NUMBER=>235);
+    $jpp->add_patch('mojo-maven2-plugins-17-javancss-maven-plugin-alt-javancss-3x-alt.patch', STRIP=>0);#, NUMBER=>233);
+    $jpp->add_patch('mojo-maven2-plugins-mojo-antlr-plugin-alt-doxia-update.patch', STRIP=>1);#, NUMBER=>234);
+    $jpp->add_patch('mojo-maven2-plugins-17-alt-delicious-maven-plugin-add-log4j-dep.patch', STRIP=>1);#, NUMBER=>235);
 };
 
 __END__

@@ -13,4 +13,4 @@ sub {
 
 __END__
 # no network; hm... maybe altspecific...
-#$jpp->add_patch('mx4j-3.0.1-alt-local-xsl-stylesheets.patch');
+#$jpp->add_patch('mx4j-3.0.1-alt-local-xsl-stylesheets.patch', STRIP=>1);

@@ -11,7 +11,7 @@ push @SPECHOOKS, sub {
     #$jpp->get_section('package','')->unshift_body('BuildRequires: spring jakarta-commons-discovery myfaces-core11-impl javassist'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: jbossretro spring-all'."\n");
 
-    $jpp->add_patch('jboss-4.0.3SP1-alt-ant17support.patch');
+    $jpp->add_patch('jboss-4.0.3SP1-alt-ant17support.patch',STRIP=>1);
     $jpp->add_patch('jboss4-4.0.4-alt-tomcat5.5.31.patch',STRIP=>1);
 
 
@@ -22,7 +22,7 @@ push @SPECHOOKS, sub {
 
     # this hack is due to the bug in blackdown
     # we build with 5.0 but pretend to build with 1.4 (as there are errors)
-    $jpp->add_patch('jboss4-4.0.3.1-alt-force-jdk14-only.patch');
+    $jpp->add_patch('jboss4-4.0.3.1-alt-force-jdk14-only.patch',STRIP=>1);
 
     # out of memory errors
     $jpp->get_section('build')->subst(qr'-Xmx128','-Xmx512');
