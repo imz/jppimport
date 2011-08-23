@@ -4,7 +4,7 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     my $oldname = $jpp->get_section('package','')->get_tag('Name');
-    $jpp->rename_package($oldname.'-repolib');
+    $jpp->rename_main_package($oldname.'-repolib');
     foreach my $section ($jpp->get_sections()) {
 	my $type = $section->get_type();
 	if ($type=~/^(pre|post|preun|postun|trigger.*)$/) {
