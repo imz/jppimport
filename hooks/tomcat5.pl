@@ -104,7 +104,7 @@ Apache Tomcat parent pom for maven2
     $jpp->get_section('package','')->push_body('Provides: %{name}-server = %{version}-%{release}'."\n");
     $jpp->get_section('package','')->push_body('Obsoletes: %{name}-server <= 5.5.16-alt1.1'."\n");
     $jpp->get_section('package','admin-webapps')->push_body('Provides: %{name}-admin-webapps = %{version}-%{release}'."\n");
-    $jpp->raw_rename_package('admin-webapps','webapps-admin');
+    $jpp->rename_package('admin-webapps','webapps-admin');
     # #14415
     $jpp->get_section('description','')->subst(qr'We invite you to participate in this open development project. To','');
     $jpp->get_section('description','')->subst(qr'learn more about getting involved, click here.','');

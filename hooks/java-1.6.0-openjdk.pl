@@ -153,7 +153,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
-    $jpp->raw_rename_package('plugin','-n mozilla-plugin-%name');
+    $jpp->rename_package('plugin','-n mozilla-plugin-%name');
     $jpp->get_section('package','devel')->push_body(q!
 %if_enabled javaws
 %package javaws
