@@ -11,7 +11,7 @@ sub {
 	sub {
 	    my $main = $jpp->get_section('package','');
 	    my @body;
-	    foreach my $line (@{$main->get_body()}) {
+	    foreach my $line (@{$main->get_bodyref()}) {
 		if ($line=~/^Source\d*:/) {
 		    $line=~s/\%/\%\%/g;
 		    $jpp->set_applied();

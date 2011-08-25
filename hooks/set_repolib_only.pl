@@ -21,7 +21,7 @@ sub {
 		$section->get_trigger_condition()
 		);
 	    } else {
-		$section->get_body()->[0]='%files'."\n";
+		$section->get_bodyref()->[0]='%files'."\n";
 	    }
 	}
     }

@@ -8,7 +8,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: velocity14'."\n");
 
     # unshift_body after each; something like filter_body {sub}
-    my @old_body=@{$jpp->get_section('build')->get_body()};
+    my @old_body=@{$jpp->get_section('build')->get_bodyref()};
     my @body;
     while (my $line=shift @old_body) {
 	push @body, $line;

@@ -11,7 +11,7 @@ push @PREHOOKS, sub {
 sub __subst_systemtap {
     my ($section)=@_;
     my @newbody;
-    my @oldbody=@{$section->get_body()};
+    my @oldbody=@{$section->get_bodyref()};
     my $i;
     for ($i=0; $i<@oldbody;$i++) {
 	my $line=$oldbody[$i];

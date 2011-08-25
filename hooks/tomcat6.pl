@@ -23,10 +23,10 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
 
     # TODO: posttrans is not supported, so hack around
     my $posttrans=$jpp->get_section('posttrans','');
-    $posttrans->set_body([map {"# ".$_} map {s!\%posttrans!\%\%posttrans!,$_}  @{$posttrans->get_body()}]);
+    $posttrans->set_body([map {"# ".$_} map {s!\%posttrans!\%\%posttrans!,$_}  @{$posttrans->get_bodyref()}]);
     my $presection=$jpp->get_section('pre','');
     my @new_body;
-    foreach my $line (@{$presection->get_body()}) {
+    foreach my $line (@{$presection->get_bodyref()}) {
 	push @new_body, $line;
 	last if $line=~/^# Save the conf, app, and lib dirs/;
     }
