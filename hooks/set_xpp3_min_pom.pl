@@ -5,7 +5,7 @@ sub {
     my ($jpp, $alt) = @_;
     # xpp3_min is referred in xstream -> breaks xsite build
     #maven2/poms/JPP-xstream-parent.pom:        <version>1.1.4c</version>
-    $jpp->get_section('build')->unshift_body_before(q!
+    $jpp->get_section('build')->unshift_body2_before(q!
 mvn-jpp \
         -e \
         -s $(pwd)/settings.xml \

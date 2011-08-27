@@ -11,7 +11,7 @@ BuildRequires: java-devel = 1.4.2
     $jpp->get_section('package')->unshift_body('BuildRequires: jaxen jakarta-oro'."\n");
     $jpp->get_section('prep')->push_body('ln -sf $(build-classpath jaxen) lib/'."\n");
     $jpp->get_section('build')->unshift_body('export CLASSPATH=$(build-classpath jaxen oro)'."\n");
-#    $jpp->get_section('build')->unshift_body_after('-Dmaven.test.skip=true \\', qr'^maven');
+#    $jpp->get_section('build')->unshift_body2_after('-Dmaven.test.skip=true \\', qr'^maven');
 };
 
 __END__

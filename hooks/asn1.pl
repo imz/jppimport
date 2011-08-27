@@ -3,7 +3,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->add_patch('asn1-0.3.3-alt-project.xml.patch', STRIP=>1);
-    $jpp->get_section('build')->unshift_body_before(q!
+    $jpp->get_section('build')->unshift_body2_before(q!
 mkdir -p .maven/repository/JPP/plugins/
 ln -s /usr/share/java/maven-plugins/maven-site-plugin.jar .maven/repository/JPP/plugins/
 !, qr'^maven');

@@ -3,7 +3,7 @@
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 ##    $jpp->get_section('package','')->unshift_body('BuildRequires: xpp3 xpp3-minimal'."\n");
-#    $jpp->get_section('build')->unshift_body_before(q'
+#    $jpp->get_section('build')->unshift_body2_before(q'
 #mvn-jpp install:install-file \
 #    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
 #    -DgroupId=xpp3 \

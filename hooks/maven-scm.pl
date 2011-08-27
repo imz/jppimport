@@ -10,7 +10,7 @@ push @SPECHOOKS, sub {
     #$jpp->get_section('package','',)->push_body('BuildRequires: saxpath'."\n");
 
     # added symlink maven-scm.jar in %{_datadir}/maven2/plugins
-    $jpp->get_section('install')->unshift_body_after('(cd $RPM_BUILD_ROOT%{_datadir}/maven2/plugins && for jar in *-%{namedversion}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{namedversion}||g"`; done)'."\n",
+    $jpp->get_section('install')->unshift_body2_after('(cd $RPM_BUILD_ROOT%{_datadir}/maven2/plugins && for jar in *-%{namedversion}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{namedversion}||g"`; done)'."\n",
 	qr'add_to_maven_depmap org.apache.maven.plugins maven-scm-plugin');
 
 };

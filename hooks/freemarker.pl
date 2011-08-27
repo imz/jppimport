@@ -12,7 +12,7 @@ popd
 
     # useful anyway :) RH compatibility.
     # compat mapping 
-    $jpp->get_section('install')->unshift_body_after(
+    $jpp->get_section('install')->unshift_body2_after(
 	'# fedora compatibility
 %add_to_maven_depmap org.freemarker %{name} %{version} JPP %{name}
 ', 'add_to_maven_depmap');

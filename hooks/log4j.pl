@@ -6,7 +6,7 @@ sub {
     my ($jpp, $alt) = @_;
     &add_missingok_config($jpp,'/etc/chainsaw.conf');
     $jpp->get_section('build')->subst(qr'jaxp.jaxp.jar.jar', 'jaxp.jaxp.jar');
-    $jpp->get_section('install')->unshift_body_after(q!sed -i "s/1.2.14-brew/%{version}-brew/g" %{buildroot}%{repodir}/component-info.xml
+    $jpp->get_section('install')->unshift_body2_after(q!sed -i "s/1.2.14-brew/%{version}-brew/g" %{buildroot}%{repodir}/component-info.xml
 !,qr'__sed.+repodir.+/component-info.xml');
 }
 __END__

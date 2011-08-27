@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('install')->unshift_body_after(q!
+    $jpp->get_section('install')->unshift_body2_after(q!
 %{__sed} -i 's/project name=""/project name="%{name}"/g' %{buildroot}%{repodir}/component-info.xml
 !,qr'sed.+repodir.+/component-info.xml');
 }

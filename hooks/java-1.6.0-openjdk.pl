@@ -132,13 +132,13 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # TODO: fix caserts!!!
     if ('with static caserts') {
 	# now there is a check %if 0%{?fedora} > 9; use given
-	#$jpp->get_section('install')->unshift_body_before('if /bin/false; then'."\n",qr'# Install cacerts symlink.');
-	#$jpp->get_section('install')->unshift_body_before('fi'."\n",qr'# Install extension symlinks.');
+	#$jpp->get_section('install')->unshift_body2_before('if /bin/false; then'."\n",qr'# Install cacerts symlink.');
+	#$jpp->get_section('install')->unshift_body2_before('fi'."\n",qr'# Install extension symlinks.');
     }
 
     # desktop-file-install is crying! TODO: replace with ALT
-    $jpp->get_section('install')->unshift_body_after('install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n",qr'for e in jconsole policytool');
-    $jpp->get_section('install')->unshift_body_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
+    $jpp->get_section('install')->unshift_body2_after('install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n",qr'for e in jconsole policytool');
+    $jpp->get_section('install')->unshift_body2_after('install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n",qr'cp javaws.png');
     $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
 
     $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
@@ -428,8 +428,8 @@ popd
 	$jpp->get_section('package','')->unshift_body(q'%def_enable visualvm'."\n");
 	$jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
 	# to disable visualvm w/o netbeans
-	$jpp->get_section('files','devel')->unshift_body_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
-	$jpp->get_section('files','devel')->unshift_body_after('%endif'."\n",qr'visualvm.desktop');
+	$jpp->get_section('files','devel')->unshift_body2_before('%if_enabled visualvm'."\n",qr'visualvm.desktop');
+	$jpp->get_section('files','devel')->unshift_body2_after('%endif'."\n",qr'visualvm.desktop');
 	$jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
     }
 

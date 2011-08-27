@@ -4,7 +4,7 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jms-1.1-api javacc3'."\n");
-    $jpp->get_section('build')->unshift_body_before(q!
+    $jpp->get_section('build')->unshift_body2_before(q!
 mvn-jpp \
         -e \
         -s ${M2SETTINGS} \

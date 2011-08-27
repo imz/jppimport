@@ -12,7 +12,7 @@ sub {
     # TODO + subst in activemq4-jpp-depmap.xml    
     $jpp->get_section('package','xmpp')->subst(qr'Requires: smack','Requires: smack1');
 
-    $jpp->get_section('build')->unshift_body_before(q!
+    $jpp->get_section('build')->unshift_body2_before(q!
 mvn-jpp \
         -e \
         -s $SETTINGS \

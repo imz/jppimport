@@ -113,7 +113,7 @@ sh ./relink_bootstrap_maven_jars.sh
 ~."\n");
 
     # we hack bootsrap repo at code above; tar xzf overwrites our hacks :(
-    $jpp->get_section('install')->unshift_body_after('sh ./relink_bootstrap_maven_jars.sh'."\n", qr'tar xzf \%{SOURCE4}');
+    $jpp->get_section('install')->unshift_body2_after('sh ./relink_bootstrap_maven_jars.sh'."\n", qr'tar xzf \%{SOURCE4}');
 }
 
 };
