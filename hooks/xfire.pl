@@ -31,7 +31,7 @@ sub {
 
 }
 __END__
-unshift_body2_after
+unshift_body_after
 qr'export DEPMAP'
 547a548,556
 > mvn-jpp -e \

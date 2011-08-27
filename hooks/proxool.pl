@@ -8,8 +8,6 @@ sub {
     # todo: remove when hibernate3 will be built
     $jpp->get_section('package','')->unshift_body('%define _without_hibernate 1'."\n");
     $jpp->get_section('prep')->subst(qr'^%patch4','#%patch4');
-    # end to remove
-    #$jpp->get_section('build')->unshift_body2_after('ln -sf $(build-classpath checkstyle) .'."\n", qr'^pushd lib');
     # hack until hibernate3
     $jpp->get_section('build')->subst(qr'build-classpath hibernate3','build-classpath checkstyle');
 

@@ -5,7 +5,7 @@ sub {
     my ($jpp, $alt) = @_;
     # xpp3_min is referred in xstream -> breaks xsite build
     #maven2/poms/JPP-xstream-parent.pom:        <version>1.1.4c</version>
-    $jpp->get_section('build')->unshift_body2_before(q!
+    $jpp->get_section('build')->unshift_body_before(qr'^\s*mvn-jpp',q!
 mvn-jpp \
         -e \
         -s $(pwd)/settings.xml \
@@ -15,5 +15,5 @@ mvn-jpp \
         install:install-file -DgroupId=xpp3 -DartifactId=xpp3_min \
         -Dversion=1.1.4c -Dpackaging=jar -Dfile=$(build-classpath xpp3)
 
-!,qr'^\s*mvn-jpp');
+!);
 }

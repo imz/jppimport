@@ -9,10 +9,11 @@ push @SPECHOOKS, sub {
 # ?
 #    $jpp->get_section('package','')->push_body('BuildRequires: maven2-plugin-shade'."\n");
     # to fix apacheds build due to shadowed junit
-    $jpp->get_section('build')->unshift_body2_after('# alt; remove embedded junit
+    $jpp->get_section('build')->unshift_body_after(qr'rm -rf META-INF',
+'# alt; remove embedded junit
 rm -rf junit org/junit org/hamcrest
 # end alt
-',qr'rm -rf META-INF');
+');
 
     $jpp->get_section('package','')->subst_if('jakarta-commons-collections32','jakarta-commons-collections',qr'Requires:');
 };

@@ -5,7 +5,7 @@ sub {
     my ($jpp, $alt) = @_;
 };
 
-__DONE__
+__END__
 addclasspath()
 {
 for arg in "$@"; do

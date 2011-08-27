@@ -5,9 +5,8 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: jetty6-core'."\n");
     $jpp->add_patch('sun-jsf-alt-add-jetty6.patch',STRIP=>1);
     $jpp->add_patch('sun-jsf-1.2.04-alt-fix-build-with-jetty6.1.14.patch',STRIP=>1);
-}
+};
 
-1;
 __END__
 @@ -162,6 +167,8 @@
  ln -sf $(build-classpath jetty6/annotations/jetty6-annotations) dependencies/jetty-6.1.2rc0/lib/annotations/jetty-annotations-6.1.2rc0.jar

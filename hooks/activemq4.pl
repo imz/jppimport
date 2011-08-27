@@ -12,7 +12,7 @@ sub {
     # TODO + subst in activemq4-jpp-depmap.xml    
     $jpp->get_section('package','xmpp')->subst(qr'Requires: smack','Requires: smack1');
 
-    $jpp->get_section('build')->unshift_body2_before(q!
+    $jpp->get_section('build')->unshift_body_before(qr'mvn-jpp',q!
 mvn-jpp \
         -e \
         -s $SETTINGS \
@@ -30,7 +30,7 @@ mvn-jpp \
         -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
         install:install-file -DgroupId=rome -DartifactId=rome \
         -Dversion=0.8 -Dpackaging=jar -Dfile=$(build-classpath rome-0.9)
-!,qr'mvn-jpp');
+!);
 
 
 

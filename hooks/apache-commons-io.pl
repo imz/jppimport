@@ -6,9 +6,8 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
     # compat mapping 
-    $jpp->get_section('install')->unshift_body2_after(
-	'%add_to_maven_depmap org.apache.commons %{short_name} %{version} JPP %{name}'."\n",
-	'add_to_maven_depmap');
+    $jpp->get_section('install')->unshift_body_after('add_to_maven_depmap',
+	'%add_to_maven_depmap org.apache.commons %{short_name} %{version} JPP %{name}'."\n");
 }
 
 __END__
