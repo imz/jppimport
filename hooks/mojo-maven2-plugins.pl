@@ -16,10 +16,10 @@ __END__
 
 #    $jpp->get_section('package','')->subst(qr'BuildRequires: batik','BuildRequires: xmlgraphics-batik');
 
-    $jpp->get_section('build')->push_body2_after('# javacc
+    $jpp->get_section('build')->push_body_after(qr'%patch2','# javacc
 mkdir -p $MAVEN_REPO_LOCAL/javacc
 ln -s $(build-classpath javacc) $MAVEN_REPO_LOCAL/javacc/javacc.jar
-', qr'/tanukisoft/wrapper-delta-pack.jar');
+');
 
 
     # hacks for missing deps
