@@ -2,7 +2,6 @@
 
 # until we fully translate to java6
 require 'set_maven1_target_14.pl';
-require 'set_apache_translation.pl';
 
 # 6.0 hook
 push @SPECHOOKS, 

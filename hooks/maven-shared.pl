@@ -2,8 +2,6 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst_if(qr'maven-plugin-modello','modello-maven-plugin',qr'Requires:');
-
     # remove when deprecated!
     #maven-shared-8-0.p8.8jpp6.src.rpm 
     $jpp->get_section('prep')->unshift_body('

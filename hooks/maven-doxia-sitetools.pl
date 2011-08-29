@@ -2,7 +2,6 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst_if('maven-plugin-modello','modello-maven-plugin',qr'Requires:');
     $jpp->get_section('package','')->push_body('BuildRequires: itext'."\n");
 };
 
