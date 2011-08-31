@@ -46,7 +46,6 @@ avalon-excalibur
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi
 ;
-push %ORIGIN2DESTMAP, qw//;
 
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
