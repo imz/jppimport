@@ -15,7 +15,6 @@ use RPM::Source::Convert::JPackage2ALT;
 our @ISA=q/RPM::Source::Convert/;
 
 my ($jvm,$nozip,$nobz2);
-my $usemavenplugins=0;
 $RPM::Source::Transform::cleanup=0;
 $RPM::Source::Transform::packager='auto';
 $RPM::Source::Transform::nextrel='jppimport';
@@ -39,7 +38,6 @@ if ($jvm and $jvm =~ /^4/) {
 } elsif ($jvm and $jvm =~ /^6/) {
     $newjava = '6';
 }
-$usemavenplugins=1 if $RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm=~m!/1.7/generic/!;
 
 $converter->transform(
     '-specargs' => [
@@ -47,7 +45,6 @@ $converter->transform(
 	'CONVERT::JPACKAGE::JVM'=>$jvm,
 	'CONVERT::JPACKAGE::NOBZ2'=>$nobz2, 
 	'CONVERT::JPACKAGE::NOZIP'=>$nozip, 
-	'CONVERT::JPACKAGE::USEMAVENPLAGINS'=>$usemavenplugins,
     ]
 );
 

@@ -46,11 +46,8 @@ avalon-excalibur
 #apache-axiom by ws-commons-axiom
 #neethi by ws-commons-neethi
 ;
-%ORIGIN2DESTMAP=qw/
-jal sg-jal
-smc jsmc
-gossip sonatype-gossip
-/;
+push %ORIGIN2DESTMAP, qw//;
+
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
 my @DESTSKIPEXTRA=qw/jpackage-utils/;
@@ -76,7 +73,9 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 	"nobz2" => \$nobz2,
 	"nozip" => \$nozip,
 	"target=s"=> \$target,
-]);
+],
+    '-originrepo' => 'jpackage',
+);
 my $verbose=0;
 $convert->run();
 

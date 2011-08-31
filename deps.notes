@@ -776,4 +776,11 @@ deleting SRPMS/atinject-1-2.20100611svn86.jpp6.src.rpm
 -----------------------------------------
 SRPMS/microemulator-2.0.4-1.jpp6.src.rpm
 -----------------------------------------
+SRPMS/xmlgraphics-batik-1.7-14.jpp6.src.rpm
+SRPMS/xmlgraphics-commons-1.4-4.jpp6.src.rpm
+SRPMS/xmlgraphics-fop-1.0-4.jpp6.src.rpm
+deleting SRPMS/xmlgraphics-fop-1.0-3.jpp6.src.rpm
+deleting SRPMS/xmlgraphics-commons-1.4-1.jpp6.src.rpm
+deleting SRPMS/xmlgraphics-batik-1.7-7.jpp6.src.rpm
+-----------------------------------------
 
