@@ -25,6 +25,7 @@ push @RPM::Source::Transform::DEFAULT_OPTIONS,
     "nobz2"   => \$nobz2,
     "nozip"   => \$nozip;
 $RPM::Source::Transform::defaultchangelog='- converted from JPackage by jppimport script';
+$RPM::Source::Convert::distromap_args{'-originrepo'}='jpackage';
 
 my $converter=RPM::Source::Convert::JPPImport->new();
 $converter->process_options();
@@ -40,7 +41,6 @@ if ($jvm and $jvm =~ /^4/) {
 }
 
 $converter->transform(
-    '-originrepo' => 'jpackage',
     '-specargs' => [
 	'CONVERT::GENERIC::NOINFO'=>0,
 	'CONVERT::JPACKAGE::JVM'=>$jvm,
