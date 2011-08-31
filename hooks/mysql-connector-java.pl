@@ -22,7 +22,7 @@ popd
 find %buildroot%_datadir -name README.txt -delete
 ');
 
-    # E: Âåðñèÿ >='0:1.0.1-0.a.1' äëÿ 'jta' íå íàéäåíà
+    # E: Ð’ÐµÑ€ÑÐ¸Ñ >='0:1.0.1-0.a.1' Ð´Ð»Ñ 'jta' Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°
     $jpp->get_section('package','')->subst_if(qr'0:1.0.1-0.a.1','0:1.0.1',qr'Requires:');
 
 };

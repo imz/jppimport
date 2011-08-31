@@ -4,8 +4,8 @@ push @SPECHOOKS,
 sub  {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->push_body('BuildRequires: dos2unix'."\n");
-#Ýòî ÷èñòûé #!/bin/sh ñêðèïò, â êîòîðîì äîñîâñêèå îêîí÷àíèÿ ñòðîê \r\n.
-#Èìåííî èç-çà ýòîãî øåëë íå ìîæåò åãî ðàñïàðñèòü.
+#Ð­Ñ‚Ð¾ Ñ‡Ð¸ÑÑ‚Ñ‹Ð¹ #!/bin/sh ÑÐºÑ€Ð¸Ð¿Ñ‚, Ð² ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¼ Ð´Ð¾ÑÐ¾Ð²ÑÐºÐ¸Ðµ Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ñ ÑÑ‚Ñ€Ð¾Ðº \r\n.
+#Ð˜Ð¼ÐµÐ½Ð½Ð¾ Ð¸Ð·-Ð·Ð° ÑÑ‚Ð¾Ð³Ð¾ ÑˆÐµÐ»Ð» Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ ÐµÐ³Ð¾ Ñ€Ð°ÑÐ¿Ð°Ñ€ÑÐ¸Ñ‚ÑŒ.
     $jpp->get_section('install')->push_body(q{
 find $RPM_BUILD_ROOT -name '*.sh' -print0 | xargs -0 dos2unix
 grep -r -m 1 -l -Z '^#!/bin/sh' $RPM_BUILD_ROOT%_bindir | xargs -0 dos2unix

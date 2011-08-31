@@ -20,7 +20,7 @@ push @SPECHOOKS, sub {
 
 }
 __END__
-предупреждение: Macro %__fe_groupadd not found
-предупреждение: Macro %__fe_useradd not found
-предупреждение: Macro %__fe_userdel not found
-предупреждение: Macro %__fe_groupdel not found
+РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ: Macro %__fe_groupadd not found
+РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ: Macro %__fe_useradd not found
+РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ: Macro %__fe_userdel not found
+РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ: Macro %__fe_groupdel not found

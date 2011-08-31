@@ -10,8 +10,8 @@ sub {
     # for 29
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
 
-    # Следующие пакеты имеют неудовлетворенные зависимости:
-    # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
+    # РЎР»РµРґСѓСЋС‰РёРµ РїР°РєРµС‚С‹ РёРјРµСЋС‚ РЅРµСѓРґРѕРІР»РµС‚РІРѕСЂРµРЅРЅС‹Рµ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё:
+    # maven2: РўСЂРµР±СѓРµС‚: /etc/mavenrc РЅРѕ РїР°РєРµС‚ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
     &add_missingok_config($jpp,'/etc/mavenrc');
 
     if ($bootstrap) {

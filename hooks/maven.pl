@@ -7,8 +7,8 @@ sub {
     my ($jpp, $alt) = @_;
 
     $jpp->get_section('install')->push_body('
-#Требует: /usr/share/maven/home/plugins/maven-changes-plugin-1.7.jar
-#Требует: /usr/share/maven/home/plugins/maven-jcoverage-plugin-1.1-SNAPSHOT.jar
+#РўСЂРµР±СѓРµС‚: /usr/share/maven/home/plugins/maven-changes-plugin-1.7.jar
+#РўСЂРµР±СѓРµС‚: /usr/share/maven/home/plugins/maven-jcoverage-plugin-1.1-SNAPSHOT.jar
 #broken symlinks (jpp 5.0/6.0 to report)
 #/usr/share/maven/repository/maven/jars/maven-changes-plugin-1.7.jar
 #/usr/share/maven/repository/maven/plugins/maven-jcoverage-plugin-1.0.9.jar
@@ -32,13 +32,13 @@ sed -i 's,<jar>plexus/containers-component-api.jar</jar>,<jar>plexus/containers-
 #:0}%{!?_without_bootstrap:%{?_bootstrap:%{_bootstrap}}%{!?_bootstrap:0}}}
     $jpp->get_section('package','')->subst(qr'%define bootstrap %{\?_with_bootstrap:1}%{!\?_with_bootstrap:%{\?_without_bootstrap\s*','%define bootstrap %{?_with_bootstrap:1}%{!?_with_bootstrap:%{?_without_bootstrap');
 
-#Следующие пакеты имеют неудовлетворенные зависимости:
-#  maven: Требует: /etc/mavenrc но пакет не может быть установлен
+#РЎР»РµРґСѓСЋС‰РёРµ РїР°РєРµС‚С‹ РёРјРµСЋС‚ РЅРµСѓРґРѕРІР»РµС‚РІРѕСЂРµРЅРЅС‹Рµ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё:
+#  maven: РўСЂРµР±СѓРµС‚: /etc/mavenrc РЅРѕ РїР°РєРµС‚ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
     &add_missingok_config($jpp,'/etc/mavenrc');
 
 # hack, according to current policy :(
 #l ./share/maven/repository/javadoc/jars
-#lrwxrwxrwx 1 igor igor 37 Мар 19 20:57 tools.jar -> /usr/lib/jvm/java-1.5.0/lib/tools.jar
+#lrwxrwxrwx 1 igor igor 37 РњР°СЂ 19 20:57 tools.jar -> /usr/lib/jvm/java-1.5.0/lib/tools.jar
     $jpp->get_section('package','')->unshift_body('%add_findreq_skiplist %_datadir/maven/repository/javadoc/jars/*'."\n");
 };
 
@@ -68,5 +68,10 @@ BuildRequires: jakarta-commons-jelly-tags-http
 
     $jpp->get_section('package','')->push_body(q!# eclipse plugin requirements (removed eclipse-pde)
 BuildRequires: jakarta-cactus eclipse
+
+# TODO: kill
+#    $jpp->get_section('pre','');
+
 !);
 
+__END__

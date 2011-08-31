@@ -15,8 +15,8 @@ push @SPECHOOKS, sub {
     $jpp->get_section('pre','server-main')->subst(qr'groupadd', 'groupadd -r');
     $jpp->get_section('pre','server-main')->subst(qr'useradd', 'useradd -r');
 
-#Ïàêåò apacheds10-server-main âåðñèè 0:1.0.2-alt1_4jpp5 èìååò íåóäîâëåòâîðåííûå çàâèñèìîñòè:
-#Òðåáóåò: /etc/sysconfig/apacheds
+#ÐŸÐ°ÐºÐµÑ‚ apacheds10-server-main Ð²ÐµÑ€ÑÐ¸Ð¸ 0:1.0.2-alt1_4jpp5 Ð¸Ð¼ÐµÐµÑ‚ Ð½ÐµÑƒÐ´Ð¾Ð²Ð»ÐµÑ‚Ð²Ð¾Ñ€ÐµÐ½Ð½Ñ‹Ðµ Ð·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ÑÑ‚Ð¸:
+#Ð¢Ñ€ÐµÐ±ÑƒÐµÑ‚: /etc/sysconfig/apacheds
     $jpp->copy_to_sources('apacheds10.init');
 #    changes applied to apacheds10.init:
 ##    if ($jpp->get_section('package','')->match(qr'^Source4:\s+\%{name}.init')) {

@@ -28,7 +28,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('prep')->subst(qr'^jar xf /usr/share/java/apache-commons-launcher.jar','jar xf /usr/share/java/commons-launcher.jar');
 
     # hack against
-    #îøèáêà: line 185: Dependency tokens must not contain '%<=>' symbols: Requires: tomcat5-common-lib = 0:5.5.31-2%{dist}
+    #Ğ¾ÑˆĞ¸Ğ±ĞºĞ°: line 185: Dependency tokens must not contain '%<=>' symbols: Requires: tomcat5-common-lib = 0:5.5.31-2%{dist}
     $jpp->get_section('package','')->unshift_body('%define dist %nil'."\n");
 
     # hack against %post build-classpath

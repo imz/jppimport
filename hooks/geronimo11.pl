@@ -9,7 +9,7 @@ push @SPECHOOKS, sub {
 #-Dmaven.test.skip=true
     if ($bootstrap2) {
 # bug to report: 
-# Ïàêåò íå ñóùåñòâóåò at bootstrap1 && 2: %post server-base
+# ÐŸÐ°ÐºÐµÑ‚ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ at bootstrap1 && 2: %post server-base
 	$jpp->disable_package('server-base');
 # note: depmap was fixed manually; use the one from successfull bootstrap2 build
 # note: maven arguments: added -Dmaven.ignore.versions

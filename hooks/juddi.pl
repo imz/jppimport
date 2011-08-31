@@ -10,9 +10,9 @@ push @SPECHOOKS, sub {
 	# webapp is needed for symlink resolution
     #$section->subst(qr'if 0','if 1');
     #}
-    # âìåñòî
+    # Ð²Ð¼ÐµÑÑ‚Ð¾
     $jpp->get_section('files','webapps')->push_body('%exclude /usr/share/juddi/webapps'."\n");
-    # âìåñòî
+    # Ð²Ð¼ÐµÑÑ‚Ð¾
     # /var/lib/juddi/webapps not packaged
     #$jpp->get_section('install')->push_body('mkdir -p $RPM_BUILD_ROOT/var/lib/juddi/webapps'."\n");
     #$jpp->get_section('files')->push_body('%dir /var/lib/juddi/webapps'."\n");
