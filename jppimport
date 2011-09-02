@@ -44,8 +44,6 @@ $converter->transform(
     '-specargs' => [
 	'CONVERT::GENERIC::NOINFO'=>0,
 	'CONVERT::JPACKAGE::JVM'=>$jvm,
-	'CONVERT::JPACKAGE::NOBZ2'=>$nobz2, 
-	'CONVERT::JPACKAGE::NOZIP'=>$nozip, 
     ]
 );
 
@@ -63,7 +61,7 @@ sub verify_options {
 	$self->usage();
 	exit (5);
     }
-    if ($RPM::Source::Transform::inrpm =~ m!/jpackage/!) {
+    if ($RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm =~ m!/jpackage/!) {
 	my %map_jpp=qw/
 maven-plugins	maven1-plugins
 maven	maven1

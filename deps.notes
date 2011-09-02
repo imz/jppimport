@@ -218,7 +218,7 @@ SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
 SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
-SRPMS/google-collections-1.0-3.jpp6.src.rpm
+SRPMS/google-collections-1.0-3.jpp6.src.rpm (build failures)
 SRPMS/javacc-5.0-5.jpp6.src.rpm
 SRPMS/javacc-maven-plugin-2.6-7.jpp6.src.rpm
 SRPMS/jboss-ejb3-proxy-impl-1.0.2-4.jpp6.src.rpm
@@ -229,7 +229,6 @@ SRPMS/velocity-tools-1.4-2.jpp6.src.rpm
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
 SRPMS/xmlgraphics-commons-1.4-1.jpp6.src.rpm
 SRPMS/xmlgraphics-fop-0.95-7.jpp6.src.rpm
-SRPMS/xmlrpc-3.1.3-3.jpp6.src.rpm
 deleting SRPMS/plexus-containers-1.0-0.1.a34.5.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-timerservice-spi-1.0.0-2.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-security-1.0.0-3.jpp6.src.rpm
