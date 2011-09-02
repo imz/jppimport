@@ -89,14 +89,12 @@ activemq4,spring-ldap,acegi-security->apacheds10->apacheds-daemon10
 ================== last 5.0 update ================
 TODO: up
 asn1
-axis2
 ops4j-pax -> spring-osgi -<- [missing pom dep on felix/osgi.core?]
 
 ============
 
 =========== maven 2.0.8 ==========================
 ========================================
-felix 1.0.3 seems to depend on qdox 1.6.3 (parse error).
 knopflerfish -> crimson 1.1.3 ,20 (devel) w/api added DONE using private crimson.jar
 jetty6 --> terraconta-dso --> jruby update (can't find fileupload.rb)
 
@@ -134,8 +132,6 @@ DONE-using-compat: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8
 DONE-using-compat: jmock/jmock2 are broken by cglib 2.2 update
 cglib-nodeps include objectweb-asm 3.2, hence objectweb-asm
 update broke them. ...net.sf.cglib.asm.ClassWriter
-
-TODO: felix is built w/private qdox 1.6.3
 
 TODO: 
 eclipse-findbugs -> findbugs up to 1.3.9 -> breaks mojo-maven2-* build
@@ -208,14 +204,12 @@ but our velocity14 has apache..velocity:velocity.
 try to add compat; try to rebuild plexus-velocity and check
 what velocity it requires in pom
 
-TODO: detect maven1 plugin dependencies (if any)
-
 TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
 
 TODO: qdox upgrade
 TODO: javacc: see easy patch in fedora (like in cssparser).
 
-TODO: excalibur-avalon-framework: Βϋςερνÿες: avalon-framework (< 1:4.3.1-alt6_0.r508111.16jpp6) && logkit
+TODO: excalibur-avalon-framework: Π’Ρ‹Ρ‚ΠµΡΠ½ΡΠµΡ‚: avalon-framework (< 1:4.3.1-alt6_0.r508111.16jpp6) && logkit
 first build .14jpp6 then test (excalibur|avalon) ?
 TODO: gmaven13: needs plexus-classworlds 2.2.2 from devel
 
@@ -246,9 +240,6 @@ SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 SRPMS/asm2-2.2.3-8.jpp6.src.rpm
 SRPMS/felix-framework-2.0.5-3.jpp6.src.rpm
 SRPMS/felix-main-2.0.5-6.jpp6.src.rpm
-SRPMS/felix-osgi-compendium-1.4.0-3.jpp6.src.rpm
-SRPMS/felix-parent-1.2.1-4.jpp6.src.rpm
-SRPMS/felix-shell-1.4.2-3.jpp6.src.rpm
 SRPMS/fontbox-0.1.0-2.jpp6.src.rpm
 SRPMS/gmaven-1.3-2.jpp6.src.rpm
 SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
@@ -304,7 +295,6 @@ deleting SRPMS/jboss-cache-core-3.1.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-bootstrap-1.0.0-0.2.Beta3.jpp6.src.rpm
 deleting SRPMS/jboss-aop2-2.1.1-4.jpp6.src.rpm
 deleting SRPMS/groovy17-1.7.6-1.jpp6.src.rpm
-deleting SRPMS/felix-parent-1.2.1-3.jpp6.src.rpm
 deleting SRPMS/apache-resource-bundles-2-1.jpp6.src.rpm
 -------------------------------------
 SRPMS/hibernate-beanvalidation-api-1.0.0-4.jpp6.src.rpm
@@ -393,7 +383,6 @@ deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
 ----------------------------
 SRPMS/cobertura-maven-plugin-2.4-3.jpp6.src.rpm
 SRPMS/codehaus-stax-1.2.0-1.jpp6.src.rpm
-SRPMS/felix-parent-1.2.1-5.jpp6.src.rpm
 SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
 SRPMS/hibernate3-annotations-3.4.0-3.jpp6.src.rpm
 SRPMS/hibernate3-commons-annotations-3.1.0-4.jpp6.src.rpm
@@ -423,7 +412,6 @@ deleting SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-5.jpp6.src.rpm
 deleting SRPMS/hibernate3-commons-annotations-3.1.0-3.jpp6.src.rpm
 deleting SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
 deleting SRPMS/geronimo-specs-1.2-14.jpp6.src.rpm
-deleting SRPMS/felix-parent-1.2.1-4.jpp6.src.rpm
 deleting SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
@@ -492,9 +480,13 @@ SRPMS/jsontools-1.5-1.jpp6.src.rpm
 SRPMS/validator-htmlparser-1.0.7-1.jpp6.src.rpm
 deleting SRPMS/jakarta-slide-webdavclient-2.1-13.jpp6.src.rpm
 -----------------------------------
+TODO: build build-helper-maven-plugin-1.5-1.jpp6.src.rpm (still bootstrap) -> plexus-containers-component-javadoc
+
 TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
-      build build-helper-maven-plugin-1.5-1.jpp6.src.rpm
       until then, fix felix-osgi-foundation-1.2.0-alt1_4jpp6.src BR: felix-parent
+      until then, fix felix-osgi-compendium BR: felix-parent.
+      felix-framework, felix-main will need fix too
+TODO: resolve jar conflict felix vs felix-framework
 -----------------------------------
 SRPMS/apache-abdera-0.4.0-4.jpp6.src.rpm
 SRPMS/google-guice-2.0-2.jpp6.src.rpm
@@ -544,7 +536,6 @@ SRPMS/java-xmlbuilder-0.4-1.jpp6.src.rpm
 SRPMS/jets3t-0.8.1-1.jpp6.src.rpm
 SRPMS/jetty-artifact-remote-resources-1.0-1.jpp6.src.rpm
 SRPMS/jetty-assembly-descriptors-1.0-1.jpp6.src.rpm
-SRPMS/jetty-build-support-1.0-1.jpp6.src.rpm
 SRPMS/jetty-servlet-3.0-api-3.0-0.20100224.3.jpp6.src.rpm
 SRPMS/jetty7-7.2.2-0.20101205.1.jpp6.src.rpm
 SRPMS/jpam-1.1-1.jpp6.src.rpm
@@ -583,7 +574,6 @@ SRPMS/cas-client-3.1.6-1.jpp6.src.rpm
 SRPMS/castor-1.3.0.1-1.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-4.jpp6.src.rpm
 SRPMS/ehcache-1.3.0-4.jpp6.src.rpm
-SRPMS/felix-1.0.3-4.jpp6.src.rpm
 SRPMS/geronimo-genesis-1.3-2.jpp6.src.rpm
 SRPMS/geronimo-specs-1.6-1.jpp6.src.rpm
 SRPMS/groovy17-1.7.10-2.jpp6.src.rpm
@@ -619,7 +609,6 @@ deleting SRPMS/httpunit-1.7-3.jpp6.src.rpm
 deleting SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
 deleting SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
 deleting SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
-deleting SRPMS/felix-1.0.3-1.jpp6.src.rpm
 deleting SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
 ----------------------------------------------

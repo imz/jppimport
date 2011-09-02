@@ -1,12 +1,17 @@
 #!/usr/bin/perl -w
 
-require 'set_jetty6_servlet_25_api.pl';
+#require 'set_jetty6_servlet_25_api.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    # TODO: update qdox in Sisyphus
-#    $jpp->get_section('package','')->subst('BuildRequires: qdox','BuildRequires: qdox >= 1.6.3');
+    $jpp->disable_package('osgi-compendium');
+    $jpp->disable_package('osgi-core');
+    $jpp->disable_package('osgi-foundation');
+    # TODO: separate and disable
+    #$jpp->disable_package('framework');
 };
+
+
 __END__
     $jpp->get_section('package','')->unshift_body('BuildRequires: cyberdomo-upnp-stack'."\n");
     # 5.0 bug to report: brioken symlink:

@@ -142,7 +142,7 @@ print SPEC q!
 !;
 if ($altrpm || $altspec) {
     my $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
-    print SPEC @{$alt->get_section('changelog')->get_body()};
+    print SPEC @{$alt->get_section('changelog')->get_bodyref()};
 }
 
 system ('add_changelog', '-e',$changelog,$specfile);
