@@ -4,7 +4,7 @@ Note: fix groups for Python, GUI, etc...
 #export MAVEN_OPTS="-Xmx256m"
 # for PermGen error, running out of memory #-XX:MaxPermSize=256m
 export MAVEN_OPTS=-XX:MaxPermSize=512m
-#-Dmaven.javadoc.additionalparam=-J-Xmx256m
+#-Dmaven.javadoc.additionalparam=-J-Xmx512m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
 #-Dmaven.test.failure.ignore=true \
@@ -213,6 +213,16 @@ TODO: excalibur-avalon-framework: Вытесняет: avalon-framework (< 1:4.3.
 first build .14jpp6 then test (excalibur|avalon) ?
 TODO: gmaven13: needs plexus-classworlds 2.2.2 from devel
 
+-----------------------------------
+TODO: build build-helper-maven-plugin-1.5-1.jpp6.src.rpm (still bootstrap) -> plexus-containers-component-javadoc
+
+TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
+      until then, fix felix-osgi-foundation-1.2.0-alt1_4jpp6.src BR: felix-parent
+      until then, fix felix-osgi-compendium BR: felix-parent.
+      
+TODO: drop felix-maven2 dep in favor of deparate plugins
+
+
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
@@ -237,8 +247,6 @@ deleting SRPMS/javacc-4.0-5.jpp6.src.rpm
 ----------------------------------------------------
 SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 SRPMS/asm2-2.2.3-8.jpp6.src.rpm
-SRPMS/felix-framework-2.0.5-3.jpp6.src.rpm
-SRPMS/felix-main-2.0.5-6.jpp6.src.rpm
 SRPMS/fontbox-0.1.0-2.jpp6.src.rpm
 SRPMS/gmaven-1.3-2.jpp6.src.rpm
 SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
@@ -479,14 +487,6 @@ SRPMS/jsontools-1.5-1.jpp6.src.rpm
 SRPMS/validator-htmlparser-1.0.7-1.jpp6.src.rpm
 deleting SRPMS/jakarta-slide-webdavclient-2.1-13.jpp6.src.rpm
 -----------------------------------
-TODO: build build-helper-maven-plugin-1.5-1.jpp6.src.rpm (still bootstrap) -> plexus-containers-component-javadoc
-
-TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
-      until then, fix felix-osgi-foundation-1.2.0-alt1_4jpp6.src BR: felix-parent
-      until then, fix felix-osgi-compendium BR: felix-parent.
-      felix-framework, felix-main will need fix too
-TODO: resolve jar conflict felix vs felix-framework
------------------------------------
 SRPMS/apache-abdera-0.4.0-4.jpp6.src.rpm
 SRPMS/google-guice-2.0-2.jpp6.src.rpm
 SRPMS/mock-javamail-1.7-1.jpp6.src.rpm
@@ -503,7 +503,6 @@ SRPMS/l10n-maven-plugin-1.0-1.alpha_2.jpp6.src.rpm
 SRPMS/maven-plugin-tools-2.4.3-5.jpp6.src.rpm
 SRPMS/mina-ftpserver-1.0.0-0.rc2.1.jpp6.src.rpm
 SRPMS/rmic-maven-plugin-1.1-1.jpp6.src.rpm
-SRPMS/xmltool-3.3-2.jpp6.src.rpm
 deleting SRPMS/maven-plugin-tools-2.4.3-4.jpp6.src.rpm
 deleting SRPMS/joda-time-1.5.2-2.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-29.jpp6.src.rpm
@@ -514,7 +513,6 @@ SRPMS/josql-2.2-1.jpp6.src.rpm
 SRPMS/plugin-support-1.0-1.alpha_1.jpp6.src.rpm
 deleting SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
 -----------------------------------
-_____________________
 
 6.0/generic/devel
 _____________________
@@ -611,7 +609,6 @@ deleting SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
 deleting SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
 ----------------------------------------------
-
 6.0/generic/devel
 _____________________
 receiving file list ... done
@@ -624,9 +621,6 @@ SRPMS/spring-ws-1.5.3-1.jpp6.src.rpm
 SRPMS/spring3-3.0.5-2.jpp6.src.rpm
 SRPMS/tiles-2.1.3-1.jpp6.src.rpm
 SRPMS/xws-security-2.0-1.jpp6.src.rpm
-
-sent 275278 bytes  received 160528848 bytes  826756.43 bytes/sec
-total size is 1801592178  speedup is 11.20
 _____________________
 
 6.0/generic/free/SRPMS
@@ -652,7 +646,6 @@ _____________________
 
 6.0/generic/devel
 _____________________
-receiving file list ... done
 SRPMS/activesoap-1.0-3.jpp6.src.rpm
 SRPMS/servicemix-utils-1.2.1-2.jpp6.src.rpm
 SRPMS/smack2-2.2.1-1.jpp6.src.rpm
@@ -667,11 +660,9 @@ SRPMS/jgoodies-common-1.2.0-3.jpp6.src.rpm
 SRPMS/jgoodies-forms-1.4.1-2.jpp6.src.rpm
 deleting SRPMS/jgoodies-forms-1.3.0-1.jpp6.src.rpm
 _____________________
-_____________________
 
 6.0/generic/devel
 _____________________
-receiving file list ... done
 SRPMS/apache-commons-jexl2-2.0.1-1.jpp6.src.rpm
 SRPMS/apache-cxf20-2.0.13-1.jpp6.src.rpm
 SRPMS/apache-cxf21-2.1.10-1.jpp6.src.rpm
@@ -700,7 +691,6 @@ _____________________
 
 6.0/generic/free/SRPMS
 _____________________
-receiving file list ... done
 SRPMS/antlr-2.7.7-13.jpp6.src.rpm
 SRPMS/aopalliance-1.0-7.jpp6.src.rpm
 SRPMS/apache-commons-io-1.4-13.jpp6.src.rpm
@@ -753,7 +743,6 @@ SRPMS/atinject-1-5.jpp6.src.rpm
 SRPMS/jarjar-maven-plugin-1.3-1.jpp6.src.rpm
 SRPMS/jcommander-1.18-1.jpp6.src.rpm
 SRPMS/joda-time-1.6.2-3.jpp6.src.rpm
-SRPMS/maven-license-plugin-1.7.0-1.jpp6.src.rpm
 SRPMS/munge-maven-plugin-1.0-3.jpp6.src.rpm
 SRPMS/snakeyaml-1.8-3.jpp6.src.rpm
 SRPMS/sonatype-plugins-parent-6-2.jpp6.src.rpm
@@ -771,4 +760,6 @@ deleting SRPMS/xmlgraphics-fop-1.0-3.jpp6.src.rpm
 deleting SRPMS/xmlgraphics-commons-1.4-1.jpp6.src.rpm
 deleting SRPMS/xmlgraphics-batik-1.7-7.jpp6.src.rpm
 -----------------------------------------
-
+SRPMS/brazil-2.3-9.jpp6.src.rpm
+SRPMS/native2ascii-maven-plugin-1.0-0.alpha_1.1.jpp6.src.rpm
+-----------------------------------------

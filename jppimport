@@ -142,6 +142,52 @@ maven-plugin-wizard	maven1-plugin-wizard
 maven-plugin-xdoc	maven1-plugin-xdoc
 /;
 	map {$RPM::Source::Convert::Generic2ALT::ALTDEPSUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
+    } elsif ($RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm =~ m!/fedora/linux/!) {
+	my %map_jpp=qw/
+maven	maven2
+maven-ant-plugin	maven2-plugin-ant
+maven-antlr-plugin	maven2-plugin-antlr
+maven-antrun-plugin	maven2-plugin-antrun
+maven-assembly-plugin	maven2-plugin-assembly
+maven-changelog-plugin	maven2-plugin-changelog
+maven-changes-plugin	maven2-plugin-changes
+maven-checkstyle-plugin	maven2-plugin-checkstyle
+maven-clean-plugin	maven2-plugin-clean
+maven-compiler-plugin	maven2-plugin-compiler
+maven-dependency-plugin	maven2-plugin-dependency
+maven-deploy-plugin	maven2-plugin-deploy
+maven-doap-plugin	maven2-plugin-doap
+maven-docck-plugin	maven2-plugin-docck
+maven-ear-plugin	maven2-plugin-ear
+maven-eclipse-plugin	maven2-plugin-eclipse
+maven-ejb-plugin	maven2-plugin-ejb
+maven-enforcer-plugin	maven2-plugin-enforcer
+maven-gpg-plugin	maven2-plugin-gpg
+maven-help-plugin	maven2-plugin-help
+maven-idea-plugin	maven2-plugin-idea
+maven-install-plugin	maven2-plugin-install
+maven-invoker-plugin	maven2-plugin-invoker
+maven-jar-plugin	maven2-plugin-jar
+maven-javadoc-plugin	maven2-plugin-javadoc
+maven-one-plugin	maven2-plugin-one
+maven-plugin-plugin	maven2-plugin-plugin
+maven-pmd-plugin	maven2-plugin-pmd
+maven-project-info-reports-plugin	maven2-plugin-project-info-reports
+maven-rar-plugin	maven2-plugin-rar
+maven-remote-resources-plugin	maven2-plugin-remote-resources
+maven-repository-plugin	maven2-plugin-repository
+maven-resources-plugin	maven2-plugin-resources
+maven-shade-plugin	maven2-plugin-shade
+maven-shade-javadoc-plugin	maven2-plugin-shade-javadoc
+maven-site-plugin	maven2-plugin-site
+maven-source-plugin	maven2-plugin-source
+maven-stage-plugin	maven2-plugin-stage
+maven-verifier-plugin	maven2-plugin-verifier
+maven-war-plugin	maven2-plugin-war
+
+maven-release-plugin	maven-release
+/;
+	map {$RPM::Source::Convert::Generic2ALT::ALTDEPSUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     }
 }
 

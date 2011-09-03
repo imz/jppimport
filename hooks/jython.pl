@@ -6,13 +6,7 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
     $jpp->get_section('package','')->set_tag('Summary','Jython is an implementation of Python written in pure Java.');
-    $jpp->get_section('package','')->subst(qr'cpython_version\s+2.3','cpython_version	2.4');
-    foreach my $section ($jpp->get_sections()) {
-	if ($section->get_type() eq 'package') {
-#	    $section->subst(qr'PyXML\s*>=\s*0:%{pyxml_version}','python-module-PyXML ');
-	    $section->subst_if(qr'PyXML','python-module-PyXML',qr'Requires:');
-	}
-    }
+    #$jpp->get_section('package','')->subst(qr'cpython_version\s+2.3','cpython_version	2.4');
 
     $jpp->get_section('package','')->push_body('BuildArch: noarch'."\n") unless $jpp->get_section('package','')->match(qr'BuildArch:\s*noarch');
 
@@ -88,6 +82,3 @@ EOF
 }
 
 __END__
-%define cpython_version 2.3
-%define cpythondir      python%{cpython_version}
-%define pyxml_version   0.8.3

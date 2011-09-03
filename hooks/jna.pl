@@ -2,5 +2,6 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','examples')->push_body('BuildArch: noarch'."\n");
+    my $ex=$jpp->get_section('package','examples');
+    $ex->push_body('BuildArch: noarch'."\n") if $ex;
 }
