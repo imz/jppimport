@@ -1,5 +1,5 @@
---- build/eclipse-3.6.2-src/plugins/org.eclipse.core.net/natives/unix/linux/makefile	2010-03-29 14:36:30.000000000 +0000
-+++ build/eclipse-3.6.2-src/plugins/org.eclipse.core.net/natives/unix/linux/makefile	2011-02-28 00:25:16.095307064 +0000
+--- build/eclipse-3.7.0-I20110613-1736-src/plugins/org.eclipse.core.net/natives/unix/linux/makefile	2010-03-29 14:36:30.000000000 +0000
++++ build/eclipse-3.7.0-I20110613-1736-src/plugins/org.eclipse.core.net/natives/unix/linux/makefile	2011-02-28 00:25:16.095307064 +0000
 @@ -38,7 +38,7 @@
  link: compile
  	@echo "Building target: $(LIB_NAME_FULL)"

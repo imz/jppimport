@@ -56,7 +56,7 @@ Was expecting one of:
     "," ...
     ")" ...
     <WHITESPACE> ..
-indicate that velocity15 should be used.
+indicate that velocity14/15 should be used.
 
 ==duplicate rpms to remove:==
 ibatis by apache-ibatis
@@ -467,16 +467,12 @@ deleting SRPMS/junit4-4.8.2-4.jpp6.src.rpm
 deleting SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 -----------------------------------
 SRPMS/ant-1.8.2-5.jpp6.src.rpm
-SRPMS/bouncycastle-1.46-3.jpp6.src.rpm
 deleting SRPMS/ant-1.8.2-3.jpp6.src.rpm
-deleting SRPMS/bouncycastle-1.45-3.jpp6.src.rpm
 -----------------------------------
-SRPMS/apache-ivy-2.2.0-1.jpp6.src.rpm
 SRPMS/codenarc-0.13-1.jpp6.src.rpm
 SRPMS/gmetrics-0.3-1.jpp6.src.rpm
 SRPMS/maven-wagon-1.0-0.7.b7.2.jpp6.src.rpm
 deleting SRPMS/maven-wagon-1.0-0.7.b7.1.jpp6.src.rpm
-deleting SRPMS/apache-ivy-2.0.0-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/ezmorph-1.0.6-1.jpp6.src.rpm
 SRPMS/jakarta-slide-webdavclient-2.1-14.jpp6.src.rpm
@@ -756,4 +752,6 @@ deleting SRPMS/xmlgraphics-batik-1.7-7.jpp6.src.rpm
 -----------------------------------------
 SRPMS/brazil-2.3-9.jpp6.src.rpm
 SRPMS/native2ascii-maven-plugin-1.0-0.alpha_1.1.jpp6.src.rpm
+-----------------------------------------
+SRPMS/aether-1.11-5.jpp6.src.rpm
 -----------------------------------------

@@ -7,6 +7,21 @@ sub {
     my ($jpp, $alt) = @_;
     my $bootstrap=1;
 
+    # for 37
+    $jpp->source_apply_patch(SOURCEFILE=>'maven2-versionless-depmap.xml', PATCHSTRING=q!
+--- maven2-versionless-depmap.xml	2011-09-06 13:01:31.616638465 +0000
++++ maven2-versionless-depmap.xml	2011-09-06 13:01:08.620637964 +0000
+@@ -1912,7 +1912,7 @@
+ 			<version>1.2</version>
+ 		</maven>
+ 		<jpp>
+-			<groupId>JPP/xmlrpc</groupId>
++			<groupId>JPP</groupId>
+ 			<artifactId>xmlrpc</artifactId>
+ 			<version>1.2</version>
+ 		</jpp>
+!);
+
     # for 29
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
 

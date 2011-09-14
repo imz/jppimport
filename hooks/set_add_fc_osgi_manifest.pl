@@ -11,6 +11,7 @@ push @SPECHOOKS,
     my ($jpp, $alt) = @_;
     my $fcpath14='/var/ftp/pub/Linux/fedora/linux/releases/14/Everything/x86_64/os/Packages/';
     my $fcpath15='/var/ftp/pub/Linux/fedora/linux/development/15/x86_64/os/Packages/';
+    my $fcpathRH='/var/ftp/pub/Linux/fedora/linux/development/rawhide/x86_64/os/Packages/';
     my $name=$jpp->get_section('package','')->get_tag('Name');
     if ($name eq 'jetty6') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
@@ -43,8 +44,8 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'jdom-1.1.1-1.fc13.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom-1.1.1.jar');
     } elsif ($name eq 'objectweb-asm') {
-	&unpack_fc_rpm($jpp,$fcpath14.'objectweb-asm-3.2-2.fc14.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all-3.2.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'objectweb-asm-3.3.1-1.fc16.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all-3.3.1.jar');
     } elsif ($name eq 'wsdl4j') {
 	&unpack_fc_rpm($jpp,$fcpath14.'wsdl4j-1.5.2-7.6.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/wsdl4j.jar','/usr/share/java/wsdl4j-1.5.2.jar');

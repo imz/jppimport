@@ -12,11 +12,17 @@ sub {
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
 
+    $jpp->get_section('build')->unshift_body(q!export CXX='g++ -Dchar16_t="unsigned short int"'!."\n");
+
+    # as-needed specific
+    $jpp->add_patch('eclipse-3.7.0-alt-as-needed-statically-link-xpcomglue.patch', STRIP=>2,
+		    PREP_HEADER=>'pushd build/eclipse-%version-*'."\n");
     # upstreamed as https://bugs.eclipse.org/bugs/show_bug.cgi?id=338360
     # missing symbol (underlinkage)
-    $jpp->add_patch('eclipse-3.6.2-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>0);
+    $jpp->add_patch('eclipse-3.7.0-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>2);
     # just -lX11 added
-    $jpp->add_patch('eclipse-3.6.2-alt-swt-linux-as-needed.patch', STRIP=>0);
+    $jpp->add_patch('eclipse-3.7.0-alt-swt-linux-as-needed.patch', STRIP=>2,
+		    PREP_FOOTER=>'popd'."\n");
 
     # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
     # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
@@ -37,7 +43,7 @@ sub {
     $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-proto-devel libGLU-devel'."\n");
-    $jpp->get_section('package','')->subst_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
+    #$jpp->get_section('package','')->subst_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
 
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
@@ -45,9 +51,6 @@ sub {
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
-
-    # seamonkey provides mozilla too
-    $jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
 
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors
@@ -69,8 +72,12 @@ sub {
 	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
 	$jpp->add_source('jetty-6.1.26.jar', NUMBER => 33);
 	$jpp->add_source('jetty-util-6.1.26.jar', NUMBER => 34);
-	$jpp->get_section('prep')->push_body('sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
-sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties'."\n");
+	$jpp->get_section('prep')->push_body('
+sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
+sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties
+#sed -i -e s,/usr/share/jetty/lib/jetty-6.1.26.jar,%{SOURCE33},g `grep -rl /usr/share/jetty/lib/jetty-6.1.26.jar .`
+#sed -i -e s,/usr/share/jetty/lib/jetty-util-6.1.26.jar,%{SOURCE34},g `grep -rl /usr/share/jetty/lib/jetty-util-6.1.26.jar .`
+'."\n");
 	$jpp->get_section('install')->push_body('
 jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.util*`
 rm -f $jetty
@@ -81,22 +88,26 @@ install -m 644 %{SOURCE33} $jetty
 ');
     }
 
-    # lucene
-    $jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
-    $jpp->get_section('install')->subst('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
+q!
+     [exec] Model is x86_64
+     [exec] libgnome-2.0 and libgnomeui-2.0 not found:
+     [exec]     *** SWT Program support for GNOME will not be compiled.
+     [exec] Cairo found, compiling SWT support for the cairo graphics library.
+     [exec] WebKit not found:
+     [exec]     *** WebKit embedding support will not be compiled.
+     [exec] libjawt.so found, the SWT/AWT integration library will be compiled.
+     [exec] Building SWT/GTK+ for linux x86_64
+!;
 
+#	$jpp->get_section('prep')->push_body('
+#sed -i -e s,/usr/share/java/apache-commons-el-1.0.jar,/usr/share/java/apache-commons-el.jar,g `grep -rl /usr/share/java/apa#che-commons-el-1.0.jar .`
+#');
 
-    if (1) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
+    if (0) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
     $jpp->get_section('prep')->push_body(q{
 #uname -p == unknown but exit code is 0 :( (alt feature :( )
 # seems to be fixed upstream.
-#find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
-
-# TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO:  DO WE NEED IT WOW?
-# due to our xulrunner
-# proper patching will touch patches/eclipse-swt-buildagainstxulrunner.patch
-find . -name build.sh -exec sed -i 's,libxul-unstable,libxul,' {} \;
-
+find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 });
     }################################################### end TODO MAKE AS PATCHES
 
@@ -148,6 +159,16 @@ fi
 
 
 __END__
+    # seamonkey provides mozilla too
+    #$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
+
+    # lucene
+    #$jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
+    #$jpp->get_section('install')->subst('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
+
+
+
+
     # TODO: remove bootstrap
     if (0) { # bootstrap
 	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');

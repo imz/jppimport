@@ -1,0 +1,13 @@
+--- build/eclipse-3.7.0-I20110613-1736-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2011-09-14 05:45:57.371781602 +0000
++++ build/eclipse-3.7.0-I20110613-1736-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2011-09-14 06:22:53.407769159 +0000
+@@ -102,8 +102,8 @@
+ ATK_OBJECTS = swt.o atk.o atk_structs.o atk_custom.o atk_stats.o
+ GNOME_OBJECTS = swt.o gnome.o gnome_structs.o gnome_stats.o
+ MOZILLA_OBJECTS = swt.o xpcom.o xpcom_custom.o xpcom_structs.o xpcom_stats.o
+-XULRUNNER_OBJECTS = swt.o xpcomxul.o xpcomxul_custom.o xpcomxul_structs.o xpcomxul_stats.o
+-XPCOMINIT_OBJECTS = swt.o xpcominit.o xpcominit_structs.o xpcominit_stats.o
++XULRUNNER_OBJECTS = swt.o xpcomxul.o xpcomxul_custom.o xpcomxul_structs.o xpcomxul_stats.o /usr/lib64/xulrunner-devel/lib/libxpcomglue.a
++XPCOMINIT_OBJECTS = swt.o xpcominit.o xpcominit_structs.o xpcominit_stats.o /usr/lib64/xulrunner-devel/lib/libxpcomglue.a
+ WEBKIT_OBJECTS = swt.o webkit.o webkit_structs.o webkit_stats.o
+ GLX_OBJECTS = swt.o glx.o glx_structs.o glx_stats.o
+ 

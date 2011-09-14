@@ -13,7 +13,7 @@ use RPM::Source::Convert::Mass;
 
 our @ISA = qw/RPM::Source::Convert::Mass/;
 
-$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
+$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
 $ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
 @ORIGINSKIP=qw/gnu.trove maven-plugin-itest
@@ -64,6 +64,7 @@ my ($jvm, $nobz2, $nozip,$target);
 my $origintoolsdir=dirname($0);
 $RPM::Source::Convert::Mass::originimport="$origintoolsdir/jppimport";
 
+my $verbose=0;
 my $convert=RPM::Source::Convert::JPPMass->new(
 '-cliargs' => [
 	"jpp=s" => \$ORIGINPATH,
@@ -75,7 +76,6 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 ],
     '-originrepo' => 'jpackage',
 );
-my $verbose=0;
 $convert->run();
 
 sub process_options_hook {
@@ -118,15 +118,17 @@ sub alt_jpp_rpmvercmp {
     my $destversion=$dest_rh->{VERSION};
     my $destrelease=$dest_rh->{RELEASE};
     my $cmp = $destversion cmp $originversion;
+    print STDERR "jppmass: $destversion cmp $originversion = $cmp\n" if $verbose;
     if ($cmp!=0) {
 	$cmp=evrcmp($destversion, $originversion);
-	print STDERR "$destversion rpmcmp $originversion = $cmp\n" if $verbose;
+	print STDERR "jppmass: $destversion rpmcmp $originversion = $cmp\n" if $verbose;
     }
     return $cmp if $cmp !=0;
-    if ($destrelease=~/^alt([^_]+)_(.+jpp)(\d.\d)$/) {
+    $originrelease=~s/\.fc\d+$//;
+    if ($destrelease=~/^alt([^_]+)_(.+)jpp[\d.]+$/) {
 	my $altjppsubrel=$2;
 	$cmp=evrcmp($altjppsubrel, $originrelease);
-	print STDERR "$altjppsubrel cmp $originrelease = $cmp\n" if $verbose;
+	print STDERR "jppmass: $altjppsubrel cmp $originrelease = $cmp\n" if $verbose;
 	return $cmp;
     }
     return -1;

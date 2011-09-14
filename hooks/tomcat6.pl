@@ -52,6 +52,7 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
     $jpp->get_section('files','lib')->push_body('%exclude %{libdir}/tomcat6-el-2.1-api*jar'."\n");
 
     $jpp->get_section('files','')->push_body('%exclude /etc/tomcat6/log4j.properties'."\n");
+    $jpp->get_section('files','')->subst('\%defattr\(0664,root,tomcat,0775\)','%defattr(0644,root,tomcat,0755)');
 
     # till ant 1.8 migration
     $jpp->get_section('package','')->push_body('BuildRequires: ant-trax'."\n");

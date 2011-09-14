@@ -6,9 +6,16 @@ push @SPECHOOKS, sub {
 
     # itext -> itext2 
     $jpp->get_section('package','')->subst_if(qr'itext\s*>=\s*\S+','itext2',qr'Requires:');
-    $jpp->get_section('build')->subst(qr'/itext-','/itext2-');
+
+# old itext -> itext2 jar rename
+#    $jpp->get_section('build')->subst(qr'/itext-','/itext2-');
+#    $jpp->get_section('prep')->push_body('
+#subst s,itext/itext,itext2/itext2, pdftk/Makefile.Base
+#');
+
+# new itext almost no rename
     $jpp->get_section('prep')->push_body('
-subst s,itext/itext,itext2/itext2, pdftk/Makefile.Base
+subst s,itext/itext,itext2/itext, pdftk/Makefile.Base
 ');
 
 };
