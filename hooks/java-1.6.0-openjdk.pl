@@ -52,14 +52,14 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
-BuildRequires: libXext-devel
+BuildRequires: libXext-devel libXrender-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
 ');
 
     $jpp->get_section('package','')->unshift_body(q'%def_enable accessibility
 %def_enable javaws
-%def_enable moz_plugin
+%def_disable moz_plugin
 %def_disable systemtap
 %def_disable desktop
 ');
@@ -93,10 +93,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 	 }
     } $jpp->get_sections();
     
-    # no need; already 0
+    # already 0
     #$jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
-
-    $jpp->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
 
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
@@ -106,12 +104,9 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
-    $jpp->get_section('package','')->subst(qr'gecko-devel','xulrunner-devel');
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
-%autoreconf
-!);
-    $jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac
-!);
+%autoreconf!."\n");
+    #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
 
     # unrecognized option; TODO: check the list
@@ -136,14 +131,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 	#$jpp->get_section('install')->unshift_body_before(qr'# Install extension symlinks.','fi'."\n");
     }
 
-    # desktop-file-install is crying! TODO: replace with ALT
-    $jpp->get_section('install')->unshift_body_after(qr'for e in jconsole policytool',
-'install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n");
-    $jpp->get_section('install')->unshift_body_after(qr'cp javaws.png',
-'install -D -m644 javaws.desktop $RPM_BUILD_ROOT%{_datadir}/applications/javaws.desktop'."\n");
-    $jpp->get_section('install')->subst(qr'desktop-file-install','#desktop-file-install');
-
-    $jpp->get_section('install')->subst(qr'--dir(\s*|=)\$RPM_BUILD_ROOT','#--dir $RPM_BUILD_ROOT');
+    $jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
     $jpp->get_section('package','')->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
@@ -155,7 +143,15 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
-    $jpp->rename_package('plugin','-n mozilla-plugin-%name');
+
+    if (0 and 'has plugin') {
+	$jpp->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
+	$jpp->rename_package('plugin','-n mozilla-plugin-%name');
+	$jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
+%{_datadir}/applications/%{name}-control-panel.desktop
+');
+    }
+
     $jpp->get_section('package','devel')->push_body(q!
 %if_enabled javaws
 %package javaws
@@ -195,16 +191,10 @@ with %{name} J2SE Runtime Environment.
     $jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
 %{_datadir}/applications/%{name}-javaws.desktop
 ');
-    $jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
-%{_datadir}/applications/%{name}-control-panel.desktop
-');
 
     $jpp->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
 %__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/jconsole.desktop
-
-%__subst 's,^Encoding,#Encoding,' %buildroot/usr/share/applications/javaws.desktop
-%__subst 's,.png$,,' %buildroot/usr/share/applications/javaws.desktop
 !);
 
     $jpp->get_section('install')->push_body(q!
@@ -246,7 +236,9 @@ Terminal=false
 Type=Application
 Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
 EOF
+%endif
 
+%if_enabled javaws
 # javaws freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
 [Desktop Entry]
@@ -450,3 +442,4 @@ find $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin/ -exec chrpath -d {} \;
 !);
     }
     # end chrpath hack
+

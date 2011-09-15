@@ -26,6 +26,9 @@ push @SPECHOOKS,
     } elsif ($name eq 'apache-commons-logging') {
 	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-logging-1.1.1-11.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-logging.jar','/usr/share/java/apache-commons-logging-1.1.1.jar');
+    } elsif ($name eq 'apache-commons-io') {
+	&unpack_fc_rpm($jpp,$fcpathRH.'apache-commons-io-2.0.1-3.fc16.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/commons-io.jar','/usr/share/java/apache-commons-io.jar');
 # no need; it contains
 #    } elsif ($name eq 'apache-commons-lang') {
 #	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-lang-2.4-1.fc14.x86_64.rpm');

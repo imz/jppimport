@@ -8,5 +8,9 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->subst_if(qr'php-pecl-xdebug','php5-xdebug',qr'Requires:');
     # altbug#13665
     $jpp->get_section('package','')->subst(qr'Requires:\s*httpd','Requires: apache2');
+
+    # 6u26
+    #$jpp->get_section('build')->subst(qr'pdebuild ','pdebuild -j "-Xmx1024m" ');
+
 };
 
