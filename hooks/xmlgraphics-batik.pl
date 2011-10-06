@@ -29,8 +29,12 @@ subst 's,maxmemory="128m",maxmemory="512m",' build.xml
 
     $jpp->get_section('install')->push_body('pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
     foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {
-	$jpp->get_section('install')->push_body("  ln -s $i.jar batik-$i.jar\n");
-	$jpp->get_section('files','')->push_body("%_javadir/xmlgraphics-batik/batik-$i.jar\n");
+	$jpp->get_section('install')->push_body("  ln -s batik-$i.jar $i.jar\n");
+	$jpp->get_section('files','')->push_body("%_javadir/xmlgraphics-batik/$i.jar\n");
+    }
+    foreach my $i ('rasterizer','rasterizer-ext') {
+	$jpp->get_section('install')->push_body("  ln -s batik-$i.jar $i.jar\n");
+	$jpp->get_section('files','rasterizer')->push_body("%_javadir/xmlgraphics-batik/$i.jar\n");
     }
     $jpp->get_section('install')->push_body('popd'."\n");
 

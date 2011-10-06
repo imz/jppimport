@@ -221,6 +221,11 @@ TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
       
 TODO: drop felix-maven2 dep in favor of deparate plugins
 
+TODO: objectweb-asm: poms: see hook:
+# poms use asm group now - incompatible with oweb-asm 3.2 and confilcts with asm2 :( 
+# seems like we need to patch asm2 to have asm2 group.
+sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %buildroot/usr/share/maven2/poms/JPP.objectweb-asm-asm*
+
 
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
@@ -447,7 +452,6 @@ deleting SRPMS/antlr-2.7.6-8.jpp6.src.rpm
 -----------------------------------
 SRPMS/dtddoc-1.1.0-3.jpp6.src.rpm
 SRPMS/dtddoc-maven2-plugin-1.1-2.jpp6.src.rpm
-SRPMS/freemarker-2.3.16-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/struts-master-4-2.jpp6.src.rpm
 -----------------------------------
@@ -721,7 +725,6 @@ deleting SRPMS/apache-commons-io-1.4-12.jpp6.src.rpm
 deleting SRPMS/aopalliance-1.0-5.jpp6.src.rpm
 deleting SRPMS/antlr-2.7.7-1.jpp6.src.rpm
 -----------------------------------------
-SRPMS/jackrabbit-parent-5-1.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-3.jpp6.src.rpm
 SRPMS/plexus-compiler-1.8.2-1.jpp6.src.rpm
 deleting SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
@@ -743,15 +746,73 @@ deleting SRPMS/atinject-1-2.20100611svn86.jpp6.src.rpm
 -----------------------------------------
 SRPMS/microemulator-2.0.4-1.jpp6.src.rpm
 -----------------------------------------
-SRPMS/xmlgraphics-batik-1.7-14.jpp6.src.rpm
 SRPMS/xmlgraphics-commons-1.4-4.jpp6.src.rpm
 SRPMS/xmlgraphics-fop-1.0-4.jpp6.src.rpm
 deleting SRPMS/xmlgraphics-fop-1.0-3.jpp6.src.rpm
 deleting SRPMS/xmlgraphics-commons-1.4-1.jpp6.src.rpm
-deleting SRPMS/xmlgraphics-batik-1.7-7.jpp6.src.rpm
 -----------------------------------------
 SRPMS/brazil-2.3-9.jpp6.src.rpm
 SRPMS/native2ascii-maven-plugin-1.0-0.alpha_1.1.jpp6.src.rpm
 -----------------------------------------
 SRPMS/aether-1.11-5.jpp6.src.rpm
 -----------------------------------------
+SRPMS/maven-archetype2-2.0-0.a5.1.jpp6.src.rpm
+SRPMS/maven-bundle-plugin-2.0.0-2.jpp6.src.rpm
+deleting SRPMS/maven-archetype2-2.0-0.a3.2.jpp6.src.rpm
+-----------------------------------------
+SRPMS/animal-sniffer-1.6-8.2.jpp6.src.rpm
+SRPMS/atinject-1-8.jpp6.src.rpm
+SRPMS/cglib-2.2.2-3.jpp6.src.rpm
+SRPMS/jdiff-1.1.1-1.jpp6.src.rpm
+SRPMS/maven-surefire-2.4.3-6.jpp6.src.rpm
+SRPMS/sisu-cglib-2.2.2-1.jpp6.src.rpm
+deleting SRPMS/maven-surefire-2.4.3-5.jpp6.src.rpm
+deleting SRPMS/cglib-2.2-4.jpp6.src.rpm
+deleting SRPMS/atinject-1-5.jpp6.src.rpm
+deleting SRPMS/animal-sniffer-1.6-8.1.jpp6.src.rpm
+-----------------------------------------
+_____________________
+
+6.0/generic/devel
+_____________________
+SRPMS/apache-cxf22-2.2.12-3.jpp6.src.rpm
+SRPMS/apache-river-2.1.2-1.jpp6.src.rpm
+SRPMS/flatpack-3.3.0-0.r425.1.jpp6.src.rpm
+SRPMS/fusesource-commonman-1.0-1.jpp6.src.rpm
+SRPMS/google-appengine-1.5.1-1.jpp6.src.rpm
+SRPMS/google-gdata-1.41.1-1.jpp6.src.rpm
+SRPMS/grizzly-1.9.34-1.jpp6.src.rpm
+SRPMS/guiceyfruit-2.0-1.jpp6.src.rpm
+SRPMS/hapi-base-1.0.1-1.jpp6.src.rpm
+SRPMS/hawtbuf-1.2-1.jpp6.src.rpm
+SRPMS/hawtdb-1.5-1.jpp6.src.rpm
+SRPMS/irclib-1.10-1.jpp6.src.rpm
+SRPMS/jetty7-integration-7.2.2-0.20101205.1.jpp6.src.rpm
+SRPMS/jsslutils-1.0.5-1.jpp6.src.rpm
+SRPMS/openejb31-3.1.4-1.jpp6.src.rpm
+SRPMS/restlet-1.1.10-1.jpp6.src.rpm
+SRPMS/simple-4.1.21-1.jpp6.src.rpm
+SRPMS/simpleframework-3.1.3-1.jpp6.src.rpm
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+SRPMS/axis-1.4-6.jpp6.src.rpm
+SRPMS/cometd-java-1.0.1-1.jpp6.src.rpm
+SRPMS/testng-6.1.1-3.jpp6.src.rpm
+SRPMS/yuicompressor-2.4.6-2.jpp6.src.rpm
+deleting SRPMS/testng-6.1.1-2.jpp6.src.rpm
+deleting SRPMS/axis-1.4-5.jpp6.src.rpm
+-----------------------------------------
+_____________________
+
+6.0/generic/devel
+_____________________
+SRPMS/apache-shiro-1.1.0-1.jpp6.src.rpm
+SRPMS/jsmpp-2.1.0-1.jpp6.src.rpm
+SRPMS/lucene3-3.0.3-1.jpp6.src.rpm
+SRPMS/mvel2-2.0.18-1.jpp6.src.rpm
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________

@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
-# (3.5.1; TODO: check 3.5.2) does we need it?
-#libgnomeui-2.so.0()(64bit) is needed by eclipse-swt-3.5.1-alt2_28jpp6
+require 'set_bin_755.pl';
 
 # TODO: update lpg when updating eclipse-cdt from 14
 
@@ -99,10 +98,6 @@ q!
      [exec] Building SWT/GTK+ for linux x86_64
 !;
 
-#	$jpp->get_section('prep')->push_body('
-#sed -i -e s,/usr/share/java/apache-commons-el-1.0.jar,/usr/share/java/apache-commons-el.jar,g `grep -rl /usr/share/java/apa#che-commons-el-1.0.jar .`
-#');
-
     if (0) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
     $jpp->get_section('prep')->push_body(q{
 #uname -p == unknown but exit code is 0 :( (alt feature :( )
@@ -116,12 +111,6 @@ find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 	$jpp->get_section('package','')->subst(qr'jpackage-1.?-compat','jpackage-generic-compat');
 	$jpp->get_section('package','')->unshift_body('BuildRequires: java-1.6.0-openjdk-devel');
     } 
-
-    # hack around added in -15 exact versions
-    $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
-    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
-    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
 
     if (0) {
     #support for alt feature
@@ -195,3 +184,9 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
 
     # hack around #22839: built-in /usr/lib*/eclipse
     # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
+    # hack around added in -15 exact versions
+
+    $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
+    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
+    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
+    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');

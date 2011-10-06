@@ -186,6 +186,7 @@ maven-verifier-plugin	maven2-plugin-verifier
 maven-war-plugin	maven2-plugin-war
 
 maven-release-plugin	maven-release
+maven-plugin-jxr	maven-jxr
 /;
 	map {$RPM::Source::Convert::Generic2ALT::ALTDEPSUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     }

@@ -47,8 +47,14 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'jdom-1.1.1-1.fc13.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom-1.1.1.jar');
     } elsif ($name eq 'objectweb-asm') {
-	&unpack_fc_rpm($jpp,$fcpathRH.'objectweb-asm-3.3.1-1.fc16.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all-3.3.1.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'objectweb-asm-3.3.1-2.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all.jar');
+    } elsif ($name eq 'rhino') {
+	&unpack_fc_rpm($jpp,$fcpathRH.'rhino-1.7-0.10.r3.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/js.jar','/usr/share/java/js-1.7.jar');
+    } elsif ($name eq 'sac') {
+	&unpack_fc_rpm($jpp,$fcpathRH.'sac-1.3-11.fc16.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/sac.jar','/usr/share/java/sac.jar');
     } elsif ($name eq 'wsdl4j') {
 	&unpack_fc_rpm($jpp,$fcpath14.'wsdl4j-1.5.2-7.6.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/wsdl4j.jar','/usr/share/java/wsdl4j-1.5.2.jar');
@@ -67,12 +73,12 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'xalan-j2-2.7.1-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xalan-j2-serializer.jar','/usr/share/java/xalan-j2-serializer-2.7.1.jar');
     } elsif ($name eq 'xmlgraphics-fop') {
-	&unpack_fc_rpm($jpp,$fcpath14.'fop-0.95-5.fc14.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-fop.jar','/usr/share/java/fop-0.95.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'fop-1.0-17.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-fop.jar','/usr/share/java/fop.jar');
     } elsif ($name eq 'xmlgraphics-batik') {
-	&unpack_fc_rpm($jpp,$fcpath14.'batik-1.7-6.fc12.noarch.rpm');
+	&unpack_fc_rpm($jpp,$fcpathRH.'batik-1.7-12.fc16.noarch.rpm');
 	foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {
-	    &merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-batik/'.$i.'.jar','/usr/share/java/batik/batik-'.$i.'-1.7.jar');
+	    &merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-batik/batik-'.$i.'.jar','/usr/share/java/batik/batik-'.$i.'.jar');
 	}
     } else {
 	warn "no need for OSGi MANIFEST or not found.";

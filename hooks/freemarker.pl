@@ -9,6 +9,7 @@ pushd %buildroot%_javadir
 ln -s freemarker-%version.jar freemarker-2.3.jar
 popd
 !);
+    $jpp->get_section('files')->push_body(q!%_javadir/freemarker-2.3.jar!."\n");
 
     # useful anyway :) RH compatibility.
     # compat mapping 
