@@ -102,36 +102,29 @@ sub origin_import_hook {
     }
 }
 
-sub is_origin_up {
-    my ($self, $origin_rh, $dest_rh)=@_;
+sub origin_cmp_dest {
+    my ($self,$origin_rh,$dest_rh) =@_;
     return 1 unless $dest_rh;
-    return 0 unless $origin_rh;
-    return &alt_jpp_rpmvercmp($dest_rh, $origin_rh) <0;
-}
-
-sub alt_jpp_rpmvercmp {
-    my ($dest_rh, $origin_rh) =@_;
-    return -1 unless $dest_rh;
-    return 1 unless $origin_rh;
+    return -1 unless $origin_rh;
     my $originversion=$origin_rh->{VERSION};
     my $originrelease=$origin_rh->{RELEASE};
     my $destversion=$dest_rh->{VERSION};
     my $destrelease=$dest_rh->{RELEASE};
-    my $cmp = $destversion cmp $originversion;
-    print STDERR "jppmass: $destversion cmp $originversion = $cmp\n" if $verbose;
+    my $cmp = $originversion cmp $destversion;
+    print STDERR "jppmass: $originversion cmp $destversion = $cmp\n" if $verbose;
     if ($cmp!=0) {
-	$cmp=evrcmp($destversion, $originversion);
-	print STDERR "jppmass: $destversion rpmcmp $originversion = $cmp\n" if $verbose;
+	$cmp=evrcmp($originversion,$destversion);
+	print STDERR "jppmass: $originversion rpmcmp $destversion = $cmp\n" if $verbose;
     }
     return $cmp if $cmp !=0;
     $originrelease=~s/\.fc\d+$//;
     if ($destrelease=~/^alt([^_]+)_(.+)jpp[\d.]+$/) {
 	my $altjppsubrel=$2;
-	$cmp=evrcmp($altjppsubrel, $originrelease);
-	print STDERR "jppmass: $altjppsubrel cmp $originrelease = $cmp\n" if $verbose;
+	$cmp=evrcmp($originrelease, $altjppsubrel);
+	print STDERR "jppmass: $originrelease cmp $altjppsubrel = $cmp\n" if $verbose;
 	return $cmp;
     }
-    return -1;
+    return 1;
 }
 
 1;
