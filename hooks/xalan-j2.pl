@@ -16,7 +16,7 @@ fi
 ');
 
     # ALT Compat provides
-    if (not $jpp->get_section('package','')->match(qr'Provides: xalan-j = ')) {
+    if (not $jpp->get_section('package','')->match_body(qr'Provides: xalan-j = ')) {
 	$jpp->get_section('install')->push_body('ln -s xalan-j2.jar $RPM_BUILD_ROOT/%{_javadir}/xalan-j.jar'."\n");
 #	$jpp->get_section('install')->push_body('ln -s xalan-j2-serializer.jar $RPM_BUILD_ROOT/%{_javadir}/serializer.jar'."\n");
 	$jpp->get_section('package','')->push_body('Provides: xalan-j = %{name}-%{version}'."\n");

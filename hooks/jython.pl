@@ -8,7 +8,7 @@ push @SPECHOOKS, sub {
     $jpp->get_section('package','')->set_tag('Summary','Jython is an implementation of Python written in pure Java.');
     #$jpp->get_section('package','')->subst(qr'cpython_version\s+2.3','cpython_version	2.4');
 
-    $jpp->get_section('package','')->push_body('BuildArch: noarch'."\n") unless $jpp->get_section('package','')->match(qr'BuildArch:\s*noarch');
+    $jpp->get_section('package','')->push_body('BuildArch: noarch'."\n") unless $jpp->get_section('package','')->match_body(qr'BuildArch:\s*noarch');
 
     $jpp->get_section('package','')->unshift_body('#BuildRequires(pre): j2se-jdbc = 1.4.2
 BuildRequires: jline
@@ -50,7 +50,7 @@ fi || :
 #    $jpp->get_section('preun','')->push_body('
 
     # for fedora jython lacking pom
-    if (!$jpp->get_section('package','')->match(qr'^Source.:.+jython.*\.pom')) {
+    if (!$jpp->get_section('package','')->match_body(qr'^Source.:.+jython.*\.pom')) {
 	$jpp->get_section('install')->push_body(q!
 %add_to_maven_depmap %{name} %{name} %{version} JPP %{name}                     
 %add_to_maven_depmap org.python %{name} %{version} JPP %{name}                  

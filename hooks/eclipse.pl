@@ -144,10 +144,24 @@ fi
 %exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
 !);
 
+    # filetrigger
+    $jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    $jpp->get_section('install')->push_body(q@# reconsiler filetrigger
+mkdir -p %buildroot/usr/lib/rpm
+cat > %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger << 'EOF'
+#!/bin/sh -e
+egrep -qs '^%{_libdir}' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
+EOF
+chmod 755 %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger
+@);
+
 };
 
 
 __END__
+
+
+
     # seamonkey provides mozilla too
     #$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
 

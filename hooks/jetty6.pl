@@ -19,7 +19,7 @@ push @SPECHOOKS, sub {
     &add_missingok_config($jpp, '/etc/default/jetty','');
 
     $jpp->copy_to_sources('jetty.init');
-    #if ($jpp->get_section('package','')->match(qr'Source7:\s+jetty.init\s*$')) {
+    #if ($jpp->get_section('package','')->match_body(qr'Source7:\s+jetty.init\s*$')) {
     #	$jpp->get_section('prep')->push_body("sed -i 's,daemon --user,start_daemon --user,' %SOURCE7"."\n");
     #}
     $jpp->applied_block(

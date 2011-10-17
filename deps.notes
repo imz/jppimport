@@ -812,7 +812,69 @@ SRPMS/apache-shiro-1.1.0-1.jpp6.src.rpm
 SRPMS/jsmpp-2.1.0-1.jpp6.src.rpm
 SRPMS/lucene3-3.0.3-1.jpp6.src.rpm
 SRPMS/mvel2-2.0.18-1.jpp6.src.rpm
+-----------------------------------------
+_____________________
+
+6.0/generic/devel
+_____________________
+SRPMS/jersey-1.1.5.1-1.jpp6.src.rpm
+SRPMS/jtopen-7.4-1.jpp6.src.rpm
+SRPMS/scala28-2.8.1-2.jpp6.src.rpm
+SRPMS/smack-3.1.0-2.jpp6.src.rpm
+deleting SRPMS/jbossws-spi-1.2.0-0.b1.1.jpp6.src.rpm
+deleting SRPMS/jbossws-common-1.1.0.2-1.jpp6.src.rpm
 _____________________
 
 6.0/generic/free/SRPMS
 _____________________
+SRPMS/bsf-2.4.0-11.jpp6.src.rpm
+SRPMS/jboss-jaxrpc-api_1.1_spec-1.0.0-13.jpp6.src.rpm
+SRPMS/maven-archiver-2.4.2-2.jpp6.src.rpm
+SRPMS/maven-doxia-1.0-2.jpp6.src.rpm
+SRPMS/maven-enforcer-1.0.1-2.jpp6.src.rpm
+SRPMS/maven-pmd-plugin-2.5-5.jpp6.src.rpm
+SRPMS/maven-shared-8-0.p8.10.jpp6.src.rpm
+SRPMS/maven22-2.2.1-23.1.jpp6.src.rpm
+-----------------------------------------
+SRPMS/jdependency-0.6-5.jpp6.src.rpm
+SRPMS/maven-clean-plugin-2.4.1-6.jpp6.src.rpm
+SRPMS/maven-compiler-plugin-2.3-1.jpp6.src.rpm
+SRPMS/maven-install-plugin-2.3-11.jpp6.src.rpm
+SRPMS/maven-jar-plugin-2.3-5.jpp6.src.rpm
+SRPMS/maven-resources-plugin-2.4.2-2.jpp6.src.rpm
+SRPMS/maven-shade-plugin-1.4-1.jpp6.src.rpm
+SRPMS/maven-shared-8-0.p8.11.jpp6.src.rpm
+SRPMS/plexus-archiver-1.0-1_alpha_12.jpp6.src.rpm
+SRPMS/plexus-io-1.0-0.a5.1.jpp6.src.rpm
+deleting SRPMS/plexus-io-1.0-0.a1.2.jpp6.src.rpm
+deleting SRPMS/plexus-archiver-1.0-0.2.a7.5.jpp6.src.rpm
+deleting SRPMS/maven-shared-8-0.p8.10.jpp6.src.rpm
+-----------------------------------------
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+receiving file list ... done
+SRPMS/
+SRPMS/easymock-classextension-1.2.1-2.jpp6.src.rpm
+SRPMS/jpackage-utils-5.0.0-7.jpp6.src.rpm
+SRPMS/junit-addons-1.4-7.jpp6.src.rpm
+SRPMS/maven-assembly-plugin-2.2-1_beta_5.jpp6.src.rpm
+SRPMS/maven-common-artifact-filters-1.3-1.jpp6.src.rpm
+SRPMS/maven-javadoc-plugin-2.7-23.jpp6.src.rpm
+SRPMS/maven-parent-20-2.jpp6.src.rpm
+SRPMS/maven-reporting-api-3.0-3.jpp6.src.rpm
+SRPMS/maven-shared-8-0.p8.12.jpp6.src.rpm
+SRPMS/maven-site-plugin-2.0.1-2.jpp6.src.rpm
+SRPMS/maven22-2.2.1-23.3.jpp6.src.rpm
+SRPMS/plexus-active-collections-1.0-1_beta_2.jpp6.src.rpm
+SRPMS/plexus-component-api-1.0-1_alpha_22.jpp6.src.rpm
+SRPMS/tomcat5-5.5.34-1.jpp6.src.rpm
+SRPMS/tomcat6-6.0.33-1.jpp6.src.rpm
+deleting SRPMS/tomcat6-6.0.32-2.jpp6.src.rpm
+deleting SRPMS/tomcat5-5.5.29-3.jpp6.src.rpm
+deleting SRPMS/maven22-2.2.1-23.1.jpp6.src.rpm
+deleting SRPMS/maven-shared-8-0.p8.11.jpp6.src.rpm
+deleting SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
+deleting SRPMS/easymock-classextension-1.2.1-1.jpp6.src.rpm
+-----------------------------------------
