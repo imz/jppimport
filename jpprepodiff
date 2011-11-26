@@ -1,17 +1,18 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
 use Carp;
 use Getopt::Long;
-use strict;
+use ALTLinux::ACL;
 
-my ($verbose,$acl);
+my ($verbose);
 #my @aclusers=('viy','@java');
 my $cmd='git.alt';
-my $PATH1='/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
+my $PATH1='/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS';
 my $PATH2='/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS';
 
 my $result = GetOptions (
-			 "acl=s" => \$acl,
 			 "path1=s" => \$PATH1,
 			 "path2=s" => \$PATH2,
 			 "out=s"  => \$cmd,
@@ -40,14 +41,12 @@ unless (-d $PATH2) {
     exit (64);
 }
 
-if ($acl) {
-    die "not implemented";
-}
-
+my $acl=ALTLinux::ACL->new();
 
 my @newer;
 my @deprecated;
 for my $name (@ARGV) {
+    next unless $acl->is_authorized($name, 'viy');
     my $rpm1=&find_rpm($name, $PATH1);
     my $rpm2=&find_rpm($name, $PATH2);
     unless ($rpm2 || $rpm1) {
@@ -71,8 +70,8 @@ for my $name (@ARGV) {
     }
 }
 
-open (GITALT, ">$cmd") || die "can't open $cmd: $!";
-print GITALT "ssh git.alt task new 5.0\n";
+open (GITALT,'>', $cmd) || die "can't open $cmd: $!";
+print GITALT "ssh git.alt task new t6\n";
 
 print "\nthe following packages are newer:\n";
 for my $rpm (@newer) {

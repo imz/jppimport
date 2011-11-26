@@ -99,6 +99,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
     $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
     $jpp->get_section('package','')->push_body('Requires: java-common'."\n");
+    $jpp->get_section('package','')->push_body('Requires: /proc'."\n");
 
     # for M40; can(should?) be disabled on M41
     #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
@@ -185,6 +186,7 @@ with %{name} J2SE Runtime Environment.
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 ');
     $jpp->_reset_speclist();
+
     $jpp->add_section('files','javaws');
     #map{$_->describe()} $jpp->get_sections();
 

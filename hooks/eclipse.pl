@@ -2,11 +2,29 @@
 
 require 'set_bin_755.pl';
 
-# TODO: update lpg when updating eclipse-cdt from 14
+push @PREHOOKS, sub {
+    my ($jpp, $parent) = @_;
+    # TODO: think how we can have clean uninstall
+    {
+	my $comment=0;
+	my $preunsec=$jpp->get_section('preun','platform');
+	# comment because it hangs on rpm -qf "$file" :(
+	$preunsec->map_body(sub {
+	    $comment=1 if /Delete orphaned profile files/;
+	    $_='#'.$_ if $comment;
+	    $comment=0 if $comment==1 and /^#done/;
+							});
+	$jpp->get_section('postun','platform')->push_body(q!if [ "$1" = 0 ]; then
+    # Delete orphaned profile files (less efficient than variant above :(
+    rm -rf %{_libdir}/%{name}/p2/org.eclipse.equinox.p2.engine/profileRegistry/PlatformProfile.profile
+fi
+!);
+    }
+};
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($jpp, $parent) = @_;
 
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
@@ -144,15 +162,22 @@ fi
 %exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
 !);
 
-    # filetrigger
-    $jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    # reconsiler filetrigger.
+    # two platform sections :(
+    #$jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    foreach my $section ($jpp->get_sections()) {
+	next unless $section->get_type eq 'files' and $section->get_package eq 'platform';
+	next if $section->get_flag('-f');
+	$section->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    }
     $jpp->get_section('install')->push_body(q@# reconsiler filetrigger
 mkdir -p %buildroot/usr/lib/rpm
 cat > %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger << 'EOF'
 #!/bin/sh -e
-egrep -qs '^%{_libdir}' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
+egrep -qs '^%{_libdir}/eclipse' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
 EOF
 chmod 755 %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger
+echo /usr/lib/rpm/%{name}-%{_arch}.filetrigger >> %{name}-platform.install
 @);
 
 };

@@ -7,9 +7,9 @@ use Carp;
 use Getopt::Long;
 use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
-use RPM::Source::Transform;
+use RPM::Source::Transform 0.001;
 use RPM::Source::Convert;
-use RPM::Source::Convert::JPackage2ALT;
+use RPM::Source::Convert::Plugins::JPackage2ALT;
 
 #Getopt::Long::Configure ("bundling");
 our @ISA=q/RPM::Source::Convert/;
@@ -25,21 +25,10 @@ push @RPM::Source::Transform::DEFAULT_OPTIONS,
     "nobz2"   => \$nobz2,
     "nozip"   => \$nozip;
 $RPM::Source::Transform::defaultchangelog='- converted from JPackage by jppimport script';
-$RPM::Source::Convert::distromap_args{'-originrepo'}='jpackage';
+$DistroMap::default_originrepo='jpackage';
 
-my $converter=RPM::Source::Convert::JPPImport->new();
-$converter->process_options();
-
-$jvm||=6;
 my $newjava='6';
-if ($jvm and $jvm =~ /^4/) {
-    $newjava = '1.7';
-} elsif ($jvm and $jvm =~ /^5/) {
-    $newjava = '5';
-} elsif ($jvm and $jvm =~ /^6/) {
-    $newjava = '6';
-}
-
+my $converter=RPM::Source::Convert::JPPImport->new();
 $converter->transform(
     '-specargs' => [
 	'CONVERT::GENERIC::NOINFO'=>0,
@@ -53,6 +42,19 @@ sub usage {
     print "--jvm jvm JVM required for the build. values are: 4 4.2 5 6. Default is java 6.\n";
 }
 
+sub process_options {
+    my ($self)=@_;
+    $self->SUPER::process_options();
+    $jvm||=6;
+    if ($jvm and $jvm =~ /^4/) {
+	$newjava = '1.7';
+    } elsif ($jvm and $jvm =~ /^5/) {
+	$newjava = '5';
+    } elsif ($jvm and $jvm =~ /^6/) {
+	$newjava = '6';
+    }
+}
+
 sub verify_options {
     my ($self)=@_;
     $self->SUPER::verify_options();
@@ -61,7 +63,7 @@ sub verify_options {
 	$self->usage();
 	exit (5);
     }
-    if ($RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm =~ m!/jpackage/!) {
+    if (grep {$_->[1] =~ m!/jpackage/!} @RPM::Source::Transform::INSRC) {
 	my %map_jpp=qw/
 maven-plugins	maven1-plugins
 maven	maven1
@@ -141,8 +143,8 @@ maven-plugin-webstart	maven1-plugin-webstart
 maven-plugin-wizard	maven1-plugin-wizard
 maven-plugin-xdoc	maven1-plugin-xdoc
 /;
-	map {$RPM::Source::Convert::Generic2ALT::ALTDEPSUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
-    } elsif ($RPM::Source::Transform::inrpm and $RPM::Source::Transform::inrpm =~ m!/fedora/linux/!) {
+	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
+    } elsif (grep {$_->[1] =~ m!/fedora/linux/!} @RPM::Source::Transform::INSRC) {
 	my %map_jpp=qw/
 maven	maven2
 maven-ant-plugin	maven2-plugin-ant
@@ -188,7 +190,7 @@ maven-war-plugin	maven2-plugin-war
 maven-release-plugin	maven-release
 maven-plugin-jxr	maven-jxr
 /;
-	map {$RPM::Source::Convert::Generic2ALT::ALTDEPSUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
+	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     }
 }
 

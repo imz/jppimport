@@ -13,6 +13,9 @@ use RPM::Source::Convert::Mass;
 
 our @ISA = qw/RPM::Source::Convert::Mass/;
 
+$DistroMap::default_originrepo='jpackage';
+$DistroMap::default_destrepo='altlinux';
+
 $DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
 $ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
@@ -74,7 +77,6 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 	"nozip" => \$nozip,
 	"target=s"=> \$target,
 ],
-    '-originrepo' => 'jpackage',
 );
 $convert->run();
 
