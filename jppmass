@@ -9,12 +9,19 @@ use Getopt::Long;
 use File::Basename;
 use RPM qw/evrcmp/;
 
-use RPM::Source::Convert::Mass;
+use Source::Repository::Mass;
+use Source::Repository::Matcher;
+use Source::Repository::Matcher::DistroMap;
+use Source::Repository::Mass::Transform::PassThrough;
 
-our @ISA = qw/RPM::Source::Convert::Mass/;
+our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
 
 $DistroMap::default_originrepo='jpackage';
 $DistroMap::default_destrepo='altlinux';
+
+$Source::Repository::Mass::strategy='all';
+my $origintoolsdir=dirname($0);
+$Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir/jppimport";
 
 $DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
 $ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
@@ -63,9 +70,7 @@ xsdlib
 
 @DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);
 
-my ($jvm, $nobz2, $nozip,$target);
-my $origintoolsdir=dirname($0);
-$RPM::Source::Convert::Mass::originimport="$origintoolsdir/jppimport";
+my ($jvm,$target);
 
 my $verbose=0;
 my $convert=RPM::Source::Convert::JPPMass->new(
@@ -73,12 +78,10 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 	"jpp=s" => \$ORIGINPATH,
 	"alt=s"   => \$DESTPATH,
 	"jvm=s" => \$jvm,
-	"nobz2" => \$nobz2,
-	"nozip" => \$nozip,
 	"target=s"=> \$target,
 ],
 );
-$convert->run();
+$convert->process();
 
 sub process_options_hook {
     my ($self)=@_;
@@ -95,8 +98,6 @@ maven	maven1
 sub origin_import_hook {
     my ($self,$argsptr)=@_;
     push @$argsptr, '--jvm', $jvm if ($jvm);
-    push @$argsptr, '--nobz2' if ($nobz2);
-    push @$argsptr, '--nozip' if ($nozip);
     my $hook;
     if ($target) {
 	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
@@ -104,14 +105,14 @@ sub origin_import_hook {
     }
 }
 
-sub origin_cmp_dest {
-    my ($self,$origin_rh,$dest_rh) =@_;
-    return 1 unless $dest_rh;
-    return -1 unless $origin_rh;
-    my $originversion=$origin_rh->{VERSION};
-    my $originrelease=$origin_rh->{RELEASE};
-    my $destversion=$dest_rh->{VERSION};
-    my $destrelease=$dest_rh->{RELEASE};
+sub cmp_origin_dest {
+    my ($self,$origin,$dest) =@_;
+    return 1 unless $dest;
+    return -1 unless $origin;
+    my $originversion=$origin->version;
+    my $originrelease=$origin->release;
+    my $destversion=$dest->version;
+    my $destrelease=$dest->release;
     my $cmp = $originversion cmp $destversion;
     print STDERR "jppmass: $originversion cmp $destversion = $cmp\n" if $verbose;
     if ($cmp!=0) {
