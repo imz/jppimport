@@ -14,16 +14,14 @@ use RPM::Source::Convert::Plugins::JPackage2ALT;
 #Getopt::Long::Configure ("bundling");
 our @ISA=q/RPM::Source::Convert/;
 
-my ($jvm,$nozip,$nobz2);
+my ($jvm);
 $RPM::Source::Transform::cleanup=0;
 $RPM::Source::Transform::packager='auto';
 $RPM::Source::Transform::nextrel='jppimport';
 $RPM::Source::Transform::NEXTREL_METHOD{'jppimport'}=\&nextrel_jppimport;
 $RPM::Source::Transform::INITREL_METHOD{'jppimport'}=\&initrel_jppimport;
 push @RPM::Source::Transform::DEFAULT_OPTIONS,
-    "jvm=s" => \$jvm,
-    "nobz2"   => \$nobz2,
-    "nozip"   => \$nozip;
+    "jvm=s" => \$jvm;
 $RPM::Source::Transform::defaultchangelog='- converted from JPackage by jppimport script';
 $DistroMap::default_originrepo='jpackage';
 
@@ -39,20 +37,14 @@ $converter->transform(
 sub usage {
     my ($self)=@_;
     $self->SUPER::usage();
-    print "--jvm jvm JVM required for the build. values are: 4 4.2 5 6. Default is java 6.\n";
+    print "--jvm jvm JVM required for the build. values are: 5 6 7. Default is java 6.\n";
 }
 
 sub process_options {
     my ($self)=@_;
     $self->SUPER::process_options();
     $jvm||=6;
-    if ($jvm and $jvm =~ /^4/) {
-	$newjava = '1.7';
-    } elsif ($jvm and $jvm =~ /^5/) {
-	$newjava = '5';
-    } elsif ($jvm and $jvm =~ /^6/) {
-	$newjava = '6';
-    }
+    $newjava = $1 if $jvm =~ /^([567])/;
 }
 
 sub verify_options {
