@@ -95,7 +95,7 @@ maven	maven1
     }
 }
 
-sub origin_import_hook {
+sub process_pair_hook {
     my ($self,$argsptr)=@_;
     push @$argsptr, '--jvm', $jvm if ($jvm);
     my $hook;

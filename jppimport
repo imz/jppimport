@@ -1,38 +1,32 @@
 #!/usr/bin/perl -w
 
-package RPM::Source::Convert::JPPImport;
+package RPM::Source::Convert::ALTLinuxJPPImport;
 use strict;
 use warnings;
-use Carp;
-use Getopt::Long;
+
 use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
-use RPM::Source::Transform 0.001;
 use RPM::Source::Convert;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
-
-#Getopt::Long::Configure ("bundling");
 our @ISA=q/RPM::Source::Convert/;
 
-my ($jvm);
-$RPM::Source::Transform::cleanup=0;
-$RPM::Source::Transform::packager='auto';
 $RPM::Source::Transform::nextrel='jppimport';
 $RPM::Source::Transform::NEXTREL_METHOD{'jppimport'}=\&nextrel_jppimport;
 $RPM::Source::Transform::INITREL_METHOD{'jppimport'}=\&initrel_jppimport;
-push @RPM::Source::Transform::DEFAULT_OPTIONS,
-    "jvm=s" => \$jvm;
 $RPM::Source::Transform::defaultchangelog='- converted from JPackage by jppimport script';
 $DistroMap::default_originrepo='jpackage';
 
-my $newjava='6';
-my $converter=RPM::Source::Convert::JPPImport->new();
-$converter->transform(
-    '-specargs' => [
-	'CONVERT::GENERIC::NOINFO'=>0,
-	'CONVERT::JPACKAGE::JVM'=>$jvm,
-    ]
-);
+# TODO: share the stem with RPM::Source::Convert::Plugins::JPackage2ALT?
+my $jvm=6;
+push @RPM::Source::Transform::LONGOPT,
+    "jvm=s" => \$jvm;
+
+# keep in util
+$RPM::Source::Transform::cleanup=0;
+$RPM::Source::Transform::packager='auto';
+
+my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
+$converter->transform();
 
 sub usage {
     my ($self)=@_;
@@ -43,15 +37,14 @@ sub usage {
 sub process_options {
     my ($self)=@_;
     $self->SUPER::process_options();
-    $jvm||=6;
-    $newjava = $1 if $jvm =~ /^([567])/;
+    $RPM::Source::Convert::Plugins::JPackage2ALT::jvm=$jvm;
 }
 
 sub verify_options {
     my ($self)=@_;
     $self->SUPER::verify_options();
-    if ($jvm and ($jvm <4 or $jvm > 7)) {
-	print "ERROR: invalid jvm option  $jvm\n";
+    if (not $jvm or ($jvm <4 or $jvm > 7)) {
+	print "ERROR: invalid jvm option $jvm\n";
 	$self->usage();
 	exit (5);
     }
@@ -208,7 +201,7 @@ sub initrel_jppimport {
     $jpprel=~s/jpp//;
   
     my $altrel="alt1";
-    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
+    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$jvm;
     return $newrel;
 }
 
@@ -259,7 +252,7 @@ sub nextrel_jppimport {
 	    } elsif (not $subrel and &vercmp(0,$jpprel,0,$jppfrom) >0) {
 		# nothing to do
 		print STDERR "nothing to do: new jppfrom is higher\n" if $RPM::Source::Transform::verbose>1;
-	    } elsif (($jppfrom eq $jpprel) and not $subrel and $java and ($java < $newjava)) {
+	    } elsif (($jppfrom eq $jpprel) and not $subrel and $java and ($java < $jvm)) {
 		# nothing to do
 		print STDERR "nothing to do: new java is higher\n" if $RPM::Source::Transform::verbose>1;
 	    } else {
@@ -279,7 +272,7 @@ sub nextrel_jppimport {
 	    }
 	}
     }
-    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$newjava;
+    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$jvm;
     return $newrel;
 }
 
