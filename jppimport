@@ -48,7 +48,13 @@ sub verify_options {
 	$self->usage();
 	exit (5);
     }
+}
+
+sub verify_args {
+    my ($self)=@_;
+    $self->SUPER::verify_args();
     if (grep {$_->[1] =~ m!/jpackage/!} @RPM::Source::Transform::INSRC) {
+	print STDERR "I: jpackage mode\n";
 	my %map_jpp=qw/
 maven-plugins	maven1-plugins
 maven	maven1
@@ -130,7 +136,10 @@ maven-plugin-xdoc	maven1-plugin-xdoc
 /;
 	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     } elsif (grep {$_->[1] =~ m!/fedora/linux/!} @RPM::Source::Transform::INSRC) {
+	print STDERR "I: fedora mode\n";
 	my %map_jpp=qw/
+itext	itext2
+
 maven	maven2
 maven-ant-plugin	maven2-plugin-ant
 maven-antlr-plugin	maven2-plugin-antlr

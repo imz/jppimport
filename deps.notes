@@ -59,8 +59,6 @@ Was expecting one of:
 indicate that velocity14/15 should be used.
 
 ==duplicate rpms to remove:==
-ibatis by apache-ibatis
-portals-pluto && portals-pluto10
 dups TODO
 bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by bouncycastle
 ----------
@@ -230,7 +228,6 @@ sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %bui
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
-SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
 SRPMS/google-collections-1.0-3.jpp6.src.rpm (build failures)
 SRPMS/javacc-5.0-5.jpp6.src.rpm
@@ -279,7 +276,6 @@ SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 SRPMS/qdox-1.12-2.jpp6.src.rpm
 SRPMS/sisu-1.4.3.2-1.jpp6.src.rpm
 SRPMS/texen-1.0-2.jpp6.src.rpm
-SRPMS/textmining-1.0-1.jpp6.src.rpm
 SRPMS/tiles-2.0.7-1.jpp6.src.rpm
 SRPMS/tl-netty2-1.9.2-4.jpp6.src.rpm
 SRPMS/vafer-dependency-0.4-4.jpp6.src.rpm
@@ -993,7 +989,6 @@ _____________________
 
 6.0/generic/free/SRPMS
 _____________________
-SRPMS/annogen-0.1.1-8.jpp6.src.rpm
 SRPMS/apache-commons-csv-1.0-0.r1086196.2.jpp6.src.rpm
 SRPMS/apache-commons-jexl2-2.0.1-2.jpp6.src.rpm
 SRPMS/apache-commons-net14-1.4.1-1.jpp6.src.rpm
@@ -1007,7 +1002,6 @@ SRPMS/aries-quiesce-0.3-2.jpp6.src.rpm
 SRPMS/aries-util-0.3-2.jpp6.src.rpm
 SRPMS/axis2-1.4.1-3.jpp6.src.rpm
 SRPMS/backport-util-concurrent-3.1-4.jpp6.src.rpm
-SRPMS/bsh2-2.1-0.b5.1.jpp6.src.rpm
 SRPMS/colt-1.2.0-5.jpp6.src.rpm
 SRPMS/d-haven-event-1.1.0-5.jpp6.src.rpm
 SRPMS/d-haven-mpool-1.0-5.jpp6.src.rpm
@@ -1016,7 +1010,6 @@ SRPMS/hamcrest-1.1-10.jpp6.src.rpm
 SRPMS/hessian-nodep-3.1.3-4.jpp6.src.rpm
 SRPMS/howl-logger-1.0.2-2.jpp6.src.rpm
 SRPMS/jackrabbit-1.6.5-1.jpp6.src.rpm
-SRPMS/jamonapi-2.7-2.jpp6.src.rpm
 SRPMS/javacc3-3.2-7.jpp6.src.rpm
 SRPMS/jna-3.2.7-13.jpp6.src.rpm
 SRPMS/jotm-2.0.11-3.jpp6.src.rpm
@@ -1070,7 +1063,6 @@ SRPMS/jffi-0.5-2.jpp6.src.rpm
 SRPMS/jsr107cache-1.0-3.jpp6.src.rpm
 SRPMS/kilim1-1.1.3-5.jpp6.src.rpm
 SRPMS/objenesis-1.1-1.jpp6.src.rpm
-SRPMS/spring-1.2.9-4.jpp6.src.rpm
 SRPMS/struts-1.3.10-3.jpp6.src.rpm
 SRPMS/sun-jaxb-2.1-api-2.1-5.jpp6.src.rpm
 deleting SRPMS/struts-1.3.10-2.jpp6.src.rpm
@@ -1134,7 +1126,6 @@ SRPMS/cpptasks-1.0-0.b5.2.jpp6.src.rpm
 SRPMS/geronimo-specs-1.6-4.jpp6.src.rpm
 SRPMS/jansi-1.7-2.jpp6.src.rpm
 SRPMS/jpackage-release-6-3.jpp6.src.rpm
-SRPMS/openorb-1.4.0-5.jpp6.src.rpm
 SRPMS/spring2-2.5.6.SEC03-3.jpp6.src.rpm
 -----------------------------------------
 SRPMS/tomcat6-6.0.33-2.jpp6.src.rpm
@@ -1145,3 +1136,9 @@ deleting SRPMS/jpackage-release-6-2.jpp6.src.rpm
 deleting SRPMS/jansi-1.7-1.jpp6.src.rpm
 deleting SRPMS/geronimo-specs-1.6-1.jpp6.src.rpm
 deleting SRPMS/apache-commons-logging-1.1.1-17.jpp6.src.rpm
+-----------------------------------------
+SRPMS/excalibur-configuration-1.1-3.jpp6.src.rpm
+SRPMS/maven-wagon-1.0-0.7.b7.4.jpp6.src.rpm
+SRPMS/spring2-2.5.6.SEC03-4.jpp6.src.rpm
+deleting SRPMS/spring2-2.5.6.SEC03-3.jpp6.src.rpm
+deleting SRPMS/maven-wagon-1.0-0.7.b7.3.jpp6.src.rpm

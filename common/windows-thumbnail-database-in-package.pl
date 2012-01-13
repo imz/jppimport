@@ -6,7 +6,7 @@ push @SPECHOOKS, sub {
     my $section=$spec->get_section('install');
     unless ($section) {
 	print STDERR "Oops! install section not found!\n";
-    } elsif (not $section->match(qr'# It is the file in the package named Thumbs.db or Thumbs.db.gz')) {
+    } elsif (not $section->match_body(qr'# It is the file in the package named Thumbs.db or Thumbs.db.gz')) {
 	$section->push_body(q!
 # It is the file in the package named Thumbs.db or Thumbs.db.gz, 
 # which is normally a Windows image thumbnail database. 

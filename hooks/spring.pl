@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'windows-thumbnail-database-in-package.pl';
+__END__
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
