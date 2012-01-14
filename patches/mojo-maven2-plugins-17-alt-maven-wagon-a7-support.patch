@@ -1,0 +1,11 @@
+--- maven-extensions/wagon-cifs/src/main/java/org/apache/maven/wagon/providers/cifs/CifsWagon.java	2008-03-28 12:22:57.000000000 +0000
++++ maven-extensions/wagon-cifs/src/main/java/org/apache/maven/wagon/providers/cifs/CifsWagon.java	2011-06-02 10:18:49.420052456 +0000
+@@ -121,7 +121,7 @@
+         }
+     }
+ 
+-    public void openConnection()
++    public void openConnectionInternal()
+         throws ConnectionException, AuthenticationException
+     {
+         // TODO: Possibly get this from the username if the username contains a '\': ITERA\trygve.laugstol

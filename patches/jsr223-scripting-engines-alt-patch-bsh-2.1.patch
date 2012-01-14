@@ -1,0 +1,29 @@
+--- scripting/engines/beanshell/src/bsh/engine/BshScriptEngine.java	2006-09-14 07:17:01.000000000 +0300
++++ scripting/engines/beanshell/src/bsh/engine/BshScriptEngine.java	2012-01-14 23:37:45.000000000 +0200
+@@ -262,12 +262,7 @@
+ 	 */
+ 	public <T> T getInterface( Class<T> clasz )
+ 	{
+-		try {
+ 			return (T) getGlobal().getInterface( clasz );
+-		} catch ( UtilEvalError utilEvalError ) {
+-			utilEvalError.printStackTrace();
+-			return null;
+-		}
+ 	}
+ 
+ 	/**
+@@ -294,13 +289,8 @@
+ 			throw new IllegalArgumentException(
+ 				"invalid object type: "+thiz.getClass() );
+ 
+-		try {
+ 			bsh.This bshThis = (bsh.This)thiz;
+ 			return (T) bshThis.getInterface( clasz );
+-		} catch ( UtilEvalError utilEvalError ) {
+-			utilEvalError.printStackTrace( System.err );
+-			return null;
+-		}
+ 	}
+ 
+ 	private bsh.This getGlobal()

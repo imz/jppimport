@@ -224,6 +224,15 @@ TODO: objectweb-asm: poms: see hook:
 # seems like we need to patch asm2 to have asm2 group.
 sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %buildroot/usr/share/maven2/poms/JPP.objectweb-asm-asm*
 
+TODO: test rebuild and drop itext in favor of itext from fedora (currently itext2)
+
+TODO: move maven1 plugins ? no need :)
+ clirr-0.6-alt4_6jpp6.src
+ db-torque-3.3-alt2_3jpp5.src (required by portals-jetspeed)
+ jakarta-cactus-1.7.2-alt4_4jpp5.src
+ maven1-1.1-alt14_9jpp6.src
+ sf-maven-plugins-1.0-alt4_0.20050908.9jpp5.src
+
 
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
@@ -1142,3 +1151,10 @@ SRPMS/maven-wagon-1.0-0.7.b7.4.jpp6.src.rpm
 SRPMS/spring2-2.5.6.SEC03-4.jpp6.src.rpm
 deleting SRPMS/spring2-2.5.6.SEC03-3.jpp6.src.rpm
 deleting SRPMS/maven-wagon-1.0-0.7.b7.3.jpp6.src.rpm
+-----------------------------------------
+SRPMS/apache-ibatis2-2.3.4-2.jpp6.src.rpm
+SRPMS/apache-jdo-2.0-5.jpp6.src.rpm
+SRPMS/castor0-0.9.9.1-4.jpp6.src.rpm
+SRPMS/knopflerfish-2.4.0-2.jpp6.src.rpm
+SRPMS/spring2-2.5.6.SEC03-5.jpp6.src.rpm
+deleting SRPMS/spring2-2.5.6.SEC03-4.jpp6.src.rpm
