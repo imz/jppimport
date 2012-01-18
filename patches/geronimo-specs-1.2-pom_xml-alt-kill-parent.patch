@@ -1,0 +1,16 @@
+--- pom.xml.sav0	2007-10-17 11:59:14.000000000 +0200
++++ pom.xml	2007-10-18 13:59:17.000000000 +0200
+@@ -24,11 +24,13 @@
+ 
+     <modelVersion>4.0.0</modelVersion>
+ 
++<!--
+     <parent>
+         <groupId>org.apache.geronimo.genesis.config</groupId>
+         <artifactId>project-config</artifactId>
+         <version>1.1</version>
+     </parent>
++-->
+ 
+     <groupId>org.apache.geronimo.specs</groupId>
+     <artifactId>specs</artifactId>

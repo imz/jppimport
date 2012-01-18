@@ -120,7 +120,7 @@ sub cmp_origin_dest {
 	print STDERR "jppmass: $originversion rpmcmp $destversion = $cmp\n" if $verbose;
     }
     return $cmp if $cmp !=0;
-    $originrelease=~s/\.fc\d+$//;
+    $originrelease=~s/\.(?:fc|jpp)\d+$//;
     if ($destrelease=~/^alt([^_]+)_(.+)jpp[\d.]+$/) {
 	my $altjppsubrel=$2;
 	$cmp=evrcmp($originrelease, $altjppsubrel);

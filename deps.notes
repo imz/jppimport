@@ -398,7 +398,6 @@ deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
 ----------------------------
 SRPMS/cobertura-maven-plugin-2.4-3.jpp6.src.rpm
 SRPMS/codehaus-stax-1.2.0-1.jpp6.src.rpm
-SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
 SRPMS/hibernate3-annotations-3.4.0-3.jpp6.src.rpm
 SRPMS/hibernate3-commons-annotations-3.1.0-4.jpp6.src.rpm
 SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-6.jpp6.src.rpm
@@ -426,7 +425,6 @@ deleting SRPMS/hibernate3-entitymanager-3.4.0-2.7.jpp6.src.rpm
 deleting SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-5.jpp6.src.rpm
 deleting SRPMS/hibernate3-commons-annotations-3.1.0-3.jpp6.src.rpm
 deleting SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
-deleting SRPMS/geronimo-specs-1.2-14.jpp6.src.rpm
 deleting SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
@@ -1158,3 +1156,12 @@ SRPMS/castor0-0.9.9.1-4.jpp6.src.rpm
 SRPMS/knopflerfish-2.4.0-2.jpp6.src.rpm
 SRPMS/spring2-2.5.6.SEC03-5.jpp6.src.rpm
 deleting SRPMS/spring2-2.5.6.SEC03-4.jpp6.src.rpm
+-----------------------------------------
+SRPMS/adaptx-0.9.14-2.jpp6.src.rpm
+SRPMS/el-impl-1.0-2.jpp6.src.rpm
+SRPMS/gentlyweb-utils-1.1-2.jpp6.src.rpm
+SRPMS/gif89encoder-0.90-0.b.4.jpp6.src.rpm
+SRPMS/ldapsdk-4.18-3.jpp6.src.rpm
+SRPMS/oscache-2.4.1-2.jpp6.src.rpm
+SRPMS/sun-jaxb-1.0-1.0.6-3.jpp6.src.rpm
+-----------------------------------------
