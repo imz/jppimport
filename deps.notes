@@ -233,6 +233,18 @@ TODO: move maven1 plugins ? no need :)
  maven1-1.1-alt14_9jpp6.src
  sf-maven-plugins-1.0-alt4_0.20050908.9jpp5.src
 
+TODO: java5 only that have updates:
+$ for i in glassfish-jstl '*-commons-jelly' jbossts jibx jpox mckoi mockrunner ; do find jpackage/6.0 fedora -name $i'*src.rpm'; done
+jpackage/6.0/fedora-9/free/SRPMS/glassfish-jstl-1.2.0-8.jpp6.src.rpm
+jpackage/6.0/generic/free/SRPMS/glassfish-jstl-1.2.0-10.jpp6.src.rpm
+jpackage/6.0/fedora-10/free/SRPMS/glassfish-jstl-1.2.0-8.jpp6.fc10.src.rpm
+jpackage/6.0/generic/free/SRPMS/jakarta-commons-jelly-1.0-7.jpp6.src.rpm
+jpackage/6.0/fedora-9/free/SRPMS/jbossts-4.2.3-1.SP7.4.jpp6.src.rpm
+jpackage/6.0/generic/free/SRPMS/jbossts-4.6.1-1.jpp6.src.rpm
+jpackage/6.0/fedora-10/free/SRPMS/jbossts-4.2.3-1.SP7.4.jpp6.fc10.src.rpm
+fedora/linux/releases/16/Everything/source/SRPMS/jibx-1.2.3-1.fc16.src.rpm
+fedora/linux/development/rawhide/source/SRPMS/jibx-1.2.3-3.fc17.src.rpm
+
 
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
@@ -469,8 +481,6 @@ deleting SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 -----------------------------------
 SRPMS/apache-resource-bundles-3-2.jpp6.src.rpm
 SRPMS/guava-05-6.jpp6.src.rpm
-SRPMS/junit4-4.8.2-5.jpp6.src.rpm
-deleting SRPMS/junit4-4.8.2-4.jpp6.src.rpm
 deleting SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 -----------------------------------
 SRPMS/ant-1.8.2-5.jpp6.src.rpm
@@ -509,7 +519,6 @@ deleting SRPMS/fest-1.0.2-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
 SRPMS/josql-2.2-1.jpp6.src.rpm
-SRPMS/plugin-support-1.0-1.alpha_1.jpp6.src.rpm
 deleting SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
 -----------------------------------
 
@@ -528,8 +537,6 @@ SRPMS/geronimo-genesis2-2.0-1.jpp6.src.rpm
 SRPMS/glassfish-jaf111-1.1.1-2.jpp6.src.rpm
 SRPMS/jackson-1.4.2-1.jpp6.src.rpm
 SRPMS/jasypt-1.7-1.jpp6.src.rpm
-SRPMS/java-xmlbuilder-0.4-1.jpp6.src.rpm
-SRPMS/jets3t-0.8.1-1.jpp6.src.rpm
 SRPMS/jetty-artifact-remote-resources-1.0-1.jpp6.src.rpm
 SRPMS/jetty-assembly-descriptors-1.0-1.jpp6.src.rpm
 SRPMS/jetty-servlet-3.0-api-3.0-0.20100224.3.jpp6.src.rpm
@@ -553,7 +560,6 @@ SRPMS/org.osgi.compendium-4.2.0-1.jpp6.src.rpm
 SRPMS/org.osgi.enterprise-4.2.0-1.jpp6.src.rpm
 SRPMS/servicemix-build-maven-plugin-1.0-1.jpp6.src.rpm
 SRPMS/servicemix-depends-maven-plugin-1.2-1.jpp6.src.rpm
-SRPMS/spring-build-aws-ant-3.0.4-1.jpp6.src.rpm
 SRPMS/spring-build-aws-ivy-1.0.9-1.jpp6.src.rpm
 SRPMS/spring-build-aws-maven-3.0.0-1.jpp6.src.rpm
 SRPMS/spring-ldap-1.3.0-1.jpp6.src.rpm
@@ -570,7 +576,6 @@ SRPMS/cas-client-3.1.6-1.jpp6.src.rpm
 SRPMS/castor-1.3.0.1-1.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-4.jpp6.src.rpm
 SRPMS/ehcache-1.3.0-4.jpp6.src.rpm
-SRPMS/geronimo-genesis-1.3-2.jpp6.src.rpm
 SRPMS/geronimo-specs-1.6-1.jpp6.src.rpm
 SRPMS/groovy17-1.7.10-2.jpp6.src.rpm
 SRPMS/groovy18-1.8.0-1.jpp6.src.rpm
@@ -735,7 +740,6 @@ SRPMS/jboss-specs-parent-1.0.0-1.Beta2.jpp6.src.rpm
 -----------------------------------------
 SRPMS/atinject-1-5.jpp6.src.rpm
 SRPMS/jarjar-maven-plugin-1.3-1.jpp6.src.rpm
-SRPMS/jcommander-1.18-1.jpp6.src.rpm
 SRPMS/joda-time-1.6.2-3.jpp6.src.rpm
 SRPMS/munge-maven-plugin-1.0-3.jpp6.src.rpm
 SRPMS/snakeyaml-1.8-3.jpp6.src.rpm
@@ -859,7 +863,6 @@ receiving file list ... done
 SRPMS/
 SRPMS/easymock-classextension-1.2.1-2.jpp6.src.rpm
 SRPMS/jpackage-utils-5.0.0-7.jpp6.src.rpm
-SRPMS/junit-addons-1.4-7.jpp6.src.rpm
 SRPMS/maven-assembly-plugin-2.2-1_beta_5.jpp6.src.rpm
 SRPMS/maven-common-artifact-filters-1.3-1.jpp6.src.rpm
 SRPMS/maven-javadoc-plugin-2.7-23.jpp6.src.rpm
@@ -1116,7 +1119,6 @@ _____________________
 SRPMS/corejava-format-1.22-4.jpp6.src.rpm
 SRPMS/geronimo-txmanager-2.1.4-1.jpp6.src.rpm
 SRPMS/janino-2.6.1-1.jpp6.src.rpm
-SRPMS/jasperreports2-2.0.5-1.jpp6.src.rpm
 SRPMS/jchardet-1.0-3.jpp6.src.rpm
 SRPMS/jexcelapi-2.6.12-1.jpp6.src.rpm
 SRPMS/jgraph-5.12.1.0-2.jpp6.src.rpm
