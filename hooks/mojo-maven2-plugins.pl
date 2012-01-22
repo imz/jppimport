@@ -51,12 +51,12 @@ sed -i 's,<module>dashboard-maven-plugin</module>,<!--2.0.8 nocompile<module>das
 sed -i 's,<module>xdoclet-maven-plugin</module>,<!-- module>xdoclet-maven-plugin</module -->,' pom.xml
 });
 
-    # apache-ibatis2
-    $jpp->get_section('package','-n mojo-maven2-plugin-ibatis')->subst_body_if('apache-ibatis-abator-core','apache-ibatis2-ibator-core',qr'Requires:');
-    $jpp->get_section('prep')->push_body(q{# apache-ibatis2
-sed -i s,abator,ibator, mojo-sandbox/ibatis-maven-plugin/pom.xml
-});
-    $jpp->source_apply_patch(PATCHFILE=>'mojo-maven2-plugins-jpp-depmap.xml-alt-use-ibatis2.patch',SOURCEFILE=>'mojo-maven2-plugins-jpp-depmap.xml');
+    # apache-ibatis2 -- not ready yet -- see what future releases require
+#    $jpp->get_section('package','-n mojo-maven2-plugin-ibatis')->subst_body_if('apache-ibatis-abator-core','apache-ibatis2-ibator-core',qr'Requires:');
+#    $jpp->get_section('prep')->push_body(q{# apache-ibatis2
+#sed -i -e 's,Abatis,Ibatis,g;s,abatis,ibatis,g;s,Abator,Ibator,g;s,abator,ibator,g;' `grep -r -i -l abat mojo-sandbox/ibatis-maven-plugin/src`
+#});
+#    $jpp->source_apply_patch(PATCHFILE=>'mojo-maven2-plugins-jpp-depmap.xml-alt-use-ibatis2.patch',SOURCEFILE=>'mojo-maven2-plugins-jpp-depmap.xml');
 
     # poi25 pom resolution
     $jpp->source_apply_patch(PATCHFILE=>'mojo-maven2-plugins-jpp-depmap.xml-alt-use-poi25.patch',SOURCEFILE=>'mojo-maven2-plugins-jpp-depmap.xml');
