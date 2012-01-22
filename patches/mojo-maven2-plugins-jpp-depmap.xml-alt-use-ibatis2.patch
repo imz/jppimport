@@ -5,7 +5,7 @@
      <jpp>
        <groupId>JPP</groupId>
 -      <artifactId>apache-ibatis-abator-core</artifactId>
-+      <artifactId>apache-ibatis-ibator-core</artifactId>
++      <artifactId>apache-ibatis2-ibator-core</artifactId>
        <version>1.0.0</version>
      </jpp>
    </dependency>
