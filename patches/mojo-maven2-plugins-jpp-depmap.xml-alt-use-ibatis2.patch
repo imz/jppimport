@@ -1,0 +1,11 @@
+--- ../SOURCES/mojo-maven2-plugins-jpp-depmap.xml~	2012-01-22 19:52:36.000000000 +0000
++++ ../SOURCES/mojo-maven2-plugins-jpp-depmap.xml	2012-01-22 20:16:39.353568794 +0000
+@@ -2034,7 +2034,7 @@
+     </maven>
+     <jpp>
+       <groupId>JPP</groupId>
+-      <artifactId>apache-ibatis-abator-core</artifactId>
++      <artifactId>apache-ibatis-ibator-core</artifactId>
+       <version>1.0.0</version>
+     </jpp>
+   </dependency>

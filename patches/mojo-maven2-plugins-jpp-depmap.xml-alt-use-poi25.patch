@@ -1,0 +1,11 @@
+--- ../SOURCES/mojo-maven2-plugins-jpp-depmap.xml~	2010-10-03 17:00:26.000000000 +0000
++++ ../SOURCES/mojo-maven2-plugins-jpp-depmap.xml	2012-01-22 19:52:36.885576898 +0000
+@@ -1894,7 +1894,7 @@
+ 	</maven>
+ 	<jpp>
+ 	  <groupId>JPP</groupId>
+-	  <artifactId>poi</artifactId>
++	  <artifactId>poi25</artifactId>
+ 	  <version>2.5.1</version>
+ 	</jpp>
+   </dependency>
