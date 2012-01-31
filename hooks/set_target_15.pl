@@ -2,10 +2,43 @@
 
 push @SPECHOOKS, \&set_target_15;
 
+my $build_repo_mode;
+
+sub section_set_target {
+    my ($jpp,$secname,$target)=@_;
+    my $section=$jpp->get_section($secname);
+    $build_repo_mode=0;
+    $section->map_body(
+	sub {
+	    if (/build-jar-repository.*\\$/) {
+		$build_repo_mode=1;
+		return;
+	    }
+	    if ($build_repo_mode) {
+		$build_repo_mode=0 unless /\\$/;
+		return;
+	    }
+	    return if /build-(?:jar-repository|classpath)/;
+
+	    s!bin/javac !bin/javac  -target $target -source $target ! or
+	    s!%{javac} !%{javac}  -target $target -source $target ! or
+	    s!^\s*mvn(?=\s|$)!mvn -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
+	    s!^\s*(?:\%{_bindir}/)?mvn-jpp(?=\s|$)!mvn-jpp -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
+	    s!^\s*(?:\%{_bindir}/)?maven(?=\s|$)!maven -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
+	    s!^(\s*\%?\{?ant\}?\s)!ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target !;
+	})
+}
+
+
 sub set_target_15 {
     my ($jpp, $alt) = @_;
     my $target='1.5';
     return if $jpp->{__::HOOKS::set_target};
+    my $buildsec=$jpp->get_section('build');
+    if ($buildsec->match_body(qr'-Dmaven.compile.target') || $buildsec->match_body(qr'-Dant.build.javac.source')) {
+	warn "target hook detected\n";
+	return;
+    }
     $jpp->{__::HOOKS::set_target}=1;
 	$jpp->applied_block(
 	"set_target_$target hook",
@@ -14,21 +47,14 @@ sub set_target_15 {
     $jpp->get_section('build')->subst(qr'^export JAVA_HOME=','#export JAVA_HOME=');
 #    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
     $jpp->clear_applied();
-    $jpp->get_section('prep')->subst(qr'^\s*\%?\{?ant\}?(?=\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
-    $jpp->get_section('build')->subst(qr'^\s*\%?\{?ant\}?(?=\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
-    # tomcat 5 :(
-    $jpp->get_section('install')->subst(qr'^\s*\%?\{?ant\}?(?=\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
-    $jpp->get_section('prep')->subst(qr'^\s*\%?\{?ant17\}?(?=\s)',"ant17 -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
-    $jpp->get_section('build')->subst(qr'^\s*\%?\{?ant17\}?(?=\s)',"ant17 -Dant.build.javac.source=$target -Dant.build.javac.target=$target ");
-    $jpp->get_section('prep')->subst(qr'^\s*mvn(?=\s|$)',"mvn -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('build')->subst(qr'^\s*mvn(?=\s|$)',"mvn -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('prep')->subst(qr'^\s*(?:\%{_bindir}/)?mvn-jpp(?=\s|$)',"mvn-jpp -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('build')->subst(qr'^\s*(?:\%{_bindir}/)?mvn-jpp(?=\s|$)',"mvn-jpp -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('prep')->subst(qr'^\s*(?:\%{_bindir}/)?maven(?=\s|$)',"maven -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('build')->subst(qr'^\s*(?:\%{_bindir}/)?maven(?=\s|$)',"maven -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ");
-    $jpp->get_section('prep')->subst(qr'bin/javac ',"bin/javac  -target $target -source $target ");
-    $jpp->get_section('build')->subst(qr'bin/javac ',"bin/javac  -target $target -source $target ");
-    $jpp->get_section('prep')->subst(qr'%{javac} ',"%{javac}  -target $target -source $target ");
-    $jpp->get_section('build')->subst(qr'%{javac} ',"%{javac}  -target $target -source $target ");
+    &section_set_target($jpp,'prep',$target);
+    &section_set_target($jpp,'build',$target);
+
+    # tomcat 5 :( but breaks felix :(
+    $jpp->get_section('install')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ") if $jpp->main_section->get_tag('Name') eq 'tomcat5';
+
+
 	    });
-}
+};
+
+1;

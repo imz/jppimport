@@ -1,0 +1,10 @@
+--- jfreechart-component-info.xml~	2009-08-18 12:21:24.000000000 +0300
++++ jfreechart-component-info.xml	2012-01-25 20:44:49.000000000 +0200
+@@ -13,6 +13,7 @@
+       <artifact id="jfreechart.jar"/>
+       <import componentref="jcommon">
+         <compatible version="1.0.12-brew"/>
++        <compatible version="1.0.16-brew"/>
+       </import>
+       <export>
+          <include input="jfreechart.jar"/>

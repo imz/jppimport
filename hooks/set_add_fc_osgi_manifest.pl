@@ -73,8 +73,8 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'xalan-j2-2.7.1-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xalan-j2-serializer.jar','/usr/share/java/xalan-j2-serializer-2.7.1.jar');
     } elsif ($name eq 'xmlgraphics-fop') {
-	&unpack_fc_rpm($jpp,$fcpathRH.'fop-1.0-17.fc17.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-fop.jar','/usr/share/java/fop.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'f/fop-1.0-18.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-fop/fop.jar','/usr/share/java/fop.jar');
     } elsif ($name eq 'xmlgraphics-batik') {
 	&unpack_fc_rpm($jpp,$fcpathRH.'batik-1.7-12.fc16.noarch.rpm');
 	foreach my $i ('anim','awt-util','bridge','codec','css','dom','ext','extension','gui-util','gvt','parser','script','svg-dom','svggen','swing','transcoder','util','xml') {

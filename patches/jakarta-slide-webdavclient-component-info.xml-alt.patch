@@ -1,0 +1,14 @@
+--- jakarta-slide-webdavclient-component-info.xml~	2011-06-28 00:21:54.000000000 +0300
++++ jakarta-slide-webdavclient-component-info.xml	2012-01-25 22:07:00.000000000 +0200
+@@ -10,9 +10,9 @@
+               scm=":ext:cvs.devel.redhat.com:/cvs/dist/jakarta-slide-webdavclient"
+               tag="@TAG@">
+       <!-- Built using JDK 1.5 -->
+-      <artifact id="webdavlib.jar"/>
++      <artifact id="jakarta-slide-webdavlib.jar"/>
+       <export>
+-         <include input="webdavlib.jar"/>
++         <include input="jakarta-slide-webdavlib.jar"/>
+       </export>
+    </component>
+ </project>

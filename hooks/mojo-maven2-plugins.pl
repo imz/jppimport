@@ -17,7 +17,7 @@ sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','-n mojo-maven2-plugin-antlr')->push_body('Provides: maven2-plugin-antlr = 2.0.4'."\n");
 
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jpa-3.0-api javacc3'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-jpa-3.0-api javacc3 sun-ws-metadata-2.0-api sun-annotation-1.0-api'."\n");
 
     $jpp->add_patch('mojo-maven2-plugins-17-alt-maven-wagon-a7-support.patch', STRIP=>0);#, NUMBER=>233);
     
