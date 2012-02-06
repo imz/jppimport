@@ -14,9 +14,9 @@ push @SPECHOOKS,
     my $fcpathRH='/var/ftp/pub/Linux/fedora/linux/development/rawhide/x86_64/os/Packages/';
     my $name=$jpp->get_section('package','')->get_tag('Name');
     if ($name eq 'jetty6') {
-	&unpack_fc_rpm($jpp,$fcpath14.'jetty-6.1.24-1.fc14.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.24.jar');
-	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.24.jar');
+#	&unpack_fc_rpm($jpp,$fcpathRH.'jetty-6.1.24-1.fc14.noarch.rpm');
+#	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6-util.jar','/usr/share/jetty/lib/jetty-util-6.1.24.jar');
+#	&merge_osgi_manifest($jpp,'/usr/share/java/jetty6/jetty6.jar','/usr/share/jetty/lib/jetty-6.1.24.jar');
     } elsif ($name eq 'apache-commons-httpclient' or $name eq 'jakarta-commons-httpclient') {
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-commons-httpclient-3.1-1.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-httpclient.jar','/usr/share/java/jakarta-commons-httpclient-3.1.jar');
@@ -24,8 +24,8 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath15.'apache-commons-el-1.0-22.fc15.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-el.jar','/usr/share/java/apache-commons-el-1.0.jar');
     } elsif ($name eq 'apache-commons-logging') {
-	&unpack_fc_rpm($jpp,$fcpath14.'apache-commons-logging-1.1.1-11.fc14.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/commons-logging.jar','/usr/share/java/apache-commons-logging-1.1.1.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'apache-commons-logging-1.1.1-17.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/commons-logging.jar','/usr/share/java/apache-commons-logging.jar');
     } elsif ($name eq 'apache-commons-io') {
 	&unpack_fc_rpm($jpp,$fcpathRH.'apache-commons-io-2.0.1-3.fc16.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-io.jar','/usr/share/java/apache-commons-io.jar');
@@ -44,8 +44,8 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'jakarta-oro-2.0.8-6.3.fc12.x86_64.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/jakarta-oro.jar','/usr/share/java/jakarta-oro-2.0.8.jar');
     } elsif ($name eq 'jdom') {
-	&unpack_fc_rpm($jpp,$fcpath14.'jdom-1.1.1-1.fc13.x86_64.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom-1.1.1.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'jdom-1.1.2-2.fc17.x86_64.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/jdom.jar','/usr/share/java/jdom.jar');
     } elsif ($name eq 'objectweb-asm') {
 	&unpack_fc_rpm($jpp,$fcpathRH.'objectweb-asm-3.3.1-2.fc17.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/objectweb-asm/asm-all.jar','/usr/share/java/objectweb-asm/asm-all.jar');
@@ -62,7 +62,7 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'xerces-j2-2.9.0-4.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xerces-j2.jar','/usr/share/java/xerces-j2-2.9.0.jar');
     } elsif ($name eq 'xml-commons') {
-	&unpack_fc_rpm($jpp,$fcpath14.'xml-commons-resolver-1.2-4.fc14.noarch.rpm');
+	&unpack_fc_rpm($jpp,$fcpathRH.'xml-commons-resolver-1.2-8.fc17.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-resolver12.jar','/usr/share/java/xml-commons-resolver-1.2.jar');
 	&unpack_fc_rpm($jpp,$fcpath14.'xml-commons-apis-1.4.01-1.fc13.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-jaxp-1.3-apis.jar','/usr/share/java/xml-commons-apis-1.4.01.jar');
@@ -70,8 +70,8 @@ push @SPECHOOKS,
 	$jpp->get_section('package','resolver12')->push_body("AutoReq: yes,noosgi\n");
 	$jpp->get_section('package','jaxp-1.3-apis')->push_body("AutoReq: yes,noosgi\n");
     } elsif ($name eq 'xalan-j2') {
-	&unpack_fc_rpm($jpp,$fcpath14.'xalan-j2-2.7.1-1.fc14.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/xalan-j2-serializer.jar','/usr/share/java/xalan-j2-serializer-2.7.1.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'xalan-j2-2.7.1-8.fc17.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/xalan-j2-serializer.jar','/usr/share/java/xalan-j2-serializer.jar');
     } elsif ($name eq 'xmlgraphics-fop') {
 	&unpack_fc_rpm($jpp,$fcpathRH.'f/fop-1.0-18.fc17.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xmlgraphics-fop/fop.jar','/usr/share/java/fop.jar');

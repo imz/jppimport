@@ -1,10 +1,21 @@
 #!/usr/bin/perl -w
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=787513
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
+
+# MADE optional, but what to replace?
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/US_export_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/US_export_policy.jar not found under RPM_BUILD_ROOT
+
+    # NOTABUG, The Right Thing To DO.
+#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java for /usr/bin/java is in another subpackage
+#symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
+
 push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
     my %type=map {$_=>1} qw/post postun/;
     my %pkg=map {$_=>1} '', 'devel','plugin';
-    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_package()}} $jpp->get_sections();
+    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
 };
 
@@ -28,42 +39,31 @@ sub __subst_systemtap {
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    # added in 16 - TODO - comment out
-    #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
+    my $mainsec=$jpp->main_section;
+
+    # man pages are used in alternatives
+    $mainsec->unshift_body('%set_compress_method none'."\n");
 
     # hack until RPM::Source::Convert will be enhanced
     $jpp->del_section('post','javadoc');
     $jpp->del_section('postun','javadoc');
 
-    # TODO:
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/US_export_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/US_export_policy.jar not found under RPM_BUILD_ROOT
-
-    # NOTABUG, The Right Thing To DO.
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java for /usr/bin/java is in another subpackage
-#symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
-
-    # TODO:
-    # broken symlink in jvm-exports (b12);
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/ControlPanel for /usr/bin/ControlPanel not found under RPM_BUILD_ROOT
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/jcontrol for /usr/bin/jcontrol not found under RPM_BUILD_ROOT
-
     # Sisyphus unmet
-    $jpp->get_section('package','')->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
+    $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
-    $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
+    $mainsec->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel libXrender-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
 ');
 
-    $jpp->get_section('package','')->unshift_body(q'%def_enable accessibility
-%def_enable javaws
+    $mainsec->unshift_body(q'%def_enable accessibility
+%def_disable javaws
 %def_disable moz_plugin
 %def_disable systemtap
 %def_disable desktop
 ');
-    $jpp->get_section('package','')->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
+    $mainsec->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
 %define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
 %define altname %name
 %define label -%{name}
@@ -94,21 +94,21 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     } $jpp->get_sections();
     
     # already 0
-    #$jpp->get_section('package','')->subst(qr'define runtests 1','define runtests 0');
+    #$mainsec->subst(qr'define runtests 1','define runtests 0');
 
-    $jpp->get_section('package','')->subst(qr'^\%define _libdir','# define _libdir');
-    $jpp->get_section('package','')->subst(qr'^\%define syslibdir','# define syslibdir');
-    $jpp->get_section('package','')->push_body('Requires: java-common'."\n");
-    $jpp->get_section('package','')->push_body('Requires: /proc'."\n");
+    $mainsec->subst(qr'^\%define _libdir','# define _libdir');
+    $mainsec->subst(qr'^\%define syslibdir','# define syslibdir');
+    $mainsec->push_body('Requires: java-common'."\n");
+    $mainsec->push_body('Requires: /proc'."\n");
 
     # for M40; can(should?) be disabled on M41
-    #$jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
-    $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst(qr'lesstif-devel','openmotif-devel');
+    $mainsec->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf!."\n");
     #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
-    $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
+    $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
@@ -125,18 +125,15 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
     $jpp->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
 
-    # TODO: fix caserts!!!
-    if ('with static caserts') {
-	# now there is a check %if 0%{?fedora} > 9; use given
-	#$jpp->get_section('install')->unshift_body_before(qr'# Install cacerts symlink.','if /bin/false; then'."\n");
-	#$jpp->get_section('install')->unshift_body_before(qr'# Install extension symlinks.','fi'."\n");
-    }
+    # TODO: fix caserts generation!!!
+    # for proper symlink requires ? 
+    $mainsec->unshift_body('BuildRequires: ca-certificates-java'."\n");
 
     $jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
-    $jpp->get_section('package','')->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
-    &__subst_systemtap($jpp->get_section('package',''));
+    $mainsec->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
+    &__subst_systemtap($mainsec);
     &__subst_systemtap($jpp->get_section('install'));
     &__subst_systemtap($jpp->get_section('files','devel'));
 
@@ -153,13 +150,14 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 ');
     }
 
-    $jpp->get_section('package','devel')->push_body(q!
+    if (0 and 'javaws') {
+	$jpp->get_section('package','devel')->push_body(q!
 %if_enabled javaws
 %package javaws
 Summary: Java Web Start
 Group: Networking/Other
 Requires: %name = %version-%release
-Requires(post,preun): alternatives >= 0.2.0
+Requires(post,preun): alternatives
 # --- jpackage compatibility stuff starts here ---
 Provides:       javaws = %{epoch}:%{javaws_ver}
 Obsoletes:      javaws-menu
@@ -178,6 +176,11 @@ This package provides the Java Web Start installation that is bundled
 with %{name} J2SE Runtime Environment.
 %endif # enabled javaws
 !);
+	$jpp->add_section('files','javaws');
+	$jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
+%{_datadir}/applications/%{name}-javaws.desktop
+');
+    }
 
     $jpp->get_section('files','')->unshift_body('%_altdir/%altname-java
 %_sysconfdir/buildreqs/packages/substitute.d/%name
@@ -186,13 +189,6 @@ with %{name} J2SE Runtime Environment.
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 ');
     $jpp->_reset_speclist();
-
-    $jpp->add_section('files','javaws');
-    #map{$_->describe()} $jpp->get_sections();
-
-    $jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
-%{_datadir}/applications/%{name}-javaws.desktop
-');
 
     $jpp->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/policytool.desktop
@@ -297,10 +293,12 @@ EOF
 EOF
 %endif
 # JPackage specific: alternatives for security policy
-%__cat <<EOF >>%buildroot%_altdir/%altname-java
+if [ -e %buildroot%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar ]; then
+    %__cat <<EOF >>%buildroot%_altdir/%altname-java
 %{_jvmdir}/%{jrelnk}/lib/security/local_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar	%{priority}
 %{_jvmdir}/%{jrelnk}/lib/security/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar
 EOF
+fi
 # ----- end: JPackage compatibility alternatives ------
 
 
@@ -325,9 +323,11 @@ done
 # binaries w/o manuals
 for i in HtmlConverter
 do
+  if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/$i ]; then
   %__cat <<EOF >>%buildroot%_altdir/%altname-javac
 %_bindir/$i	%{_jvmdir}/%{sdkdir}/bin/$i	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
+fi
 done
 
 # ----- JPackage compatibility alternatives ------
@@ -421,7 +421,7 @@ rm -rf jdk1?/linux
 %endif
 popd
 !);
-	$jpp->get_section('package','')->unshift_body(q'%def_enable visualvm'."\n");
+	$mainsec->unshift_body(q'%def_enable visualvm'."\n");
 	$jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
 	# to disable visualvm w/o netbeans
 	$jpp->get_section('files','devel')->unshift_body_before(qr'visualvm.desktop','%if_enabled visualvm'."\n");
@@ -431,7 +431,7 @@ popd
 
     # chrpath hack (disabled)
     if (0) {
-	$jpp->get_section('package','')->push_body(q'# hack :(
+	$mainsec->push_body(q'# hack :(
 BuildRequires: chrpath
 # todo: remove after as-needed fix
 %set_verify_elf_method unresolved=relaxed

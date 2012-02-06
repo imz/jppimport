@@ -3,7 +3,6 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: mojo-maven2-archetypeng'."\n");
 };
 
 __END__
@@ -14,3 +13,5 @@ __END__
 
     # patch does not help -- need refactoring see above
     $jpp->add_patch('gmaven-1.0-alt-groovy158-support.patch', STRIP=>0);
+
+#    $jpp->get_section('package','')->unshift_body('BuildRequires: mojo-maven2-archetypeng'."\n");

@@ -7,10 +7,22 @@ require 'set_add_fc_osgi_manifest.pl';
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 
+    $jpp->main_section->subst('bcond_without cometd','bcond_with cometd');
+    # till cometd will be updated
+$jpp->get_section('prep')->push_body(q!
+ sed -i -e '/<module>contrib\/jboss<\/module>/d' pom.xml
+ sed -i -e '/<module>contrib\/cometd<\/module>/d' pom.xml
+ sed -i -e '/<module>contrib\/grizzly<\/module>/d' pom.xml
+!."\n");
+    $jpp->disable_package('grizzly');
+    $jpp->disable_package('jboss');
+
+
     #%define appdir /srv/jetty6
     $jpp->get_section('package','')->subst_if(qr'/srv/jetty6', '/var/lib/jetty6',qr'\%define');
 
-    $jpp->get_section('package','')->unshift_body(q!BuildRequires: jetty6-core!."\n");
+    # not tested
+    #$jpp->get_section('package','')->unshift_body(q!BuildRequires: jetty6-core!."\n");
 
     # requires from nanocontainer-webcontainer :(
     #$jpp->get_section('package','jsp-2.0')->push_body('Provides: jetty6-jsp-2.0-api = %version'."\n");

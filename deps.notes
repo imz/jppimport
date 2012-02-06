@@ -179,8 +179,6 @@ ln -sf $(build-classpath jbossas/jboss-jmx) .
 ln -sf $(build-classpath jbossas/jnpserver) .
 %endif
 
-TODO: jpp hibernate3-annotations-3.4.0-2 is broken! do not update!
-
 TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
 
 TODO: %{_libdir}/*: generic fix (at least, exclude debug)
@@ -224,9 +222,7 @@ TODO: move maven1 plugins ? no need :)
 
 TODO: java5 only that have updates:
 $ for i in glassfish-jstl '*-commons-jelly' jbossts jibx jpox mckoi mockrunner ; do find jpackage/6.0 fedora -name $i'*src.rpm'; done
-jpackage/6.0/fedora-9/free/SRPMS/glassfish-jstl-1.2.0-8.jpp6.src.rpm
 jpackage/6.0/generic/free/SRPMS/glassfish-jstl-1.2.0-10.jpp6.src.rpm
-jpackage/6.0/fedora-10/free/SRPMS/glassfish-jstl-1.2.0-8.jpp6.fc10.src.rpm
 jpackage/6.0/generic/free/SRPMS/jakarta-commons-jelly-1.0-7.jpp6.src.rpm
 jpackage/6.0/fedora-9/free/SRPMS/jbossts-4.2.3-1.SP7.4.jpp6.src.rpm
 jpackage/6.0/generic/free/SRPMS/jbossts-4.6.1-1.jpp6.src.rpm
@@ -248,23 +244,19 @@ SRPMS/jboss-ejb3-proxy-impl-1.0.2-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-security-1.0.0-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-timerservice-spi-1.0.0-4.jpp6.src.rpm
 SRPMS/plexus-containers-1.5.5-1.jpp6.src.rpm
-SRPMS/velocity-tools-1.4-2.jpp6.src.rpm
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
 deleting SRPMS/plexus-containers-1.0-0.1.a34.5.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-timerservice-spi-1.0.0-2.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-security-1.0.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-proxy-impl-1.0.2-3.jpp6.src.rpm
 ----------------------------------------------------
-SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 SRPMS/gmaven-1.3-2.jpp6.src.rpm
 SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
 SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
 SRPMS/gshell-2.6.2-1.jpp6.src.rpm
 SRPMS/jakarta-commons-httpclient-3.1-2.jpp6.src.rpm
 SRPMS/jboss-aop2-2.1.1-6.jpp6.src.rpm
-SRPMS/jboss-bootstrap-1.0.0-0.3.Beta3.jpp6.src.rpm
 SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
-SRPMS/jboss-cl-2.0.6-3.jpp6.src.rpm
 SRPMS/jboss-ejb3-proxy-spi-1.0.0-5.jpp6.src.rpm
 SRPMS/jboss-ejb3-test-1.0.0-3.jpp6.src.rpm
 SRPMS/jboss-ejb3-test-remote-1.0.0-4.jpp6.src.rpm
@@ -278,7 +270,6 @@ SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 SRPMS/qdox-1.12-2.jpp6.src.rpm
 SRPMS/sisu-1.4.3.2-1.jpp6.src.rpm
-SRPMS/tiles-2.0.7-1.jpp6.src.rpm
 SRPMS/xalan-j2-2.7.1-2.jpp6.src.rpm
 SRPMS/xml-commons-resolver12-1.2-1.2.jpp6.src.rpm
 deleting SRPMS/xml-commons-resolver12-1.2-1.1.jpp6.src.rpm
@@ -292,23 +283,14 @@ deleting SRPMS/jboss-ejb3-test-1.0.0-2.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-proxy-spi-1.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cl-2.0.6-2.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-3.jpp6.src.rpm
-deleting SRPMS/jboss-bootstrap-1.0.0-0.2.Beta3.jpp6.src.rpm
 deleting SRPMS/jboss-aop2-2.1.1-4.jpp6.src.rpm
 deleting SRPMS/groovy17-1.7.6-1.jpp6.src.rpm
-deleting SRPMS/apache-resource-bundles-2-1.jpp6.src.rpm
 -------------------------------------
-SRPMS/hibernate-beanvalidation-api-1.0.0-4.jpp6.src.rpm
-SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
-deleting SRPMS/hibernate3-annotations-3.4.0-1.4.jpp6.src.rpm
-deleting SRPMS/hibernate-beanvalidation-api-1.0.0-3.CR2.1.jpp6.src.rpm
-------------
-SRPMS/apache-commons-collections-3.2.1-6.jpp6.src.rpm
 SRPMS/apache-taglibs-standard-1.1.2-8.jpp6.src.rpm
 SRPMS/axion-1.0-0.M3.6.jpp6.src.rpm
 SRPMS/xbean-3.7-1.jpp6.src.rpm
 deleting SRPMS/xbean-3.4.3-2.jpp6.src.rpm
 deleting SRPMS/axion-1.0-0.M3.5.jpp6.src.rpm
-deleting SRPMS/apache-commons-collections-3.2.1-5.jpp6.src.rpm
 -----------
 SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 -----------
@@ -317,24 +299,14 @@ SRPMS/hsqldb-1.8.0.10-3.jpp6.src.rpm
 SRPMS/jakarta-commons-logging-jboss-1.1-6.jpp6.src.rpm
 SRPMS/jboss-cache-core-3.1.0-8.jpp6.src.rpm
 SRPMS/jboss-cache-pojo-3.0.0-7.jpp6.src.rpm
-SRPMS/jboss-common-logging-log4j-2.1.0-4.jpp6.src.rpm
-SRPMS/jboss-man-2.1.0-2.SP1.2.jpp6.src.rpm
-SRPMS/jboss-profiler-1.0.0-0.1.CR5.6.jpp6.src.rpm
 SRPMS/jboss-seam-int-5.1.0-0.CR1.1.6.jpp6.src.rpm
-SRPMS/jboss-security-spi-2.0.3-2.SP1.2.jpp6.src.rpm
 SRPMS/jboss-webbeans-1.0.0-0.2.PREVIEW1.jpp6.src.rpm
 SRPMS/jms-integration-tests-1.0.1-2.jpp6.src.rpm
-SRPMS/juddi-0.9-0.rc4.8.jpp6.src.rpm
 SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 SRPMS/xml-commons-1.3.04-10.jpp6.src.rpm
 deleting SRPMS/xml-commons-1.3.04-9.jpp6.src.rpm
 deleting SRPMS/objectweb-asm-3.2-2.jpp6.src.rpm
-deleting SRPMS/juddi-0.9-0.rc4.7.jpp6.src.rpm
-deleting SRPMS/jboss-security-spi-2.0.3-2.SP1.1.jpp6.src.rpm
 deleting SRPMS/jboss-seam-int-5.1.0-0.CR1.1.5.jpp6.src.rpm
-deleting SRPMS/jboss-profiler-1.0.0-0.1.CR5.5.jpp6.src.rpm
-deleting SRPMS/jboss-man-2.1.0-2.SP1.1.jpp6.src.rpm
-deleting SRPMS/jboss-common-logging-log4j-2.1.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-cache-pojo-3.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
 deleting SRPMS/jakarta-commons-logging-jboss-1.1-5.jpp6.src.rpm
@@ -360,14 +332,12 @@ SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
 SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 SRPMS/findbugs-1.3.9-5.jpp6.src.rpm
 SRPMS/findbugs-maven-plugin-2.3.2-0.3.SNAPSHOT.jpp6.src.rpm
-SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
 SRPMS/jdepend-maven-plugin-2.0-1.beta_3_SNAPSHOT.jpp6.src.rpm
 SRPMS/log4j-1.2.16-3.jpp6.src.rpm
 SRPMS/maven-skins-5-2.1.jpp6.src.rpm
 SRPMS/rat-maven-plugin-1.0-1.alpha_3.jpp6.src.rpm
 SRPMS/taglist-maven-plugin-2.4-1.jpp6.src.rpm
 deleting SRPMS/log4j-1.2.16-1.jpp6.src.rpm
-deleting SRPMS/hibernate3-validator-3.1.0-2.jpp6.src.rpm
 deleting SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
 deleting SRPMS/findbugs-1.3.9-4.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
@@ -379,31 +349,17 @@ deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
 ----------------------------
 SRPMS/cobertura-maven-plugin-2.4-3.jpp6.src.rpm
 SRPMS/codehaus-stax-1.2.0-1.jpp6.src.rpm
-SRPMS/hibernate3-annotations-3.4.0-3.jpp6.src.rpm
-SRPMS/hibernate3-commons-annotations-3.1.0-4.jpp6.src.rpm
-SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-6.jpp6.src.rpm
-SRPMS/hibernate3-entitymanager-3.4.0-2.8.jpp6.src.rpm
-SRPMS/hibernate3-validator-3.1.0-4.jpp6.src.rpm
 SRPMS/jboss-metadata-1.0.1-9.jpp6.src.rpm
-SRPMS/jboss-security-xacml-2.0.4-5.jpp6.src.rpm
 SRPMS/jbossas-tp-5.1.0-8.jpp6.src.rpm
 SRPMS/jbosssx2-2.0.3.1-5.jpp6.src.rpm
-SRPMS/jbossws-parent-1.0.2-4.jpp6.src.rpm
 SRPMS/mojo-parent-28-1.jpp6.src.rpm
 SRPMS/velocity14-1.4-11.jpp6.src.rpm
 SRPMS/webbeans-jboss-int-5.2.0-0.2.Beta2.jpp6.src.rpm
 deleting SRPMS/velocity14-1.4-9.jpp6.src.rpm
 deleting SRPMS/mojo-parent-20-3.jpp6.src.rpm
-deleting SRPMS/jbossws-parent-1.0.2-3.jpp6.src.rpm
 deleting SRPMS/jbosssx2-2.0.3.1-4.jpp6.src.rpm
 deleting SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
-deleting SRPMS/jboss-security-xacml-2.0.4-4.jpp6.src.rpm
 deleting SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
-deleting SRPMS/hibernate3-validator-3.1.0-3.jpp6.src.rpm
-deleting SRPMS/hibernate3-entitymanager-3.4.0-2.7.jpp6.src.rpm
-deleting SRPMS/hibernate3-ejb-persistence-3.0-api-1.0.2-5.jpp6.src.rpm
-deleting SRPMS/hibernate3-commons-annotations-3.1.0-3.jpp6.src.rpm
-deleting SRPMS/hibernate3-annotations-3.4.0-2.jpp6.src.rpm
 deleting SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
@@ -433,9 +389,7 @@ SRPMS/myfaces-maven-1.0.5-2.jpp6.src.rpm
 SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
 deleting SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 -----------------------------------
-SRPMS/apache-resource-bundles-3-2.jpp6.src.rpm
 SRPMS/guava-05-6.jpp6.src.rpm
-deleting SRPMS/apache-resource-bundles-3-1.jpp6.src.rpm
 -----------------------------------
 SRPMS/ant-1.8.2-5.jpp6.src.rpm
 deleting SRPMS/ant-1.8.2-3.jpp6.src.rpm
@@ -573,7 +527,6 @@ SRPMS/servicemix-specs-1.7.0-2.jpp6.src.rpm
 SRPMS/spring-security-3.0.3-1.jpp6.src.rpm
 SRPMS/spring-ws-1.5.3-1.jpp6.src.rpm
 SRPMS/spring3-3.0.5-2.jpp6.src.rpm
-SRPMS/tiles-2.1.3-1.jpp6.src.rpm
 SRPMS/xws-security-2.0-1.jpp6.src.rpm
 _____________________
 
@@ -646,13 +599,11 @@ _____________________
 _____________________
 SRPMS/apache-commons-io-1.4-13.jpp6.src.rpm
 SRPMS/async-http-client-1.6.1-2.jpp6.src.rpm
-SRPMS/ecj3-3.7-1.jpp6.src.rpm
 SRPMS/jcifs-1.3.16-1.jpp6.src.rpm
 SRPMS/jdom-1.1.1-4.jpp6.src.rpm
 SRPMS/jetty6-6.1.26-1.jpp6.src.rpm
 SRPMS/mojo-signatures-1.1-0.5.svn11457.1.jpp6.src.rpm
 SRPMS/netty-3.2.4-1.jpp6.src.rpm
-SRPMS/plexus-interpolation-1.14-1.jpp6.src.rpm
 SRPMS/plexus-tools-1.0.10-5.jpp6.src.rpm
 SRPMS/plexus-utils-1.5.15-3.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-5.jpp6.src.rpm
@@ -668,10 +619,8 @@ deleting SRPMS/slf4j-1.6.1-4.jpp6.src.rpm
 deleting SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 deleting SRPMS/plexus-utils-1.5.15-2.jpp6.src.rpm
 deleting SRPMS/plexus-tools-1.0.10-4.jpp6.src.rpm
-deleting SRPMS/plexus-interpolation-1.12-1.jpp6.src.rpm
 deleting SRPMS/jetty6-6.1.22-2.jpp6.src.rpm
 deleting SRPMS/jdom-1.1.1-2.jpp6.src.rpm
-deleting SRPMS/ecj3-3.6-2.jpp6.src.rpm
 deleting SRPMS/apache-commons-io-1.4-12.jpp6.src.rpm
 -----------------------------------------
 SRPMS/pdfbox-0.7.3-3.jpp6.src.rpm
@@ -934,7 +883,6 @@ SRPMS/jackrabbit-1.6.5-1.jpp6.src.rpm
 SRPMS/jna-3.2.7-13.jpp6.src.rpm
 SRPMS/json-20080425-2.jpp6.src.rpm
 SRPMS/livetribe-jsr223-2.0.3-2.jpp6.src.rpm
-SRPMS/lucene24-2.4.1-6.jpp6.src.rpm
 SRPMS/mina-2.0.4-1.jpp6.src.rpm
 SRPMS/mina11-1.1.7-1.jpp6.src.rpm
 SRPMS/multithreadedtc-1.01-2.jpp6.src.rpm
@@ -951,7 +899,6 @@ SRPMS/smc-5.0.2-3.jpp6.src.rpm
 SRPMS/sun-jsf-1.2-1.2.04-2.jpp6.src.rpm
 SRPMS/svn-javahl-1.5.9-1.jpp6.src.rpm
 SRPMS/svnkit-1.3.5-4.jpp6.src.rpm
-SRPMS/vdoclet-0.2-0.20070127.8.jpp6.src.rpm
 deleting SRPMS/svnkit-1.3.5-2.jpp6.src.rpm
 deleting SRPMS/svn-javahl-1.4.2-2.jpp6.src.rpm
 deleting SRPMS/plexus-classworlds-1.2-0.a9.5.jpp6.src.rpm
@@ -1066,4 +1013,9 @@ SRPMS/apacheds10-1.0.2-5.jpp6.src.rpm
 SRPMS/openxri-1.2.0-2.jpp6.src.rpm
 SRPMS/tomcat5-5.5.35-1.jpp6.src.rpm
 deleting SRPMS/tomcat5-5.5.34-1.jpp6.src.rpm
+-----------------------------------------
+SRPMS/apacheds-daemon10-1.0.2-4.jpp6.src.rpm
+SRPMS/jdbm-1.0-3.jpp6.src.rpm
+SRPMS/mina10-1.0.10-1.jpp6.src.rpm
+SRPMS/nlog4j-1.2.25-2.jpp6.src.rpm
 -----------------------------------------

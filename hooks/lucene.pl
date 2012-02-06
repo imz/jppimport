@@ -2,6 +2,10 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     $jpp->get_section('package','')->unshift_body('BuildRequires: rpm-build-java-osgi'."\n");
+};
+
+__END__
+    # lucene2; already a package
     $jpp->get_section('package','')->push_body(q!
 Provides: lucene2 = %{epoch}:%{version}-%{release}
 Obsoletes: lucene2 < 2.4.1
@@ -18,5 +22,3 @@ ln -s lucene-demos.jar $RPM_BUILD_ROOT%{_javadir}/lucene2-demos.jar
 !);
     $jpp->get_section('files','demo')->push_body(q!%{_javadir}/lucene2-demos.jar
 !);
-};
-

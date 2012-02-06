@@ -3,6 +3,10 @@
 push @SPECHOOKS, 
 sub  {
     my ($jpp, $alt) = @_;
+    $jpp->add_patch('commons-jelly-1.0-alt-velocity-fix-incorrect-logsystem.patch',STRIP=>0);
+};
+__END__
+
     $jpp->get_section('package','')->unshift_body('BuildRequires: jline'."\n");
     my $srcnum=$jpp->add_source('ant-SNAPSHOT-20071102.tar');
     $jpp->get_section('prep')->push_body(
@@ -12,9 +16,12 @@ tar xf %{SOURCE'.$srcnum.'}
 popd
 ');
     $jpp->add_patch('commons-jelly-1.0-alt-xml-unit-1.2-support.patch',STRIP=>1);
-    $jpp->add_patch('commons-jelly-1.0-alt-velocity-fix-incorrect-logsystem.patch',STRIP=>0);
-};
-__END__
+
+
+
+
+################### old jpp5 ###############################################3
+
 #added commons-collections to classpath:
 %s,build-classpath commons-beanutils commons-jexl commons-logging dom4j jaxen,build-classpath commons-beanutils commons-jexl commons-logging dom4j jaxen commons-collections,c
 %s,build-classpath commons-beanutils commons-betwixt commons-digester commons-jexl commons-logging dom4j jaxen,build-classpath commons-beanutils commons-betwixt commons-digester commons-jexl commons-logging dom4j jaxen commons-collections,c
