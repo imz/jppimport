@@ -98,11 +98,7 @@ TODO: opensaml: warn: possible regression: jpp5 pom is missing in jpp6
 
 TODO: jcalendar, jgoodies-* asked msp, no need to rush
 
-TODO: svnkit update: update from fedora 14 or devel
-
-TODO: jboss4 basiconly does not have jboss4-security
-BR: jetty6-6.1.22-alt4_2jpp6.src|jboss4-security
-
+TODO: rebuild jboss4 basiconly (does not have jboss4-security)
 
 DONE-using-compat: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8.1?)
 #step1: remove deps on cargo in 
@@ -120,21 +116,13 @@ cglib-nodeps include objectweb-asm 3.2, hence objectweb-asm
 update broke them. ...net.sf.cglib.asm.ClassWriter
 
 TODO: 
-eclipse-findbugs -> findbugs up to 1.3.9 -> breaks mojo-maven2-* build
+eclipse-findbugs -> findbugs up to 1.3.9 -> DONE
 findbugs(DONE): umnet pom gependency on findbugsGUI (split findbugs jar?)
 
 TODO: (robot?)
 eclipse-callgraph unmet on systemtap
 
 TODO: merge pom and berkeleydb package to berkeleydb-je3
-
-TODO: gmaven blocks update to groovy15
-# TODO: the problem is, all gmaven parts are built with groovy 10, 
-# instead of gmaven-runtime-1.5 to be built with groovy 1.5.8.
-# so deep refactoring (perhaps, build should be separated) is required.
-#$jpp->add_patch('gmaven-1.0-alt-groovy158-support.patch', STRIP=>0);
-java.lang.NoSuchMethodError: org.codehaus.groovy.antlr.AntlrASTProcessSnippets.<init>(Lorg/codehaus/groovy/antlr/SourceBuffer;)V
-
 
 NOTE:
 due to: both velocity and velocity15 are installed
@@ -190,12 +178,8 @@ what velocity it requires in pom
 
 TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
 
-TODO: qdox upgrade
-TODO: javacc: see easy patch in fedora (like in cssparser).
-
 TODO: excalibur-avalon-framework: Вытесняет: avalon-framework (< 1:4.3.1-alt6_0.r508111.16jpp6) && logkit
 first build .14jpp6 then test (excalibur|avalon) ?
-TODO: gmaven13: needs plexus-classworlds 2.2.2 from devel
 
 -----------------------------------
 TODO: build build-helper-maven-plugin-1.5-1.jpp6.src.rpm (still bootstrap) -> plexus-containers-component-javadoc
@@ -234,26 +218,22 @@ TODO: merge apache-ibatis2 and apache-ibatis, axis2 ans axis
 
 TODO: log4j .16 -- missing jmx-extra in build.xml :( keep .15
 
+TODO: 
+portals-pluto12 -> castor
+
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
 SRPMS/cglib21-2.1.3-2.jpp6.src.rpm
-SRPMS/google-collections-1.0-3.jpp6.src.rpm (build failures)
-SRPMS/javacc-maven-plugin-2.6-7.jpp6.src.rpm
 SRPMS/jboss-ejb3-proxy-impl-1.0.2-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-security-1.0.0-4.jpp6.src.rpm
 SRPMS/jboss-ejb3-timerservice-spi-1.0.0-4.jpp6.src.rpm
-SRPMS/plexus-containers-1.5.5-1.jpp6.src.rpm
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
-deleting SRPMS/plexus-containers-1.0-0.1.a34.5.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-timerservice-spi-1.0.0-2.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-security-1.0.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-proxy-impl-1.0.2-3.jpp6.src.rpm
 ----------------------------------------------------
-SRPMS/gmaven-1.3-2.jpp6.src.rpm
-SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
 SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
-SRPMS/gshell-2.6.2-1.jpp6.src.rpm
 SRPMS/jakarta-commons-httpclient-3.1-2.jpp6.src.rpm
 SRPMS/jboss-aop2-2.1.1-6.jpp6.src.rpm
 SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
@@ -264,17 +244,13 @@ SRPMS/jboss-ejb3-transactions-1.0.1-3.jpp6.src.rpm
 SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
 SRPMS/jbossorg-docbook-xslt-1.1.0-2.jpp6.src.rpm
 SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
-SRPMS/logback-0.9.27-1.jpp6.src.rpm
 SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
-SRPMS/qdox-1.12-2.jpp6.src.rpm
-SRPMS/sisu-1.4.3.2-1.jpp6.src.rpm
 SRPMS/xalan-j2-2.7.1-2.jpp6.src.rpm
 SRPMS/xml-commons-resolver12-1.2-1.2.jpp6.src.rpm
 deleting SRPMS/xml-commons-resolver12-1.2-1.1.jpp6.src.rpm
 deleting SRPMS/xalan-j2-2.7.1-1.jpp6.src.rpm
-deleting SRPMS/logback-0.9.14-2.jpp6.src.rpm
 deleting SRPMS/jpackage-utils-5.0.0-2.jpp6.src.rpm
 deleting SRPMS/jboss-metadata-1.0.1-5.jpp6.src.rpm
 deleting SRPMS/jboss-ejb3-transactions-1.0.1-2.jpp6.src.rpm
@@ -284,7 +260,6 @@ deleting SRPMS/jboss-ejb3-proxy-spi-1.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cl-2.0.6-2.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-3.jpp6.src.rpm
 deleting SRPMS/jboss-aop2-2.1.1-4.jpp6.src.rpm
-deleting SRPMS/groovy17-1.7.6-1.jpp6.src.rpm
 -------------------------------------
 SRPMS/apache-taglibs-standard-1.1.2-8.jpp6.src.rpm
 SRPMS/axion-1.0-0.M3.6.jpp6.src.rpm
@@ -302,10 +277,8 @@ SRPMS/jboss-cache-pojo-3.0.0-7.jpp6.src.rpm
 SRPMS/jboss-seam-int-5.1.0-0.CR1.1.6.jpp6.src.rpm
 SRPMS/jboss-webbeans-1.0.0-0.2.PREVIEW1.jpp6.src.rpm
 SRPMS/jms-integration-tests-1.0.1-2.jpp6.src.rpm
-SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
 SRPMS/xml-commons-1.3.04-10.jpp6.src.rpm
 deleting SRPMS/xml-commons-1.3.04-9.jpp6.src.rpm
-deleting SRPMS/objectweb-asm-3.2-2.jpp6.src.rpm
 deleting SRPMS/jboss-seam-int-5.1.0-0.CR1.1.5.jpp6.src.rpm
 deleting SRPMS/jboss-cache-pojo-3.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
@@ -316,14 +289,12 @@ deleting SRPMS/dtdparser-1.21-7.jpp6.src.rpm
 ------------
 SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
 SRPMS/findbugs-maven-plugin-2.3.2-0.2.SNAPSHOT.jpp6.src.rpm
-SRPMS/gmaven-1.3-3.jpp6.src.rpm
 SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
 SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
 SRPMS/log4j-1.2.16-1.jpp6.src.rpm
 deleting SRPMS/log4j-1.2.15-7.jpp6.src.rpm
 deleting SRPMS/jbossas-tp-5.1.0-5.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-25.jpp6.src.rpm
-deleting SRPMS/gmaven-1.3-2.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.3-2.jpp6.src.rpm
 ------------
 SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
@@ -386,9 +357,6 @@ SRPMS/struts-master-4-2.jpp6.src.rpm
 SRPMS/myfaces-core11-api-1.1.5-4.jpp6.src.rpm
 SRPMS/myfaces-maven-1.0.5-2.jpp6.src.rpm
 -----------------------------------
-SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
-deleting SRPMS/objectweb-asm-3.3.1-1.jpp6.src.rpm
------------------------------------
 SRPMS/guava-05-6.jpp6.src.rpm
 -----------------------------------
 SRPMS/ant-1.8.2-5.jpp6.src.rpm
@@ -425,9 +393,7 @@ deleting SRPMS/joda-time-1.5.2-2.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-29.jpp6.src.rpm
 deleting SRPMS/fest-1.0.2-2.jpp6.src.rpm
 -----------------------------------
-SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
 SRPMS/josql-2.2-1.jpp6.src.rpm
-deleting SRPMS/groovy17-1.7.6-2.jpp6.src.rpm
 -----------------------------------
 
 6.0/generic/devel
@@ -485,13 +451,11 @@ SRPMS/castor-1.3.0.1-1.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-4.jpp6.src.rpm
 SRPMS/ehcache-1.3.0-4.jpp6.src.rpm
 SRPMS/geronimo-specs-1.6-1.jpp6.src.rpm
-SRPMS/groovy17-1.7.10-2.jpp6.src.rpm
 SRPMS/groovy18-1.8.0-1.jpp6.src.rpm
 SRPMS/httpunit-1.7-4.jpp6.src.rpm
 SRPMS/jakarta-slide-webdavclient-2.1-16.jpp6.src.rpm
 SRPMS/maven-shared-8-0.p8.9.jpp6.src.rpm
 SRPMS/mojo-maven2-plugins-17-8.jpp6.src.rpm
-SRPMS/objectweb-asm-3.3.1-4.jpp6.src.rpm
 SRPMS/ops4j-base-1.2.2-1.jpp6.src.rpm
 SRPMS/oss-parent-6-2.jpp6.src.rpm
 SRPMS/plexus-cdc-1.0-0.4.a11.1.jpp6.src.rpm
@@ -506,13 +470,11 @@ deleting SRPMS/tomcat6-6.0.29-1.jpp6.src.rpm
 deleting SRPMS/plexus-utils-1.5.8-1.jpp6.src.rpm
 deleting SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
 deleting SRPMS/oss-parent-6-1.jpp6.src.rpm
-deleting SRPMS/objectweb-asm-3.3.1-3.jpp6.src.rpm
 deleting SRPMS/mojo-maven2-plugins-17-7.jpp6.src.rpm
 deleting SRPMS/maven-shared-8-0.p8.8.jpp6.src.rpm
 deleting SRPMS/jakarta-slide-webdavclient-2.1-14.jpp6.src.rpm
 deleting SRPMS/httpunit-1.7-3.jpp6.src.rpm
 deleting SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
-deleting SRPMS/groovy17-1.7.10-1.jpp6.src.rpm
 deleting SRPMS/geronimo-specs-1.2-16.jpp6.src.rpm
 deleting SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
@@ -554,7 +516,6 @@ _____________________
 _____________________
 SRPMS/activesoap-1.0-3.jpp6.src.rpm
 SRPMS/servicemix-utils-1.2.1-2.jpp6.src.rpm
-SRPMS/smack2-2.2.1-1.jpp6.src.rpm
 SRPMS/tranql-connector-generic-1.7-1.jpp6.src.rpm
 SRPMS/ws-soap-2.3.1-6.jpp6.src.rpm
 SRPMS/ws-wsif-2.1.0-0.rc1.2.jpp6.src.rpm
@@ -601,25 +562,21 @@ SRPMS/apache-commons-io-1.4-13.jpp6.src.rpm
 SRPMS/async-http-client-1.6.1-2.jpp6.src.rpm
 SRPMS/jcifs-1.3.16-1.jpp6.src.rpm
 SRPMS/jdom-1.1.1-4.jpp6.src.rpm
-SRPMS/jetty6-6.1.26-1.jpp6.src.rpm
 SRPMS/mojo-signatures-1.1-0.5.svn11457.1.jpp6.src.rpm
 SRPMS/netty-3.2.4-1.jpp6.src.rpm
 SRPMS/plexus-tools-1.0.10-5.jpp6.src.rpm
 SRPMS/plexus-utils-1.5.15-3.jpp6.src.rpm
 SRPMS/protobuf-java-2.3.0-5.jpp6.src.rpm
 SRPMS/proxool-0.9.1-1.jpp6.src.rpm
-SRPMS/slf4j-1.6.1-5.jpp6.src.rpm
 SRPMS/sun-istack-commons-1.0-3.jpp6.src.rpm
 SRPMS/sun-jaxb-2.1-impl-2.1.13-1.jpp6.src.rpm
 SRPMS/wss4j-1.5.10-1.jpp6.src.rpm
 SRPMS/xbean-3.7-3.jpp6.src.rpm
 deleting SRPMS/xbean-3.7-2.jpp6.src.rpm
 deleting SRPMS/wss4j-1.5.8-7.jpp6.src.rpm
-deleting SRPMS/slf4j-1.6.1-4.jpp6.src.rpm
 deleting SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 deleting SRPMS/plexus-utils-1.5.15-2.jpp6.src.rpm
 deleting SRPMS/plexus-tools-1.0.10-4.jpp6.src.rpm
-deleting SRPMS/jetty6-6.1.22-2.jpp6.src.rpm
 deleting SRPMS/jdom-1.1.1-2.jpp6.src.rpm
 deleting SRPMS/apache-commons-io-1.4-12.jpp6.src.rpm
 -----------------------------------------
@@ -892,7 +849,6 @@ SRPMS/ops4j-pax-master-1.9-2.jpp6.src.rpm
 SRPMS/org.osgi.compendium-4.2.0-2.jpp6.src.rpm
 SRPMS/org.osgi.core-4.2.0-2.jpp6.src.rpm
 SRPMS/org.osgi.enterprise-4.2.0-2.jpp6.src.rpm
-SRPMS/plexus-classworlds-2.2.2-2.jpp6.src.rpm
 SRPMS/rhino16-1.6-1.r7.2.jpp6.src.rpm
 SRPMS/sitemesh-2.4.1-3.jpp6.src.rpm
 SRPMS/smc-5.0.2-3.jpp6.src.rpm
@@ -901,7 +857,6 @@ SRPMS/svn-javahl-1.5.9-1.jpp6.src.rpm
 SRPMS/svnkit-1.3.5-4.jpp6.src.rpm
 deleting SRPMS/svnkit-1.3.5-2.jpp6.src.rpm
 deleting SRPMS/svn-javahl-1.4.2-2.jpp6.src.rpm
-deleting SRPMS/plexus-classworlds-1.2-0.a9.5.jpp6.src.rpm
 deleting SRPMS/jna-3.2.7-1.jpp6.src.rpm
 deleting SRPMS/axis2-1.4.1-2.jpp6.src.rpm
 deleting SRPMS/apiviz-1.3.0-1.jpp6.src.rpm
@@ -919,11 +874,9 @@ SRPMS/struts-1.3.10-3.jpp6.src.rpm
 SRPMS/sun-jaxb-2.1-api-2.1-5.jpp6.src.rpm
 deleting SRPMS/struts-1.3.10-2.jpp6.src.rpm
 -----------------------------------------
-SRPMS/activemq4-4.1.2-2.jpp6.src.rpm
 SRPMS/apache-commons-parent-18-3.jpp6.src.rpm
 SRPMS/cssparser-0.9.6-1.jpp6.src.rpm
 SRPMS/fusesource-pom-1.8-1.jpp6.src.rpm
-SRPMS/groovy17-1.7.10-3.jpp6.src.rpm
 SRPMS/groovy18-1.8.1-1.jpp6.src.rpm
 SRPMS/hawtjni-1.5-3.jpp6.src.rpm
 SRPMS/jakarta-commons-grant-1.0-0.b5.cvs20040118.4.jpp6.src.rpm
@@ -938,7 +891,6 @@ deleting SRPMS/jansi-native-1.1-1.jpp6.src.rpm
 deleting SRPMS/jansi-1.4-1.jpp6.src.rpm
 deleting SRPMS/hawtjni-1.1-4.jpp6.src.rpm
 deleting SRPMS/groovy18-1.8.0-1.jpp6.src.rpm
-deleting SRPMS/groovy17-1.7.10-2.jpp6.src.rpm
 deleting SRPMS/fusesource-pom-1.2-3.jpp6.src.rpm
 deleting SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
 -----------------------------------------
@@ -997,7 +949,6 @@ SRPMS/jibx-1.2.3-2.jpp6.src.rpm
 SRPMS/ldapbp-1.1.1-2.jpp6.src.rpm
 SRPMS/mojo-maven2-plugins-17-9.jpp6.src.rpm
 SRPMS/proxytoys-1.0-1.jpp6.src.rpm
-SRPMS/smack2-2.2.1-2.jpp6.src.rpm
 SRPMS/spring-ldap-1.3.0-2.jpp6.src.rpm
 SRPMS/spring-security2-2.0.5-2.jpp6.src.rpm
 SRPMS/xws-security-2.0-2.jpp6.src.rpm
@@ -1018,4 +969,23 @@ SRPMS/apacheds-daemon10-1.0.2-4.jpp6.src.rpm
 SRPMS/jdbm-1.0-3.jpp6.src.rpm
 SRPMS/mina10-1.0.10-1.jpp6.src.rpm
 SRPMS/nlog4j-1.2.25-2.jpp6.src.rpm
+-----------------------------------------
+SRPMS/apacheds-shared0955-0.9.5.5-2.jpp6.src.rpm
+SRPMS/hessian-3.0.8-2.jpp6.src.rpm
+SRPMS/htmlunit1-1.14-6.jpp6.src.rpm
+SRPMS/httpunit16-1.6.2-2.jpp6.src.rpm
+SRPMS/jetty5-5.1.15-1.jpp6.src.rpm
+SRPMS/jug-2.0.0-2.jpp6.src.rpm
+SRPMS/mina-2.0.4-2.jpp6.src.rpm
+SRPMS/openxri-1.2.0-3.jpp6.src.rpm
+SRPMS/ops4j-pax-exam-1.2.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-runner-1.5.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-scanner-1.1.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-swissbox-1.3.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-url-1.1.3-2.jpp6.src.rpm
+SRPMS/portals-bridges1-1.0.4-5.jpp6.src.rpm
+SRPMS/wicket13-1.3.7-2.jpp6.src.rpm
+deleting SRPMS/openxri-1.2.0-2.jpp6.src.rpm
+deleting SRPMS/mina-2.0.4-1.jpp6.src.rpm
+deleting SRPMS/apacheds-shared0955-0.9.5.5-1.jpp6.src.rpm
 -----------------------------------------

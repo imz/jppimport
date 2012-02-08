@@ -41,6 +41,18 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     my $mainsec=$jpp->main_section;
 
+    $mainsec->push_body('# jpp provides
+Provides: java = %version
+Provides: java-1.6.0 = %version
+Provides: java-openjdk = %version
+Provides: java-sasl = %version
+');
+    $jpp->get_section('package','devel')->push_body('# jpp provides
+Provides: java-1.6.0-devel = %version
+Provides: java-devel = %version
+Provides: java-devel-openjdk = %version
+');
+
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
