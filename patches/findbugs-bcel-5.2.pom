@@ -1,8 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>findbugs</groupId>
-  <artifactId>bcel</artifactId>
-  <version>5.2</version>
-  <url>http://findbugs.sf.net</url>
-  <description>supports the FindBugs tool</description>
-</project>
