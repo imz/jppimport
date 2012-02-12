@@ -14,7 +14,7 @@
 push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
     my %type=map {$_=>1} qw/post postun/;
-    my %pkg=map {$_=>1} '', 'devel','plugin';
+    my %pkg=map {$_=>1} '', 'devel';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
 };
@@ -51,6 +51,23 @@ push @SPECHOOKS, sub {
     # Sisyphus unmet
     $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
+$jpp->spec_apply_patch(PATCHSTRING=>q!
+--- java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-
+12 17:57:37.000000000 +0000
++++ java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-12 17:22:40.000000000 +0000
+@@ -118,8 +118,7 @@ BuildRequires: jpackage-compat
+ # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
+ # simply be another alternative.
+ %ifarch %{multilib_arches}
+-%global syslibdir       %{_prefix}/lib64
+-%global _libdir         %{_prefix}/lib
++%global syslibdir       %{_libdir}
+ %global archname        %{name}.%{_arch}
+ %else
+ %global syslibdir       %{_libdir}
+!);
+    $mainsec=$jpp->main_section;
+
     $mainsec->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel libXrender-devel
 BuildRequires(pre): browser-plugins-npapi-devel
@@ -63,8 +80,7 @@ BuildRequires(pre): rpm-build-java
 %def_disable systemtap
 %def_disable desktop
 ');
-    $mainsec->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
-%define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
+    $mainsec->push_body('
 %define altname %name
 %define label -%{name}
 %define javaws_ver      %{javaver}
@@ -127,7 +143,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # for proper symlink requires ? 
     $mainsec->unshift_body('BuildRequires: ca-certificates-java'."\n");
 
-    $jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+    # no need in 1.7.0.1
+    #$jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
     #$mainsec->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
@@ -140,47 +157,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $jpp->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
-
-    if (0 and 'has plugin') {
-	$jpp->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
-	$jpp->rename_package('plugin','-n mozilla-plugin-%name');
-	$jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
-%{_datadir}/applications/%{name}-control-panel.desktop
-');
-    }
-
-    if (0 and 'javaws') {
-	$jpp->get_section('package','devel')->push_body(q!
-%if_enabled javaws
-%package javaws
-Summary: Java Web Start
-Group: Networking/Other
-Requires: %name = %version-%release
-Requires(post,preun): alternatives
-# --- jpackage compatibility stuff starts here ---
-Provides:       javaws = %{epoch}:%{javaws_ver}
-Obsoletes:      javaws-menu
-# --- jpackage compatibility stuff ends here ---
-
-%description javaws
-Java Web Start is a deployment solution for Java-technology-based
-applications. It is the plumbing between the computer and the Internet
-that allows the user to launch and manage applications right off the
-Web. Java Web Start provides easy, one-click activation of
-applications, and guarantees that you are always running the latest
-version of the application, eliminating complicated installation or
-upgrade procedures.
-
-This package provides the Java Web Start installation that is bundled
-with %{name} J2SE Runtime Environment.
-%endif # enabled javaws
-!);
-	$jpp->add_section('files','javaws');
-	$jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
-%{_datadir}/applications/%{name}-javaws.desktop
-');
-    }
-
     $jpp->get_section('files','')->unshift_body('%_altdir/%altname-java
 %_sysconfdir/buildreqs/packages/substitute.d/%name
 ');
@@ -188,6 +164,7 @@ with %{name} J2SE Runtime Environment.
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 ');
     $jpp->_reset_speclist();
+    $mainsec=$jpp->main_section;
 
     $jpp->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
@@ -222,35 +199,6 @@ Type=Application
 Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
 EOF
 fi
-
-%if_enabled moz_plugin
-# ControlPanel freedesktop.org menu entry
-cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
-[Desktop Entry]
-Name=Java Plugin Control Panel (%{name})
-Comment=Java Control Panel
-Exec=jcontrol
-Icon=%{name}
-Terminal=false
-Type=Application
-Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
-EOF
-%endif
-
-%if_enabled javaws
-# javaws freedesktop.org menu entry
-cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
-[Desktop Entry]
-Name=Java Web Start (%{name})
-Comment=Java Application Launcher
-MimeType=application/x-java-jnlp-file;
-Exec=%{_jvmdir}/%{jredir}/bin/javaws %%u
-Icon=%{name}
-Terminal=false
-Type=Application
-Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
-EOF
-%endif
 
 # Install substitute rules for buildreq
 echo java >j2se-buildreq-substitute
@@ -287,12 +235,6 @@ done
 %{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 EOF
-%if_enabled moz_plugin
-%__cat <<EOF >>%buildroot%_altdir/%altname-java
-%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
-%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
-EOF
-%endif
 # JPackage specific: alternatives for security policy
 if [ -e %buildroot%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar ]; then
     %__cat <<EOF >>%buildroot%_altdir/%altname-java
@@ -342,26 +284,6 @@ done
 EOF
 # ----- end: JPackage compatibility alternatives ------
 
-%if_enabled moz_plugin
-# Mozilla plugin alternative
-%__cat <<EOF >%buildroot%_altdir/%name-mozilla
-%browser_plugins_path/libjavaplugin_oji.so	%mozilla_java_plugin_so	%priority
-EOF
-%endif	# enabled moz_plugin
-
-%if_enabled javaws
-# Java Web Start alternative
-%__cat <<EOF >%buildroot%_altdir/%altname-javaws
-%_bindir/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
-%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{_jvmdir}/%{jredir}/bin/java
-EOF
-# ----- JPackage compatibility alternatives ------
-%__cat <<EOF >>%buildroot%_altdir/%altname-javaws
-%{_datadir}/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
-EOF
-# ----- end: JPackage compatibility alternatives ------
-%endif	# enabled javaws
-
 # hack (see altbug #11383) to enshure that all man pages will be compressed
 for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
     [ -f $i ] && gzip -9 $i
@@ -375,7 +297,6 @@ done
 ##################################################
 
 
-
 !);
 
     $jpp->_reset_speclist();
@@ -386,32 +307,11 @@ done
 %ifarch ppc ppc64
 Provides: java-devel = 1.5.0
 %endif
-');
+') if 0; # jdk 1.6 already provides
 };
 
 
 __END__
-    # deprecated
-    unless ('old java w/visualvm') {
-    $jpp->get_section('install')->push_body(q!
-# dirty, dirty hack :(
-pushd %buildroot%{_jvmdir}/%{sdkdir}/lib/visualvm/profiler3/lib/deployed
-rm -rf jdk1?/{mac,solaris-amd64,solaris-i386,solaris-sparc,solaris-sparcv9,windows,windows-amd64}
-%ifarch %{ix86}
-rm -rf jdk1?/linux-amd64
-%endif
-%ifarch x86_64
-rm -rf jdk1?/linux
-%endif
-popd
-!);
-	$mainsec->unshift_body(q'%def_enable visualvm'."\n");
-	$jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
-	# to disable visualvm w/o netbeans
-	$jpp->get_section('files','devel')->unshift_body_before(qr'visualvm.desktop','%if_enabled visualvm'."\n");
-	$jpp->get_section('files','devel')->unshift_body_after(qr'visualvm.desktop','%endif'."\n");
-	$jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
-    }
 
     # chrpath hack (disabled)
     if (0) {

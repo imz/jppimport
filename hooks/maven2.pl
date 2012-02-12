@@ -7,21 +7,6 @@ sub {
     my ($jpp, $alt) = @_;
     my $bootstrap=1;
 
-    # for 37
-    $jpp->source_apply_patch(SOURCEFILE=>'maven2-versionless-depmap.xml', PATCHSTRING=q!
---- maven2-versionless-depmap.xml	2011-09-06 13:01:31.616638465 +0000
-+++ maven2-versionless-depmap.xml	2011-09-06 13:01:08.620637964 +0000
-@@ -1912,7 +1912,7 @@
- 			<version>1.2</version>
- 		</maven>
- 		<jpp>
--			<groupId>JPP/xmlrpc</groupId>
-+			<groupId>JPP</groupId>
- 			<artifactId>xmlrpc</artifactId>
- 			<version>1.2</version>
- 		</jpp>
-!);
-
     # for 29
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
 
@@ -34,7 +19,7 @@ sub {
 	$jpp->get_section('package','plugin-remote-resources')->push_body('Requires:  maven-shared-doxia-tools'."\n") ;
 	$jpp->get_section('package','plugin-resources')->push_body('Requires:  maven-shared-filtering'."\n") ;
     }
-#    $jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
+    #$jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
     $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver plexus-containers-container-default plexus-containers plexus-classworlds maven-plugin-tools plexus-cli plexus-containers-component-annotations 
 BuildRequires: maven-enforcer maven2-plugin-war geronimo-j2ee-1.4-apis
 # unbootstrap
@@ -134,6 +119,8 @@ sh ./relink_bootstrap_maven_jars.sh
 };
 
 __END__
+
+
 __DATA__
 #2) some plexuses are missing components.xml (which ones?)
 are good
@@ -160,3 +147,20 @@ for i in `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]*  -type f -name '*.j
     fi
 done
 popd
+
+
+__END__
+    # done in 37
+    $jpp->source_apply_patch(SOURCEFILE=>'maven2-versionless-depmap.xml', PATCHSTRING=>q!
+--- maven2-versionless-depmap.xml	2011-09-06 13:01:31.616638465 +0000
++++ maven2-versionless-depmap.xml	2011-09-06 13:01:08.620637964 +0000
+@@ -1912,7 +1912,7 @@
+ 			<version>1.2</version>
+ 		</maven>
+ 		<jpp>
+-			<groupId>JPP/xmlrpc</groupId>
++			<groupId>JPP</groupId>
+ 			<artifactId>xmlrpc</artifactId>
+ 			<version>1.2</version>
+ 		</jpp>
+!);

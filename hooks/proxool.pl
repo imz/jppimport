@@ -5,6 +5,10 @@ push @SPECHOOKS,
 
 sub {
     my ($jpp, $alt) = @_;
+}
+
+__END__
+5.0
     # todo: remove when hibernate3 will be built
     $jpp->get_section('package','')->unshift_body('%define _without_hibernate 1'."\n");
     $jpp->get_section('prep')->subst(qr'^%patch4','#%patch4');

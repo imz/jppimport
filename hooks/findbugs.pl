@@ -6,8 +6,12 @@ push @SPECHOOKS,
  sub {
     my ($jpp, $alt) = @_;
     &add_missingok_config($jpp,'/etc/%name.conf');
+
+    $jpp->get_section('prep')->push_body(q{# offline
+sed -i -e s,http://findbugs.googlecode.com/svn/trunk/findbugs/etc/docbook/docbookx.dtd,`pwd`/etc/docbook/docbookx.dtd,g `grep -rl 'http://findbugs.googlecode.com/svn/trunk/findbugs/etc/docbook/docbookx.dtd' .`
+});
     $jpp->get_section('install')->push_body(q{# fix to report
-%__subst 's,Categories=Application;Development;X-JPackage;,Categories=X-JPackage;Java;Development;Debugger;,' $RPM_BUILD_ROOT%_desktopdir/jpackage-%name.desktop
+sed -i -e 's,Categories=Development;X-JPackage;,Categories=X-JPackage;Java;Development;Debugger;,' $RPM_BUILD_ROOT%_desktopdir/*.desktop
 });
     $jpp->get_section('files')->push_body(q{#unpackaged directory: 
 %dir %_datadir/%name-%version/bin/deprecated

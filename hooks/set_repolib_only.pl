@@ -8,18 +8,10 @@ sub {
     foreach my $section ($jpp->get_sections()) {
 	my $type = $section->get_type();
 	if ($type=~/^(pre|post|preun|postun|trigger.*)$/) {
-	    $jpp->del_section(
-		$section->get_type(),
-		$section->get_package(),
-		$section->get_trigger_condition()
-		);
+	    $section->delete();
 	} elsif ($type eq 'files') {
-	    if ($section->get_package() ne 'repolib') {
-	    $jpp->del_section(
-		$section->get_type(),
-		$section->get_package(),
-		$section->get_trigger_condition()
-		);
+	    if ($section->get_raw_package() ne 'repolib') {
+	    	$section->delete();
 	    } else {
 		$section->get_bodyref()->[0]='%files'."\n";
 	    }

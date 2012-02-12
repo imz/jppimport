@@ -2,5 +2,6 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->add_patch('jboss-4-generic-alt-ant17support.patch', STRIP=>1);
 }
+__END__
+    $jpp->add_patch('jboss-4-generic-alt-ant17support.patch', STRIP=>1);
