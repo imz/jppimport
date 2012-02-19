@@ -48,6 +48,10 @@ push @SPECHOOKS, sub {
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
+    # i586 build is not included :(
+    $mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
+    $mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
+
     # Sisyphus unmet
     $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
@@ -172,33 +176,12 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 !);
 
     $jpp->get_section('install')->push_body(q!
-# HACK around find-requires
-%define __find_requires    $RPM_BUILD_ROOT/.find-requires
-cat > $RPM_BUILD_ROOT/.find-requires <<EOF
-(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | grep -v /usr/bin/java | sed -e s,^/usr/lib64/lib,lib, | sed -e s,^/usr/lib/lib,lib,) || :
-EOF
-chmod 755 $RPM_BUILD_ROOT/.find-requires
-# end HACK around find-requires
-!) if 0;
-    $jpp->get_section('install')->push_body(q!
 
 ##################################################
 # --- alt linux specific, shared with openjdk ---#
 ##################################################
 
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
-if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/jvisualvm ]; then
-  cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-jvisualvm.desktop << EOF
-[Desktop Entry]
-Name=Java VisualVM (%{name})
-Comment=Java Virtual Machine Monitoring, Troubleshooting, and Profiling Tool
-Exec=jvisualvm
-Icon=%{name}
-Terminal=false
-Type=Application
-Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
-EOF
-fi
 
 # Install substitute rules for buildreq
 echo java >j2se-buildreq-substitute
@@ -329,3 +312,12 @@ find $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin/ -exec chrpath -d {} \;
     }
     # end chrpath hack
 
+    $jpp->get_section('install')->push_body(q!
+# HACK around find-requires
+%define __find_requires    $RPM_BUILD_ROOT/.find-requires
+cat > $RPM_BUILD_ROOT/.find-requires <<EOF
+(/usr/lib/rpm/find-requires | grep -v %{_jvmdir}/%{sdkdir} | grep -v /usr/bin/java | sed -e s,^/usr/lib64/lib,lib, | sed -e s,^/usr/lib/lib,lib,) || :
+EOF
+chmod 755 $RPM_BUILD_ROOT/.find-requires
+# end HACK around find-requires
+!);

@@ -73,7 +73,6 @@ BuildRequires(pre): rpm-build-java
 %def_disable javaws
 %def_disable moz_plugin
 %def_disable systemtap
-%def_disable desktop
 ');
     $mainsec->push_body('#define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
 %define mozilla_java_plugin_so %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
@@ -159,38 +158,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 	$jpp->rename_package('plugin','-n mozilla-plugin-%name');
 	$jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
 %{_datadir}/applications/%{name}-control-panel.desktop
-');
-    }
-
-    if (0 and 'javaws') {
-	$jpp->get_section('package','devel')->push_body(q!
-%if_enabled javaws
-%package javaws
-Summary: Java Web Start
-Group: Networking/Other
-Requires: %name = %version-%release
-Requires(post,preun): alternatives
-# --- jpackage compatibility stuff starts here ---
-Provides:       javaws = %{epoch}:%{javaws_ver}
-Obsoletes:      javaws-menu
-# --- jpackage compatibility stuff ends here ---
-
-%description javaws
-Java Web Start is a deployment solution for Java-technology-based
-applications. It is the plumbing between the computer and the Internet
-that allows the user to launch and manage applications right off the
-Web. Java Web Start provides easy, one-click activation of
-applications, and guarantees that you are always running the latest
-version of the application, eliminating complicated installation or
-upgrade procedures.
-
-This package provides the Java Web Start installation that is bundled
-with %{name} J2SE Runtime Environment.
-%endif # enabled javaws
-!);
-	$jpp->add_section('files','javaws');
-	$jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
-%{_datadir}/applications/%{name}-javaws.desktop
 ');
     }
 
@@ -379,23 +346,6 @@ for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
 done
 
 %post
-# ----- JPackage stuff ------
-if [ -d %{_jvmdir}/%{jrelnk}/lib/security ]; then
-  # Need to remove the old jars in order to support upgrading, ugly :(
-  # update-alternatives fails silently if the link targets exist as files.
-  rm -f %{_jvmdir}/%{jrelnk}/lib/security/{local,US_export}_policy.jar
-fi
-
-# %ifnarch x86_64
-# if [ -f %{_sysconfdir}/mime.types ]; then
-#    %__subst 's|application/x-java-jnlp-file.*||g' %{_sysconfdir}/mailcap.bak 2>/dev/null
-#    echo "type=application/x-java-jnlp-file; description=\"Java Web Start\"; exts=\"jnlp\"" >> %{_sysconfdir}/mailcap 2>/dev/null
-
-#    %__subst 's|application/x-java-jnlp-file.*||g' %{_sysconfdir}/mime.types 2>/dev/null
-#    echo "application/x-java-jnlp-file      jnlp" >> %{_sysconfdir}/mime.types 2>/dev/null
-# fi
-# %endif
-# ----- JPackage stuff ------
 %force_update_alternatives
 
 ##################################################
@@ -419,28 +369,6 @@ Provides: java-devel = 1.5.0
 
 
 __END__
-    # deprecated
-    unless ('old java w/visualvm') {
-    $jpp->get_section('install')->push_body(q!
-# dirty, dirty hack :(
-pushd %buildroot%{_jvmdir}/%{sdkdir}/lib/visualvm/profiler3/lib/deployed
-rm -rf jdk1?/{mac,solaris-amd64,solaris-i386,solaris-sparc,solaris-sparcv9,windows,windows-amd64}
-%ifarch %{ix86}
-rm -rf jdk1?/linux-amd64
-%endif
-%ifarch x86_64
-rm -rf jdk1?/linux
-%endif
-popd
-!);
-	$mainsec->unshift_body(q'%def_enable visualvm'."\n");
-	$jpp->get_section('build')->subst(qr'--enable-visualvm','%{subst_enable visualvm}');
-	# to disable visualvm w/o netbeans
-	$jpp->get_section('files','devel')->unshift_body_before(qr'visualvm.desktop','%if_enabled visualvm'."\n");
-	$jpp->get_section('files','devel')->unshift_body_after(qr'visualvm.desktop','%endif'."\n");
-	$jpp->get_section('files','devel')->subst(qr'visualvm.desktop','%{name}-jvisualvm.desktop');
-    }
-
     # chrpath hack (disabled)
     if (0) {
 	$mainsec->push_body(q'# hack :(

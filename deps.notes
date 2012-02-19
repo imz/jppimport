@@ -965,3 +965,12 @@ SRPMS/noggit-1.0-0.r1242214.1.jpp6.src.rpm
 SRPMS/stringtree-2.0.5-1.jpp6.src.rpm
 deleting SRPMS/geronimo-specs-1.6-4.jpp6.src.rpm
 -----------------------------------------
+SRPMS/aelfred-1.2-1.a.10.jpp6.src.rpm
+SRPMS/anttex-0.2-6.jpp6.src.rpm
+SRPMS/antunit-1.2-1.jpp6.src.rpm
+SRPMS/apache-poi-3.8-0.b5.1.jpp6.src.rpm
+SRPMS/boilerpipe-1.1.0-1.jpp6.src.rpm
+SRPMS/jibx-1.2.3-3.jpp6.src.rpm
+deleting SRPMS/jibx-1.2.3-2.jpp6.src.rpm
+deleting SRPMS/apache-poi-3.6-1.jpp6.src.rpm
+-----------------------------------------
