@@ -141,7 +141,7 @@ EOF
 %if_enabled javaws
 # Java Web Start alternative
 cat <<EOF >%buildroot%_altdir/%altname-javaws
-%_bindir/javaws	%_bindir/javaws.itweb	%{_jvmdir}/%{jredir}/bin/java
+%_bindir/javaws	%_bindir/javaws.itweb	%{jredir}/bin/java
 %_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{jredir}/bin/java
 EOF
 # ----- JPackage compatibility alternatives ------
