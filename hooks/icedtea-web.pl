@@ -7,41 +7,15 @@ push @PREHOOKS, sub {
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->rename_main_package('mozilla-plugin-java-1.7.0-openjdk');
     my $mainsec=$jpp->main_section;
 
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
-my $rpminfo='
-/usr/bin/itweb-settings.itweb
-/usr/bin/javaws.itweb
-/usr/lib64/IcedTeaPlugin.so
-/usr/share/applications/itweb-settings.desktop
-/usr/share/applications/javaws.desktop
-/usr/share/doc/icedtea-web-1.1.4
-/usr/share/doc/icedtea-web-1.1.4/COPYING
-/usr/share/doc/icedtea-web-1.1.4/NEWS
-/usr/share/doc/icedtea-web-1.1.4/README
-/usr/share/icedtea-web
-/usr/share/icedtea-web/about.jar
-/usr/share/icedtea-web/about.jnlp
-/usr/share/icedtea-web/netx.jar
-/usr/share/icedtea-web/plugin.jar
-/usr/share/man/man1/javaws-itweb.1.gz
-/usr/share/pixmaps/javaws.png
-
-%define min_openjdk_version 1:1.6.0.0-60
-%define multilib_arches ppc64 sparc64 x86_64
-
-# Version of java
-%define javaver 1.7.0
-
-# For the mozilla plugin dir
-Requires:       mozilla-filesystem%{?_isa}
-
-Provides:   java-1.6.0-openjdk-plugin = %{min_openjdk_version}
-Obsoletes:  java-1.6.0-openjdk-plugin <= %{min_openjdk_version}
-';
+    #Provides:   java-1.6.0-openjdk-plugin = %{min_openjdk_version}
+    #Obsoletes:  java-1.6.0-openjdk-plugin <= %{min_openjdk_version}
+    $mainsec->exclude_body(qr'^(Provides|Obsoletes):\s+java-1.6.0-openjdk-plugin');
 
     $mainsec->unshift_body(q'
 BuildRequires(pre): browser-plugins-npapi-devel
@@ -49,16 +23,18 @@ BuildRequires(pre): rpm-build-java
 ');
 
     $mainsec->unshift_body(q'%def_enable javaws
+%def_enable moz_plugin
 ');
     $mainsec->push_body('
-%define altname %name
+%define altname java-%{javaver}-openjdk
 %define origin openjdk
 %define label -itweb
 %define javaws_ver      %{javaver}
 %define sdkdir          java-%{javaver}-openjdk-%{javaver}.0.%{_arch}
 # TODO: move here
-%define mozilla_java_plugin_so %{_libdir}/%{sdkdir}/IcedTeaPlugin.so
-BuildRequires: java-%javaver-%origin-devel
+#define mozilla_java_plugin_so %{_prefix}/lib/%{sdkdir}/IcedTeaPlugin.so
+%define mozilla_java_plugin_so %{_libdir}/IcedTeaPlugin.so
+#BuildRequires: java-%javaver-%origin-devel
 ');
 
     #$jpp->get_section('build')->subst(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
@@ -66,17 +42,9 @@ BuildRequires: java-%javaver-%origin-devel
 
 # --- alt linux specific, shared with openjdk ---#
 
-    if (0 and 'has plugin') {
-	$jpp->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
-	$jpp->rename_package('plugin','-n mozilla-plugin-%name');
-	$jpp->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
-%{_datadir}/applications/%{name}-control-panel.desktop
-');
-    }
-
     $jpp->get_section('package','')->push_body(q!
 %if_enabled javaws
-%package javaws
+%package -n %altname-javaws
 Summary: Java Web Start
 Group: Networking/Other
 Requires: %name = %version-%release
@@ -85,8 +53,10 @@ Requires(post,preun): alternatives
 Provides:       javaws = %{javaws_ver}
 Obsoletes:      javaws-menu
 # --- jpackage compatibility stuff ends here ---
+# due to the build specific
+Requires: mozilla-plugin-%altname = %version-%release
 
-%description javaws
+%description -n %altname-javaws
 Java Web Start is a deployment solution for Java-technology-based
 applications. It is the plumbing between the computer and the Internet
 that allows the user to launch and manage applications right off the
@@ -100,12 +70,26 @@ with %{name} J2SE Runtime Environment.
 %endif # enabled javaws
 !);
 
-    $jpp->add_section('files','javaws');
+    $jpp->add_section('files','-n %altname-javaws');
     #map{$_->describe()} $jpp->get_sections();
 
-    $jpp->get_section('files','javaws')->unshift_body('%_altdir/%altname-javaws
-%{_datadir}/applications/%{name}-javaws.desktop
+    $jpp->get_section('files','-n %altname-javaws')->unshift_body('# 
+%_altdir/%altname-javaws
+%{_desktopdir}/%{altname}-javaws.desktop
+%{_datadir}/pixmaps/javaws.png
+%{_man1dir}/javaws-itweb.1.gz
 ');
+    $jpp->get_section('files','')->push_body('# alt linux specific
+%_altdir/%altname-plugin
+%{_desktopdir}/%{altname}-control-panel.desktop
+# separate javaws
+%exclude %{_desktopdir}/%{altname}-javaws.desktop
+%exclude %{_desktopdir}/itweb-settings.desktop
+%exclude %{_desktopdir}/javaws.desktop
+%exclude %{_datadir}/pixmaps/javaws.png
+%exclude %{_man1dir}/javaws-itweb.1.gz
+%exclude %_bindir/javaws.itweb'."\n");
+
     $jpp->_reset_speclist();
 
     $jpp->get_section('install')->push_body(q!
@@ -115,7 +99,7 @@ with %{name} J2SE Runtime Environment.
 ##################################################
 %if_enabled moz_plugin
 # ControlPanel freedesktop.org menu entry
-cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
+cat >> $RPM_BUILD_ROOT%{_desktopdir}/%{altname}-control-panel.desktop << EOF
 [Desktop Entry]
 Name=Java Plugin Control Panel (%{name})
 Comment=Java Control Panel
@@ -129,7 +113,7 @@ EOF
 
 %if_enabled javaws
 # javaws freedesktop.org menu entry
-cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
+cat >> $RPM_BUILD_ROOT%{_desktopdir}/%{altname}-javaws.desktop << EOF
 [Desktop Entry]
 Name=Java Web Start (%{name})
 Comment=Java Application Launcher
@@ -143,24 +127,12 @@ EOF
 %endif
 
 install -d %buildroot%_altdir
-
-# ----- JPackage compatibility alternatives ------
-%if_enabled moz_plugin
-cat <<EOF >>%buildroot%_altdir/%altname-java
-%{_bindir}/ControlPanel	%{jredir}/bin/ControlPanel	%{jredir}/bin/java
-%{_bindir}/jcontrol	%{jredir}/bin/jcontrol	%{jredir}/bin/java
-EOF
-%endif
-# ----- end: JPackage compatibility alternatives ------
-
 %if_enabled moz_plugin
 # Mozilla plugin alternative
-%__cat <<EOF >%buildroot%_altdir/%name-mozilla
+%__cat <<EOF >%buildroot%_altdir/%altname-plugin
 %browser_plugins_path/libjavaplugin_oji.so	%mozilla_java_plugin_so	%priority
 EOF
-%endif	# enabled moz_plugin
-%if_enabled moz_plugin
-%__cat <<EOF >>%buildroot%_altdir/%name-java
+%__cat <<EOF >>%buildroot%_altdir/%altname-plugin
 %{_bindir}/ControlPanel	%_bindir/itweb-settings.itweb	%{jredir}/bin/java
 %{_bindir}/jcontrol	%_bindir/itweb-settings.itweb	%{jredir}/bin/java
 EOF
