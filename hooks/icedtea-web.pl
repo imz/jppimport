@@ -17,6 +17,8 @@ push @SPECHOOKS, sub {
     #Obsoletes:  java-1.6.0-openjdk-plugin <= %{min_openjdk_version}
     $mainsec->exclude_body(qr'^(Provides|Obsoletes):\s+java-1.6.0-openjdk-plugin');
 
+    $mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
+
     $mainsec->unshift_body(q'
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
