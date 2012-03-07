@@ -75,19 +75,21 @@ with %{name} J2SE Runtime Environment.
     $jpp->add_section('files','-n %altname-javaws');
     #map{$_->describe()} $jpp->get_sections();
 
-    $jpp->get_section('files','-n %altname-javaws')->unshift_body('# 
+    $jpp->get_section('files','-n %altname-javaws')->unshift_body('#
 %_altdir/%altname-javaws
 %{_desktopdir}/%{altname}-javaws.desktop
 %{_datadir}/pixmaps/javaws.png
 %{_man1dir}/javaws-itweb.1.gz
+%_bindir/javaws.itweb
 ');
     $jpp->get_section('files','')->push_body('# alt linux specific
 %_altdir/%altname-plugin
 %{_desktopdir}/%{altname}-control-panel.desktop
+# replace by local variants
+%exclude %{_desktopdir}/javaws.desktop
+%exclude %{_desktopdir}/itweb-settings.desktop
 # separate javaws
 %exclude %{_desktopdir}/%{altname}-javaws.desktop
-%exclude %{_desktopdir}/itweb-settings.desktop
-%exclude %{_desktopdir}/javaws.desktop
 %exclude %{_datadir}/pixmaps/javaws.png
 %exclude %{_man1dir}/javaws-itweb.1.gz
 %exclude %_bindir/javaws.itweb'."\n");
@@ -128,6 +130,9 @@ Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
 EOF
 %endif
 
+
+JAVACANDIDATE=`head -2 /etc/alternatives/packages.d/java-%{javaver}-openjdk-java| tail -1 | awk '{print $3}'`
+
 install -d %buildroot%_altdir
 %if_enabled moz_plugin
 # Mozilla plugin alternative
@@ -135,20 +140,20 @@ install -d %buildroot%_altdir
 %browser_plugins_path/libjavaplugin_oji.so	%mozilla_java_plugin_so	%priority
 EOF
 %__cat <<EOF >>%buildroot%_altdir/%altname-plugin
-%{_bindir}/ControlPanel	%_bindir/itweb-settings.itweb	%{jredir}/bin/java
-%{_bindir}/jcontrol	%_bindir/itweb-settings.itweb	%{jredir}/bin/java
+%{_bindir}/ControlPanel	%_bindir/itweb-settings.itweb	$JAVACANDIDATE
+%{_bindir}/jcontrol	%_bindir/itweb-settings.itweb	$JAVACANDIDATE
 EOF
 %endif
 
 %if_enabled javaws
 # Java Web Start alternative
 cat <<EOF >%buildroot%_altdir/%altname-javaws
-%_bindir/javaws	%_bindir/javaws.itweb	%{jredir}/bin/java
-%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{jredir}/bin/java
+%_bindir/javaws	%_bindir/javaws.itweb	$JAVACANDIDATE
+%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	$JAVACANDIDATE
 EOF
 # ----- JPackage compatibility alternatives ------
 %__cat <<EOF >>%buildroot%_altdir/%altname-javaws
-%{_datadir}/javaws	%_bindir/javaws.itweb	%{jredir}/bin/java
+%{_datadir}/javaws	%_bindir/javaws.itweb	$JAVACANDIDATE
 EOF
 # ----- end: JPackage compatibility alternatives ------
 %endif	# enabled javaws
