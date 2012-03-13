@@ -42,9 +42,18 @@ $skip{REQUIRENAME}={map {$_=>1} split(',',join(',',@skiprequires))};
 
 map {&package($_)} @ARGV;
 
+sub print_tag {
+    my ($fn,$tag,$tagval)=@_;
+    print $fn ucfirst(lc($tag)).": ".$tagval."\n" if defined $tagval && $tagval ne '(none)';
+}
+
 sub package {
     my $rpmfile=shift;
     my $jpp=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
+    my $alt;
+    if ($altrpm || $altspec) {
+	$alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+    }
 
     my $trippletname=$jpp->query('NAME')."-".$jpp->query('VERSION')."-".$jpp->query('RELEASE');
     my $tmpdir = $trippletname.$$;
@@ -63,13 +72,22 @@ sub package {
 NAME
 VERSION
 SUMMARY
-EPOCH
 LICENSE
 URL
 / {
     my $tagval=$jpp->query($tag);
-    print SPEC ucfirst(lc($tag)).": ".$tagval."\n" if defined $tagval && $tagval ne '(none)';
+    &print_tag(\*SPEC, $tag,$tagval);
 }
+
+    my $epoch=$jpp->query('EPOCH');
+    if ($alt) {
+	my $altepoch=$alt->main_section->get_tag('Epoch');
+	if (defined $altepoch and (not defined $epoch or $epoch eq '(none)' or $altepoch> $epoch)) {
+	    $epoch=$altepoch;
+	}
+    }
+    &print_tag(\*SPEC, 'EPOCH',$epoch);
+
     print SPEC "Packager: $packager\n" if $packager;
 
     my $pkgname=$jpp->query('NAME');
@@ -140,8 +158,7 @@ print SPEC q!
 
 %changelog
 !;
-if ($altrpm || $altspec) {
-    my $alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+if ($alt) {
     print SPEC @{$alt->get_section('changelog')->get_bodyref()};
 }
 
