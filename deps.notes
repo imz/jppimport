@@ -21,10 +21,11 @@ export MAVEN_OPTS=-XX:MaxPermSize=512m
 #-Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5
 #-Dant.javadoc.maxmemory=64m
 
+# java7 javadoc encodings error (unmappable character for encoding utf-8)
+$jpp->get_section('build')->subst(qr'export MAVEN_OPTS="','export MAVEN_OPTS="-Dproject.build.sourceEncoding=ISO-8859-1 ');
+
 # maven opt to avoid xvfb
 #-Djava.awt.headless=true
-
-
 
 subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 

@@ -16,8 +16,12 @@ print_rpm_jarinfo()
 	find $tmp/jar -name '*.class' -exec file -b {} \; | sort -u >> $tmp/ver
 	rm -rf $tmp/jar
     done
-    echo "javaclassinfo: $1:"
-    sort -u $tmp/ver
+    if [ -s $tmp/ver ]; then
+	echo "$1: javaclassinfo:"
+	sort -u $tmp/ver
+    else
+	echo "$1: no java class info"
+    fi
     rm -rf $tmp
 }
 
