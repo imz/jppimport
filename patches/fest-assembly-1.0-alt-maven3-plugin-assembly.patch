@@ -1,0 +1,9 @@
+--- src/main/resources/assembly.xml~	2009-11-24 15:02:59.000000000 +0000
++++ src/main/resources/assembly.xml	2012-03-15 15:50:37.453663854 +0000
+@@ -1,5 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <assembly>
++  <id>AltLinux</id>
+   <formats>
+     <format>zip</format>
+   </formats>

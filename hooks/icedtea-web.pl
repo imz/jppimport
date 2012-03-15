@@ -97,6 +97,23 @@ with %{name} J2SE Runtime Environment.
     $jpp->_reset_speclist();
 
     $jpp->get_section('install')->push_body(q!
+install -d -m 755 %buildroot/etc/icedtea-web
+cat > %buildroot/etc/icedtea-web/javaws.policy << EOF
+// Based on Oracle JDK policy file
+grant codeBase "file:/usr/share/icedtea-web/netx.jar" {
+    permission java.security.AllPermission;
+};
+EOF
+sed -e 's,^JAVA_ARGS=,JAVA_ARGS="-Djava.security.policy=/etc/icedtea-web/javaws.policy",' \
+%buildroot%_bindir/javaws.itweb
+!);
+
+    $jpp->get_section('files')->push_body(q!# security policy
+%dir /etc/icedtea-web
+/etc/icedtea-web/javaws.policy
+!);
+
+    $jpp->get_section('install')->push_body(q!
 
 ##################################################
 # --- alt linux specific, shared with openjdk ---#
