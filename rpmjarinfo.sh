@@ -12,6 +12,7 @@ print_rpm_jarinfo()
     popd >/dev/null
     find $tmp/unpack/usr -type f -name '*.jar' | while read a; do
 	mkdir -p $tmp/jar
+	ls -l "$a"
 	unzip -d $tmp/jar "$a" >/dev/null
 	find $tmp/jar -name '*.class' -exec file -b {} \; | sort -u >> $tmp/ver
 	rm -rf $tmp/jar

@@ -9,6 +9,8 @@ sub {
 
 }
 __END__
+maven3 BR:+ maven-plugin-descriptor gmaven mojo-parent
+
 mvn-jpp -Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5 \
         -e \
         -s $(pwd)/settings.xml \

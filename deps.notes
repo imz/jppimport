@@ -145,6 +145,10 @@ downgrade because a8 has a bug [at apache-abderra]
 
 TODO: incorrect obsoletes in apache-commons-*
 
+maven3: assembly: assembly.xml must have <id></id> see fest-assembly patch for example
+maven3: maven-plugin-descriptor from maven22
+maven3: mvn-jpp: TODO: drop -s settngs.xml, see jung2.pl hook - useless and dangerous.
+
 DONE:renameBR: maven-plugin-modello(conflicts with maven1) -> modello-maven-plugin
 DONE:aspectj group. aspectj -> org.aspectj
 # alt; aspectj 1.5.4
