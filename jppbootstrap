@@ -15,7 +15,7 @@ my $outdir='.';
 my $changelog='- bootstrap pack of jars created with jppbootstrap script
 - temporary package to satisfy circular dependencies';
 my (@skiprequires,@skipprovides);
-my (@addprovides,@addrequires,@addobsoletes);
+my (@addprovides,@addrequires,@addobsoletes,$opt_epoch);
 my ($altrpm,$altspec);
 my $result = GetOptions (
 		      "changelog=s"   => \$changelog,
@@ -23,6 +23,7 @@ my $result = GetOptions (
 		      "release=s"   => \$release,
 		      "alt=s"   => \$altrpm,
 		      "parent=s"   => \$altrpm,
+		      "epoch=s"   => \$opt_epoch,
 		      "skip-requires=s"   => \@skiprequires,
 		      "skip-provides=s"   => \@skipprovides,
 		      "add-provides=s"   => \@addprovides,
@@ -86,6 +87,7 @@ URL
 	    $epoch=$altepoch;
 	}
     }
+    $epoch=$opt_epoch if defined $opt_epoch;
     &print_tag(\*SPEC, 'EPOCH',$epoch);
 
     print SPEC "Packager: $packager\n" if $packager;

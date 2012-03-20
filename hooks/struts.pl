@@ -1,8 +1,6 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    # for site
-    $jpp->get_section('package','')->unshift_body('BuildRequires: velocity14'."\n");
     $jpp->get_section('package','')->subst_if(qr'tomcat6-el-1.0-api','tomcat6-el-2.1-api',qr'Requires');
     $jpp->get_section('package','')->unshift_body('BuildRequires: cssparser'."\n");
 
