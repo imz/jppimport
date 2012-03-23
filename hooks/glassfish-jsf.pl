@@ -15,3 +15,4 @@ sed -i s,sun-jsf,glassfish/jsf, $RPM_BUILD_ROOT%{compatrepodir}/component-info.x
 ');
 };
 __END__
+# TODO: pick up java7 patch 

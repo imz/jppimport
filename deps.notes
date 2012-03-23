@@ -31,6 +31,10 @@ $jpp->get_section('build')->subst(qr'export MAVEN_OPTS="','export MAVEN_OPTS="-D
 
 subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
++      install:install-file -DgroupId=xpp3 -DartifactId=xpp3_min \
++                -Dversion=1.1.4c -Dpackaging=jar -Dfile=$(build-classpath xpp3)
+
+
 #--------------------------------------------------------------
 
 ### HOW TO ADD synonims in pom ###
@@ -237,6 +241,7 @@ TODO: миграция на apache-ivy:
 oscache, ...
 sed -i -e s,fr.jayasoft.ivy,org.apache.ivy,g build.xml
 
+TODO: maven-plugin-build-helper to kill mojo-maven2-plugin-build-helper
 
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm

@@ -134,49 +134,6 @@ maven-plugin-webstart	maven1-plugin-webstart
 maven-plugin-wizard	maven1-plugin-wizard
 maven-plugin-xdoc	maven1-plugin-xdoc
 
-
-maven2	maven
-maven2-bootstrap	maven
-maven2-plugin-ant	maven-ant-plugin
-maven2-plugin-antlr	maven-antlr-plugin
-maven2-plugin-antrun	maven-antrun-plugin
-maven2-plugin-assembly	maven-assembly-plugin
-maven2-plugin-changelog	maven-changelog-plugin
-maven2-plugin-changes	maven-changes-plugin
-maven2-plugin-checkstyle	maven-checkstyle-plugin
-maven2-plugin-clean	maven-clean-plugin
-maven2-plugin-compiler	maven-compiler-plugin
-maven2-plugin-dependency	maven-dependency-plugin
-maven2-plugin-deploy	maven-deploy-plugin
-maven2-plugin-doap	maven-doap-plugin
-maven2-plugin-docck	maven-docck-plugin
-maven2-plugin-ear	maven-ear-plugin
-maven2-plugin-eclipse	maven-eclipse-plugin
-maven2-plugin-ejb	maven-ejb-plugin
-maven2-plugin-enforcer	maven-enforcer-plugin
-maven2-plugin-gpg	maven-gpg-plugin
-maven2-plugin-help	maven-help-plugin
-maven2-plugin-idea	maven-idea-plugin
-maven2-plugin-install	maven-install-plugin
-maven2-plugin-invoker	maven-invoker-plugin
-maven2-plugin-jar	maven-jar-plugin
-maven2-plugin-javadoc	maven-javadoc-plugin
-maven2-plugin-one	maven-one-plugin
-maven2-plugin-plugin	maven-plugin-plugin
-maven2-plugin-pmd	maven-pmd-plugin
-maven2-plugin-project-info-reports	maven-project-info-reports-plugin
-maven2-plugin-rar	maven-rar-plugin
-maven2-plugin-remote-resources	maven-remote-resources-plugin
-maven2-plugin-repository	maven-repository-plugin
-maven2-plugin-resources	maven-resources-plugin
-maven2-plugin-shade	maven-shade-plugin
-maven2-plugin-shade-javadoc	maven-shade-javadoc-plugin
-maven2-plugin-site	maven-site-plugin
-maven2-plugin-source	maven-source-plugin
-maven2-plugin-stage	maven-stage-plugin
-maven2-plugin-verifier	maven-verifier-plugin
-maven2-plugin-war	maven-war-plugin
-
 /;
 	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     } elsif (grep {$_->[1] =~ m!/fedora/linux/!} @RPM::Source::Transform::INSRC) {

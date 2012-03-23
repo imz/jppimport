@@ -53,6 +53,11 @@ Provides: java-devel = %version
 Provides: java-devel-openjdk = %version
 ');
 
+    $jpp->get_section('package','javadoc')->push_body('# fc provides
+Provides: java-javadoc = 1:1.6.0
+');
+
+
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 

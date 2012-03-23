@@ -48,6 +48,10 @@ push @SPECHOOKS, sub {
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
+    $jpp->get_section('package','javadoc')->push_body('# fc provides
+Provides: java-javadoc = 1:1.7.0
+');
+
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
     $jpp->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
