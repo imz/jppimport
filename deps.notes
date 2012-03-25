@@ -127,29 +127,15 @@ eclipse-callgraph unmet on systemtap
 
 TODO: merge pom and berkeleydb package to berkeleydb-je3
 
-NOTE:
-due to: both velocity and velocity15 are installed
-Embedded error: Error rendering Maven report: Error while generating the HTML source code of the projet.
-The specified class for ResourceManager (org.apache.velocity.runtime.resource.ResourceManagerImpl) does not implement org.apache.velocity.runtime.resource.ResourceManager; Velocity is not initialized correctly.
-
-NOTE: plexus-archiver: a8 in jpp5, a7 in jpp6.
-when tried to downgrade, mojo-maven2-plugins was broken. fixes:
-[mojo-maven2-plugins-17-alt-plexus-archiver-a7-support.patch; disable patch10]
-extra exception is thrown
-downgrade because a8 has a bug [at apache-abderra]
-[INFO] [jar:jar]
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] Building jar: /usr/src/RPM/BUILD/apache-abdera-0.4.0/bundle/target/abdera-bundle-0.4.0-incubating.jar
-[INFO] Preparing source:jar
-[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
-[INFO] No goals needed for project - skipping
-[INFO] [source:jar {execution: attach-sources}]
-[INFO] ------------------------------------------------------------------------
-[ERROR] BUILD ERROR
-[INFO] ------------------------------------------------------------------------
-[INFO] Error creating source archive: You must set at least one file.
-
 TODO: incorrect obsoletes in apache-commons-*
+
+maven3: todo: fix plugins to allow cmdline override 
+apache-commons-lang: -Dmaven.javadoc.source=1.4 was ignored by javadoc plugin defaults (1.5)
+
+maven3: see velocity-dvsl ws-commons-neethi (default-skin related?)
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-site-plugin:3.0:site (default-site) on project dvsl: Error during page generation: Error while generating code. Invocation of method 'calculateLink' in  class org.codehaus.plexus.util.PathTool threw exception java.lang.NullPointerException at org/apache/maven/doxia/siterenderer/resources/default-site.vm[line 121, column 41] -> [Help 1]
+org.apache.maven.lifecycle.LifecycleExecutionException: Failed to execute goal org.apache.maven.plugins:maven-site-plugin:3.0:site (default-site) on project dvsl: Error during page generation
+
 
 maven3: assembly: assembly.xml must have <id></id> see fest-assembly patch for example
 maven3: maven-plugin-descriptor from maven22

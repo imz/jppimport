@@ -1,0 +1,79 @@
+diff -ru woden-api/pom.xml /woden-api/pom.xml
+--- woden-api/pom.xml	2008-04-23 22:55:09.000000000 +0300
++++ woden-api/pom.xml	2012-03-23 20:39:28.000000000 +0200
+@@ -76,23 +76,6 @@
+                </configuration>
+            </plugin>
+            <plugin>
+-               <artifactId>maven-one-plugin</artifactId>
+-               <executions>
+-                   <execution>
+-                       <goals>
+-                           <goal>install-maven-one-repository</goal>
+-                           <goal>deploy-maven-one-repository</goal>
+-                       </goals>
+-                   </execution>
+-               </executions>
+-               <configuration>
+-                   <remoteRepositoryId>apache</remoteRepositoryId>
+-                   <remoteRepositoryUrl>
+-                       scpexe://people.apache.org/www/people.apache.org/repo/m1-snapshot-repository
+-                   </remoteRepositoryUrl>
+-               </configuration>
+-           </plugin>
+-           <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+diff -ru woden-dom/pom.xml woden-dom/pom.xml
+--- woden-dom/pom.xml	2008-04-23 22:55:09.000000000 +0300
++++ woden-dom/pom.xml	2012-03-23 20:39:49.000000000 +0200
+@@ -93,23 +93,6 @@
+                    </testExcludes>
+                </configuration>
+            </plugin>
+-           <plugin>
+-               <artifactId>maven-one-plugin</artifactId>
+-               <executions>
+-                   <execution>
+-                       <goals>
+-                           <goal>install-maven-one-repository</goal>
+-                           <goal>deploy-maven-one-repository</goal>
+-                       </goals>
+-                   </execution>
+-               </executions>
+-               <configuration>
+-                   <remoteRepositoryId>apache</remoteRepositoryId>
+-                   <remoteRepositoryUrl>
+-                       scpexe://people.apache.org/www/people.apache.org/repo/m1-snapshot-repository
+-                   </remoteRepositoryUrl>
+-               </configuration>
+-           </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+diff -ru woden-om/pom.xml woden-om/pom.xml
+--- woden-om/pom.xml	2008-04-23 22:55:09.000000000 +0300
++++ woden-om/pom.xml	2012-03-23 20:39:13.000000000 +0200
+@@ -96,21 +96,6 @@
+                </configuration>
+            </plugin>
+            <plugin>
+-               <artifactId>maven-one-plugin</artifactId>
+-               <executions>
+-                   <execution>
+-                       <goals>
+-                           <goal>install-maven-one-repository</goal>
+-                           <goal>deploy-maven-one-repository</goal>
+-                       </goals>
+-                   </execution>
+-               </executions>
+-               <configuration>
+-                   <remoteRepositoryId>apache</remoteRepositoryId>
+-                   <remoteRepositoryUrl>scpexe://people.apache.org/www/people.apache.org/repo/m1-snapshot-repository</remoteRepositoryUrl>
+-               </configuration>
+-           </plugin>
+-           <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <configuration>
