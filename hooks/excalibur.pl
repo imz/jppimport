@@ -6,6 +6,10 @@ sub {
     # 6.0
     $jpp->get_section('package','')->subst(qr'\%bcond_with\s+jdk6','%bcond_without jdk6');
 
+    $jpp->get_section('install')->push_body(q'# due to maven3fragmentsdir move
+    mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
+');
+
     # Too early; should test first
 
 #+Provides:       avalon-logkit = %{epoch}:%{containerkit_version}-%{release}

@@ -370,6 +370,38 @@ done
 Provides: java-devel = 1.5.0
 %endif
 ');
+
+    $jpp->spec_apply_patch(PATCHSTRING=> q!
+--- java-1.6.0-openjdk.spec~	2012-04-16 22:45:12.000000000 +0300
++++ java-1.6.0-openjdk.spec	2012-04-16 22:47:02.000000000 +0300
+@@ -226,7 +226,7 @@
+ BuildRequires: fontconfig
+ BuildRequires: eclipse-ecj
+ # Java Access Bridge for GNOME build requirements.
+-BuildRequires: libat-spi-devel
++#BuildRequires: libat-spi-devel
+ BuildRequires: gawk
+ BuildRequires: libbonobo-devel
+ BuildRequires: xorg-x11-utils
+@@ -441,6 +441,7 @@
+ 
+ export JAVA_HOME=$(pwd)/%{buildoutputdir}/j2sdk-image
+ 
++%if_with java_access_bridge
+ # Build Java Access Bridge for GNOME.
+ pushd java-access-bridge-%{accessver}
+   patch -l -p1 < %{PATCH1}
+@@ -453,7 +454,7 @@
+   cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
+   cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
+ popd
+-
++%endif
+ %if %{runtests}
+ # Run jtreg test suite.
+ {
+!);
+
 };
 
 

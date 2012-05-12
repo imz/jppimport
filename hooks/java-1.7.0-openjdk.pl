@@ -299,6 +299,37 @@ done
 Provides: java-devel = 1.5.0
 %endif
 ') if 0; # jdk 1.6 already provides
+
+    $jpp->spec_apply_patch(PATCHSTRING=> q!
+--- java-1.7.0-openjdk.spec.orig	2012-04-16 23:15:27.000000000 +0300
++++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
+@@ -435,7 +435,7 @@
+ BuildRequires: fontconfig
+ BuildRequires: ecj
+ # Java Access Bridge for GNOME build requirements.
+-BuildRequires: libat-spi-devel
++#BuildRequires: libat-spi-devel
+ BuildRequires: gawk
+ BuildRequires: libbonobo-devel
+ BuildRequires: xorg-x11-utils
+@@ -869,6 +869,7 @@
+ popd
+ %endif
+ 
++%if_with java_access_bridge
+ # Build Java Access Bridge for GNOME.
+ pushd java-access-bridge-%{accessver}
+   patch -l -p1 < %{PATCH1}
+@@ -881,6 +882,7 @@
+   cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
+   cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
+ popd
++%endif
+ 
+ # Copy tz.properties
+ echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
+!);
+
 };
 
 

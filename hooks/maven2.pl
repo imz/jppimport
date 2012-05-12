@@ -1,166 +1,49 @@
 #!/usr/bin/perl -w
 
-require 'add_missingok_config.pl';
+#require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    my $bootstrap=1;
-
-    # for 29
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-javamail-1.3.1-api geronimo-jms-1.1-api'."\n");
 
     # Следующие пакеты имеют неудовлетворенные зависимости:
     # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
-    &add_missingok_config($jpp,'/etc/mavenrc');
+    #&add_missingok_config($jpp,'/etc/mavenrc');
 
-    if ($bootstrap) {
-	$jpp->get_section('package','plugin-site')->push_body('Requires: maven-shared-downloader maven-shared-doxia-tools'."\n") ;
-	$jpp->get_section('package','plugin-remote-resources')->push_body('Requires:  maven-shared-doxia-tools'."\n") ;
-	$jpp->get_section('package','plugin-resources')->push_body('Requires:  maven-shared-filtering'."\n") ;
-    }
-    #$jpp->get_section('package','')->unshift_body('%define _without_bootstrap 1'."\n");
-    $jpp->get_section('package','')->push_body('BuildRequires: maven-shared-archiver plexus-containers-container-default plexus-containers plexus-classworlds maven-plugin-tools plexus-cli plexus-containers-component-annotations 
-BuildRequires: maven-enforcer maven2-plugin-war geronimo-j2ee-1.4-apis
-# unbootstrap
-BuildRequires: maven2-plugin-ant
-BuildRequires: maven2-plugin-assembly
-BuildRequires: maven2-plugin-clean
-BuildRequires: maven2-plugin-compiler
-BuildRequires: maven2-plugin-install
-BuildRequires: maven2-plugin-jar
-BuildRequires: maven2-plugin-javadoc
-BuildRequires: maven2-plugin-plugin
-BuildRequires: maven2-plugin-resources
-BuildRequires: maven2-plugin-shade
-BuildRequires: maven2-plugin-site
-BuildRequires: maven-surefire-plugin
-BuildRequires: maven-shared-archiver
-BuildRequires: maven-doxia-sitetools
-BuildRequires: maven-embedder
-BuildRequires: maven-scm >= 0:1.0-0.b3.2
-BuildRequires: maven-scm-test >= 0:1.0-0.b3.2
-BuildRequires: maven-shared-common-artifact-filters
-BuildRequires: maven-shared-dependency-analyzer
-BuildRequires: maven-shared-dependency-tree
-BuildRequires: maven-shared-downloader
-BuildRequires: maven-shared-file-management >= 1.0
-BuildRequires: maven-shared-io
-BuildRequires: maven-shared-plugin-testing-harness >= 1.0
-BuildRequires: maven-shared-repository-builder
-BuildRequires: maven-shared-invoker
-BuildRequires: maven-shared-jar
-BuildRequires: maven-shared-model-converter
-BuildRequires: maven-shared-plugin-testing-tools
-BuildRequires: maven-shared-plugin-tools-api
-BuildRequires: maven-shared-plugin-tools-beanshell
-BuildRequires: maven-shared-plugin-tools-java
-BuildRequires: maven-shared-reporting-impl
-BuildRequires: maven-shared-verifier
-BuildRequires: maven-surefire >= 2.0
-BuildRequires: maven-surefire-provider-junit
-BuildRequires: maven-surefire-booter >= 2.0
-BuildRequires: modello >= 1.0-0.a8.3
-BuildRequires: modello-maven-plugin >= 1.0-0.a8.3
-BuildRequires: plexus-digest
-BuildRequires: plexus-maven-plugin >= 1.3.5
-BuildRequires: plexus-mail-sender
-BuildRequires: plexus-resources
-'."\n");
-    $jpp->get_section('package','')->push_body('BuildRequires: jakarta-commons-digester jakarta-commons-parent excalibur-avalon-framework'."\n");
+    $jpp->rename_package('-n maven-model','-n maven-model22');
+    $jpp->main_section->subst_body_if(qr'maven-model','maven-model22',qr'Requires');
+    $jpp->get_section('files','-n maven-model22')->subst_body_if(qr'maven-model','maven-model22',qr'mavendepmapfragdir');
+    $jpp->get_section('install')->push_body(q!# maven-model22
+mv $RPM_BUILD_ROOT%{_mavendepmapfragdir}/maven-model \
+   $RPM_BUILD_ROOT%{_mavendepmapfragdir}/maven-model22
+!);
 
-    # maven2-plugin-javadoc reqs avalon-framework pom due to pom dependencies
-    $jpp->get_section('package','plugin-javadoc')->push_body('Requires: excalibur-avalon-framework'."\n");
+    $srcid=$jpp->add_source('maven3-jpp-script');
+    $jpp->main_section->push_body(q!
+Provides:        maven2-bootstrap = %{epoch}:%{version}-%{release}
+Obsoletes:       maven2-plugin-jxr <= 0:2.0.4 
+Obsoletes:       maven2-plugin-surefire <= 0:2.0.4 
+Obsoletes:       maven2-plugin-surefire-report <= 0:2.0.4 
+Obsoletes:       maven2-plugin-release <= 0:2.0.4 
+!."\n");
+    $jpp->get_section('install')->push_body(q!
+# Items in %%{_bindir}
+install -Dm 755 %{SOURCE!.$srcid.q!} $RPM_BUILD_ROOT%{_bindir}/mvn-jpp
 
-    unless ('revert to a7') {
-	# I do not want to update(revert) plexus-archiver from a8 to a7.
-	# so disable maven2-plugins-catch-uncaught-exceptions.patch
-	$jpp->get_section('prep')->subst(qr'^\%patch4\s','#patch4 ');
-	# and make other similar patches
-	$jpp->add_patch('maven2-2.0.8-alt-plexus-archiver-a8.patch',STRIP=>1);
-    }
+%post
+# clear the old links
+find %{_datadir}/%{name}/boot/ -type l -exec rm -f '{}' \; ||:
+find %{_datadir}/%{name}/lib/ -type l -exec rm -f '{}' \; ||:
 
-    # tmp hack over sandbox error :(
-    #$jpp->get_section('package','')->push_body('ExclusiveArch: x86_64'."\n");
-    $jpp->add_patch('maven2-2.0.8-alt-bootstrap-fix-descriptor-leak.patch',STRIP=>0);
+%postun
+# FIXME: This doesn't always remove the plugins dir. It seems that rpm doesn't
+# honour the Requires(postun) as it should, causing maven to get uninstalled 
+# before some plugins are
+if [ -d %{_javadir}/%{name} ] ; then rmdir --ignore-fail-on-non-empty %{_javadir}/%{name} >& /dev/null; fi
+!."\n");
 
-    if (1) { # for 28
-    $jpp->get_section('prep')->push_body(q~
-cat > relink_bootstrap_maven_jars.sh << 'EOF'
-#!/bin/sh
-DUP='cp -pL'
-# old 26: `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]* -type f -name '*.jar'` 
-pushd m2_repo/repository/JPP
-for i in maven-surefire/api.jar maven-surefire/booter.jar maven-surefire/maven-plugin.jar ;do
-    if [ -f /usr/share/java/$i ]; then
-    mv $i $i.no;
-    $DUP /usr/share/java/$i $i
-    fi
-done
-# old 26:
-#i=maven-archiver.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/archiver.jar $i
-#i=maven-embedder.jar; mv $i $i.no; $DUP /usr/share/java/maven2/embedder.jar $i
-#i=maven-enforcer-rule-api.jar; mv $i $i.no; $DUP /usr/share/java/maven-enforcer/enforcer-api.jar $i
-# 
-#i=maven2-plugin-cobertura.jar; mv $i $i.no; $DUP  $i
-#i=maven-shared/maven-plugin-testing-harness.jar; mv $i $i.no; $DUP /usr/share/java/maven-shared/plugin-testing-harness.jar $i
-#i=maven-reporting/impl.jar; mv $i $i.no; $DUP maven-shared/reporting-impl.jar $i
-find . -name '*.jar.no' -delete
-popd
-EOF
-#%_sourcedir
-sh ./relink_bootstrap_maven_jars.sh
-~."\n");
-
-    # we hack bootsrap repo at code above; tar xzf overwrites our hacks :(
-    $jpp->get_section('install')->unshift_body_after(qr'tar xzf \%{SOURCE4}','sh ./relink_bootstrap_maven_jars.sh'."\n");
-}
+    $jpp->get_section('files')->push_body(q!%attr(0755,root,root) %{_bindir}/mvn-jpp!."\n");
 
 };
 
 __END__
-
-
-__DATA__
-#2) some plexuses are missing components.xml (which ones?)
-are good
-m* plexus/[adr-x]* plexus/mail* plexus/c[ol]* 
-# suspects:
-# criminal: plexus/cdc.jar
-Embedded error: Error reading input descriptor for merge: /usr/src/RPM/BUILD/maven2/maven2-plugins/maven-assembly-plugin/target/generated-resources/plexus/META-INF/plexus/components.xml
-/usr/src/RPM/BUILD/maven2/maven2-plugins/maven-assembly-plugin/target/generated-resources/plexus/META-INF/plexus/components.xml (No such file or directory)
-# criminal: plexus/maven-plugin.jar
-Embedded error: Error reading input descriptor for merge: /usr/src/RPM/BUILD/maven2/maven2-plugins/maven-assembly-plugin/target/generated-resources/plexus/META-INF/plexus/components.xml
-...
-        at org.codehaus.plexus.cdc.DefaultComponentDescriptorCreator.mergeDescriptors(DefaultComponentDescriptorCreator.java:246)
-
-plexus: seems there is a need for downgrade,
-or, at least, to simplify their components (let us try on cdc)
-
-relink_bootstrap_maven_jars.sh
-#!/bin/sh
-pushd m2_repo/repository/JPP
-for i in `find m* plexus/[adr-x]* plexus/mail* plexus/c[ol]*  -type f -name '*.jar'`;do
-    if [ -f /usr/share/java/$i ]; then
-    mv $i $i.no;
-    ln /usr/share/java/$i $i
-    fi
-done
-popd
-
-
-__END__
-    # done in 37
-    $jpp->source_apply_patch(SOURCEFILE=>'maven2-versionless-depmap.xml', PATCHSTRING=>q!
---- maven2-versionless-depmap.xml	2011-09-06 13:01:31.616638465 +0000
-+++ maven2-versionless-depmap.xml	2011-09-06 13:01:08.620637964 +0000
-@@ -1912,7 +1912,7 @@
- 			<version>1.2</version>
- 		</maven>
- 		<jpp>
--			<groupId>JPP/xmlrpc</groupId>
-+			<groupId>JPP</groupId>
- 			<artifactId>xmlrpc</artifactId>
- 			<version>1.2</version>
- 		</jpp>
-!);

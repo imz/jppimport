@@ -2,6 +2,10 @@
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    $jpp->get_section('package','')->unshift_body("BuildRequires: spring2-beans spring2-context\n");
+    $jpp->get_section('install','')->subst_body(qr'^spring/','spring2/');
+    $jpp->get_section('post','server')->subst_body(qr'^spring/','spring2/');
+
     # maven3
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-remote-resources-plugin\n");
 
