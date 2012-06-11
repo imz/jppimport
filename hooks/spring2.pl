@@ -33,3 +33,14 @@ current - fixes for old tiles
 
 
 
+--- spring2.spec~	2012-03-20 23:43:25.000000000 +0000
++++ spring2.spec	2012-06-01 19:38:13.851010907 +0000
+@@ -1158,7 +1158,7 @@
+ ln -sf $(build-classpath struts-tiles) lib/struts/struts-tiles.jar
+ ln -sf $(build-classpath struts-extras) lib/struts/struts-extras.jar
+ # BUILD/spring/lib/testng/testng-5.8-jdk15.jar.no
+-ln -sf $(build-classpath testng-jdk15) lib/testng/testng-5.8-jdk15.jar
++ln -sf $(build-classpath testng) lib/testng/testng-5.8-jdk15.jar
+ ln -sf $(build-classpath jcommander) lib/testng/jcommander.jar
+ ln -sf $(build-classpath objenesis) lib/testng/objenesis.jar
+ # BUILD/spring/lib/tiles/tiles-api-2.0.6.jar.no

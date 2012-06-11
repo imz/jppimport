@@ -9,16 +9,22 @@ sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: spring2-beans spring2-context spring2-web'."\n");
 
     $jpp->source_apply_patch(SOURCEFILE=>'pom-3.8.patch', PATCHSTRING=>q!
---- pom-3.7.patch.orig	2011-05-30 12:20:07.000000000 +0300
-+++ pom-3.7.patch	2012-05-08 19:21:32.000000000 +0300
-@@ -14,42 +14,6 @@
+--- pom-3.8.patch.orig	2012-05-03 16:58:47.000000000 +0300
++++ pom-3.8.patch	2012-05-12 22:53:24.000000000 +0300
+@@ -15,48 +15,6 @@
       <groupId>org.apache.xbean</groupId>
       <artifactId>xbean</artifactId>
       <name>Apache XBean</name>
--@@ -265,33 +259,15 @@
+-@@ -259,39 +253,15 @@
 -             </dependency>
 - 
 -             <dependency>
+--                <groupId>mx4j</groupId>
+--                <artifactId>mx4j</artifactId>
+--                <version>3.0.1</version>
+--            </dependency>
+--
+--            <dependency>
 --                <groupId>org.springframework</groupId>
 --                <artifactId>spring-beans</artifactId>
 --                <version>2.5.6</version>
@@ -51,19 +57,10 @@ sub {
 -             </dependency>
 -         </dependencies>
 -     </dependencyManagement>
- @@ -327,13 +303,13 @@
-                      <artifactId>maven-bundle-plugin</artifactId>
-                      <version>2.0.0</version>
-@@ -71,7 +35,7 @@
-                  </plugin>
-              </plugins>
-          </pluginManagement>
--@@ -343,22 +319,22 @@
-+@@ -343,22 +319,24 @@
+ @@ -343,22 +313,22 @@
                   <groupId>org.apache.felix</groupId>
                   <artifactId>maven-bundle-plugin</artifactId>
-              </plugin>
-@@ -93,9 +57,9 @@
+@@ -79,9 +37,9 @@
           <module>xbean-naming</module>
           <module>xbean-reflect</module>
  -        <module>xbean-blueprint</module>

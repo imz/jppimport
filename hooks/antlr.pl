@@ -12,7 +12,7 @@ push @SPECHOOKS,
 
 
     # native subpackage; let it be built from separate (older? rpm)
-    if (0) {
+    if (1) {
 # or ?
 #    $jpp->get_section('package','')->subst(qr'\%define native  \%{\?_with_native:1}\%{!\?_without_native:0}', 	'%define native 1');
 
@@ -22,11 +22,13 @@ push @SPECHOOKS,
 # bug to report
 # if w/native w/o gcc should be arch!
     #$jpp->get_section('package','')->subst(qr'\%configure', 	'%configure --build=');
+	$jpp->source_apply_patch(SOURCEFILE=>'makefile.gcj', PATCHFILE=>'antlr-2.7.7-makefile.gcj.patch');
+
+	# TODO: manually added configure in spec ...
 
 	$jpp->get_section('package','')->subst(qr'BuildArch:\s*noarch', '##BuildArch: noarch');
-	$jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++\n");
+	$jpp->get_section('package','')->unshift_body("BuildRequires: gcc-c++ java-1.5.0-gcj\n");
 
-	$jpp->get_section('package','javadoc')->push_body("BuildArch: noarch\n");
 	$jpp->add_patch('antlr-2.7.7-alt-gcc44.patch', STRIP=>1);
 	
 	$jpp->get_section('description','native')->push_body(q{

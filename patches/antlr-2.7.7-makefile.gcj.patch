@@ -1,0 +1,41 @@
+--- makefile.gcj.0	2012-06-11 18:55:39.977466747 +0000
++++ makefile.gcj	2012-06-11 19:06:27.241189523 +0000
+@@ -188,6 +188,38 @@
+ 	antlr/TreeWalkerGrammar.java \
+ 	antlr/Version.java \
+ 	antlr/WildcardElement.java \
++	antlr/CSharpBlockFinishingInfo.java \
++	antlr/CSharpCharFormatter.java \
++	antlr/CSharpCodeGenerator.java \
++	antlr/CSharpNameSpace.java \
++	antlr/DefaultJavaCodeGeneratorPrintWriterManager.java \
++	antlr/JavaCodeGeneratorPrintWriterManager.java \
++	antlr/ParseTree.java \
++	antlr/ParseTreeRule.java \
++	antlr/ParseTreeToken.java \
++	antlr/PrintWriterWithSMAP.java \
++	antlr/PythonBlockFinishingInfo.java \
++	antlr/PythonCharFormatter.java \
++	antlr/PythonCodeGenerator.java \
++	antlr/TokenStreamRewriteEngine.java \
++	antlr/TokenWithIndex.java \
++	antlr/Utils.java \
++	antlr/ASdebug/ASDebugStream.java \
++	antlr/ASdebug/IASDebugStream.java \
++	antlr/ASdebug/TokenOffsetInfo.java \
++	antlr/build/ANTLR.java \
++	antlr/build/StreamScarfer.java \
++	antlr/build/Tool.java \
++	antlr/debug/ParseTreeDebugParser.java \
++	antlr/actions/csharp/ActionLexer.java \
++	antlr/actions/csharp/ActionLexerTokenTypes.java \
++	antlr/actions/python/ActionLexer.java \
++	antlr/actions/python/ActionLexerTokenTypes.java \
++	antlr/actions/python/CodeLexer.java \
++	antlr/actions/python/CodeLexerTokenTypes.java \
++	antlr/debug/misc/ASTFrame.java \
++	antlr/debug/misc/JTreeASTModel.java \
++	antlr/debug/misc/JTreeASTPanel.java \
+ 	antlr/ZeroOrMoreBlock.java 
+ OBJFILES = $(SOURCES:%.java=%.o)
+ 

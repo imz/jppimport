@@ -139,8 +139,6 @@ maven-plugin-xdoc	maven1-plugin-xdoc
     } elsif (grep {$_->[1] =~ m!/fedora/linux/!} @RPM::Source::Transform::INSRC) {
 	print STDERR "I: fedora mode\n";
 	my %map_jpp=qw/
-itext	itext2
-
 -maven-release-plugin	maven-release
 -maven-plugin-jxr	maven-jxr
 /;
