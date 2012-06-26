@@ -25,6 +25,17 @@ Obsoletes: '.$pkg_rename{$pkg}.' < 1.8.0
 Obsoletes: ant-task-reference < 1.8.0
 ');
 
+    # add compat jarmaps
+    $jpp->get_section('install')->map_body(
+	sub{
+	    if (/^\%add_to_maven_depmap org.apache.ant\s/) {
+		my $old=$_;
+		s/^\%add_to_maven_depmap org.apache.ant\s/\%add_to_maven_depmap ant /;
+		$_=$old.$_;
+	    }
+	});
+
+
 }
 
 

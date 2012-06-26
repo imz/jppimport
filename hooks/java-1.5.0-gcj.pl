@@ -2,6 +2,8 @@
 
 require 'set_bootstrap.pl';
 
+my $gccsuffix='4.6';
+
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     $jpp->add_section('package','aot-compile');
@@ -17,14 +19,14 @@ java jcj ahead-of-time compile scripts
     #$jpp->get_section('package','')->subst_if(qr'libssl-devel','ca-certificates',qr'BuildRequires:');
 
     # ARM-friendly deps...
-    $jpp->get_section('package','')->exclude(qr'BuildRequires: jpackage-.*-compat');
+    $jpp->get_section('package','')->exclude(qr'BuildRequires: jpackage.*-compat');
     $jpp->get_section('package','')->unshift_body('BuildRequires(pre): rpm-build-java'."\n");
 
     $jpp->get_section('package','')->subst_if(qr'openssl','ca-certificates',qr'BuildRequires:');
     $jpp->get_section('package','')->subst(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
-    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          4.4-alt1'."\n");
-    $jpp->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -4.4'."\n");
-    $jpp->get_section('package','')->unshift_body('%define gccrpmsuffix    4.4'."\n");
+    $jpp->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          '.$gccsuffix.'-alt1'."\n");
+    $jpp->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -'.$gccsuffix."\n");
+    $jpp->get_section('package','')->unshift_body('%define gccrpmsuffix    '.$gccsuffix."\n");
     $jpp->get_section('package','')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
     $jpp->get_section('package','devel')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
     $jpp->get_section('package','devel')->push_body('Requires: %name-aot-compile = %version-%release'."\n");
@@ -32,7 +34,7 @@ java jcj ahead-of-time compile scripts
 
     foreach my $section ($jpp->get_sections()) {
 	if ($section->get_type() eq 'triggerin') {
-	    $section->subst_if(qr'gccsuffix','gccrpmsuffix',qr'^\%trigger');
+	    $section->get_bodyref()->[0] =~ s/gccsuffix/gccrpmsuffix/g;
 	}
     }
 
@@ -48,18 +50,24 @@ done
     # ghosts. kill?
     #$jpp->get_section('install')->subst(qr'^touch \$RPM_BUILD_ROOT','#touch $RPM_BUILD_ROOT');
     # or
-    $jpp->get_section('files','')->subst(qr'#%ghost','%ghost');
-    $jpp->get_section('files','devel')->subst(qr'#%ghost','%ghost');
+    $jpp->get_section('files','')->subst(qr'#%ghost','#ghost');
+    $jpp->get_section('files','devel')->subst(qr'#%ghost','#ghost');
+    $jpp->get_section('files','src')->subst(qr'#%ghost','#ghost');
     
-    # why they intersect... it is better to fix
     $jpp->get_section('files','')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
     $jpp->get_section('files','devel')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
-    $jpp->get_section('files','devel')->subst(qr'%{python_sitelib}','#%{python_sitelib}');
-    $jpp->get_section('files','devel')->push_body('%exclude %_bindir/aot-compile*'."\n");
 
-    $jpp->add_section('files','aot-compile');
-    $jpp->get_section('files','aot-compile')->push_body('%_bindir/aot-compile*
-/usr/lib/python*/site-packages/*'."\n");
+
+    # separated from -devel
+    $jpp->get_section('files','devel')->exclude_body(qr'python_sitelib');
+    $jpp->get_section('files','devel')->exclude_body('%{_bindir}/aot-compile'."\n");
+    #$jpp->add_section('files','aot-compile');
+    $jpp->add_section('files','aot-compile')->push_body('# separated from devel
+%{_bindir}/aot-compile
+%{_bindir}/aot-compile-rpm
+%{python_sitelibdir_noarch}/aotcompile.py*
+%{python_sitelibdir_noarch}/classfile.py*
+%{python_sitelibdir_noarch}/java_gcj_compat-%{jgcver}-py?.?.egg-info'."\n");
 
 #    my @sections=grep {$_->get_type() ne 'triggerin' && !($_->get_type() eq 'postun' && $_->get_package() eq 'plugin')} $jpp->get_sections();
 #    $jpp->set_sections(\@sections);
@@ -67,5 +75,6 @@ done
 
     $jpp->disable_package('');
     $jpp->disable_package('devel');
+    # TODO: drop triggers instead and use alternatives?
     $jpp->disable_package('src');
 }

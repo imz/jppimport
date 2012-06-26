@@ -6,6 +6,7 @@ push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 # do we need it? inherited, but not tested with SC03
 #    $jpp->get_section('package','')->unshift_body('BuildRequires: avalon-framework'."\n");
+
 };
 __END__
 current - fixes for old tiles
@@ -44,3 +45,15 @@ current - fixes for old tiles
  ln -sf $(build-classpath jcommander) lib/testng/jcommander.jar
  ln -sf $(build-classpath objenesis) lib/testng/objenesis.jar
  # BUILD/spring/lib/tiles/tiles-api-2.0.6.jar.no
+
+--- spring2.spec~       2012-06-22 18:29:51.000000000 +0300
++++ spring2.spec        2012-06-22 18:31:54.000000000 +0300
+@@ -1104,7 +1104,7 @@
+ # BUILD/spring/lib/jets3t/jets3t.jar.no
+ ln -sf $(build-classpath jets3t/jets3t) lib/jdt/jdt-compiler-3.1.1.jar
+ # BUILD/spring/lib/jexcelapi/jxl.jar.no
+-ln -sf $(build-classpath jexcelapi) lib/jexcelapi/jxl.jar
++ln -sf $(build-classpath jexcelapi/jxl) lib/jexcelapi/jxl.jar
+ # BUILD/spring/lib/jmock/jmock-cglib.jar.no
+ ln -sf $(build-classpath jmock-cglib) lib/jmock/jmock-cglib.jar
+ # BUILD/spring/lib/jmock/jmock.jar.no

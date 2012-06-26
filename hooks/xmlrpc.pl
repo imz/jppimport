@@ -3,6 +3,9 @@ sub {
     my ($jpp, $alt) = @_;
     # todo: disable tests! Out of memory!
     $jpp->get_section('package','')->unshift_body("BuildRequires: maven-scm maven2-default-skin\n");
+    # no! reserved for xmlrpc2
+#    $jpp->get_section('install')->unshift_body_after(qr'add_to_maven_depmap','%add_to_maven_depmap xmlrpc xmlrpc %{version} JPP/%{name} xmlrpc'."\n");
+
 };
 
 __END__

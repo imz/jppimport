@@ -1105,6 +1105,205 @@ deleting SRPMS/maven-assembly-plugin-2.2-1_beta_5.jpp6.src.rpm
 deleting SRPMS/jbosscache-support-1.6-2.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-8.jpp6.src.rpm
 -----------------------------------------
+_____________________
+
+6.0/generic/devel
+_____________________
+SRPMS/intellij-idea9-9.0.4-3.jpp6.src.rpm
+-----------------------------------------
+_____________________
+
+6.0/generic/free/SRPMS
+_____________________
+receiving file list ... done
+SRPMS/
+SRPMS/cc-xjc-1.5-1.jpp6.src.rpm
+SRPMS/easymock3-3.0-1.jpp6.src.rpm
+SRPMS/gossip-1.8-1.jpp6.src.rpm
+SRPMS/guava-libraries-10.0.1-1.jpp6.src.rpm
+SRPMS/hamcrest13-1.3-0.rc2.1.jpp6.src.rpm
+SRPMS/jackson-1.8.8-1.jpp6.src.rpm
+SRPMS/java-diff-1.1-1.jpp6.src.rpm
+SRPMS/jna-3.2.7-14.jpp6.src.rpm
+SRPMS/junit-ext-1.0-0.rc3.1.jpp6.src.rpm
+SRPMS/junit4-4.8.2-6.jpp6.src.rpm
+SRPMS/maven-common-artifact-filters-1.4-1.jpp6.src.rpm
+SRPMS/maven-enforcer-1.0.1-4.jpp6.src.rpm
+SRPMS/maven-jarsigner-1.0-1.jpp6.src.rpm
+SRPMS/maven-script-interpreter-1.0-1.jpp6.src.rpm
+SRPMS/plexus-build-api-0.0.7-1.jpp6.src.rpm
+SRPMS/plexus-cipher-1.7-2.jpp6.src.rpm
+SRPMS/plexus-classworlds-2.4-1.jpp6.src.rpm
+SRPMS/plexus-sec-dispatcher-1.4-6.jpp6.src.rpm
+SRPMS/powermock-1.4.9-1.jpp6.src.rpm
+SRPMS/sisu-litmus-testsupport-1.1-1.jpp6.src.rpm
+SRPMS/sisu-maven-plugin-1.1-2.jpp6.src.rpm
+SRPMS/smc-6.0.1-1.jpp6.src.rpm
+SRPMS/sun-txw2-20110809-1.jpp6.src.rpm
+SRPMS/sun-xsom-20110809-1.jpp6.src.rpm
+deleting SRPMS/sun-xsom-20070515-3.jpp6.src.rpm
+deleting SRPMS/smc-5.0.2-3.jpp6.src.rpm
+deleting SRPMS/plexus-classworlds-2.2.2-2.jpp6.src.rpm
+deleting SRPMS/plexus-build-api-0.0.4-2.jpp6.src.rpm
+deleting SRPMS/maven-enforcer-1.0.1-3.jpp6.src.rpm
+deleting SRPMS/maven-common-artifact-filters-1.3-1.jpp6.src.rpm
+deleting SRPMS/junit4-4.8.2-5.jpp6.src.rpm
+deleting SRPMS/jna-3.2.7-13.jpp6.src.rpm
+deleting SRPMS/jackson-1.4.2-2.jpp6.src.rpm
+deleting SRPMS/gossip-1.5-1.jpp6.src.rpm
+-----------------------------------------
+SRPMS/antlr30-3.0.1-1.jpp6.src.rpm
+SRPMS/apacheds-shared0955-0.9.5.5-3.jpp6.src.rpm
+SRPMS/apacheds10-1.0.2-6.jpp6.src.rpm
+SRPMS/cc-xjc-1.5-2.jpp6.src.rpm
+SRPMS/easymock3-3.0-2.jpp6.src.rpm
+SRPMS/forge-parent-5-8.jpp6.src.rpm
+SRPMS/geronimo-specs-1.6-7.jpp6.src.rpm
+SRPMS/gossip-1.8-2.jpp6.src.rpm
+SRPMS/gwt-2.2.0-2.jpp6.src.rpm
+SRPMS/hamcrest13-1.3-0.rc2.2.jpp6.src.rpm
+SRPMS/jackson-1.8.8-2.jpp6.src.rpm
+SRPMS/java-diff-1.1-2.jpp6.src.rpm
+SRPMS/jena-2.6.4-2.jpp6.src.rpm
+SRPMS/jena-iri-0.8-2.jpp6.src.rpm
+SRPMS/jibx-1.2.3-4.jpp6.src.rpm
+SRPMS/junit-ext-1.0-0.rc3.2.jpp6.src.rpm
+SRPMS/junit4-4.8.2-7.jpp6.src.rpm
+SRPMS/karaf-2.2.0-3.jpp6.src.rpm
+SRPMS/maven-acr-plugin-1.0-2.jpp6.src.rpm
+SRPMS/maven-ant-plugin-2.3-2.jpp6.src.rpm
+SRPMS/maven-antrun-plugin-1.7-2.jpp6.src.rpm
+SRPMS/maven-assembly-plugin-2.2-3_beta_5.jpp6.src.rpm
+SRPMS/maven-changelog-plugin-2.2-2.jpp6.src.rpm
+SRPMS/maven-changes-plugin-2.4-2.jpp6.src.rpm
+SRPMS/maven-checkstyle-plugin-2.5-2.jpp6.src.rpm
+SRPMS/maven-clean-plugin-2.4.1-8.jpp6.src.rpm
+SRPMS/maven-compiler-plugin-2.4-2.jpp6.src.rpm
+SRPMS/maven-dependency-plugin-2.4-2.jpp6.src.rpm
+SRPMS/maven-deploy-plugin-2.7-3.jpp6.src.rpm
+SRPMS/maven-doap-plugin-1.1-2.jpp6.src.rpm
+SRPMS/maven-docck-plugin-1.0-3.jpp6.src.rpm
+SRPMS/maven-ear-plugin-2.7-2.jpp6.src.rpm
+SRPMS/maven-eclipse-plugin-2.9-2.jpp6.src.rpm
+SRPMS/maven-ejb-plugin-2.3-2.jpp6.src.rpm
+SRPMS/maven-enforcer-1.0.1-5.jpp6.src.rpm
+SRPMS/maven-help-plugin-2.1.1-2.jpp6.src.rpm
+SRPMS/maven-idea-plugin-2.2-2.jpp6.src.rpm
+SRPMS/maven-install-plugin-2.3.1-3.jpp6.src.rpm
+SRPMS/maven-invoker-plugin-1.5-2.jpp6.src.rpm
+SRPMS/maven-jar-plugin-2.3.1-2.jpp6.src.rpm
+SRPMS/maven-jarsigner-plugin-1.2-2.jpp6.src.rpm
+SRPMS/maven-javadoc-plugin-2.8.1-4.jpp6.src.rpm
+SRPMS/maven-jxr-plugin-2.0-3.jpp6.src.rpm
+SRPMS/maven-one-plugin-1.2-2.jpp6.src.rpm
+SRPMS/maven-plugin-testing-1.2-13.jpp6.src.rpm
+SRPMS/maven-pmd-plugin-2.5-7.jpp6.src.rpm
+SRPMS/maven-rar-plugin-2.2-2.jpp6.src.rpm
+SRPMS/maven-remote-resources-plugin-1.2.1-2.jpp6.src.rpm
+SRPMS/maven-repository-plugin-2.3.1-2.jpp6.src.rpm
+SRPMS/maven-resources-plugin-2.5-3.jpp6.src.rpm
+SRPMS/maven-scm-1.3-2.jpp6.src.rpm
+SRPMS/maven-shade-plugin-1.5-2.jpp6.src.rpm
+SRPMS/maven-site-plugin-2.0.1-4.jpp6.src.rpm
+SRPMS/maven-source-plugin-2.1.2-2.jpp6.src.rpm
+SRPMS/maven-surefire-2.7.2-2.jpp6.src.rpm
+SRPMS/maven-toolchains-plugin-1.0-2.jpp6.src.rpm
+SRPMS/maven-verifier-1.2-4.jpp6.src.rpm
+SRPMS/maven-verifier-plugin-1.0-2.jpp6.src.rpm
+SRPMS/maven-war-plugin-2.1.1-2.jpp6.src.rpm
+SRPMS/maven2-2.0.8-39.jpp6.src.rpm
+SRPMS/mina-2.0.4-3.jpp6.src.rpm
+SRPMS/modello-1.4.1-2.jpp6.src.rpm
+SRPMS/mojo-antlr-maven-plugin-2.2-2.jpp6.src.rpm
+SRPMS/mojo-antlr3-maven-plugin-1.0-1.jpp6.src.rpm
+SRPMS/mojo-aspectj-maven-plugin-1.4-1.jpp6.src.rpm
+SRPMS/mojo-axistools-maven-plugin-1.4-1.jpp6.src.rpm
+SRPMS/mojo-executor-0.2.1-1.jpp6.src.rpm
+SRPMS/plexus-build-api-0.0.7-4.jpp6.src.rpm
+SRPMS/plexus-cipher-1.7-3.jpp6.src.rpm
+SRPMS/plexus-classworlds-2.4-2.jpp6.src.rpm
+SRPMS/plexus-mail-sender-1.0-0.a7.2.jpp6.src.rpm
+SRPMS/plexus-sec-dispatcher-1.4-7.jpp6.src.rpm
+SRPMS/powermock-1.4.9-2.jpp6.src.rpm
+SRPMS/sisu-litmus-testsupport-1.1-2.jpp6.src.rpm
+SRPMS/sisu-maven-plugin-1.1-3.jpp6.src.rpm
+SRPMS/smc-6.0.1-2.jpp6.src.rpm
+SRPMS/sun-codemodel-2.5-2.jpp6.src.rpm
+SRPMS/sun-txw2-20110809-2.jpp6.src.rpm
+SRPMS/sun-xsom-20110809-3.jpp6.src.rpm
+deleting SRPMS/sun-xsom-20110809-1.jpp6.src.rpm
+deleting SRPMS/sun-txw2-20110809-1.jpp6.src.rpm
+deleting SRPMS/smc-6.0.1-1.jpp6.src.rpm
+deleting SRPMS/sisu-maven-plugin-1.1-2.jpp6.src.rpm
+deleting SRPMS/sisu-litmus-testsupport-1.1-1.jpp6.src.rpm
+deleting SRPMS/powermock-1.4.9-1.jpp6.src.rpm
+deleting SRPMS/plexus-sec-dispatcher-1.4-6.jpp6.src.rpm
+deleting SRPMS/plexus-mail-sender-1.0-0.a7.1.jpp6.src.rpm
+deleting SRPMS/plexus-classworlds-2.4-1.jpp6.src.rpm
+deleting SRPMS/plexus-cipher-1.7-2.jpp6.src.rpm
+deleting SRPMS/plexus-build-api-0.0.7-1.jpp6.src.rpm
+deleting SRPMS/modello-1.4.1-1.jpp6.src.rpm
+deleting SRPMS/mina-2.0.4-2.jpp6.src.rpm
+deleting SRPMS/maven2-2.0.8-38.jpp6.src.rpm
+deleting SRPMS/maven-war-plugin-2.1.1-1.jpp6.src.rpm
+deleting SRPMS/maven-verifier-plugin-1.0-1.jpp6.src.rpm
+deleting SRPMS/maven-verifier-1.2-3.jpp6.src.rpm
+deleting SRPMS/maven-toolchains-plugin-1.0-1.jpp6.src.rpm
+deleting SRPMS/maven-surefire-2.7.2-1.jpp6.src.rpm
+deleting SRPMS/maven-source-plugin-2.1.2-1.jpp6.src.rpm
+deleting SRPMS/maven-site-plugin-2.0.1-3.jpp6.src.rpm
+deleting SRPMS/maven-shade-plugin-1.5-1.jpp6.src.rpm
+deleting SRPMS/maven-scm-1.3-1.jpp6.src.rpm
+deleting SRPMS/maven-resources-plugin-2.5-2.jpp6.src.rpm
+deleting SRPMS/maven-repository-plugin-2.3.1-1.jpp6.src.rpm
+deleting SRPMS/maven-remote-resources-plugin-1.2.1-1.jpp6.src.rpm
+deleting SRPMS/maven-rar-plugin-2.2-1.jpp6.src.rpm
+deleting SRPMS/maven-pmd-plugin-2.5-6.jpp6.src.rpm
+deleting SRPMS/maven-plugin-testing-1.2-12.jpp6.src.rpm
+deleting SRPMS/maven-one-plugin-1.2-1.jpp6.src.rpm
+deleting SRPMS/maven-jxr-plugin-2.0-2.jpp6.src.rpm
+deleting SRPMS/maven-javadoc-plugin-2.8.1-3.jpp6.src.rpm
+deleting SRPMS/maven-jarsigner-plugin-1.2-1.jpp6.src.rpm
+deleting SRPMS/maven-jar-plugin-2.3.1-1.jpp6.src.rpm
+deleting SRPMS/maven-invoker-plugin-1.5-1.jpp6.src.rpm
+deleting SRPMS/maven-install-plugin-2.3.1-2.jpp6.src.rpm
+deleting SRPMS/maven-idea-plugin-2.2-1.jpp6.src.rpm
+deleting SRPMS/maven-help-plugin-2.1.1-1.jpp6.src.rpm
+deleting SRPMS/maven-enforcer-1.0.1-4.jpp6.src.rpm
+deleting SRPMS/maven-ejb-plugin-2.3-1.jpp6.src.rpm
+deleting SRPMS/maven-eclipse-plugin-2.9-1.jpp6.src.rpm
+deleting SRPMS/maven-ear-plugin-2.7-1.jpp6.src.rpm
+deleting SRPMS/maven-docck-plugin-1.0-1.jpp6.src.rpm
+deleting SRPMS/maven-doap-plugin-1.1-1.jpp6.src.rpm
+deleting SRPMS/maven-deploy-plugin-2.7-2.jpp6.src.rpm
+deleting SRPMS/maven-dependency-plugin-2.4-1.jpp6.src.rpm
+deleting SRPMS/maven-compiler-plugin-2.4-1.jpp6.src.rpm
+deleting SRPMS/maven-clean-plugin-2.4.1-7.jpp6.src.rpm
+deleting SRPMS/maven-checkstyle-plugin-2.5-1.jpp6.src.rpm
+deleting SRPMS/maven-changes-plugin-2.4-1.jpp6.src.rpm
+deleting SRPMS/maven-changelog-plugin-2.2-1.jpp6.src.rpm
+deleting SRPMS/maven-assembly-plugin-2.2-2_beta_5.jpp6.src.rpm
+deleting SRPMS/maven-antrun-plugin-1.7-1.jpp6.src.rpm
+deleting SRPMS/maven-ant-plugin-2.3-1.jpp6.src.rpm
+deleting SRPMS/maven-acr-plugin-1.0-1.jpp6.src.rpm
+deleting SRPMS/karaf-2.2.0-2.jpp6.src.rpm
+deleting SRPMS/junit4-4.8.2-6.jpp6.src.rpm
+deleting SRPMS/junit-ext-1.0-0.rc3.1.jpp6.src.rpm
+deleting SRPMS/jibx-1.2.3-3.jpp6.src.rpm
+deleting SRPMS/jena-iri-0.8-1.jpp6.src.rpm
+deleting SRPMS/jena-2.6.4-1.jpp6.src.rpm
+deleting SRPMS/java-diff-1.1-1.jpp6.src.rpm
+deleting SRPMS/jackson-1.8.8-1.jpp6.src.rpm
+deleting SRPMS/hamcrest13-1.3-0.rc2.1.jpp6.src.rpm
+deleting SRPMS/gwt-2.2.0-1.jpp6.src.rpm
+deleting SRPMS/gossip-1.8-1.jpp6.src.rpm
+deleting SRPMS/geronimo-specs-1.6-6.jpp6.src.rpm
+deleting SRPMS/forge-parent-5-7.jpp6.src.rpm
+deleting SRPMS/easymock3-3.0-1.jpp6.src.rpm
+deleting SRPMS/cc-xjc-1.5-1.jpp6.src.rpm
+deleting SRPMS/apacheds10-1.0.2-5.jpp6.src.rpm
+deleting SRPMS/apacheds-shared0955-0.9.5.5-2.jpp6.src.rpm
+-----------------------------------------
 
 
 safe to kill group:
