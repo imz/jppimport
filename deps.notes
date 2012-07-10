@@ -1304,6 +1304,18 @@ deleting SRPMS/cc-xjc-1.5-1.jpp6.src.rpm
 deleting SRPMS/apacheds10-1.0.2-5.jpp6.src.rpm
 deleting SRPMS/apacheds-shared0955-0.9.5.5-2.jpp6.src.rpm
 -----------------------------------------
+SRPMS/mojo-castor-maven-plugin-2.1-1.jpp6.src.rpm
+SRPMS/mojo-commons-attributes-maven-plugin-1.0-1.jpp6.src.rpm
+SRPMS/mojo-gwt-maven-plugin-2.2.0-1.jpp6.src.rpm
+SRPMS/mojo-idlj-maven-plugin-1.1-1.jpp6.src.rpm
+SRPMS/mojo-javacc-maven-plugin-2.6-1.jpp6.src.rpm
+SRPMS/mojo-jaxb2-maven-plugin-1.3.1-1.jpp6.src.rpm
+SRPMS/mojo-jboss-maven-plugin-1.5.0-1.jpp6.src.rpm
+SRPMS/mojo-jboss-packaging-maven-plugin-2.2-3.jpp6.src.rpm
+SRPMS/mojo-jpox-maven-plugin-1.1.7-1.jpp6.src.rpm
+SRPMS/mojo-jspc-maven-plugin-1.4.6-1.jpp6.src.rpm
+SRPMS/mojo-was6-maven-plugin-1.1.1-1.jpp6.src.rpm
+-----------------------------------------
 
 
 safe to kill group:
