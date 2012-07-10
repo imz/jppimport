@@ -7,7 +7,7 @@ push @PREHOOKS, sub {
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->rename_main_package('mozilla-plugin-java-1.7.0-openjdk');
+    #$jpp->rename_main_package('mozilla-plugin-java-1.7.0-openjdk');
     my $mainsec=$jpp->main_section;
 
     # man pages are used in alternatives

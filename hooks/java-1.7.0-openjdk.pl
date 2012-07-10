@@ -57,8 +57,8 @@ Provides: java-javadoc = 1:1.7.0
     $jpp->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
 
     # i586 build is not included :(
-    $mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
-    $mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
+    #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
+    #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
     # Sisyphus unmet
     $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
