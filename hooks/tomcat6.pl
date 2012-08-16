@@ -31,7 +31,8 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
 	last if $line=~/^# Save the conf, app, and lib dirs/;
     }
     $presection->set_body(\@new_body);
-    $jpp->get_section('preun','')->subst(qr'\%{__rm} -rf \%{workdir}','#%{__rm} -rf %{workdir}');
+    # killed
+    #$jpp->get_section('preun','')->subst(qr'\%{__rm} -rf \%{workdir}','#%{__rm} -rf %{workdir}');
 
     # TODO: write proper tomcat6-6.0.init!
     # as a hack, an old version is taken
@@ -42,7 +43,7 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
 
     # a part of #%post_service %name that is not implemented there:
     # condrestart on upgrade 
-    $jpp->get_section('post')->push_body('/sbin/service %name condrestart'."\n");
+    $jpp->add_section('post')->push_body('/sbin/service %name condrestart'."\n");
 
     $jpp->get_section('files','')->push_body('%dir %{bindir}'."\n");
     #$jpp->get_section('files','el-%{elspec}-api')->subst(qr'\%defattr\(0665,root,root','#defattr(0665,root,root');
@@ -55,8 +56,8 @@ Conflicts: tomcat6-el-1.0-api < %{epoch}:%{version}-%{release}
     $jpp->get_section('files','')->subst('\%defattr\(0664,root,tomcat,0775\)','%defattr(0644,root,tomcat,0755)');
 
     # till ant 1.8 migration
-    $jpp->get_section('package','')->push_body('BuildRequires: ant-trax'."\n");
-    $jpp->get_section('build','')->subst_if(qr'xalan-j2-serializer','xalan-j2-serializer ant/ant-trax',qr'OPT_JAR_LIST');
+    #$jpp->get_section('package','')->push_body('BuildRequires: ant-trax'."\n");
+    #$jpp->get_section('build','')->subst_if(qr'xalan-j2-serializer','xalan-j2-serializer ant/ant-trax',qr'OPT_JAR_LIST');
     #="ant/ant-trax"
 
     # fedora tomcat misses those jpackage alternatives

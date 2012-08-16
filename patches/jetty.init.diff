@@ -1,0 +1,25 @@
+--- jetty.init	2012-02-24 12:37:18.000000000 +0200
++++ jetty.init	2010-10-16 02:08:48.000000000 +0300
+@@ -70,8 +70,8 @@
+ #	[ -x ${JETTY_HOME}/ext ] &&
+ #	  	rebuild-jar-repository -s ${JETTY_HOME}/ext
+ 
+-        if [ -x /etc/rc.d/init.d/functions ]; then
+-                daemon --user $JETTY_USER JETTY_PID=$JETTY_PID $JETTY_SCRIPT
++        if [ -r /etc/rc.d/init.d/functions ]; then
++                start_daemon --user $JETTY_USER JETTY_PID=$JETTY_PID $JETTY_SCRIPT
+         else
+                 su - $JETTY_USER -c "JETTY_PID=$JETTY_PID $JETTY_SCRIPT"
+         fi
+@@ -142,6 +142,11 @@
+                 start
+         fi
+         ;;
++  condstop)
++        if [ -f $JETTY_PID ] ; then
++                stop
++        fi
++        ;;
+   *)
+         echo "Usage: $0 {start|stop|status|restart|reload|condrestart}"
+         exit 1

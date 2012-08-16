@@ -79,6 +79,7 @@ $jpp->spec_apply_patch(PATCHSTRING=>q!
  %global syslibdir       %{_libdir}
 !);
     $mainsec=$jpp->main_section;
+    $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
 
     $mainsec->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel libXrender-devel

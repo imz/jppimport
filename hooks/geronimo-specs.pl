@@ -37,6 +37,13 @@ geronimo-servlet-2.4-api		geronimo-specs-servlet
     # maven2-208-29+jpp5
     #$jpp->get_section('package','')->unshift_body('BuildRequires: maven2-plugin-site'."\n");
 
+    # geronimo-parent-poms
+    $jpp->main_section->push_body(q!# splitting to be fc compatible...
+Requires: geronimo-parent-poms!."\n");
+    my $files=$jpp->get_section('files','');
+    $files->subst(qr'^\%{_datadir}/maven2/poms/JPP-geronimo-specs.pom','%{_datadir}/maven2/poms/JPP-geronimo-specs.pom');
+    $files->subst(qr'^\%{_mavendepmapfragdir}/\%{name}','%{_mavendepmapfragdir}/%{name}');
+
     if (0) {  #'old13-14'
 	# 1.2-13,14 specific hack against broken symlinks
 	$jpp->get_section('install','')->subst_body_if(qr'-\%{version}','',qr'^  ln -sf ../geronimo-');
