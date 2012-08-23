@@ -4,22 +4,8 @@ require 'set_bin_755.pl';
 
 push @PREHOOKS, sub {
     my ($jpp, $parent) = @_;
-    # TODO: think how we can have clean uninstall
-    {
-	my $comment=0;
-	my $preunsec=$jpp->get_section('preun','platform');
-	# comment because it hangs on rpm -qf "$file" :(
-	$preunsec->map_body(sub {
-	    $comment=1 if /Delete orphaned profile files/;
-	    $_='#'.$_ if $comment;
-	    $comment=0 if $comment==1 and /^#done/;
-							});
-	$jpp->get_section('postun','platform')->push_body(q!if [ "$1" = 0 ]; then
-    # Delete orphaned profile files (less efficient than variant above :(
-    rm -rf %{_libdir}/%{name}/p2/org.eclipse.equinox.p2.engine/profileRegistry/PlatformProfile.profile
-fi
-!);
-    }
+    my $presec=$jpp->get_section('pre','jdt');
+    $presec->exclude(qr'^rm -rf \%{_bindir}/efj/');
 };
 
 push @SPECHOOKS, 
@@ -56,9 +42,6 @@ sub {
     # it does work...
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-devel-openjdk'."\n");
 
-    # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
-    $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
-
     $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-proto-devel libGLU-devel'."\n");
     #$jpp->get_section('package','')->subst_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
 
@@ -77,13 +60,6 @@ sub {
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
     if (0) {
-	# around jetty (after 3.3.0-7)
-	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','BuildRequires: jetty6-core');
-	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','Requires: jetty6-core');
-	
-	$jpp->get_section('prep')->push_body('sed -i -e s,/jetty,/jetty6,g ./dependencies.properties'."\n");
-	# end around jetty 
-    } else {
 	# embed jetty and apply the patch below
 	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6-core');
 	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
@@ -162,24 +138,6 @@ fi
 %exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
 !);
 
-    # reconsiler filetrigger.
-    # two platform sections :(
-    #$jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
-    foreach my $section ($jpp->get_sections()) {
-	next unless $section->get_type eq 'files' and $section->get_package eq 'platform';
-	next if $section->get_flag('-f');
-	$section->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
-    }
-    $jpp->get_section('install')->push_body(q@# reconsiler filetrigger
-mkdir -p %buildroot/usr/lib/rpm
-cat > %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger << 'EOF'
-#!/bin/sh -e
-egrep -qs '^%{_libdir}/eclipse' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
-EOF
-chmod 755 %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger
-echo /usr/lib/rpm/%{name}-%{_arch}.filetrigger >> %{name}-platform.install
-@);
-
 };
 
 
@@ -229,3 +187,26 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
     $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
     $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
+
+
+    # reconsiler filetrigger.
+    # two platform sections :(
+    #$jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    foreach my $section ($jpp->get_sections()) {
+	next unless $section->get_type eq 'files' and $section->get_package eq 'platform';
+	next if $section->get_flag('-f');
+	$section->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
+    }
+    $jpp->get_section('install')->push_body(q@# reconsiler filetrigger
+mkdir -p %buildroot/usr/lib/rpm
+cat > %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger << 'EOF'
+#!/bin/sh -e
+egrep -qs '^%{_libdir}/eclipse' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
+EOF
+chmod 755 %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger
+echo /usr/lib/rpm/%{name}-%{_arch}.filetrigger >> %{name}-platform.install
+@);
+
+    # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
+    $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
+

@@ -32,8 +32,8 @@ install -Dm 755 %{SOURCE!.$srcid.q!} $RPM_BUILD_ROOT%{_bindir}/mvn-jpp
 
 %post
 # clear the old links
-find %{_datadir}/%{name}/boot/ -type l -exec rm -f '{}' \; ||:
-find %{_datadir}/%{name}/lib/ -type l -exec rm -f '{}' \; ||:
+[ -d %{_datadir}/%{name}/boot/ ] && find %{_datadir}/%{name}/boot/ -type l -exec rm -f '{}' \; ||:
+[ -d %{_datadir}/%{name}/lib/ ] && find %{_datadir}/%{name}/lib/ -type l -exec rm -f '{}' \; ||:
 
 %postun
 # FIXME: This doesn't always remove the plugins dir. It seems that rpm doesn't
