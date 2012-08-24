@@ -62,11 +62,11 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpath14.'xerces-j2-2.9.0-4.fc14.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xerces-j2.jar','/usr/share/java/xerces-j2-2.9.0.jar');
     } elsif ($name eq 'xml-commons') {
-	&unpack_fc_rpm($jpp,$fcpathRH.'xml-commons-resolver-1.2-8.fc17.noarch.rpm');
+	&unpack_fc_rpm($jpp,$fcpathRH.'x/xml-commons-resolver-1.2-10.fc19.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-resolver12.jar','/usr/share/java/xml-commons-resolver-1.2.jar');
-	&unpack_fc_rpm($jpp,$fcpath14.'xml-commons-apis-1.4.01-1.fc13.noarch.rpm');
-	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-jaxp-1.3-apis.jar','/usr/share/java/xml-commons-apis-1.4.01.jar');
-	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-jaxp-1.3-apis-ext.jar','/usr/share/java/xml-commons-apis-ext-1.4.01.jar');
+	&unpack_fc_rpm($jpp,$fcpathRH.'x/xml-commons-apis-1.4.01-8.fc19.noarch.rpm');
+	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-jaxp-1.3-apis.jar','/usr/share/java/xml-commons-apis.jar');
+	&merge_osgi_manifest($jpp,'/usr/share/java/xml-commons-jaxp-1.3-apis-ext.jar','/usr/share/java/xml-commons-apis-ext.jar');
 	$jpp->get_section('package','resolver12')->push_body("AutoReq: yes,noosgi\n");
 	$jpp->get_section('package','jaxp-1.3-apis')->push_body("AutoReq: yes,noosgi\n");
     } elsif ($name eq 'xalan-j2') {

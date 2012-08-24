@@ -11,13 +11,15 @@ sub {
     $jpp->get_section('files','jaxp-1.2-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
     $jpp->get_section('files','jaxp-1.3-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
 
+    $jpp->get_section('package','')->subst_body(qr'global _extension \.gz','global _extension .bz2');
+
     $jpp->applied_block(
 	"from %post to %install (not to break provides) hook",
 	sub {
     # from %post to %install (not to break provides)
     foreach my $sec ($jpp->get_sections()) {
 	my $type=$sec->get_type();
-	my $name=$sec->get_package();
+	my $name=$sec->get_raw_package();
 	next if $name=~/javadoc$/;
 	if ($type eq 'post' or $type eq 'postun') {
 	    $sec->subst(qr'rm -f \%{_javadir}','#rm -f %{_javadir}');
@@ -30,9 +32,9 @@ sub {
     $jpp->get_section('install')->push_body(q'
 chmod 755 %buildroot%{_bindir}/*
 ');
-    $jpp->get_section('files','jaxp-1.3-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}/jaxp13.jar');
-    $jpp->get_section('files','jaxp-1.2-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}/jaxp12.jar');
-    $jpp->get_section('files','jaxp-1.1-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}/jaxp11.jar');
+    $jpp->get_section('files','jaxp-1.3-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp13.jar');
+    $jpp->get_section('files','jaxp-1.2-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp12.jar');
+    $jpp->get_section('files','jaxp-1.1-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp11.jar');
 
     #  ghost alternatives. as a hook?
     $jpp->applied_block(
@@ -80,3 +82,4 @@ ln -s %{name}-jaxp-1.3-apis.jar %{_javadir}/jaxp13.jar
 
 %postun jaxp-1.3-apis
   rm -f %{_javadir}/jaxp13.jar
+
