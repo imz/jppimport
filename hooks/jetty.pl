@@ -8,7 +8,23 @@ push @SPECHOOKS, sub {
     &add_missingok_config($jpp, '/etc/default/jetty8','');
 
     # tmp
-    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-equinox-osgi felix-osgi-foundation xpp3-minimal'."\n") if $spec->main_section->get_tag('Version') eq '8.1.0';
+    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-equinox-osgi felix-osgi-foundation xpp3-minimal'."\n") if $jpp->main_section->get_tag('Version') eq '8.1.5';
+
+    my $initN=$jpp->add_source('jetty.init');
+    $jpp->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
+    $jpp->get_section('pre','')->subst_body(qr'-(?:g|u)\s+\%jtuid','');
+    $jpp->get_section('postun','')->subst_body(qr'^userdel','# userdel');
+    $jpp->get_section('postun','')->subst_body(qr'^groupdel','# groupdel');
+
+    $jpp->get_section('files','')->push_body('%_initdir/%name'."\n");
+
+}
+__END__
+   $jpp->apply_to_sources(SOURCEFILE=>'jetty.init', PATCHFILE=>'jetty.init.diff');
+    #if ($jpp->get_section('package','')->match_body(qr'Source7:\s+jetty.init\s*$')) {
+    #	$jpp->get_section('prep')->push_body("sed -i 's,daemon --user,start_daemon --user,' %SOURCE7"."\n");
+    #}
+
 
 
     # TODO fix in import
@@ -31,12 +47,3 @@ push @SPECHOOKS, sub {
 	}
 	);
 
- 
-   $jpp->apply_to_sources(SOURCEFILE=>'jetty.init', PATCHFILE=>'jetty.init.diff');
-    #if ($jpp->get_section('package','')->match_body(qr'Source7:\s+jetty.init\s*$')) {
-    #	$jpp->get_section('prep')->push_body("sed -i 's,daemon --user,start_daemon --user,' %SOURCE7"."\n");
-    #}
-
-
-}
-__END__

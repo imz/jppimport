@@ -23,6 +23,7 @@ sub section_set_target {
 
 	    s!bin/javac !bin/javac  -target $target -source $target ! or
 	    s!%{javac} !%{javac}  -target $target -source $target ! or
+	    s!^javac !javac  -target $target -source $target ! or
 	    s!^\s*(?:\%{_bindir}/)?(maven|mvn|mvn-jpp|mvn-jpp22|mvn-rpmbuild)(?=\s|$)!$1 -Dmaven.compile.source=1.5 -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
 	    s!^(\s*\%?\{?ant(?:17)?\}?)(?=\s)!$1 -Dant.build.javac.source=$target -Dant.build.javac.target=$target !;
 	})

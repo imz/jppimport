@@ -48,6 +48,10 @@ chmod 755 %buildroot%{_bindir}/*
 	    }
 	});
 
+    $jpp->get_section('install')->push_body(q'# fc compatibility: xml-commons-apis-ext.jar
+ln -s xml-commons-jaxp-1.3-apis-ext-%{version}.jar %buildroot%{_javadir}/xml-commons-apis-ext.jar'."\n");
+    $jpp->get_section('files','jaxp-1.3-apis')->push_body(q'# fc compatibility: 
+%{_javadir}/xml-commons-apis-ext.jar'."\n");
 }
 
 __END__

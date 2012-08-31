@@ -134,6 +134,7 @@ maven-plugin-webstart	maven1-plugin-webstart
 maven-plugin-wizard	maven1-plugin-wizard
 maven-plugin-xdoc	maven1-plugin-xdoc
 
+aqute-bndlib	aqute-bnd
 /;
 	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     } elsif (grep {$_->[1] =~ m!/fedora/linux/!} @RPM::Source::Transform::INSRC) {

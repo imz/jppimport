@@ -24,8 +24,10 @@ sub {
     # missing symbol (underlinkage)
     $jpp->add_patch('eclipse-3.7.0-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>2);
     # just -lX11 added
-    $jpp->add_patch('eclipse-3.7.0-alt-swt-linux-as-needed.patch', STRIP=>2,
+    $jpp->add_patch('eclipse-4.2.0-alt-swt-linux-as-needed.patch', STRIP=>2,
 		    PREP_FOOTER=>'popd'."\n");
+
+    $jpp->add_patch('eclipse-3.7.0-alt-dependencies.patch', STRIP=>0);
 
     # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
     # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
@@ -35,7 +37,7 @@ sub {
     #$jpp->del_section('post','platform');
     #$jpp->del_section('postun','platform');
 
-    # ant-bcel,... is missing in BR :(
+    # we uncomment ant-jai ant-junit4 ant-junit...
     $jpp->get_section('package','')->unshift_body('BuildRequires: ant-optional'."\n");
 
     $jpp->get_section('package','')->unshift_body('Requires: dbus'."\n");
@@ -58,28 +60,6 @@ sub {
     # it is split from eclipse-launcher-set-install-dir-and-shared-config.patch;
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
-
-    if (0) {
-	# embed jetty and apply the patch below
-	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6-core');
-	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
-	$jpp->add_source('jetty-6.1.26.jar', NUMBER => 33);
-	$jpp->add_source('jetty-util-6.1.26.jar', NUMBER => 34);
-	$jpp->get_section('prep')->push_body('
-sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
-sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties
-#sed -i -e s,/usr/share/jetty/lib/jetty-6.1.26.jar,%{SOURCE33},g `grep -rl /usr/share/jetty/lib/jetty-6.1.26.jar .`
-#sed -i -e s,/usr/share/jetty/lib/jetty-util-6.1.26.jar,%{SOURCE34},g `grep -rl /usr/share/jetty/lib/jetty-util-6.1.26.jar .`
-'."\n");
-	$jpp->get_section('install')->push_body('
-jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.util*`
-rm -f $jetty
-install -m 644 %{SOURCE34} $jetty
-jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.server*`
-rm -f $jetty
-install -m 644 %{SOURCE33} $jetty
-');
-    }
 
 q!
      [exec] Model is x86_64
@@ -143,6 +123,27 @@ fi
 
 __END__
 
+    if (0) {
+	# embed jetty and apply the patch below
+	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6-core');
+	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
+	$jpp->add_source('jetty-6.1.26.jar', NUMBER => 33);
+	$jpp->add_source('jetty-util-6.1.26.jar', NUMBER => 34);
+	$jpp->get_section('prep')->push_body('
+sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
+sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties
+#sed -i -e s,/usr/share/jetty/lib/jetty-6.1.26.jar,%{SOURCE33},g `grep -rl /usr/share/jetty/lib/jetty-6.1.26.jar .`
+#sed -i -e s,/usr/share/jetty/lib/jetty-util-6.1.26.jar,%{SOURCE34},g `grep -rl /usr/share/jetty/lib/jetty-util-6.1.26.jar .`
+'."\n");
+	$jpp->get_section('install')->push_body('
+jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.util*`
+rm -f $jetty
+install -m 644 %{SOURCE34} $jetty
+jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.server*`
+rm -f $jetty
+install -m 644 %{SOURCE33} $jetty
+');
+    }
 
 
     # seamonkey provides mozilla too

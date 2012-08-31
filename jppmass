@@ -85,13 +85,8 @@ $convert->process();
 
 sub process_options_hook {
     my ($self)=@_;
-    if ($ORIGINPATH !~ m!/fedora/linux/!) {
-	## TODO: move to DistroMap
-	## jpp specific maven1 translations
-	my %map_jpp=qw/
-maven	maven1
-/;
-	map {$ORIGIN2DESTMAP{$_}=$map_jpp{$_}} keys (%map_jpp);
+    if ($ORIGINPATH =~ m!/fedora/linux/!) {
+	$DistroMap::default_originrepo='fedora';
     }
 }
 
@@ -103,6 +98,7 @@ sub process_pair_hook {
 	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
 	push @$argsptr, '--hook', $hook if (-e $hook);
     }
+    push @$argsptr, '--originrepo', $DistroMap::default_originrepo;
 }
 
 sub cmp_origin_dest {

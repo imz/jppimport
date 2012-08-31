@@ -1,12 +1,16 @@
 #!/usr/bin/perl -w
 
-require 'set_fix_repolib_project.pl';
+require 'set_osgi.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('install')->unshift_body_after(qr'__sed.+repodir.+/component-info.xml',
-q!%{__sed} -i "s/@VERSION@/%{version}-brew/g" %{buildroot}%{repodir}/component-info.xml
-!);
+# already in spec
+#    $jpp->get_section('package','')->push_body('Provides: jakarta-%{short_name} = %{version}'."\n");
+#    $jpp->get_section('package','')->push_body('Provides: %{short_name} = %{version}'."\n");
+    $jpp->get_section('install')->push_body('# jakarta compat
+ln -s %{short_name}.jar %buildroot%_javadir/jakarta-%{short_name}.jar
+ln -s %{short_name}.jar %buildroot%_javadir/apache-%{short_name}.jar
+'."\n");
+    #$jpp->get_section('files','')->push_body('%exclude %_javadir/repository.jboss.com'."\n");
 }
-
 __END__
