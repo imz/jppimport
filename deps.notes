@@ -1546,13 +1546,11 @@ myfaces-core12-api
 myfaces-core12-impl
 myfaces-maven2-plugins
 
-safe to kill group:
-acegi-security
-spring-ldap
-
 
 -----
 todo: aot-complie-rpm fails in itext -- add
 /usr/share/java/gcj-endorsed/bcprov-1.46.jar
 
 jansi-native -> hawtjni -> xbean
+
+spring-ldap -> springframework -> h2 -> lucene -> apache-ivy merge Sis+FC

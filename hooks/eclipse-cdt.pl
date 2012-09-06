@@ -3,6 +3,8 @@ require 'set_add_java_bin.pl';
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+__END__
     # Deprecated?
     # tmp hack to satisfy osgi req
     $jpp->get_section('package','')->unshift_body('
@@ -11,4 +13,3 @@ Provides: osgi(org.eclipse.cdt.core.tests) = 7.0.0
 #Provides: osgi(javax.servlet) = 2.5.0
 '."\n");
 #osgi(javax.servlet) >= 2.5.0
-};

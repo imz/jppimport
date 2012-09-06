@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'set_bin_755.pl';
+require 'add_missingok_config.pl';
 
 push @PREHOOKS, sub {
     my ($jpp, $parent) = @_;
@@ -11,6 +12,9 @@ push @PREHOOKS, sub {
 push @SPECHOOKS, 
 sub {
     my ($jpp, $parent) = @_;
+
+    # 4.2.0-alt1_7jpp7. Do we need it?
+    #&add_missingok_config($jpp, '/etc/eclipse.ini','swt');
 
     $apprelease=$jpp->get_section('package','')->get_tag('Release');
     $apprelease=$1 if $apprelease=~/_(\d+)jpp/;
@@ -28,10 +32,6 @@ sub {
 		    PREP_FOOTER=>'popd'."\n");
 
     $jpp->add_patch('eclipse-3.7.0-alt-dependencies.patch', STRIP=>0);
-
-    # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
-    # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
-    $jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
 
     # hack until gtk-update-icon-cache fix
     #$jpp->del_section('post','platform');
@@ -113,15 +113,21 @@ if find %buildroot%_libdir/eclipse -type f -name '*.so' -print0 \
 fi
 !);
 
+};
+
+
+__END__
+
+    # dropped at 4.2.0-9
+    # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
+    # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
+    $jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
+
 #warning: file /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/111/1/.cp/libswt-atk-gtk-3557.so is packaged into both eclipse-swt and eclipse-rcp
     $jpp->get_section('files','rcp')->push_body(q!# duplicates of swt
 %exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
 !);
 
-};
-
-
-__END__
 
     if (0) {
 	# embed jetty and apply the patch below
