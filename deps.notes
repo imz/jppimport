@@ -1551,6 +1551,5 @@ myfaces-maven2-plugins
 todo: aot-complie-rpm fails in itext -- add
 /usr/share/java/gcj-endorsed/bcprov-1.46.jar
 
-jansi-native -> hawtjni -> xbean
-
-spring-ldap -> springframework -> h2 -> lucene -> apache-ivy merge Sis+FC
+spring-ldap -> springframework -> 
+new h2 -> lucene (hacks with apache-ivy and junit paths)
