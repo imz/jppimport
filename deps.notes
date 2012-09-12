@@ -27,7 +27,7 @@ $ -DskipAssembly=true \
 error: unmappable character for encoding ASCII
 export LANG=en_US.ISO8859-1
 or 
--Dproject.build.sourceEncoding=ISO-8859-1
+-Dproject.build.sourceEncoding=ISO8859-1
 
 # java7 javadoc encodings error (unmappable character for encoding utf-8)
 $jpp->get_section('build')->subst(qr'export MAVEN_OPTS="','export MAVEN_OPTS="-Dproject.build.sourceEncoding=ISO-8859-1 ');
@@ -1553,3 +1553,7 @@ todo: aot-complie-rpm fails in itext -- add
 
 spring-ldap -> springframework -> 
 new h2 -> lucene (hacks with apache-ivy and junit paths)
+
+todo: drop fest and fest-assembly in favor of fest-common,
+move fest-swig-junit to  fest-swig-junit3, update fest-swig-junit.
+
