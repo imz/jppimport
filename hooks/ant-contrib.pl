@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, \&fix_junit_epoch;
-
-sub fix_junit_epoch {
+push @SPECHOOKS, 
+sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->subst(qr'= 0:3.8.2','= 3.8.2');
-    $jpp->get_section('package','')->subst_if(qr'0:1.6.5',' 1.6.5',qr'equires:.*ant');
-    $jpp->get_section('package','')->unshift_body('BuildRequires: ant-junit'."\n");
-}
 
-1;
+    $jpp->get_section('install')->push_body(q!# jpp compat symlink
+ln -s ant/ant-contrib.jar %buildroot%_javadir/ant-contrib.jar!."\n");
+    $jpp->get_section('files')->push_body(q!%_javadir/ant-contrib.jar!."\n");
+};
+
+__END__

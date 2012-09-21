@@ -43,9 +43,6 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 +      install:install-file -DgroupId=xpp3 -DartifactId=xpp3_min \
 +                -Dversion=1.1.4c -Dpackaging=jar -Dfile=$(build-classpath xpp3)
 
-
-
-
 find maven2-brew \! -path '*/org/jboss/security/*' -type f -print -delete ||:
 find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 
@@ -87,11 +84,6 @@ Was expecting one of:
     <WHITESPACE> ..
 indicate that velocity14/15 should be used. (deprecated!!! now just use velocity)
 
-==duplicate rpms to remove:==
-dups TODO
-bouncycastle13(todo:it's safe to remove suffix -jdk.x from requirements) by bouncycastle
-----------
-
 # TODO: geronimo-j2ee-1.4-apis should not provide ... because they do not have the corresponding symlinks!
 
 # to report:
@@ -104,40 +96,13 @@ smc -> jsmc
 # wersiondowns
 bcel(let be up)
 
-# bootstrap 
-bcel-repolib
-snmptrapappender-repolib
-
-==== deprecation:
-activemq4,spring-ldap,acegi-security->apacheds10->apacheds-daemon10
-
 ============
 
 =========== maven 2.0.8 ==========================
 ========================================
-knopflerfish -> crimson 1.1.3 ,20 (devel) w/api added DONE using private crimson.jar
-jetty6 --> terraconta-dso --> jruby update (can't find fileupload.rb)
-
-wicket and portals-* : it seems those dependent on portals-jetspeed2 can be safely deleted.
-
 ---
 UP:
-TODO: opensaml: warn: possible regression: jpp5 pom is missing in jpp6
-
 TODO: jcalendar, jgoodies-* asked msp, no need to rush
-
-TODO: rebuild jboss4 basiconly (does not have jboss4-connector) -> spring
-
-DONE-using-compat: jakarta-cactus 1.7 needs old cargo 0.9. (update cactus to 1.8.1?)
-#step1: remove deps on cargo in 
-#myfaces-shared11-2.0.5-alt1_2jpp5.src|cargo
-#myfaces-core11-impl-1.1.5-alt2_2jpp5.src|cargo
-#myfaces-core12-impl-1.2.3-alt2_1jpp5.src|cargo
-#myfaces-shared12-3.0.4-alt2_1jpp5.src|cargo
-## this seem to need cargo-maven2-plugin, leave it as is?
-#myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo
-#myfaces-tomahawk-1.1.6-alt3_1jpp5.src|cargo-maven2-plugin
-## step 2: add dep on cargo0 to jakarta-cactus
 
 DONE-using-compat: jmock/jmock2 are broken by cglib 2.2 update
 cglib-nodeps include objectweb-asm 3.2, hence objectweb-asm
@@ -169,33 +134,21 @@ org.apache.maven.lifecycle.LifecycleExecutionException: Failed to execute goal o
 
 
 maven3: assembly: assembly.xml must have <id></id> see fest-assembly patch for example
+an example for null assembly id (cargo0)
+> sed -i -e 's,<assembly>,<assembly><id>ALT</id>,' core/uberjar/src/assemble/main.xml
+<    core/uberjar/target/%{oldname}-core-uberjar-%{version}.jar \
+>    core/uberjar/target/%{oldname}-core-uberjar-%{version}-ALT.jar \
+
 maven3: maven-plugin-descriptor from maven22
-maven3: mvn-jpp: TODO: drop -s settngs.xml, see jung2.pl hook - useless and dangerous.
+maven3: mvn-jpp: TODO: drop -s settings.xml, see jung2.pl hook - useless and dangerous.
 
 TODO: drop fake osgi provides for oscar due to
        x86_64: NEW unmet dependencies detected:
 eclipse-mylyn-tasks-bugzilla#3.6.4-alt1_2jpp6   osgi(org.apache.xmlrpc)
 
-
-
-DONE:renameBR: maven-plugin-modello(conflicts with maven1) -> modello-maven-plugin
 DONE:aspectj group. aspectj -> org.aspectj
 # alt; aspectj 1.5.4
 sed -i 's,<groupId>aspectj</groupId>,<groupId>org.aspectj</groupId>,' 
-
-%if %with bootstrap
-Requires: jboss4-jmx
-Requires: jboss4-naming
-%else
-Requires: jbossas
-%endif
-%if %with bootstrap
-ln -sf $(build-classpath jboss4/jboss-jmx.jar) .
-ln -sf $(build-classpath jboss4/jnpserver.jar) .
-%else
-ln -sf $(build-classpath jbossas/jboss-jmx) .
-ln -sf $(build-classpath jbossas/jnpserver) .
-%endif
 
 TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
 
@@ -218,8 +171,6 @@ TODO: manually dropped felix-parent dep on mojo-maven2-plugin-build-helper
       until then, fix felix-osgi-foundation-1.2.0-alt1_4jpp6.src BR: felix-parent
       until then, fix felix-osgi-compendium BR: felix-parent.
       
-TODO: drop felix-maven2 dep in favor of deparate plugins
-
 TODO: objectweb-asm: poms: see hook:
 # poms use asm group now - incompatible with oweb-asm 3.2 and confilcts with asm2 :( 
 # seems like we need to patch asm2 to have asm2 group.
@@ -235,51 +186,27 @@ TODO: move maven1 plugins ? no need :)
  sf-maven-plugins-1.0-alt4_0.20050908.9jpp5.src
 
 TODO: java5 only that have updates:
-$ for i in glassfish-jstl '*-commons-jelly' jbossts jibx jpox mckoi mockrunner ; do find jpackage/6.0 fedora -name $i'*src.rpm'; done
+$ for i in glassfish-jstl '*-commons-jelly' jbossts jibx mckoi mockrunner ; do find jpackage/6.0 fedora -name $i'*src.rpm'; done
 jpackage/6.0/generic/free/SRPMS/glassfish-jstl-1.2.0-10.jpp6.src.rpm
 jpackage/6.0/generic/free/SRPMS/jakarta-commons-jelly-1.0-7.jpp6.src.rpm
-jpackage/6.0/fedora-9/free/SRPMS/jbossts-4.2.3-1.SP7.4.jpp6.src.rpm
-jpackage/6.0/generic/free/SRPMS/jbossts-4.6.1-1.jpp6.src.rpm
-jpackage/6.0/fedora-10/free/SRPMS/jbossts-4.2.3-1.SP7.4.jpp6.fc10.src.rpm
 fedora/linux/releases/16/Everything/source/SRPMS/jibx-1.2.3-1.fc16.src.rpm
 fedora/linux/development/rawhide/source/SRPMS/jibx-1.2.3-3.fc17.src.rpm
 
-TODO: merge axis2 ans axis
-TODO: kill htmlunit replace by htmlunit1
-
 TODO: log4j .16 -- missing jmx-extra in build.xml :( keep .15
-
-TODO: plexus-tools have plexus-cli 1.4 > 1.2
 
 TODO: 
 portals-pluto12 -> castor
 
-TODO: миграция на apache-ivy: (DONE in oscache)
+DONE: миграция на apache-ivy: (DONE in oscache)
 sed -i -e s,fr.jayasoft.ivy,org.apache.ivy,g build.xml osbuild.xml
-
-TODO: maven-plugin-build-helper to kill mojo-maven2-plugin-build-helper
 
 #--------------------------------------
 SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
-SRPMS/jboss-ejb3-proxy-impl-1.0.2-4.jpp6.src.rpm
-SRPMS/jboss-ejb3-security-1.0.0-4.jpp6.src.rpm
-SRPMS/jboss-ejb3-timerservice-spi-1.0.0-4.jpp6.src.rpm
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-timerservice-spi-1.0.0-2.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-security-1.0.0-3.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-proxy-impl-1.0.2-3.jpp6.src.rpm
 ----------------------------------------------------
 SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
 SRPMS/jakarta-commons-httpclient-3.1-2.jpp6.src.rpm
-SRPMS/jboss-aop2-2.1.1-6.jpp6.src.rpm
-SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
-SRPMS/jboss-ejb3-proxy-spi-1.0.0-5.jpp6.src.rpm
-SRPMS/jboss-ejb3-test-1.0.0-3.jpp6.src.rpm
-SRPMS/jboss-ejb3-test-remote-1.0.0-4.jpp6.src.rpm
-SRPMS/jboss-ejb3-transactions-1.0.1-3.jpp6.src.rpm
-SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
-SRPMS/jbossorg-docbook-xslt-1.1.0-2.jpp6.src.rpm
 SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
 SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
 SRPMS/pdfbox-0.7.3-2.jpp6.src.rpm
@@ -289,19 +216,9 @@ SRPMS/xml-commons-resolver12-1.2-1.2.jpp6.src.rpm
 deleting SRPMS/xml-commons-resolver12-1.2-1.1.jpp6.src.rpm
 deleting SRPMS/xalan-j2-2.7.1-1.jpp6.src.rpm
 deleting SRPMS/jpackage-utils-5.0.0-2.jpp6.src.rpm
-deleting SRPMS/jboss-metadata-1.0.1-5.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-transactions-1.0.1-2.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-test-remote-1.0.0-3.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-test-1.0.0-2.jpp6.src.rpm
-deleting SRPMS/jboss-ejb3-proxy-spi-1.0.0-4.jpp6.src.rpm
-deleting SRPMS/jboss-cl-2.0.6-2.jpp6.src.rpm
-deleting SRPMS/jboss-cache-core-3.1.0-3.jpp6.src.rpm
-deleting SRPMS/jboss-aop2-2.1.1-4.jpp6.src.rpm
 -------------------------------------
 SRPMS/apache-taglibs-standard-1.1.2-8.jpp6.src.rpm
 SRPMS/axion-1.0-0.M3.6.jpp6.src.rpm
-SRPMS/xbean-3.7-1.jpp6.src.rpm
-deleting SRPMS/xbean-3.4.3-2.jpp6.src.rpm
 deleting SRPMS/axion-1.0-0.M3.5.jpp6.src.rpm
 -----------
 SRPMS/ehcache-1.3.0-3.jpp6.src.rpm
@@ -312,8 +229,6 @@ SRPMS/jboss-cache-pojo-3.0.0-7.jpp6.src.rpm
 SRPMS/jboss-seam-int-5.1.0-0.CR1.1.6.jpp6.src.rpm
 SRPMS/jboss-webbeans-1.0.0-0.2.PREVIEW1.jpp6.src.rpm
 SRPMS/jms-integration-tests-1.0.1-2.jpp6.src.rpm
-SRPMS/xml-commons-1.3.04-10.jpp6.src.rpm
-deleting SRPMS/xml-commons-1.3.04-9.jpp6.src.rpm
 deleting SRPMS/jboss-seam-int-5.1.0-0.CR1.1.5.jpp6.src.rpm
 deleting SRPMS/jboss-cache-pojo-3.0.0-4.jpp6.src.rpm
 deleting SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
@@ -1533,12 +1448,45 @@ SRPMS/tukaani-xz-1.1-1.jpp6.src.rpm
 SRPMS/vorbis-java-0.1-1.jpp6.src.rpm
 deleting SRPMS/apache-commons-compress-1.3-1.jpp6.src.rpm
 -----------------------------------------
-SRPMS/db-ojb-1.0.4-5.jpp6.src.rpm
 SRPMS/mockejb-0.6-0.b2.4.jpp6.src.rpm
 SRPMS/mockrunner-0.4.3-1.jpp6.src.rpm
 SRPMS/nekodtd-0.1.11-2.jpp6.src.rpm
 SRPMS/nekopull-0.2.4-1.jpp6.src.rpm
 -----------------------------------------
+SRPMS/apache-cocoon-parent-6-1.jpp6.src.rpm
+SRPMS/apache-cocoon21-2.1.11-1.jpp6.src.rpm
+SRPMS/avalon-excalibur-4.1-9.jpp6.src.rpm
+SRPMS/chaperon-3.0-0.dev.20040205.2.jpp6.src.rpm
+SRPMS/cocoon-serializers-charsets-1.0.2-1.jpp6.src.rpm
+SRPMS/cocoon-wildcardhelper-2.1.9-1.jpp6.src.rpm
+SRPMS/daisy-1.5.1-1.jpp6.src.rpm
+SRPMS/deli-1.0-1.jpp6.src.rpm
+SRPMS/excalibur-1.0-0.r508111.18.jpp6.src.rpm
+SRPMS/fop020-0.20.5-13.jpp6.src.rpm
+SRPMS/izpress-1.1-2.jpp6.src.rpm
+SRPMS/javacApi-0.9-1.jpp6.src.rpm
+SRPMS/jdbi-1.3.3-1.jpp6.src.rpm
+SRPMS/jext-3.2-0.pre4.4.jpp6.src.rpm
+SRPMS/jfor-0.7.2-0.rc1.2.jpp6.src.rpm
+SRPMS/joost-0.9.1-1.jpp6.src.rpm
+deleting SRPMS/excalibur-1.0-0.r508111.16.jpp6.src.rpm
+-----------------------------------------
+SRPMS/apache-cocoon21-2.1.11-2.jpp6.src.rpm
+SRPMS/apache-commons-el10-1.0-1.jpp6.src.rpm
+SRPMS/exolabcore-0.3.3-2.jpp6.src.rpm
+SRPMS/omquery-0.92.3-4.jpp6.src.rpm
+SRPMS/openjms-0.7.7-0.b1.1.jpp6.src.rpm
+SRPMS/openjpa-1.2.2-1.jpp6.src.rpm
+SRPMS/ops4j-pax-coin-0.1.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-confman-0.2.3-2.jpp6.src.rpm
+SRPMS/ops4j-pax-reflector-0.9.11-2.jpp6.src.rpm
+SRPMS/ops4j-pax-web-1.1.4-1.jpp6.src.rpm
+SRPMS/spicerepo-1.0-3.jpp6.src.rpm
+SRPMS/xml-xindice-1.1-1.jpp6.src.rpm
+SRPMS/xmldb-xupdate-0.4-0.20041010.2.jpp6.src.rpm
+deleting SRPMS/apache-cocoon21-2.1.11-1.jpp6.src.rpm
+-----------------------------------------
+
 
 safe to kill group:
 myfaces-shared12
@@ -1551,9 +1499,27 @@ myfaces-maven2-plugins
 todo: aot-complie-rpm fails in itext -- add
 /usr/share/java/gcj-endorsed/bcprov-1.46.jar
 
-spring-ldap -> springframework -> 
-new h2 -> lucene (hacks with apache-ivy and junit paths)
+new h2 -> lucene (hacks with junit paths)
 
-todo: drop fest and fest-assembly in favor of fest-common,
-move fest-swig-junit to  fest-swig-junit3, update fest-swig-junit.
+todo: drop fest-assembly in favor of fest-common,
 
+
+
+TODO:!!! maven-one-plugin see apache-commons-jcs
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-one-plugin:1.2:convert (default-cli) on project jcs: Execution default-cli of goal org.apache.maven.plugins:maven-one-plugin:1.2:convert failed: Unable to load the mojo 'convert' (or one of its required components) from the plugin 'org.apache.maven.plugins:maven-one-plugin:1.2': com.google.inject.ProvisionException: Guice provision errors:
+[ERROR]
+[ERROR] 1) No implementation for org.apache.maven.model.converter.Maven1Converter was bound.
+[ERROR] while locating org.apache.maven.plugins.mavenone.PomV3ConvertMojo
+[ERROR] at ClassRealm[plugin>org.apache.maven.plugins:maven-one-plugin:latest, parent: sun.misc.Launcher$AppClassLoader@34780af5]
+[ERROR] while locating org.apache.maven.plugin.Mojo annotated with @com.google.inject.name.Named(value=org.apache.maven.plugins:maven-one-plugin:1.2:convert)
+[ERROR]
+[ERROR] 1 error
+[ERROR] role: org.apache.maven.plugin.Mojo
+[ERROR] roleHint: org.apache.maven.plugins:maven-one-plugin:1.2:convert
+[ERROR] -> [Help 1]
+at that 
+maven-shared-model-converter-2.3-alt9_23jpp7.noarch|/usr/share/java/maven-shared/model-converter.jar|org/apache/maven/model/converter/Maven1Converter.class
+maybe plexus descriptor is missing...
+
+TODO: jacoco-> objectweb-asm (fc): No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle org.objectweb.asm [3.2.0,4.0.0).

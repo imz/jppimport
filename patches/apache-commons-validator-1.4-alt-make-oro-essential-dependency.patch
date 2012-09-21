@@ -1,0 +1,10 @@
+--- pom.xml	2009-10-21 02:00:29.000000000 +0300
++++ pom.xml	2012-09-15 22:41:58.000000000 +0300
+@@ -200,7 +200,6 @@
+             <groupId>oro</groupId>
+             <artifactId>oro</artifactId>
+             <version>2.0.8</version>
+-            <optional>true</optional>
+         </dependency>
+ 
+         <dependency>

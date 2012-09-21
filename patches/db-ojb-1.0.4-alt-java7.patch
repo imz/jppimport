@@ -1,0 +1,34 @@
+--- ojb-1.0.4-src/src/java/org/apache/ojb/broker/util/WrappedConnection.java	2012-09-13 08:18:05.137078772 +0000
++++ ojb-1.0.4-src/src/java/org/apache/ojb/broker/util/WrappedConnection.java	2012-09-13 08:26:11.164626467 +0000
+@@ -87,6 +87,31 @@
+         return c;
+     }
+ 
++    public int getNetworkTimeout() throws SQLException
++    {
++	throw new java.sql.SQLFeatureNotSupportedException();
++    }
++
++    public void setNetworkTimeout(java.util.concurrent.Executor e, int ms) throws SQLException
++    {
++	throw new java.sql.SQLFeatureNotSupportedException();
++    }
++
++    public void abort(java.util.concurrent.Executor e) throws SQLException
++    {
++	throw new java.sql.SQLFeatureNotSupportedException();
++    }
++
++    public void setSchema(String schema) throws SQLException
++    {
++	return;
++    }
++
++    public String getSchema() throws SQLException
++    {
++	return null;
++    }
++
+     /** Sets my delegate. */
+     public void setDelegate(Connection c)
+     {

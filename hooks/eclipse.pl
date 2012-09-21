@@ -113,12 +113,19 @@ if find %buildroot%_libdir/eclipse -type f -name '*.so' -print0 \
 fi
 !);
 
-};
+    # RPM macros file
+    $jpp->get_section('install')->exclude(qr'^install.*RPM_BUILD_ROOT\%{_sysconfdir}/rpm/');
+    $jpp->applied_block(
+	"platform files hook",
+	sub {
+	    foreach my $sec ($jpp->get_sections()) {
+		next if $sec->get_type ne 'files';
+		next if $sec->get_package ne 'platform';
+		$sec->exclude(qr'\%{_sysconfdir}/rpm/macros.\%{name}');
+	    }
+	});
 
-
-__END__
-
-    # dropped at 4.2.0-9
+    # note: dropped at 4.2.0-9 (we still use build 6)
     # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
     # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
     $jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
@@ -127,6 +134,12 @@ __END__
     $jpp->get_section('files','rcp')->push_body(q!# duplicates of swt
 %exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
 !);
+
+};
+
+
+__END__
+
 
 
     if (0) {
