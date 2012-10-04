@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_target_14.pl';
-
 push @PREHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
@@ -19,27 +17,3 @@ sub {
 };
 
 __END__
-BuildRequires: jakarta-commons-codec
-Requires: jakarta-commons-codec
-# taken from fedora
-Source11:        ws-jaxme-bind-MANIFEST.MF
-Patch3:         ws-jaxme-jdk16.patch
-Patch5:         ws-jaxme-use-commons-codec.patch
-
-%prep
-...
-#TODO
-#%patch3 -p1
-%patch5 -b .sav
-subst 's,<pathelement location="\${preqs}/ant.jar"/>,<pathelement location="${preqs}/ant.jar"/><pathelement location="${preqs}/commons-codec.jar"/>,' ant/jm.xml
-
-%build
-...
- hsqldb \
-+commons-codec
-
-...
-mkdir -p META-INF
-cp -p %{SOURCE11} META-INF/MANIFEST.MF
-touch META-INF/MANIFEST.MF
-zip -u dist/jaxmeapi-%{version}.jar META-INF/MANIFEST.MF

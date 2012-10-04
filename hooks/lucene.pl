@@ -3,17 +3,21 @@ require 'set_osgi.pl';
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+
 };
 
 __END__
+# not really
+    $jpp->get_section('package','contrib')->push_body(q!
+#Provides: lucene-demo = %{epoch}:%{version}-%{release}
+!);
+
+
+
     # lucene2; already a package
     $jpp->get_section('package','')->push_body(q!
 Provides: lucene2 = %{epoch}:%{version}-%{release}
 Obsoletes: lucene2 < 2.4.1
-!);
-    $jpp->get_section('package','demo')->push_body(q!
-Provides: lucene2-demo = %{epoch}:%{version}-%{release}
-Obsoletes: lucene2-demo < 2.4.1
 !);
     $jpp->get_section('install')->push_body(q!
 ln -s lucene.jar $RPM_BUILD_ROOT%{_javadir}/lucene2.jar

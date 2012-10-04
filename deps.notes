@@ -161,8 +161,8 @@ what velocity it requires in pom
 
 TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
 
-TODO: excalibur-avalon-framework: Вытесняет: avalon-framework (< 1:4.3.1-alt6_0.r508111.16jpp6) && logkit
-first build .14jpp6 then test (excalibur|avalon) ?
+TODO: excalibur-avalon-framework: Вытесняет: avalon-framework (< 1:4.3.1-alt6_0.r508111.16jpp6)
+first build .18jpp6 then test (excalibur|avalon) ?
 
 -----------------------------------
 TODO: build build-helper-maven-plugin-1.5-1.jpp6.src.rpm (still bootstrap) -> plexus-containers-component-javadoc
@@ -185,13 +185,6 @@ TODO: move maven1 plugins ? no need :)
  maven1-1.1-alt14_9jpp6.src
  sf-maven-plugins-1.0-alt4_0.20050908.9jpp5.src
 
-TODO: java5 only that have updates:
-$ for i in glassfish-jstl '*-commons-jelly' jbossts jibx mckoi mockrunner ; do find jpackage/6.0 fedora -name $i'*src.rpm'; done
-jpackage/6.0/generic/free/SRPMS/glassfish-jstl-1.2.0-10.jpp6.src.rpm
-jpackage/6.0/generic/free/SRPMS/jakarta-commons-jelly-1.0-7.jpp6.src.rpm
-fedora/linux/releases/16/Everything/source/SRPMS/jibx-1.2.3-1.fc16.src.rpm
-fedora/linux/development/rawhide/source/SRPMS/jibx-1.2.3-3.fc17.src.rpm
-
 TODO: log4j .16 -- missing jmx-extra in build.xml :( keep .15
 
 TODO: 
@@ -205,7 +198,6 @@ SRPMS/docbook-maven-5.0-2.jpp6.src.rpm
 #--------------------------------------
 SRPMS/velocity14-1.4-9.jpp6.src.rpm
 ----------------------------------------------------
-SRPMS/groovy18-1.8.0-0.beta3.1.jpp6.src.rpm
 SRPMS/jakarta-commons-httpclient-3.1-2.jpp6.src.rpm
 SRPMS/jpackage-utils-5.0.0-3.jpp6.src.rpm
 SRPMS/maven-jdocbook-plugin-2.1.2-3.jpp6.src.rpm
@@ -235,18 +227,11 @@ deleting SRPMS/jboss-cache-core-3.1.0-5.jpp6.src.rpm
 deleting SRPMS/jakarta-commons-logging-jboss-1.1-5.jpp6.src.rpm
 deleting SRPMS/dtdparser-1.21-7.jpp6.src.rpm
 ------------
-SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
-SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
-SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
 SRPMS/log4j-1.2.16-1.jpp6.src.rpm
 deleting SRPMS/log4j-1.2.15-7.jpp6.src.rpm
-deleting SRPMS/jbossas-tp-5.1.0-5.jpp6.src.rpm
-deleting SRPMS/jbossas-5.1.0-25.jpp6.src.rpm
-deleting SRPMS/cobertura-1.9.3-2.jpp6.src.rpm
 ------------
 SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
 SRPMS/cobertura-1.9.4.1-2.jpp6.src.rpm
-SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 SRPMS/jdepend-maven-plugin-2.0-1.beta_3_SNAPSHOT.jpp6.src.rpm
 SRPMS/log4j-1.2.16-3.jpp6.src.rpm
 SRPMS/maven-skins-5-2.1.jpp6.src.rpm
@@ -256,24 +241,10 @@ deleting SRPMS/log4j-1.2.16-1.jpp6.src.rpm
 deleting SRPMS/cobertura-1.9.4.1-1.jpp6.src.rpm
 deleting SRPMS/apache-commons-parent-12-3.jpp6.src.rpm
 ----------------------------
-SRPMS/jboss-aspects-build-1.0.1-1.CR5.jpp6.src.rpm
-SRPMS/jboss-aspects-common-1.0.0-1.Beta1.jpp6.src.rpm
-deleting SRPMS/jboss-aspects-common-1.0.0-0.b1.2.jpp6.src.rpm
-----------------------------
-SRPMS/cobertura-maven-plugin-2.4-3.jpp6.src.rpm
 SRPMS/codehaus-stax-1.2.0-1.jpp6.src.rpm
-SRPMS/jboss-metadata-1.0.1-9.jpp6.src.rpm
-SRPMS/jbossas-tp-5.1.0-8.jpp6.src.rpm
-SRPMS/jbosssx2-2.0.3.1-5.jpp6.src.rpm
-SRPMS/mojo-parent-28-1.jpp6.src.rpm
 SRPMS/velocity14-1.4-11.jpp6.src.rpm
 SRPMS/webbeans-jboss-int-5.2.0-0.2.Beta2.jpp6.src.rpm
 deleting SRPMS/velocity14-1.4-9.jpp6.src.rpm
-deleting SRPMS/mojo-parent-20-3.jpp6.src.rpm
-deleting SRPMS/jbosssx2-2.0.3.1-4.jpp6.src.rpm
-deleting SRPMS/jbossas-tp-5.1.0-6.jpp6.src.rpm
-deleting SRPMS/jboss-metadata-1.0.1-8.jpp6.src.rpm
-deleting SRPMS/cobertura-maven-plugin-2.4-2.jpp6.src.rpm
 -----------------------------------
 SRPMS/jbossas-5.1.0-28.jpp6.src.rpm
 deleting SRPMS/jbossas-5.1.0-27.jpp6.src.rpm
@@ -397,10 +368,8 @@ SRPMS/oss-parent-6-2.jpp6.src.rpm
 SRPMS/plexus-cdc-1.0-0.4.a11.1.jpp6.src.rpm
 SRPMS/spring-osgi-1.2.0-0.m1.1.jpp6.src.rpm
 SRPMS/tomcat6-6.0.32-2.jpp6.src.rpm
-SRPMS/xbean-3.7-2.jpp6.src.rpm
 SRPMS/xmlrpc-3.1.3-4.jpp6.src.rpm
 deleting SRPMS/xmlrpc-3.1.3-3.jpp6.src.rpm
-deleting SRPMS/xbean-3.7-1.jpp6.src.rpm
 deleting SRPMS/tomcat6-6.0.29-1.jpp6.src.rpm
 deleting SRPMS/plexus-cdc-1.0-0.3.a10.8.jpp6.src.rpm
 deleting SRPMS/oss-parent-6-1.jpp6.src.rpm
@@ -501,8 +470,6 @@ SRPMS/proxool-0.9.1-1.jpp6.src.rpm
 SRPMS/sun-istack-commons-1.0-3.jpp6.src.rpm
 SRPMS/sun-jaxb-2.1-impl-2.1.13-1.jpp6.src.rpm
 SRPMS/wss4j-1.5.10-1.jpp6.src.rpm
-SRPMS/xbean-3.7-3.jpp6.src.rpm
-deleting SRPMS/xbean-3.7-2.jpp6.src.rpm
 deleting SRPMS/wss4j-1.5.8-7.jpp6.src.rpm
 deleting SRPMS/protobuf-java-2.3.0-3.jpp6.src.rpm
 deleting SRPMS/jdom-1.1.1-2.jpp6.src.rpm
@@ -799,7 +766,6 @@ deleting SRPMS/struts-1.3.10-2.jpp6.src.rpm
 -----------------------------------------
 SRPMS/apache-commons-parent-18-3.jpp6.src.rpm
 SRPMS/cssparser-0.9.6-1.jpp6.src.rpm
-SRPMS/fusesource-pom-1.8-1.jpp6.src.rpm
 SRPMS/groovy18-1.8.1-1.jpp6.src.rpm
 SRPMS/hawtjni-1.5-3.jpp6.src.rpm
 SRPMS/jakarta-commons-grant-1.0-0.b5.cvs20040118.4.jpp6.src.rpm
@@ -808,13 +774,10 @@ SRPMS/jansi-native-1.3-2.jpp6.src.rpm
 SRPMS/jrms-1.1-3.jpp6.src.rpm
 SRPMS/jython-2.5.0-2.jpp6.src.rpm
 SRPMS/monolog-2.1.12-1.jpp6.src.rpm
-SRPMS/xbean-3.7-4.jpp6.src.rpm
-deleting SRPMS/xbean-3.7-3.jpp6.src.rpm
 deleting SRPMS/jansi-native-1.1-1.jpp6.src.rpm
 deleting SRPMS/jansi-1.4-1.jpp6.src.rpm
 deleting SRPMS/hawtjni-1.1-4.jpp6.src.rpm
 deleting SRPMS/groovy18-1.8.0-1.jpp6.src.rpm
-deleting SRPMS/fusesource-pom-1.2-3.jpp6.src.rpm
 deleting SRPMS/apache-commons-parent-18-2.jpp6.src.rpm
 -----------------------------------------
 _____________________
@@ -1455,13 +1418,11 @@ SRPMS/nekopull-0.2.4-1.jpp6.src.rpm
 -----------------------------------------
 SRPMS/apache-cocoon-parent-6-1.jpp6.src.rpm
 SRPMS/apache-cocoon21-2.1.11-1.jpp6.src.rpm
-SRPMS/avalon-excalibur-4.1-9.jpp6.src.rpm
 SRPMS/chaperon-3.0-0.dev.20040205.2.jpp6.src.rpm
 SRPMS/cocoon-serializers-charsets-1.0.2-1.jpp6.src.rpm
 SRPMS/cocoon-wildcardhelper-2.1.9-1.jpp6.src.rpm
 SRPMS/daisy-1.5.1-1.jpp6.src.rpm
 SRPMS/deli-1.0-1.jpp6.src.rpm
-SRPMS/excalibur-1.0-0.r508111.18.jpp6.src.rpm
 SRPMS/fop020-0.20.5-13.jpp6.src.rpm
 SRPMS/izpress-1.1-2.jpp6.src.rpm
 SRPMS/javacApi-0.9-1.jpp6.src.rpm
@@ -1469,7 +1430,6 @@ SRPMS/jdbi-1.3.3-1.jpp6.src.rpm
 SRPMS/jext-3.2-0.pre4.4.jpp6.src.rpm
 SRPMS/jfor-0.7.2-0.rc1.2.jpp6.src.rpm
 SRPMS/joost-0.9.1-1.jpp6.src.rpm
-deleting SRPMS/excalibur-1.0-0.r508111.16.jpp6.src.rpm
 -----------------------------------------
 SRPMS/apache-cocoon21-2.1.11-2.jpp6.src.rpm
 SRPMS/apache-commons-el10-1.0-1.jpp6.src.rpm
@@ -1486,6 +1446,34 @@ SRPMS/xml-xindice-1.1-1.jpp6.src.rpm
 SRPMS/xmldb-xupdate-0.4-0.20041010.2.jpp6.src.rpm
 deleting SRPMS/apache-cocoon21-2.1.11-1.jpp6.src.rpm
 -----------------------------------------
+SRPMS/geronimo-specs-1.6-8.jpp6.src.rpm
+SRPMS/jtreemap-1.1.0-2.jpp6.src.rpm
+SRPMS/livetribe-slp-1.0.2-1.jpp6.src.rpm
+SRPMS/ops4j-base-1.3.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-exam2-2.4.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-swissbox-1.5.1-1.jpp6.src.rpm
+SRPMS/ops4j-pax-swissbox-tinybundles-1.3.0-1.jpp6.src.rpm
+SRPMS/ops4j-pax-wicket-1.1.0-1.jpp6.src.rpm
+SRPMS/piccolo-1.0.4-4.jpp6.src.rpm
+SRPMS/pjl-comp-filter-1.7-1.jpp6.src.rpm
+SRPMS/pnuts-1.2-2.jpp6.src.rpm
+SRPMS/testng-6.3.1-1.jpp6.src.rpm
+SRPMS/wicket-1.5.8-1.jpp6.src.rpm
+SRPMS/wiquery-1.5.7-1.jpp6.src.rpm
+deleting SRPMS/testng-6.1.1-3.jpp6.src.rpm
+deleting SRPMS/ops4j-pax-swissbox-1.3.0-2.jpp6.src.rpm
+deleting SRPMS/ops4j-pax-exam2-2.2.0-1.jpp6.src.rpm
+deleting SRPMS/ops4j-base-1.2.2-1.jpp6.src.rpm
+deleting SRPMS/geronimo-specs-1.6-7.jpp6.src.rpm
+-----------------------------------------
+SRPMS/maven-shared-8-0.p8.14.jpp6.src.rpm
+SRPMS/portals-bridges1-1.0.4-6.jpp6.src.rpm
+SRPMS/portals-jetspeed2-2.1.3-5.jpp6.src.rpm
+SRPMS/prefuse-0.0-0.beta20071021.1.jpp6.src.rpm
+deleting SRPMS/portals-bridges1-1.0.4-5.jpp6.src.rpm
+deleting SRPMS/maven-shared-8-0.p8.13.jpp6.src.rpm
+-----------------------------------------
+
 
 
 safe to kill group:
@@ -1499,7 +1487,7 @@ myfaces-maven2-plugins
 todo: aot-complie-rpm fails in itext -- add
 /usr/share/java/gcj-endorsed/bcprov-1.46.jar
 
-new h2 -> lucene (hacks with junit paths)
+new h2 -> lucene
 
 todo: drop fest-assembly in favor of fest-common,
 
@@ -1522,4 +1510,12 @@ at that
 maven-shared-model-converter-2.3-alt9_23jpp7.noarch|/usr/share/java/maven-shared/model-converter.jar|org/apache/maven/model/converter/Maven1Converter.class
 maybe plexus descriptor is missing...
 
-TODO: jacoco-> objectweb-asm (fc): No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle org.objectweb.asm [3.2.0,4.0.0).
+DONE: jacoco-> No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle ...
+ThxGoodness, fixed with -Dtycho.targetPlatform=%_libdir/eclipse
+
+lucene3 update: build with eclipse, then eclipse dtp
+
+# todo: fix rpm-build-java-osgi to auto get from eclipse-dtp
+Provides: osgi(org.eclipse.datatools.sqltools.result) = 1.1.3 
+
+eclipse-linuxtools -> eclipse-swtbot -> log4j osgi

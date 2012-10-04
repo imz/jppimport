@@ -1,10 +1,13 @@
 #!/usr/bin/perl -w
 
-require 'set_add_fc_osgi_manifest.pl';
+#require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+
+__END__
 
     # takes over asm2 and breaks pure asm2 builds such as:
     # jakarta-commons-javaflow
@@ -18,6 +21,3 @@ sub {
 sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %buildroot/usr/share/maven2/poms/JPP.objectweb-asm-asm*
 !);
 
-};
-
-__END__

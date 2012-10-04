@@ -21,7 +21,9 @@ get_arch_rpmdir()
 
 list_java_src_rpm_names()
 {
-for i in `find . -name '*.rpm'`; do 
+    local ARCH
+    ARCH=$1
+    for i in `find . -name '*.'$ARCH'.rpm'`; do 
     if rpmquery -l -p $i | egrep "$JAVA_PATTERN" >/dev/null; then 
 	SRCRPMNAME=`rpmquery --queryformat '%{SOURCERPM}\n' -p $i`;
 	SRCNAME=`rpmquery --queryformat '%{NAME}\n' -p $SOURCE_RPM_PATH/?/$SRCRPMNAME`;
@@ -29,17 +31,17 @@ for i in `find . -name '*.rpm'`; do
 	    echo $SRCNAME
 	fi; 
     fi; 
-done  | sort -u > $DEST/$NAME.$ARCH.src
+    done  | sort -u > $DEST/$NAME.$ARCH.src
 }
 
 ARCH=x86_64
 get_arch_rpmdir
-[ -z "$ARCH_RPMDIR" ] && ARCH=x86_64
-get_arch_rpmdir
 pushd $ARCH_RPMDIR
-list_java_src_rpm_names
+list_java_src_rpm_names $ARCH
+list_java_src_rpm_names noarch
 popd
+
 grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' $DEST/$NAME.$ARCH.src | sort -u > $DEST/$NAME.$ARCH.src.0
 mv $DEST/$NAME.$ARCH.src.0 $DEST/$NAME.$ARCH.src
 
-sort -u $DEST/$NAME.$ARCH.src > $NAME.src
+sort -u $DEST/$NAME.$ARCH.src $DEST/$NAME.noarch.src > $NAME.src

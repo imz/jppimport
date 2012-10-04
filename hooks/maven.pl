@@ -14,9 +14,6 @@ sub {
     # for /etc/mavenrc
     #%add_findreq_skiplist /usr/share/maven/bin/*
 
-    # we are not ready for it yet - todo enable with a-c-p upgrade
-    $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+apache-commons-parent\s*$');
-
     $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+yum-utils\s*$');
 };
 
@@ -44,3 +41,6 @@ qr'^\s*fi',
 
 
 __END__
+    # we are not ready for it yet - todo enable with a-c-p upgrade
+#    $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+apache-commons-parent\s*$');
+
