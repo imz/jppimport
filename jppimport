@@ -6,15 +6,21 @@ use warnings;
 
 use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
-use RPM::Source::Convert;
-use RPM::Source::Convert::Plugins::JPackage2ALT;
-our @ISA=q/RPM::Source::Convert/;
 
-$RPM::Source::Transform::nextrel='jppimport';
-$RPM::Source::Transform::NEXTREL_METHOD{'jppimport'}=\&nextrel_jppimport;
-$RPM::Source::Transform::INITREL_METHOD{'jppimport'}=\&initrel_jppimport;
-$RPM::Source::Transform::defaultchangelog='- converted from JPackage by jppimport script';
+use RPM::Source::Transformation::RaiseReleaseFactory;
+use RPM::Source::Convert::Plugins::JPackage2ALT;
+our @ISA=q/RPM::Source::Transform/;
+
+
+$RPM::Source::Transformation::RaiseReleaseFactory::nextrel='jppimport';
+$RPM::Source::Transformation::RaiseReleaseFactory::defaultchangelog='- converted from JPackage by jppimport script';
 $DistroMap::default_originrepo='jpackage';
+
+&RPM::Source::Transformation::RaiseReleaseFactory::register_nextrel_method(
+    -name => 'jppimport',
+    -nextrel_method => \&nextrel_jppimport,
+    -initrel_method => \&initrel_jppimport,
+    );
 
 # TODO: share the stem with RPM::Source::Convert::Plugins::JPackage2ALT?
 my $jvm=7;
@@ -23,7 +29,7 @@ push @RPM::Source::Transform::LONGOPT,
 
 # keep in util
 $RPM::Source::Transform::cleanup=0;
-$RPM::Source::Transform::packager='auto';
+$RPM::Source::Transformation::RaiseReleaseFactory::packager='auto';
 
 my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
 $converter->transform();

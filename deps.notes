@@ -1473,7 +1473,253 @@ SRPMS/prefuse-0.0-0.beta20071021.1.jpp6.src.rpm
 deleting SRPMS/portals-bridges1-1.0.4-5.jpp6.src.rpm
 deleting SRPMS/maven-shared-8-0.p8.13.jpp6.src.rpm
 -----------------------------------------
-
+SRPMS/aether-1.11-5.jpp6.src.rpm
+SRPMS/apache-commons-compress-1.3-1.jpp6.src.rpm
+SRPMS/apache-commons-configuration-1.6-4.jpp6.src.rpm
+SRPMS/apache-commons-net-2.0-6.jpp6.src.rpm
+SRPMS/apache-poi-3.8-0.b5.1.jpp6.src.rpm
+SRPMS/apacheds-shared0955-0.9.5.5-2.jpp6.src.rpm
+SRPMS/apacheds10-1.0.2-5.jpp6.src.rpm
+SRPMS/aspectj-1.5.4-1.jpp6.src.rpm
+SRPMS/easymock3-3.0-1.jpp6.src.rpm
+SRPMS/excalibur-1.0-0.r508111.16.jpp6.src.rpm
+SRPMS/forge-parent-5-7.jpp6.src.rpm
+SRPMS/geronimo-specs-1.6-6.jpp6.src.rpm
+SRPMS/gmaven-1.3-4.jpp6.src.rpm
+SRPMS/google-collections-1.0-3.jpp6.src.rpm
+SRPMS/gossip-1.8-1.jpp6.src.rpm
+SRPMS/gwt-2.2.0-1.jpp6.src.rpm
+SRPMS/hamcrest13-1.3-0.rc2.1.jpp6.src.rpm
+SRPMS/jackson-1.4.2-2.jpp6.src.rpm
+SRPMS/java-diff-1.1-1.jpp6.src.rpm
+SRPMS/jboss-aop2-2.1.1-6.jpp6.src.rpm
+SRPMS/jena-2.6.4-1.jpp6.src.rpm
+SRPMS/jena-iri-0.8-1.jpp6.src.rpm
+SRPMS/jibx-1.2.3-3.jpp6.src.rpm
+SRPMS/junit-3.8.2-9.jpp6.src.rpm
+SRPMS/junit-ext-1.0-0.rc3.1.jpp6.src.rpm
+SRPMS/junit4-4.8.2-6.jpp6.src.rpm
+SRPMS/karaf-2.2.0-2.jpp6.src.rpm
+SRPMS/maven-acr-plugin-1.0-1.jpp6.src.rpm
+SRPMS/maven-ant-plugin-2.3-1.jpp6.src.rpm
+SRPMS/maven-antrun-plugin-1.7-1.jpp6.src.rpm
+SRPMS/maven-archetype2-2.0-0.a5.1.jpp6.src.rpm
+SRPMS/maven-assembly-plugin-2.2-2_beta_5.jpp6.src.rpm
+SRPMS/maven-changelog-plugin-2.2-1.jpp6.src.rpm
+SRPMS/maven-changes-plugin-2.4-1.jpp6.src.rpm
+SRPMS/maven-checkstyle-plugin-2.5-1.jpp6.src.rpm
+SRPMS/maven-clean-plugin-2.4.1-7.jpp6.src.rpm
+SRPMS/maven-common-artifact-filters-1.4-1.jpp6.src.rpm
+SRPMS/maven-compiler-plugin-2.4-1.jpp6.src.rpm
+SRPMS/maven-dependency-plugin-2.4-1.jpp6.src.rpm
+SRPMS/maven-deploy-plugin-2.7-2.jpp6.src.rpm
+SRPMS/maven-doap-plugin-1.1-1.jpp6.src.rpm
+SRPMS/maven-docck-plugin-1.0-1.jpp6.src.rpm
+SRPMS/maven-ear-plugin-2.7-1.jpp6.src.rpm
+SRPMS/maven-eclipse-plugin-2.9-1.jpp6.src.rpm
+SRPMS/maven-ejb-plugin-2.3-1.jpp6.src.rpm
+SRPMS/maven-enforcer-1.0.1-4.jpp6.src.rpm
+SRPMS/maven-help-plugin-2.1.1-1.jpp6.src.rpm
+SRPMS/maven-idea-plugin-2.2-1.jpp6.src.rpm
+SRPMS/maven-install-plugin-2.3.1-2.jpp6.src.rpm
+SRPMS/maven-invoker-plugin-1.5-1.jpp6.src.rpm
+SRPMS/maven-jar-plugin-2.3.1-1.jpp6.src.rpm
+SRPMS/maven-jarsigner-plugin-1.2-1.jpp6.src.rpm
+SRPMS/maven-javadoc-plugin-2.8.1-3.jpp6.src.rpm
+SRPMS/maven-jxr-plugin-2.0-2.jpp6.src.rpm
+SRPMS/maven-one-plugin-1.2-1.jpp6.src.rpm
+SRPMS/maven-plugin-testing-1.2-12.jpp6.src.rpm
+SRPMS/maven-pmd-plugin-2.5-6.jpp6.src.rpm
+SRPMS/maven-rar-plugin-2.2-1.jpp6.src.rpm
+SRPMS/maven-remote-resources-plugin-1.2.1-1.jpp6.src.rpm
+SRPMS/maven-repository-plugin-2.3.1-1.jpp6.src.rpm
+SRPMS/maven-resources-plugin-2.5-2.jpp6.src.rpm
+SRPMS/maven-scm-1.3-1.jpp6.src.rpm
+SRPMS/maven-shade-plugin-1.5-1.jpp6.src.rpm
+SRPMS/maven-shared-8-0.p8.12.jpp6.src.rpm
+SRPMS/maven-site-plugin-2.0.1-3.jpp6.src.rpm
+SRPMS/maven-source-plugin-2.1.2-1.jpp6.src.rpm
+SRPMS/maven-surefire-2.7.2-1.jpp6.src.rpm
+SRPMS/maven-toolchains-plugin-1.0-1.jpp6.src.rpm
+SRPMS/maven-verifier-1.2-3.jpp6.src.rpm
+SRPMS/maven-verifier-plugin-1.0-1.jpp6.src.rpm
+SRPMS/maven-wagon-1.0-0.7.b7.4.jpp6.src.rpm
+SRPMS/maven-war-plugin-2.1.1-1.jpp6.src.rpm
+SRPMS/maven2-2.0.8-38.jpp6.src.rpm
+SRPMS/mina-2.0.4-2.jpp6.src.rpm
+SRPMS/modello-1.4.1-1.jpp6.src.rpm
+SRPMS/ops4j-base-1.2.2-1.jpp6.src.rpm
+SRPMS/ops4j-pax-swissbox-1.3.0-2.jpp6.src.rpm
+SRPMS/ops4j-pax-url-1.1.3-2.jpp6.src.rpm
+SRPMS/plexus-archiver-1.0-2.jpp6.src.rpm
+SRPMS/plexus-build-api-0.0.4-2.jpp6.src.rpm
+SRPMS/plexus-cipher-1.7-2.jpp6.src.rpm
+SRPMS/plexus-classworlds-2.4-1.jpp6.src.rpm
+SRPMS/plexus-compiler-1.8.2-1.jpp6.src.rpm
+SRPMS/plexus-io-1.0-0.a5.1.jpp6.src.rpm
+SRPMS/plexus-mail-sender-1.0-0.a7.1.jpp6.src.rpm
+SRPMS/plexus-resources-1.0-0.1.a4.4.jpp6.src.rpm
+SRPMS/plexus-sec-dispatcher-1.4-6.jpp6.src.rpm
+SRPMS/portals-bridges1-1.0.4-5.jpp6.src.rpm
+SRPMS/powermock-1.4.9-1.jpp6.src.rpm
+SRPMS/sisu-litmus-testsupport-1.1-1.jpp6.src.rpm
+SRPMS/sisu-maven-plugin-1.1-2.jpp6.src.rpm
+SRPMS/smc-5.0.2-3.jpp6.src.rpm
+SRPMS/sun-xsom-20070515-3.jpp6.src.rpm
+SRPMS/testng-6.1.1-3.jpp6.src.rpm
+SRPMS/xstream-1.3.1-4.jpp6.src.rpm
+-----------------------------------------
+SRPMS/adobe-xmpcore-5.1.2-2.jpp6.src.rpm
+SRPMS/antlr30-3.0.1-2.jpp6.src.rpm
+SRPMS/apache-commons-el10-1.0-2.jpp6.src.rpm
+SRPMS/apache-poi-3.8-2.jpp6.src.rpm
+SRPMS/args4j10-1.0-3.jpp6.src.rpm
+SRPMS/avalon-excalibur-4.1-10.jpp6.src.rpm
+SRPMS/berkeleydb-je5-5.0.58-2.jpp6.src.rpm
+SRPMS/bouncycastle-1.46-4.jpp6.src.rpm
+SRPMS/cas-client2-2.0.11-3.jpp6.src.rpm
+SRPMS/cewolf-1.1.12-2.jpp6.src.rpm
+SRPMS/classpathx-mail-1.1.2-3.jpp6.src.rpm
+SRPMS/day-jcr-2.0-api-2.0-3.jpp6.src.rpm
+SRPMS/db-ojb-1.0.4-6.jpp6.src.rpm
+SRPMS/deli-1.0-2.jpp6.src.rpm
+SRPMS/dsiutils-2.0.7-3.jpp6.src.rpm
+SRPMS/fastutil5-5.1.5-2.jpp6.src.rpm
+SRPMS/fastutil6-6.4.3-2.jpp6.src.rpm
+SRPMS/felix-osgi-core-1.4.0-7.jpp6.src.rpm
+SRPMS/fit-1.1-4.jpp6.src.rpm
+SRPMS/fop020-0.20.5-14.jpp6.src.rpm
+SRPMS/forge-parent-5-9.jpp6.src.rpm
+SRPMS/genericjmsra10-1.0-3.jpp6.src.rpm
+SRPMS/google-collections-1.0-5.jpp6.src.rpm
+SRPMS/guava-05-7.jpp6.src.rpm
+SRPMS/gwt-2.2.0-3.jpp6.src.rpm
+SRPMS/hibernate2-tools-2.1.3-4.jpp6.src.rpm
+SRPMS/icu4j-4.2.1.1-2.jpp6.src.rpm
+SRPMS/ipdr-2.0.0-3.jpp6.src.rpm
+SRPMS/it-could-webdav-0.4-5.jpp6.src.rpm
+SRPMS/izpack-3.8.1-6.jpp6.src.rpm
+SRPMS/izpress-1.1-3.jpp6.src.rpm
+SRPMS/jackson-1.8.8-3.jpp6.src.rpm
+SRPMS/jain-sip-1.2.118-4.jpp6.src.rpm
+SRPMS/jal-20031117-6.jpp6.src.rpm
+SRPMS/jama-1.0.2-3.jpp6.src.rpm
+SRPMS/jaranalyzer-1.2-2.jpp6.src.rpm
+SRPMS/java-diff-1.1-3.jpp6.src.rpm
+SRPMS/javacApi-0.9-2.jpp6.src.rpm
+SRPMS/jawk-1.02-3.jpp6.src.rpm
+SRPMS/jena-2.6.4-3.jpp6.src.rpm
+SRPMS/jena-iri-0.8-3.jpp6.src.rpm
+SRPMS/jep-2.4.1-3.jpp6.src.rpm
+SRPMS/jetbrains-annotations-6.0.2-4.jpp6.src.rpm
+SRPMS/jfunutil-0.2.3-3.jpp6.src.rpm
+SRPMS/jmock2-2.5.1-2.jpp6.src.rpm
+SRPMS/joost-0.9.1-2.jpp6.src.rpm
+SRPMS/josql-2.2-2.jpp6.src.rpm
+SRPMS/jrexx-1.1.1-6.jpp6.src.rpm
+SRPMS/jruby-bytelist-1.0.3-2.jpp6.src.rpm
+SRPMS/jsap-2.1-5.jpp6.src.rpm
+SRPMS/juel21-2.1.3-2.jpp6.src.rpm
+SRPMS/jung-1.7.6-3.jpp6.src.rpm
+SRPMS/junit4-4.8.2-8.jpp6.src.rpm
+SRPMS/junitperf-1.9.1-5.jpp6.src.rpm
+SRPMS/juniversalchardet-1.0.3-2.jpp6.src.rpm
+SRPMS/jvnet-parent-1-2.jpp6.src.rpm
+SRPMS/jvyamlb-0.2.5-3.jpp6.src.rpm
+SRPMS/jython221-2.2.1-2.jpp6.src.rpm
+SRPMS/maven-archetype-parent-2-2.jpp6.src.rpm
+SRPMS/mg4j-5.0-2.jpp6.src.rpm
+SRPMS/nekodtd-0.1.11-3.jpp6.src.rpm
+SRPMS/nekopull-0.2.4-2.jpp6.src.rpm
+SRPMS/objectweb-asm-3.3.1-5.jpp6.src.rpm
+SRPMS/omquery-0.92.3-5.jpp6.src.rpm
+SRPMS/piccolo-1.0.4-5.jpp6.src.rpm
+SRPMS/pnuts-1.2-3.jpp6.src.rpm
+SRPMS/smc-6.0.1-3.jpp6.src.rpm
+SRPMS/tukaani-xz-1.1-2.jpp6.src.rpm
+SRPMS/webgraph-3.0.7-2.jpp6.src.rpm
+SRPMS/xml-xindice-1.1-2.jpp6.src.rpm
+deleting SRPMS/xml-xindice-1.1-1.jpp6.src.rpm
+deleting SRPMS/webgraph-3.0.7-1.jpp6.src.rpm
+deleting SRPMS/tukaani-xz-1.1-1.jpp6.src.rpm
+deleting SRPMS/smc-6.0.1-2.jpp6.src.rpm
+deleting SRPMS/smc-5.0.2-3.jpp6.src.rpm
+deleting SRPMS/pnuts-1.2-2.jpp6.src.rpm
+deleting SRPMS/piccolo-1.0.4-4.jpp6.src.rpm
+deleting SRPMS/omquery-0.92.3-4.jpp6.src.rpm
+deleting SRPMS/objectweb-asm-3.3.1-4.jpp6.src.rpm
+deleting SRPMS/nekopull-0.2.4-1.jpp6.src.rpm
+deleting SRPMS/nekodtd-0.1.11-2.jpp6.src.rpm
+deleting SRPMS/mg4j-5.0-1.jpp6.src.rpm
+deleting SRPMS/maven-archetype-parent-2-1.jpp6.src.rpm
+deleting SRPMS/jython221-2.2.1-1.jpp6.src.rpm
+deleting SRPMS/jvyamlb-0.2.5-2.jpp6.src.rpm
+deleting SRPMS/jvnet-parent-1-1.jpp6.src.rpm
+deleting SRPMS/juniversalchardet-1.0.3-1.jpp6.src.rpm
+deleting SRPMS/junitperf-1.9.1-4.jpp6.src.rpm
+deleting SRPMS/junit4-4.8.2-7.jpp6.src.rpm
+deleting SRPMS/junit4-4.8.2-6.jpp6.src.rpm
+deleting SRPMS/jung-1.7.6-2.jpp6.src.rpm
+deleting SRPMS/juel21-2.1.3-1.jpp6.src.rpm
+deleting SRPMS/jsap-2.1-4.jpp6.src.rpm
+deleting SRPMS/jruby-bytelist-1.0.3-1.jpp6.src.rpm
+deleting SRPMS/jrexx-1.1.1-5.jpp6.src.rpm
+deleting SRPMS/josql-2.2-1.jpp6.src.rpm
+deleting SRPMS/joost-0.9.1-1.jpp6.src.rpm
+deleting SRPMS/jmock2-2.5.1-1.jpp6.src.rpm
+deleting SRPMS/jfunutil-0.2.3-2.jpp6.src.rpm
+deleting SRPMS/jetbrains-annotations-6.0.2-3.jpp6.src.rpm
+deleting SRPMS/jep-2.4.1-2.jpp6.src.rpm
+deleting SRPMS/jena-iri-0.8-2.jpp6.src.rpm
+deleting SRPMS/jena-iri-0.8-1.jpp6.src.rpm
+deleting SRPMS/jena-2.6.4-2.jpp6.src.rpm
+deleting SRPMS/jena-2.6.4-1.jpp6.src.rpm
+deleting SRPMS/jawk-1.02-2.jpp6.src.rpm
+deleting SRPMS/javacApi-0.9-1.jpp6.src.rpm
+deleting SRPMS/java-diff-1.1-2.jpp6.src.rpm
+deleting SRPMS/java-diff-1.1-1.jpp6.src.rpm
+deleting SRPMS/jaranalyzer-1.2-1.jpp6.src.rpm
+deleting SRPMS/jama-1.0.2-2.jpp6.src.rpm
+deleting SRPMS/jal-20031117-5.jpp6.src.rpm
+deleting SRPMS/jain-sip-1.2.118-3.jpp6.src.rpm
+deleting SRPMS/jackson-1.8.8-2.jpp6.src.rpm
+deleting SRPMS/jackson-1.4.2-2.jpp6.src.rpm
+deleting SRPMS/izpress-1.1-2.jpp6.src.rpm
+deleting SRPMS/izpack-3.8.1-5.jpp6.src.rpm
+deleting SRPMS/it-could-webdav-0.4-4.jpp6.src.rpm
+deleting SRPMS/ipdr-2.0.0-2.jpp6.src.rpm
+deleting SRPMS/icu4j-4.2.1.1-1.jpp6.src.rpm
+deleting SRPMS/hibernate2-tools-2.1.3-3.jpp6.src.rpm
+deleting SRPMS/gwt-2.2.0-2.jpp6.src.rpm
+deleting SRPMS/gwt-2.2.0-1.jpp6.src.rpm
+deleting SRPMS/guava-05-6.jpp6.src.rpm
+deleting SRPMS/google-collections-1.0-4.jpp6.src.rpm
+deleting SRPMS/google-collections-1.0-3.jpp6.src.rpm
+deleting SRPMS/genericjmsra10-1.0-2.jpp6.src.rpm
+deleting SRPMS/forge-parent-5-8.jpp6.src.rpm
+deleting SRPMS/forge-parent-5-7.jpp6.src.rpm
+deleting SRPMS/fop020-0.20.5-13.jpp6.src.rpm
+deleting SRPMS/fit-1.1-3.jpp6.src.rpm
+deleting SRPMS/felix-osgi-core-1.4.0-6.jpp6.src.rpm
+deleting SRPMS/fastutil6-6.4.3-1.jpp6.src.rpm
+deleting SRPMS/fastutil5-5.1.5-1.jpp6.src.rpm
+deleting SRPMS/dsiutils-2.0.7-2.jpp6.src.rpm
+deleting SRPMS/deli-1.0-1.jpp6.src.rpm
+deleting SRPMS/db-ojb-1.0.4-5.jpp6.src.rpm
+deleting SRPMS/day-jcr-2.0-api-2.0-2.jpp6.src.rpm
+deleting SRPMS/classpathx-mail-1.1.2-2.jpp6.src.rpm
+deleting SRPMS/cewolf-1.1.12-1.jpp6.src.rpm
+deleting SRPMS/cas-client2-2.0.11-2.jpp6.src.rpm
+deleting SRPMS/bouncycastle-1.46-3.jpp6.src.rpm
+deleting SRPMS/berkeleydb-je5-5.0.58-1.jpp6.src.rpm
+deleting SRPMS/avalon-excalibur-4.1-9.jpp6.src.rpm
+deleting SRPMS/args4j10-1.0-2.jpp6.src.rpm
+deleting SRPMS/apache-poi-3.8-1.jpp6.src.rpm
+deleting SRPMS/apache-poi-3.8-0.b5.1.jpp6.src.rpm
+deleting SRPMS/apache-commons-el10-1.0-1.jpp6.src.rpm
+deleting SRPMS/antlr30-3.0.1-1.jpp6.src.rpm
+deleting SRPMS/adobe-xmpcore-5.1.2-1.jpp6.src.rpm
+-----------------------------------------
 
 
 safe to kill group:

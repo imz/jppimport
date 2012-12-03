@@ -12,7 +12,12 @@ use RPM qw/evrcmp/;
 use Source::Repository::Mass;
 use Source::Repository::Matcher;
 use Source::Repository::Matcher::DistroMap;
+use RPM::Source::Convert::Plugins::JPackage2ALT;
 use Source::Repository::Mass::Transform::PassThrough;
+# uncomment if use embedded
+#use Source::Repository::Mass::ALTLinuxImport;
+#use Source::Repository::Mass::Transform::Embedded;
+
 
 our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
 
@@ -74,13 +79,15 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 );
 $convert->process();
 
-sub process_options_hook {
+sub process_options {
     my ($self)=@_;
+    $self->SUPER::process_options();
     if ($ORIGINPATH =~ m!/fedora/linux/!) {
 	$DistroMap::default_originrepo='fedora';
     }
 }
 
+# NOTE: PassThrough specific!!!
 sub process_pair_hook {
     my ($self,$argsptr)=@_;
     push @$argsptr, '--jvm', $jvm if ($jvm);
@@ -100,6 +107,8 @@ sub cmp_origin_dest {
     my $originrelease=$origin->release;
     my $destversion=$dest->version;
     my $destrelease=$dest->release;
+    # (?=(?:\.|$)) due to smth like Release: 7%{?dist}.1
+    $originrelease=~s/\.fc\d+(\.R)?(?=(?:\.|$))//;
     my $cmp = $originversion cmp $destversion;
     print STDERR "jppmass: $originversion cmp $destversion = $cmp\n" if $verbose;
     if ($cmp!=0) {

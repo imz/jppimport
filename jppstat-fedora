@@ -41,7 +41,7 @@ list_java_src_rpm_names $ARCH
 list_java_src_rpm_names noarch
 popd
 
-grep -v -E '^(gcc|libdb|subversion|fedora-ds-)' $DEST/$NAME.$ARCH.src | sort -u > $DEST/$NAME.$ARCH.src.0
+grep -v -E '^(jaffl|gcc|libdb|subversion|fedora-ds-)' $DEST/$NAME.$ARCH.src | sort -u > $DEST/$NAME.$ARCH.src.0
 mv $DEST/$NAME.$ARCH.src.0 $DEST/$NAME.$ARCH.src
 
 sort -u $DEST/$NAME.$ARCH.src $DEST/$NAME.noarch.src > $NAME.src

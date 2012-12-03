@@ -10,7 +10,9 @@ sub {
     # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
     #&add_missingok_config($jpp,'/etc/mavenrc');
 
-    $jpp->get_section('package','-n maven-model')->push_body(q!Epoch: 1
+    #$jpp->get_section('package')->set_tag(q!Epoch:!,1);
+
+    $jpp->get_section('package','-n maven-model')->push_body(q!# it was a tmp package during migration
 Obsoletes:       maven-model22 < 0:%{version}-%{release}!."\n");
 
     $jpp->copy_to_sources('%{name}-empty-dep.pom');
@@ -21,7 +23,7 @@ Source105:    %{name}-empty-dep.jar'."\n");
     $jpp->get_section('package','')->unshift_body_before(qr'^BuildArch','
 Requires: maven-artifact-manager = %{?epoch:%epoch:}%{version}-%{release}
 Requires: maven-error-diagnostics = %{?epoch:%epoch:}%{version}-%{release}
-Requires: maven-model = 1:%{version}-%{release}
+Requires: maven-model = %{?epoch:%epoch:}:%{version}-%{release}
 Requires: maven-monitor = %{?epoch:%epoch:}%{version}-%{release}
 Requires: maven-plugin-registry = %{?epoch:%epoch:}%{version}-%{release}
 Requires: maven-profile = %{?epoch:%epoch:}%{version}-%{release}
@@ -61,7 +63,7 @@ install -m 644 %{SOURCE105} $RPM_BUILD_ROOT%{_javadir}/%{name}/empty-dep.jar
 
     $srcid=$jpp->add_source('maven3-jpp-script');
     $jpp->main_section->push_body(q!
-Provides:        maven2-bootstrap = %{epoch}:%{version}-%{release}
+Provides:        maven2-bootstrap = 0:%{version}-%{release}
 Obsoletes:       maven2-plugin-jxr <= 0:2.0.4 
 Obsoletes:       maven2-plugin-surefire <= 0:2.0.4 
 Obsoletes:       maven2-plugin-surefire-report <= 0:2.0.4 

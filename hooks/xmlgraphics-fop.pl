@@ -12,7 +12,7 @@ push @SPECHOOKS, sub {
 subst 's,excalibur/avalon-framework,excalibur/avalon-framework-api excalibur/avalon-framework-impl,' %buildroot%_bindir/%name
 !);
     $jpp->get_section('install')->push_body(q!# add xmlgraphics-commons to classpath
-grep xmlgraphics-commons %buildroot%_bindir/xmlgraphics-fop || sed -i 's,xmlgraphics-batik,xmlgraphics-batik-all xmlgraphics-commons commons-io commons-logging,' %buildroot%_bindir/xmlgraphics-fop
+grep xmlgraphics-commons %buildroot%_bindir/xmlgraphics-fop || sed -i 's,xmlgraphics-batik,batik-all xmlgraphics-commons commons-io commons-logging,' %buildroot%_bindir/xmlgraphics-fop
 !);
     $jpp->get_section('package','')->push_body(q!Requires: commons-io commons-logging xmlgraphics-commons
 !);

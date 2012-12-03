@@ -116,6 +116,9 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 %endif
 ');
 
+    # parasyte -Werror breaks build on x86_64
+    $jpp->add_patch('java-1.7.0-openjdk-alt-no-Werror.patch',STRIP=>1);
+
 #map {if ($_->get_type() eq 'package') {
 #	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
 #	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');

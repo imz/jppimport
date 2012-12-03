@@ -1,0 +1,11 @@
+--- rxtx-2.2-lock.patch~	2012-07-22 05:34:40.000000000 +0300
++++ rxtx-2.2-lock.patch	2012-12-02 23:23:49.000000000 +0200
+@@ -6,7 +6,7 @@
+  #	
+  #	define DEVICEDIR "/dev/"
+ -#	define LOCKDIR "/var/lock"
+-+#	define LOCKDIR "/var/lock/lockdev"
+++#	define LOCKDIR "/var/lock/serial"
+  #	define LOCKFILEPREFIX "LCK.."
+  #	define FHS
+  #endif /* __linux__ */

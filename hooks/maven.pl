@@ -15,6 +15,9 @@ sub {
     #%add_findreq_skiplist /usr/share/maven/bin/*
 
     $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+yum-utils\s*$');
+
+    $jpp->add_section('pre','')->push_body(q'# https://bugzilla.altlinux.org/show_bug.cgi?id=27807 (upgrade from maven1)
+[ -d %_datadir/maven/repository/JPP ] && rm -rf %_datadir/maven/repository/JPP ||:'."\n");
 };
 
 push @PREHOOKS, 

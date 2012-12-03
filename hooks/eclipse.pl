@@ -120,7 +120,7 @@ fi
 	sub {
 	    foreach my $sec ($jpp->get_sections()) {
 		next if $sec->get_type ne 'files';
-		next if $sec->get_package ne 'platform';
+		next if $sec->get_raw_package ne 'platform';
 		$sec->exclude(qr'\%{_sysconfdir}/rpm/macros.\%{name}');
 	    }
 	});
@@ -128,42 +128,36 @@ fi
     # note: dropped at 4.2.0-9 (we still use build 6)
     # eclipse-rcp-3.6.2...: unpackaged directory: /usr/...
     # sisyphus_check: check-subdirs ERROR: subdirectories packaging violation
-    $jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
+    #$jpp->get_section('files','rcp')->push_body('%dir %_libdir/eclipse/configuration/org.eclipse.osgi'."\n");
 
 #warning: file /usr/lib64/eclipse/configuration/org.eclipse.osgi/bundles/111/1/.cp/libswt-atk-gtk-3557.so is packaged into both eclipse-swt and eclipse-rcp
-    $jpp->get_section('files','rcp')->push_body(q!# duplicates of swt
-%exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
-!);
+#    $jpp->get_section('files','rcp')->push_body(q!# duplicates of swt
+#%exclude %_libdir/eclipse/configuration/org.eclipse.osgi/bundles/*/*/.cp/libswt-*.so
+#!);
 
 };
 
 
+
+
+
+
+
+
+
+
 __END__
 
+#################################
+#
+#  GARBAGE
+#
+#  NOT USED
+#
+################################
 
 
     if (0) {
-	# embed jetty and apply the patch below
-	$jpp->get_section('package','')->subst(qr'BuildRequires:\s+jetty','#BuildRequires: jetty6-core');
-	$jpp->get_section('package','platform')->subst(qr'Requires:\s+jetty','#Requires: jetty6-core');
-	$jpp->add_source('jetty-6.1.26.jar', NUMBER => 33);
-	$jpp->add_source('jetty-util-6.1.26.jar', NUMBER => 34);
-	$jpp->get_section('prep')->push_body('
-sed -i -e s,/usr/share/java/jetty/jetty.jar,%{SOURCE33},g dependencies.properties
-sed -i -e s,/usr/share/java/jetty/jetty-util.jar,%{SOURCE34},g dependencies.properties
-#sed -i -e s,/usr/share/jetty/lib/jetty-6.1.26.jar,%{SOURCE33},g `grep -rl /usr/share/jetty/lib/jetty-6.1.26.jar .`
-#sed -i -e s,/usr/share/jetty/lib/jetty-util-6.1.26.jar,%{SOURCE34},g `grep -rl /usr/share/jetty/lib/jetty-util-6.1.26.jar .`
-'."\n");
-	$jpp->get_section('install')->push_body('
-jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.util*`
-rm -f $jetty
-install -m 644 %{SOURCE34} $jetty
-jetty=`ls %buildroot%_libdir/eclipse/plugins/org.mortbay.jetty.server*`
-rm -f $jetty
-install -m 644 %{SOURCE33} $jetty
-');
-    }
-
 
     # seamonkey provides mozilla too
     #$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
@@ -171,7 +165,6 @@ install -m 644 %{SOURCE33} $jetty
     # lucene
     #$jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
     #$jpp->get_section('install')->subst('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
-
 
 
 
