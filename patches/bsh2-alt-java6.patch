@@ -1,0 +1,21 @@
+--- engine/javax-src/./javax/script/ScriptEngineManager.java~	2005-06-08 16:26:22.000000000 +0000
++++ engine/javax-src/./javax/script/ScriptEngineManager.java	2010-05-18 15:46:22.799433398 +0000
+@@ -86,7 +86,6 @@
+         extensionAssociations = new HashMap<String, ScriptEngineFactory>();
+         mimeTypeAssociations = new HashMap<String, ScriptEngineFactory>();
+         
+-        try {
+             final String resourceName =
+                     "META-INF/services/javax.script.ScriptEngineFactory";
+             final List<URL> urls = new ArrayList<URL>();
+@@ -124,10 +123,6 @@
+                     // continue the loop...
+                 }
+             }
+-        } catch (IOException e) {
+-            // getResources call failed.
+-            if (DEBUG) e.printStackTrace();
+-        }
+     }
+     
+     /**

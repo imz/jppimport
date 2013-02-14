@@ -77,14 +77,17 @@ my $convert=RPM::Source::Convert::JPPMass->new(
 	"target=s"=> \$target,
 ],
 );
+
 $convert->process();
 
-sub process_options {
-    my ($self)=@_;
-    $self->SUPER::process_options();
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
     if ($ORIGINPATH =~ m!/fedora/linux/!) {
+	#print STDERR "I: jppmass: setting fedora\n";
 	$DistroMap::default_originrepo='fedora';
     }
+    return $self;
 }
 
 # NOTE: PassThrough specific!!!
@@ -127,3 +130,4 @@ sub cmp_origin_dest {
 }
 
 1;
+ 

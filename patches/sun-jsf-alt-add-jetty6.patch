@@ -1,0 +1,24 @@
+diff -ru javaserverfaces-sources.old/common/ant/common.xml javaserverfaces-sources/common/ant/common.xml
+--- javaserverfaces-sources.old/common/ant/common.xml	2009-07-27 07:37:37 +0000
++++ javaserverfaces-sources/common/ant/common.xml	2009-07-27 07:56:16 +0000
+@@ -132,6 +132,8 @@
+         <pathelement location="${tomcat6.jar}"/>
+         <pathelement location="${jetty.annotations.jar}"/>
+         <pathelement location="${jetty.plus.jar}"/>
++        <pathelement location="${jetty.core.jar}"/>
++        <pathelement location="${jetty.util.jar}"/>
+     </path>
+     
+     <path id="sun.commons.classpath">
+diff -ru javaserverfaces-sources.old/common/ant/dependencies.xml javaserverfaces-sources/common/ant/dependencies.xml
+--- javaserverfaces-sources.old/common/ant/dependencies.xml	2009-07-27 07:37:37 +0000
++++ javaserverfaces-sources/common/ant/dependencies.xml	2009-07-27 07:55:56 +0000
+@@ -313,6 +313,8 @@
+               value="${jetty.home}/lib/annotations/jetty-annotations-${jetty.version}.jar"/>
+     <property name="jetty.plus.jar"
+               value="${jetty.home}/lib/plus/jetty-plus-${jetty.version}.jar"/>
++    <property name="jetty.core.jar" value="${jetty.home}/lib/jetty6.jar"/>
++    <property name="jetty.util.jar" value="${jetty.home}/lib/jetty6-util.jar"/>
+     <target name="update.containers"
+             description="Downloads containers necessary for building implementation specific additions"
+             depends="detect.os">

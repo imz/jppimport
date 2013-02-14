@@ -1,0 +1,30 @@
+diff -ru jspc/jspc-compilers/pom.xml jspc/jspc-compilers/pom.xml
+--- jspc/jspc-compilers/pom.xml	2008-09-19 14:27:28.000000000 +0000
++++ jspc/jspc-compilers/pom.xml	2012-08-21 14:56:07.780132787 +0000
+@@ -48,11 +48,11 @@
+         <plugins>
+             <plugin>
+                 <groupId>org.codehaus.plexus</groupId>
+-                <artifactId>plexus-maven-plugin</artifactId>
++                <artifactId>plexus-component-metadata</artifactId>
+                 <executions>
+                     <execution>
+                         <goals>
+-                            <goal>descriptor</goal>
++                            <goal>generate-metadata</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+diff -ru jspc/pom.xml jspc/pom.xml
+--- jspc/pom.xml	2012-08-21 14:53:04.480930841 +0000
++++ jspc/pom.xml	2012-08-21 14:54:58.397948940 +0000
+@@ -228,8 +228,7 @@
+                 
+                 <plugin>
+                     <groupId>org.codehaus.plexus</groupId>
+-                    <artifactId>plexus-maven-plugin</artifactId>
+-                    <version>1.3.5</version>
++                    <artifactId>plexus-component-metadata</artifactId>
+                 </plugin>
+                 
+                 <plugin>
