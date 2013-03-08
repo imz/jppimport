@@ -30,7 +30,7 @@ push @SPECHOOKS,
 	&unpack_fc_rpm($jpp,$fcpathRH.'a/apache-commons-el-1.0-3.fc16.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-io.jar','/usr/share/java/apache-commons-io.jar');
     } elsif ($name eq 'apache-commons-codec') {
-	&unpack_fc_rpm($jpp,$fcpathRH.'a/apache-commons-codec-1.6-5.fc19.noarch.rpm');
+	&unpack_fc_rpm($jpp,$fcpathRH.'a/apache-commons-codec-1.7-4.fc19.noarch.rpm');
 	&merge_osgi_manifest($jpp,'/usr/share/java/commons-codec.jar','/usr/share/java/commons-codec.jar');
 # no need; it contains
 #    } elsif ($name eq 'apache-commons-lang') {

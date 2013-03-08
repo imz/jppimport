@@ -2006,6 +2006,17 @@ deleting SRPMS/tomcat7-7.0.34-2.jpp6.src.rpm
 deleting SRPMS/dyuproject-1.1.1-2.jpp6.src.rpm
 deleting SRPMS/apache-felix-1-8.jpp6.src.rpm
 -----------------------------------------
+SRPMS/jackrabbit21-2.1.6-4.jpp6.src.rpm
+SRPMS/jackrabbit22-2.2.13-3.jpp6.src.rpm
+SRPMS/slf4j15-1.5.6-6.jpp6.src.rpm
+SRPMS/sling6-6-1.jpp6.src.rpm
+deleting SRPMS/slf4j15-1.5.6-4.jpp6.src.rpm
+deleting SRPMS/jackrabbit22-2.2.13-2.jpp6.src.rpm
+deleting SRPMS/jackrabbit21-2.1.6-2.jpp6.src.rpm
+-----------------------------------------
+SRPMS/jackrabbit22-2.2.13-4.jpp6.src.rpm
+deleting SRPMS/jackrabbit22-2.2.13-3.jpp6.src.rpm
+-----------------------------------------
 
 safe to kill group:
 myfaces-shared12
