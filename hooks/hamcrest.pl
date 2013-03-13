@@ -4,9 +4,6 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-
-    # due to jmock2 which is currently does not build with hamcrest built with java7
-    $jpp->get_section('package','')->subst_body_if(qr'jpackage-compat','jpackage-1.6.0-compat',qr'Requires:');
-
+    $jpp->get_section('build')->subst_body(qr'ant -Dant.build.javac.source=1.5 ','ant -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 ');
 }
 __END__

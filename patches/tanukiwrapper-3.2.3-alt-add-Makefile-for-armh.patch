@@ -1,0 +1,58 @@
+From 26c376ebbe89b2d626a79c27c3b5628be72fa092 Mon Sep 17 00:00:00 2001
+From: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Date: Mon, 11 Mar 2013 07:50:42 +0000
+Subject: [PATCH] add Makefile-linux-arm-32 to build on arm/armh
+
+---
+ wrapper_3.2.3_src/src/c/Makefile-linux-arm-32 | 39 +++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+ create mode 100644 wrapper_3.2.3_src/src/c/Makefile-linux-arm-32
+
+diff --git a/wrapper_3.2.3_src/src/c/Makefile-linux-arm-32 b/wrapper_3.2.3_src/src/c/Makefile-linux-arm-32
+new file mode 100644
+index 0000000..2628f70
+--- /dev/null
++++ b/wrapper_3.2.3_src/src/c/Makefile-linux-arm-32
+@@ -0,0 +1,39 @@
++COMPILE = gcc -pipe -Wall -g -O2 -fomit-frame-pointer -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -mthumb -Wall --pedantic -fPIC
++
++INCLUDE=$(JAVA_HOME)/include
++
++DEFS = -I$(INCLUDE) -I$(INCLUDE)/linux
++
++wrapper_SOURCE = wrapper.c wrapperinfo.c wrappereventloop.c wrapper_unix.c property.c logger.c
++
++libwrapper_so_OBJECTS = wrapperjni_unix.o wrapperinfo.o wrapperjni.o
++
++BIN = ../../bin
++LIB = ../../lib
++
++all: init wrapper libwrapper.so
++
++clean:
++	rm -f *.o
++
++cleanall: clean
++	rm -rf *~ .deps
++	rm -f $(BIN)/wrapper $(LIB)/libwrapper.so
++
++init:
++	if test ! -d .deps; then mkdir .deps; fi
++
++wrapper: $(wrapper_SOURCE)
++	$(COMPILE) -pthread $(wrapper_SOURCE) -o $(BIN)/wrapper -lm
++
++libwrapper.so: $(libwrapper_so_OBJECTS)
++	${COMPILE} -shared -fPIC $(libwrapper_so_OBJECTS) -o $(LIB)/libwrapper.so
++
++%.o: %.c
++	@echo '$(COMPILE) -c $<'; \
++	$(COMPILE) $(DEFS) -Wp,-MD,.deps/$(*F).pp -c $<
++	@-cp .deps/$(*F).pp .deps/$(*F).P; \
++	tr ' ' '\012' < .deps/$(*F).pp \
++	| sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
++	>> .deps/$(*F).P; \
++	rm .deps/$(*F).pp
+-- 
+1.7.12.4
+
