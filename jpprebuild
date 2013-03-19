@@ -11,7 +11,7 @@ number=1
 hasherdir=$TMPDIR/hasher$number
 if ! [ -e $hasherdir ]; then
     mkdir -p $hasherdir/chroot
-    chgrp -R igor_a$number $hasherdir/chroot
+    chgrp -R `whoami`_a$number $hasherdir/chroot
 fi
 hshB="hsh --apt-config=$aptconfig --mountpoints=/proc --number=$number $hasherdir"
 mkdir success failure
