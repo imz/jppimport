@@ -135,8 +135,10 @@ easymock2
 easymock3
 eclipse-color-theme
 eclipse-ecf
+eclipse-epic
 eclipse-findbugs
 eclipselink
+eclipse-moreunit
 eclipse-p2-discovery
 eclipse-packagekit
 eclipse-testframework
@@ -146,6 +148,7 @@ ehcache-parent
 ehcache-sizeof-agent
 electric
 emma
+ezmorph
 fasterxml-oss-parent
 felix-bundlerepository
 felix-configadmin
@@ -171,9 +174,12 @@ fest-util
 findbugs-bcel
 flexdock
 fluite
+flute
 flyingsaucer
+forge-parent
 freemarker
 fusesource-pom
+ganymed-ssh2
 gdata-java
 gentlyweb-utils
 geronimo-annotation
@@ -203,6 +209,8 @@ gluegen2
 #gluegen - foreign, see (lib)jogl
 gmaven
 gmetrics
+gnu-getopt
+gnu-regexp
 google-gson
 google-guice
 gradle
@@ -227,6 +235,7 @@ hibernate-jpamodelgen
 hibernate-validator
 hornetq
 hsqldb
+htmlparser
 htmlunit
 htmlunit-core-js
 httpcomponents-client
@@ -238,6 +247,7 @@ inamik-tableformatter
 infinispan
 ini4j
 ironjacamar
+isorelax
 istack-commons
 itext
 jabref
@@ -256,13 +266,16 @@ janino-parent
 jansi
 jansi-native
 jarbundler
+jargs
 jarjar
 jasperreports
 jasypt
 java-augeas
 javacc
+javacc-maven-plugin
 javacsv
 java-gnome
+javahelp2
 javamail
 java-oauth
 javaparser
@@ -548,6 +561,7 @@ mysql-connector-java
 nailgun
 native2ascii-maven-plugin
 neethi
+nekohtml
 netty
 netty31
 not-yet-commons-ssl
@@ -644,6 +658,7 @@ shrinkwrap-resolver
 sigar
 signpost-core
 simple
+simple-jndi
 simplevalidation
 SimplyHTML
 sinjdoc
@@ -667,6 +682,7 @@ sslext
 stax2-api
 stax-ex
 staxmapper
+stax-utils
 stringtemplate4
 struts
 svgsalamander
