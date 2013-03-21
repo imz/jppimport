@@ -61,17 +61,6 @@ sub {
     # no need to apply it: our build of eclipse 3.3.2 seems to be rather stable
     # $jpp->add_patch('eclipse-3.3.2-alt-build-with-debuginfo.patch', STRIP => 0);
 
-q!
-     [exec] Model is x86_64
-     [exec] libgnome-2.0 and libgnomeui-2.0 not found:
-     [exec]     *** SWT Program support for GNOME will not be compiled.
-     [exec] Cairo found, compiling SWT support for the cairo graphics library.
-     [exec] WebKit not found:
-     [exec]     *** WebKit embedding support will not be compiled.
-     [exec] libjawt.so found, the SWT/AWT integration library will be compiled.
-     [exec] Building SWT/GTK+ for linux x86_64
-!;
-
     if (0) {############## TODO: MAKE THEM PATCHES AND CONTRIBUTE #############################
     $jpp->get_section('prep')->push_body(q{
 #uname -p == unknown but exit code is 0 :( (alt feature :( )
@@ -137,16 +126,19 @@ fi
 
 };
 
-
-
-
-
-
-
-
-
-
 __END__
+
+q!
+     [exec] Model is x86_64
+     [exec] libgnome-2.0 and libgnomeui-2.0 not found:
+     [exec]     *** SWT Program support for GNOME will not be compiled.
+     [exec] Cairo found, compiling SWT support for the cairo graphics library.
+     [exec] WebKit not found:
+     [exec]     *** WebKit embedding support will not be compiled.
+     [exec] libjawt.so found, the SWT/AWT integration library will be compiled.
+     [exec] Building SWT/GTK+ for linux x86_64
+!;
+
 
 #################################
 #

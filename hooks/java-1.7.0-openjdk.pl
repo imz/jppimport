@@ -17,6 +17,7 @@ push @PREHOOKS, sub {
     my %pkg=map {$_=>1} '', 'devel';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
+    $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
 };
 
 sub __subst_systemtap {
@@ -78,11 +79,12 @@ $jpp->spec_apply_patch(PATCHSTRING=>q!
  %else
  %global syslibdir       %{_libdir}
 !);
+
     $mainsec=$jpp->main_section;
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
 
-    $mainsec->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
-BuildRequires: libXext-devel libXrender-devel
+    $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static 
+BuildRequires: libXext-devel libXrender-devel libfreetype-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
 ');
@@ -113,6 +115,11 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.1)
+%endif
+');
+    $mainsec->unshift_body(q'# ALT arm fix by Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+%ifarch %{arm}
+%set_verify_elf_method textrel=relaxed
 %endif
 ');
 
