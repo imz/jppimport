@@ -3,6 +3,7 @@ activemq
 activemq-protobuf
 aether
 animal-sniffer
+annogen
 annox
 ant-antlr3
 ant-antunit
@@ -10,8 +11,12 @@ ant-contrib
 antlr3
 antlr-maven-plugin
 antlrworks
+aopalliance
 apache-commons-beanutils
+apache-commons-chain
+apache-commons-cli
 apache-commons-codec
+apache-commons-collections
 apache-commons-compress
 apache-commons-configuration
 apache-commons-csv
@@ -19,6 +24,7 @@ apache-commons-daemon
 apache-commons-dbcp
 apache-commons-dbutils
 apache-commons-digester
+apache-commons-discovery
 apache-commons-el
 apache-commons-email
 apache-commons-exec
@@ -30,12 +36,15 @@ apache-commons-jexl
 apache-commons-jxpath
 apache-commons-lang
 apache-commons-lang3
+apache-commons-launcher
 apache-commons-logging
 apache-commons-math
+apache-commons-modeler
 apache-commons-net
 apache-commons-ognl
 apache-commons-parent
 apache-commons-pool
+apache-commons-validator
 apache-commons-validator
 apache-commons-vfs
 apacheds
@@ -63,6 +72,7 @@ aries-quiesce
 aries-util
 arquillian-core
 arquillian-osgi
+asm2
 aspectjweaver
 async-http-client
 atinject
@@ -97,6 +107,7 @@ byaccj
 bytelist
 byteman
 c3p0
+cal10n
 cambozola
 CardManager
 cargo-parent
@@ -106,6 +117,7 @@ cglib
 checkstyle
 clapham
 classmate
+classworlds
 classycle
 clojure
 clojure-compat
@@ -116,6 +128,7 @@ cobertura
 codehaus-parent
 codemodel
 codenarc
+concurrent
 cookcc
 cookxml
 cortado
@@ -131,6 +144,8 @@ directory-project
 ditaa
 dnsjava
 dogtag-pki-theme
+dumbster
+easymock
 easymock2
 easymock3
 eclipse-color-theme
@@ -176,6 +191,7 @@ flexdock
 fluite
 flute
 flyingsaucer
+fop
 forge-parent
 freemarker
 fusesource-pom
@@ -283,6 +299,7 @@ javasqlite
 javassist
 javatar
 jaxb2-common-basics
+jaxen
 jaxen-bootstrap
 jaxodraw
 jaxws-jboss-httpserver-httpspi
@@ -369,7 +386,9 @@ jcodings
 jcommon
 jcommon-serializer
 jdbm
+jdepend
 jdependency
+jdiff
 jdo2-api
 jdom
 jemmy
@@ -404,6 +423,7 @@ jinput
 jlatexmath
 jline
 jline2
+jmock
 jmol
 jna
 jnr-constants
@@ -565,6 +585,7 @@ nekohtml
 netty
 netty31
 not-yet-commons-ssl
+objectweb-anttask
 objectweb-asm
 objectweb-asm4
 objenesis
@@ -642,9 +663,11 @@ rmic-maven-plugin
 rngom
 robert-hooke
 rome
+sablecc
 sac
 sat4j
 saxon
+saxpath
 sblim-cim-client
 sblim-cim-client2
 scannotation
@@ -683,6 +706,7 @@ stax2-api
 stax-ex
 staxmapper
 stax-utils
+stringtemplate
 stringtemplate4
 struts
 svgsalamander
@@ -696,6 +720,7 @@ testng
 tiles
 tomcat
 tomcat-native
+tomcatjss
 trilead-ssh2
 truezip
 tuscany-parent
@@ -749,3 +774,4 @@ xstream
 xz-java
 yecht
 yydebug
+znerd-oss-parent

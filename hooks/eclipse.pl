@@ -13,6 +13,9 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $parent) = @_;
 
+    # bootstrap
+    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-pack'."\n");
+
     # 4.2.0-alt1_7jpp7. Do we need it?
     #&add_missingok_config($jpp, '/etc/eclipse.ini','swt');
 
@@ -22,16 +25,12 @@ sub {
     $jpp->get_section('build')->unshift_body(q!export CXX='g++ -Dchar16_t="unsigned short int"'!."\n");
 
     # as-needed specific
-    $jpp->add_patch('eclipse-3.7.0-alt-as-needed-statically-link-xpcomglue.patch', STRIP=>2,
-		    PREP_HEADER=>'pushd build/eclipse-%version-*'."\n");
+    $jpp->add_patch('eclipse-4.2.2-alt-as-needed-statically-link-xpcomglue.patch', STRIP=>0);
     # upstreamed as https://bugs.eclipse.org/bugs/show_bug.cgi?id=338360
     # missing symbol (underlinkage)
-    $jpp->add_patch('eclipse-3.7.0-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>2);
+    $jpp->add_patch('eclipse-4.2.2-alt-libgnomeproxy-gcc-as-needed.patch', STRIP=>0);
     # just -lX11 added
-    $jpp->add_patch('eclipse-4.2.0-alt-swt-linux-as-needed.patch', STRIP=>2,
-		    PREP_FOOTER=>'popd'."\n");
-
-    $jpp->add_patch('eclipse-3.7.0-alt-dependencies.patch', STRIP=>0);
+    $jpp->add_patch('eclipse-4.2.2-alt-swt-linux-as-needed.patch', STRIP=>0);
 
     # hack until gtk-update-icon-cache fix
     #$jpp->del_section('post','platform');
@@ -53,6 +52,9 @@ sub {
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-javadoc'."\n");
     $jpp->get_section('package','')->unshift_body('%define _enable_debug 1'."\n");
+
+    $jpp->get_section('package','')->subst_body_if('>= 8.1.0-1','>= 8.1.0',qr'^BuildRequires: osgi\(org.eclipse.jetty');
+    $jpp->get_section('package','platform')->subst_body_if('>= 8.1.0-1','>= 8.1.0',qr'^Requires: osgi\(org.eclipse.jetty');
 
 # add this to debug org.eclipse.equinox.p2
 #-nosplash -debug -consoleLog --launcher.suppressErrors

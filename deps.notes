@@ -2017,6 +2017,16 @@ deleting SRPMS/jackrabbit21-2.1.6-2.jpp6.src.rpm
 SRPMS/jackrabbit22-2.2.13-4.jpp6.src.rpm
 deleting SRPMS/jackrabbit22-2.2.13-3.jpp6.src.rpm
 -----------------------------------------
+SRPMS/tomcat6-6.0.36-2.jpp6.src.rpm
+SRPMS/tomcat7-7.0.39-3.jpp6.src.rpm
+deleting SRPMS/tomcat7-7.0.34-3.jpp6.src.rpm
+deleting SRPMS/tomcat6-6.0.33-2.jpp6.src.rpm
+-----------------------------------------
+SRPMS/tomcat6-6.0.33-2.jpp6.src.rpm
+SRPMS/tomcat7-7.0.39-1.jpp6.src.rpm
+deleting SRPMS/tomcat7-7.0.39-3.jpp6.src.rpm
+deleting SRPMS/tomcat6-6.0.36-2.jpp6.src.rpm
+-----------------------------------------
 
 safe to kill group:
 myfaces-shared12
@@ -2026,10 +2036,6 @@ myfaces-maven2-plugins
 
 
 -----
-todo: aot-complie-rpm fails in itext -- add
-/usr/share/java/gcj-endorsed/bcprov-1.46.jar
-
-new h2 -> lucene
 
 todo: drop fest-assembly in favor of fest-common,
 
@@ -2061,3 +2067,6 @@ lucene3 update: build with eclipse, then eclipse dtp
 Provides: osgi(org.eclipse.datatools.sqltools.result) = 1.1.3 
 
 eclipse-linuxtools -> eclipse-swtbot -> log4j osgi
+
+tycho:
+-Dtycho.targetPlatform=/usr/lib64/eclipse

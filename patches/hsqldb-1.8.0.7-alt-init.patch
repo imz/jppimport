@@ -22,3 +22,20 @@
  
  COMMAND="$1"; shift
  
+@@ -467,6 +467,16 @@
+         "${INVOC_PATH}"hsqldb $STOP_COMMAND || exit $?
+         exec "${INVOC_PATH}"/hsqldb start
+     ;;
++    condrestart)
++        if [ -n "$HSQLDB_PID" ]; then
++	        exec "${INVOC_PATH}"/hsqldb restart
++	fi
++    ;;
++    condstop)
++        if [ -n "$HSQLDB_PID" ]; then
++	        exec "${INVOC_PATH}"/hsqldb stop
++	fi
++    ;;
+     *)
+         echo "$SYNTAX_MSG" 1>&2
+         exit 5

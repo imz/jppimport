@@ -9,6 +9,7 @@ use RPM qw/vercmp/;
 
 use RPM::Source::Transformation::RaiseReleaseFactory;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
+use RPM::Source::Transformation::GenericUtility;
 our @ISA=q/RPM::Source::Transform/;
 
 
@@ -56,9 +57,9 @@ sub verify_options {
     }
 }
 
-sub verify_args {
-    my ($self)=@_;
-    $self->SUPER::verify_args();
+sub new {
+    my ($class)=@_;
+    my $self=$class->SUPER::new();
     if (grep {$_->[1] =~ m!/jpackage/!} @RPM::Source::Transform::INSRC) {
 	print STDERR "I: jpackage mode\n";
 	my %map_jpp=qw/
@@ -151,6 +152,7 @@ aqute-bndlib	aqute-bnd
 /;
 	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     }
+    return $self;
 }
 
 sub initrel_jppimport {

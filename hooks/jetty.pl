@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+require 'set_osgi.pl';
 require 'set_fix_homedir_macro.pl';
 require 'add_missingok_config.pl';
 
@@ -21,11 +22,13 @@ Requires: jetty-orbit-maven-depmap'."\n");
     $jpp->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
     $jpp->get_section('files','')->push_body('%_initdir/%name'."\n");
 
-
     $jpp->get_section('pre','')->subst_body(qr'-(?:g|u)\s+\%jtuid','');
     $jpp->get_section('pre','')->subst_body(qr'-s\s+/sbin/nologin','-s /bin/sh');
-    $jpp->get_section('postun','')->subst_body(qr'^userdel','# userdel');
-    $jpp->get_section('postun','')->subst_body(qr'^groupdel','# groupdel');
+    my $postun=$jpp->get_section('postun','');
+    if ($postun) {
+	$postun->subst_body(qr'^userdel','# userdel');
+	$postun->subst_body(qr'^groupdel','# groupdel');
+    }
 }
 __END__
 TODO: apply

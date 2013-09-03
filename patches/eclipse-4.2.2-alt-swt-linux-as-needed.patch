@@ -1,5 +1,5 @@
---- build/eclipse-4.2.0-I20120608-1400-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2012-08-30 19:47:52.257638551 +0000
-+++ build/eclipse-4.2.0-I20120608-1400-src/plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2012-08-30 20:02:40.741137641 +0000
+--- eclipse.platform.swt/bundles/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2012-08-30 19:47:52.257638551 +0000
++++ eclipse.platform.swt/bundles/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak	2012-08-30 20:02:40.741137641 +0000
 @@ -53,7 +53,7 @@
  CDE_LIBS = -L$(CDE_HOME)/lib -R$(CDE_HOME)/lib -lXt -lX11 -lDtSvc
  

@@ -6,7 +6,8 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
 
-    # TODO: drop junit4-* provides/obsoletes
+    # drop junit4-* provides/obsoletes
+    $jpp->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
 
     $jpp->spec_apply_patch(PATCHSTRING=>q!
 --- junit.spec	2012-08-30 00:56:04.000000000 +0300
@@ -64,6 +65,32 @@ sub {
  %files manual
  %doc cpl-v10.html
 !);
+
+    $jpp->get_section('description','manual')->push_body('
+%package -n junit-junit4
+Group:          Development/Java
+Summary:        %{oldname} provider
+BuildArch: noarch
+Requires: %name = %epoch:%{version}-%{release}
+#Provides: junit = 0:%{version}
+#Provides: junit = %{epoch}:%{version}-%{release}
+#Provides: %_javadir/junit.jar
+
+%description -n junit-junit4
+Virtual junit package based on %{name}.
+
+');
+    $jpp->get_section('files','manual')->push_body('
+%files -n junit-junit4
+%_altdir/%{name}
+');
+    $jpp->get_section('install')->push_body('
+mkdir -p %buildroot%_altdir
+cat >>%buildroot%_altdir/%{name}<<EOF
+%{_javadir}/junit.jar	%{_javadir}/%{name}.jar	4100
+EOF
+');
+
 };
 
 __END__

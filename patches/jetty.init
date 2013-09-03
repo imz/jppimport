@@ -51,6 +51,9 @@ if [ -z "$JETTY_PID" ]; then
     JETTY_PID=/var/run/jetty/jetty.pid
 fi
 
+# new releases seem to use relative paths :(
+# https://bugzilla.altlinux.org/show_bug.cgi?id=28719#c3
+cd "$JETTY_HOME"
 
 prog=jetty
 RETVAL=0
