@@ -6,7 +6,8 @@ push @SPECHOOKS, sub {
     $jpp->applied_block(
 	"homedir confilct",
 	sub {
-	    map {$_->subst(qr'homedir','apphomedir')} $jpp->get_sections();
+#	    map {$_->subst(qr'homedir','apphomedir')} $jpp->get_sections();
+watn "Oops! fix_homedir_macro: I am deprecated! KILL ME APSTENU!!!\n"
 	});
 };
 

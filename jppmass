@@ -10,6 +10,7 @@ use File::Basename;
 use RPM qw/evrcmp/;
 
 use Source::Repository::Mass;
+use Source::Repository::Mass::SkipName::Listed;
 use Source::Repository::Matcher;
 use Source::Repository::Matcher::DistroMap;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
