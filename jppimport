@@ -7,17 +7,17 @@ use warnings;
 use File::Temp qw/tempfile/;
 use RPM qw/vercmp/;
 
-use RPM::Source::Transformation::RaiseReleaseFactory;
+use RPM::Source::Transformation::Factory::RaiseRelease;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
 use RPM::Source::Transformation::GenericUtility;
 our @ISA=q/RPM::Source::Transform/;
 
 
-$RPM::Source::Transformation::RaiseReleaseFactory::nextrel='jppimport';
-$RPM::Source::Transformation::RaiseReleaseFactory::defaultchangelog='- converted from JPackage by jppimport script';
+$RPM::Source::Transformation::Factory::RaiseRelease::nextrel='jppimport';
+$RPM::Source::Transformation::Factory::RaiseRelease::defaultchangelog='- converted from JPackage by jppimport script';
 $DistroMap::default_originrepo='jpackage';
 
-&RPM::Source::Transformation::RaiseReleaseFactory::register_nextrel_method(
+&RPM::Source::Transformation::Factory::RaiseRelease::register_nextrel_method(
     -name => 'jppimport',
     -nextrel_method => \&nextrel_jppimport,
     -initrel_method => \&initrel_jppimport,
@@ -30,7 +30,7 @@ push @RPM::Source::Transform::LONGOPT,
 
 # keep in util
 $RPM::Source::Transform::cleanup=0;
-$RPM::Source::Transformation::RaiseReleaseFactory::packager='auto';
+$RPM::Source::Transformation::Factory::RaiseRelease::packager='auto';
 
 my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
 $converter->transform();
