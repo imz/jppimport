@@ -62,7 +62,7 @@ Provides: java-javadoc = 1:1.7.0
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
     # Sisyphus unmet
-    $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
+    $mainsec->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
 $jpp->spec_apply_patch(PATCHSTRING=>q!
 --- java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-
@@ -75,9 +75,9 @@ $jpp->spec_apply_patch(PATCHSTRING=>q!
 -%global syslibdir       %{_prefix}/lib64
 -%global _libdir         %{_prefix}/lib
 +%global syslibdir       %{_libdir}
- %global archname        %{name}.%{_arch}
  %else
  %global syslibdir       %{_libdir}
+ %endif
 !);
 
     $mainsec=$jpp->main_section;
@@ -133,31 +133,31 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 #} $jpp->get_sections();
     
     # already 0
-    #$mainsec->subst(qr'define runtests 1','define runtests 0');
+    #$mainsec->subst_body(qr'define runtests 1','define runtests 0');
 
-    #$mainsec->subst(qr'^\%define _libdir','# define _libdir');
-    #$mainsec->subst(qr'^\%define syslibdir','# define syslibdir');
+    #$mainsec->subst_body(qr'^\%define _libdir','# define _libdir');
+    #$mainsec->subst_body(qr'^\%define syslibdir','# define syslibdir');
     $mainsec->push_body('Requires: java-common'."\n");
     $mainsec->push_body('Requires: /proc'."\n");
 
     # for M40; can(should?) be disabled on M41
-    #$mainsec->subst(qr'lesstif-devel','openmotif-devel');
-    $mainsec->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    #$mainsec->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst_body(qr'lesstif-devel','openmotif-devel');
+    $mainsec->subst_body(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst_body(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     # unrecognized option; TODO: check the list
-    #$jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    $jpp->get_section('build')->subst(qr'fedora-','ALTLinux-');
+    #$jpp->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    $jpp->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
 
     # hack for sun-based build (i586) only!!!
-    $jpp->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
+    $jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # builds end up randomly :(
-    $jpp->get_section('build')->subst(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
+    $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
-    $jpp->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
+    $jpp->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
     # just to suppress warnings on %
     $jpp->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
     $jpp->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
@@ -170,14 +170,14 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
-    #$mainsec->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
+    #$mainsec->subst_body(qr'--enable-systemtap','%{subst_enable systemtap}');
     &__subst_systemtap($mainsec);
     &__subst_systemtap($jpp->get_section('prep'));
     &__subst_systemtap($jpp->get_section('install'));
     &__subst_systemtap($jpp->get_section('files','devel'));
 
     # big changelog
-    $jpp->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
+    $jpp->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->get_section('files','')->unshift_body('%_altdir/%altname-java
@@ -311,18 +311,10 @@ Provides: java-devel = 1.5.0
 %endif
 ') if 0; # jdk 1.6 already provides
 
+    $jpp->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
     $jpp->spec_apply_patch(PATCHSTRING=> q!
---- java-1.7.0-openjdk.spec.orig	2012-04-16 23:15:27.000000000 +0300
+--- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
-@@ -435,7 +435,7 @@
- BuildRequires: fontconfig
- BuildRequires: ecj
- # Java Access Bridge for GNOME build requirements.
--BuildRequires: libat-spi-devel
-+#BuildRequires: libat-spi-devel
- BuildRequires: gawk
- BuildRequires: libbonobo-devel
- BuildRequires: xorg-x11-utils
 @@ -869,6 +869,7 @@
  popd
  %endif
@@ -339,7 +331,7 @@ Provides: java-devel = 1.5.0
  
  # Copy tz.properties
  echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
-!);
+!) if 0;
 
 };
 

@@ -28,7 +28,7 @@ $DistroMap::default_destrepo='altlinux';
 $Source::Repository::Mass::strategy='all';
 my $origintoolsdir=dirname($0);
 $Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir/jppimport";
-$Source::Repository::Mass::version_comparator=\&Source::Repository::Comparators::rpm_plus_perl_version_comparator;
+$Source::Repository::Mass::version_comparator=\&Source::Package::Comparators::rpm_plus_perl_version_comparator;
 $Source::Repository::Mass::release_comparator=\&jppimport_release_comparator;
 
 $DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.0:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/apt-java-Sisyphus/SRPMS.java:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/t7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
