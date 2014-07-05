@@ -13,6 +13,7 @@ use Source::Repository::Mass;
 use Source::Repository::Mass::SkipName::Listed;
 use Source::Repository::Matcher;
 use Source::Repository::Matcher::DistroMap;
+use RPM::Source::Convert::ALTLinuxImport;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
 use Source::Repository::Mass::Transform::PassThrough;
 # uncomment if use embedded
