@@ -11,7 +11,7 @@ sub {
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: docbook-xml docbook-dtds'."\n");
+    $jpp->get_section('package','')->unshift_body('BuildRequires: docbook-dtds'."\n");
     $jpp->get_section('package','')->unshift_body('BuildRequires: xmldb-api-sdk'."\n");
     $jpp->get_section('package','')->unshift_body('Requires: xmldb-api-sdk'."\n");
 };

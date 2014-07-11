@@ -2,7 +2,6 @@
 
 require 'set_without_extra.pl';
 require 'set_add_jspapi_dep.pl';
-require 'set_fix_homedir_macro.pl';
 
 push @SPECHOOKS, 
  sub {

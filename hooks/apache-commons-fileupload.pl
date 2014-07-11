@@ -4,6 +4,7 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
     #$jpp->add_patch('',STRIP=>1);
+    $jpp->get_section('package','')->push_body('Provides: %{short_name} = %{version}'."\n");
     #Obsoletes:        jakarta-%{short_name} < 1:1.2.1-2
     $jpp->get_section('package','')->subst_body_if(qr'1.2.1-2','1.2.2',qr'Obsoletes:');
     $jpp->get_section('package','')->push_body(q!Conflicts:	jakarta-%{short_name} < 1:%version!."\n");

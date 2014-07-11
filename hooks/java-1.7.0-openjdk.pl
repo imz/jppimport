@@ -13,8 +13,10 @@
 
 push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
-    my %type=map {$_=>1} qw/post postun/;
-    my %pkg=map {$_=>1} '', 'devel';
+    my %type=map {$_=>1} qw/post postun pretrans posttrans/;
+    # TODO: javadoc alternatives: not provided.
+    # TODO: add proper alternatives to javadoc manually (and check java-1.7.0-oracle too!)
+    my %pkg=map {$_=>1} '', 'devel', 'headless';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
     $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
@@ -63,14 +65,17 @@ Provides: java-javadoc = 1:1.7.0
 
     # Sisyphus unmet
     $mainsec->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
+    #$spec->get_section('package','headless')->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
 $jpp->spec_apply_patch(PATCHSTRING=>q!
+ # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
+ # simply be another alternative.
 --- java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-
 12 17:57:37.000000000 +0000
 +++ java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-12 17:22:40.000000000 +0000
-@@ -118,8 +118,7 @@ BuildRequires: jpackage-compat
- # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
- # simply be another alternative.
+@@ -110,8 +110,7 @@ # simply be another alternative.
+ %global LIBDIR       %{_libdir}
+ #backuped original one
  %ifarch %{multilib_arches}
 -%global syslibdir       %{_prefix}/lib64
 -%global _libdir         %{_prefix}/lib
@@ -79,14 +84,42 @@ $jpp->spec_apply_patch(PATCHSTRING=>q!
  %global syslibdir       %{_libdir}
  %endif
 !);
+$jpp->spec_apply_patch(PATCHSTRING=>q!
+# fix definitions for rpm 4.0.4
+--- java-1.7.0-openjdk.spec	2014-07-05 16:37:23.000000000 +0300
++++ java-1.7.0-openjdk.spec	2014-07-05 16:47:31.000000000 +0300
+@@ -124,6 +123,10 @@
+ %global priority        1700%{updatever}
+ %global javaver         1.7.0
+ 
++%global fullversion     %{name}-%{version}-%{release}
++
++%global uniquesuffix          %{fullversion}.%{_arch}
++
+ %global sdkdir          %{uniquesuffix}
+ %global jrelnk          jre-%{javaver}-%{origin}-%{version}-%{release}.%{_arch}
+ 
+@@ -132,9 +135,6 @@
+ %global jrebindir       %{_jvmdir}/%{jredir}/bin
+ %global jvmjardir       %{_jvmjardir}/%{uniquesuffix}
+ 
+-%global fullversion     %{name}-%{version}-%{release}
+-
+-%global uniquesuffix          %{fullversion}.%{_arch}
+ #we can copy the javadoc to not arched dir, or made it not noarch
+ %global uniquejavadocdir       %{fullversion}
+ 
+
+!);
 
     $mainsec=$jpp->main_section;
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
 
-    $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static 
+    $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libfreetype-devel
 BuildRequires(pre): browser-plugins-npapi-devel
 BuildRequires(pre): rpm-build-java
+BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
 ');
 
     $mainsec->unshift_body(q'%def_enable accessibility
@@ -140,11 +173,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $mainsec->push_body('Requires: java-common'."\n");
     $mainsec->push_body('Requires: /proc'."\n");
 
-    # for M40; can(should?) be disabled on M41
-    #$mainsec->subst_body(qr'lesstif-devel','openmotif-devel');
-    $mainsec->subst_body(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    #$mainsec->subst_body(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
-    #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     # unrecognized option; TODO: check the list
@@ -153,8 +181,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     # hack for sun-based build (i586) only!!!
     $jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
-    # builds end up randomly :(
-    $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
     $jpp->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
@@ -194,6 +220,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 %__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
 !);
 
+    # NOTE: s,sdklnk,sdkdir,g
     $jpp->get_section('install')->push_body(q!
 
 ##################################################
@@ -201,6 +228,47 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 ##################################################
 
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
+if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/jvisualvm ]; then
+  cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-jvisualvm.desktop << EOF
+[Desktop Entry]
+Name=Java VisualVM (%{name})
+Comment=Java Virtual Machine Monitoring, Troubleshooting, and Profiling Tool
+Exec=%{_jvmdir}/%{sdkdir}/bin/jvisualvm
+Icon=%{name}
+Terminal=false
+Type=Application
+Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
+EOF
+fi
+
+%if_enabled moz_plugin
+# ControlPanel freedesktop.org menu entry
+cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
+[Desktop Entry]
+Name=Java Plugin Control Panel (%{name})
+Comment=Java Control Panel
+Exec=%{_jvmdir}/%{jredir}/bin/jcontrol
+Icon=%{name}
+Terminal=false
+Type=Application
+Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
+EOF
+%endif
+
+%if_enabled javaws
+# javaws freedesktop.org menu entry
+cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
+[Desktop Entry]
+Name=Java Web Start (%{name})
+Comment=Java Application Launcher
+MimeType=application/x-java-jnlp-file;
+Exec=%{_jvmdir}/%{jredir}/bin/javaws %%u
+Icon=%{name}
+Terminal=false
+Type=Application
+Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
+EOF
+%endif
 
 # Install substitute rules for buildreq
 echo java >j2se-buildreq-substitute
@@ -211,10 +279,10 @@ install -m644 j2se-buildreq-substitute \
 install -m644 j2se-devel-buildreq-substitute \
     %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 
-%__install -d %buildroot%_altdir
+install -d %buildroot%_altdir
 
 # J2SE alternative
-%__cat <<EOF >%buildroot%_altdir/%altname-java
+cat <<EOF >%buildroot%_altdir/%name-java
 %{_bindir}/java	%{_jvmdir}/%{jredir}/bin/java	%priority
 %_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
@@ -222,14 +290,14 @@ EOF
 for i in keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
-  %__cat <<EOF >>%buildroot%_altdir/%altname-java
+  cat <<EOF >>%buildroot%_altdir/%name-java
 %_bindir/$i	%{_jvmdir}/%{jredir}/bin/$i	%{_jvmdir}/%{jredir}/bin/java
 %_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
 done
 
 # ----- JPackage compatibility alternatives ------
-%__cat <<EOF >>%buildroot%_altdir/%altname-java
+cat <<EOF >>%buildroot%_altdir/%name-java
 %{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
@@ -237,29 +305,32 @@ done
 %{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 EOF
+%if_enabled moz_plugin
+cat <<EOF >>%buildroot%_altdir/%name-java
+%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
+%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
+EOF
+%endif
 # JPackage specific: alternatives for security policy
-if [ -e %buildroot%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar ]; then
-    %__cat <<EOF >>%buildroot%_altdir/%altname-java
+cat <<EOF >>%buildroot%_altdir/%name-java
 %{_jvmdir}/%{jrelnk}/lib/security/local_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar	%{priority}
 %{_jvmdir}/%{jrelnk}/lib/security/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar
 EOF
-fi
 # ----- end: JPackage compatibility alternatives ------
 
 
 # Javac alternative
-%__cat <<EOF >%buildroot%_altdir/%altname-javac
+cat <<EOF >%buildroot%_altdir/%name-javac
 %_bindir/javac	%{_jvmdir}/%{sdkdir}/bin/javac	%priority
-%_prefix/lib/jdk	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 %_man1dir/javac.1.gz	%_man1dir/javac%{label}.1.gz	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
 
 # binaries and manuals
-for i in appletviewer extcheck idlj jar jarsigner javadoc javah javap jdb native2ascii rmic serialver apt jconsole jinfo jmap jps jsadebugd jstack jstat jstatd \
+for i in appletviewer extcheck idlj jar jarsigner javadoc javah javap jdb native2ascii rmic serialver apt jconsole jinfo jmap jmc jps jsadebugd jstack jstat jstatd \
 jhat jrunscript jvisualvm schemagen wsgen wsimport xjc
 do
   if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/$i ]; then
-  %__cat <<EOF >>%buildroot%_altdir/%altname-javac
+  cat <<EOF >>%buildroot%_altdir/%name-javac
 %_bindir/$i	%{_jvmdir}/%{sdkdir}/bin/$i	%{_jvmdir}/%{sdkdir}/bin/javac
 %_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
@@ -268,25 +339,43 @@ done
 # binaries w/o manuals
 for i in HtmlConverter
 do
-  if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/$i ]; then
-  %__cat <<EOF >>%buildroot%_altdir/%altname-javac
+  cat <<EOF >>%buildroot%_altdir/%name-javac
 %_bindir/$i	%{_jvmdir}/%{sdkdir}/bin/$i	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
-fi
 done
 
 # ----- JPackage compatibility alternatives ------
-  %__cat <<EOF >>%buildroot%_altdir/%altname-javac
-%{_jvmdir}/java	%{_jvmdir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmjardir}/java	%{_jvmjardir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmdir}/java-%{origin}	%{_jvmdir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmjardir}/java-%{origin}	%{_jvmjardir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmjardir}/java-%{javaver}	%{_jvmjardir}/%{sdklnk}	%{_jvmdir}/%{sdkdir}/bin/javac
+  cat <<EOF >>%buildroot%_altdir/%name-javac
+%{_jvmdir}/java	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+%{_jvmjardir}/java	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+%{_jvmdir}/java-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+%{_jvmjardir}/java-%{origin}	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+%{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+%{_jvmjardir}/java-%{javaver}	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
 # ----- end: JPackage compatibility alternatives ------
 
-# hack (see altbug #11383) to enshure that all man pages will be compressed
+%if_enabled moz_plugin
+# Mozilla plugin alternative
+cat <<EOF >%buildroot%_altdir/%name-mozilla
+%browser_plugins_path/libjavaplugin_oji.so	%mozilla_java_plugin_so	%priority
+EOF
+%endif	# enabled moz_plugin
+
+%if_enabled javaws
+# Java Web Start alternative
+cat <<EOF >%buildroot%_altdir/%name-javaws
+%_bindir/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
+%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{_jvmdir}/%{jredir}/bin/java
+EOF
+# ----- JPackage compatibility alternatives ------
+cat <<EOF >>%buildroot%_altdir/%name-javaws
+%{_datadir}/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
+EOF
+# ----- end: JPackage compatibility alternatives ------
+%endif	# enabled javaws
+
+# hack (see #11383) to enshure that all man pages will be compressed
 for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
     [ -f $i ] && gzip -9 $i
 done
@@ -337,6 +426,14 @@ Provides: java-devel = 1.5.0
 
 
 __END__
+    # for M40; can(should?) be disabled on M41
+    #$mainsec->subst_body(qr'lesstif-devel','openmotif-devel');
+    $mainsec->subst_body(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst_body(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
+    #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
+
+    # builds end up randomly :(
+    $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     # chrpath hack (disabled)
     if (0) {

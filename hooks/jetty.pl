@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 require 'set_osgi.pl';
-require 'set_fix_homedir_macro.pl';
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
@@ -10,10 +9,10 @@ push @SPECHOOKS, sub {
 
     if ($jpp->main_section->get_tag('Version') eq '8.1.5') {
 	# TODO drop jetty-orbit-maven-depmap when it will be deprecated
-	$jpp->get_section('package','')->unshift_body('BuildRequires: jetty-orbit-maven-depmap
-Requires: jetty-orbit-maven-depmap'."\n");
+#	$jpp->get_section('package','')->unshift_body('BuildRequires: jetty-orbit-maven-depmap
+#Requires: jetty-orbit-maven-depmap'."\n");
 	# tmp
-	$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-equinox-osgi felix-osgi-foundation xpp3-minimal maven-antrun-plugin eclipse-jdt'."\n") ;
+#	$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-equinox-osgi felix-osgi-foundation xpp3-minimal maven-antrun-plugin eclipse-jdt'."\n") ;
     }
 
     $jpp->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%{rundir}');

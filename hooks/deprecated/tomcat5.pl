@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 
-require 'set_fix_homedir_macro.pl';
 require 'windows-thumbnail-database-in-package.pl';
 require 'set_osgi.pl';
 
