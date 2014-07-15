@@ -11,10 +11,8 @@ push @SPECHOOKS, sub {
 
     # ALT Compat provides
     if (not $jpp->get_section('package','')->match_body(qr'Provides: xalan-j = ')) {
-	$jpp->get_section('install')->push_body('ln -s xalan-j2.jar $RPM_BUILD_ROOT/%{_javadir}/xalan-j.jar'."\n");
 	$jpp->get_section('package','')->push_body('Provides: xalan-j = %{name}-%{version}'."\n");
 	$jpp->get_section('package','')->push_body('Obsoletes: xalan-j <= 2.7.0-alt3'."\n");
-	$jpp->get_section('files','')->unshift_body('%{_javadir}/xalan-j.jar'."\n");
     }
 
     # jpp compat symlinks
@@ -31,11 +29,6 @@ ln -s %{name}.jar $RPM_BUILD_ROOT/%{_javadir}/xalan.jar'."\n");
 #Provides:       jaxp_transform_impl
 Source11:        xalan-j2-2.7.0-component-info.xml
 
-%def_with repolib
-%define reltag patch02
-%define repodir %{_javadir}/repository.jboss.com/apache-xalan/%{version}.%{reltag}-brew
-%define repodirlib %{repodir}/lib
-%define repodirsrc %{repodir}/src
 '."\n");
 
     $jpp->get_section('install')->push_body(q!
@@ -46,31 +39,6 @@ Source11:        xalan-j2-2.7.0-component-info.xml
 install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/jaxp_transform_impl_%{name}-xsltc<<EOF
 %{_javadir}/jaxp_transform_impl.jar	%{_javadir}/xsltc.jar	10
 EOF
-
-%if_with repolib
-install -d -m 755 $RPM_BUILD_ROOT%{repodir}
-install -d -m 755 $RPM_BUILD_ROOT%{repodirlib}
-install -p -m 644 %{SOURCE11} $RPM_BUILD_ROOT%{repodir}/component-info.xml
-sed -i 's/@VERSION@/%{version}.%{reltag}-brew/g' $RPM_BUILD_ROOT%{repodir}/component-info.xml
-tag=`echo %{name}-%{version}-%{release} | sed 's|\.|_|g'`
-sed -i "s/@TAG@/$tag/g" $RPM_BUILD_ROOT%{repodir}/component-info.xml
-install -d -m 755 $RPM_BUILD_ROOT%{repodirsrc}
-install -p -m 644 %{SOURCE0} $RPM_BUILD_ROOT%{repodirsrc}
-cp -p $RPM_BUILD_ROOT%{_javadir}/serializer.jar $RPM_BUILD_ROOT%{repodirlib}/serializer.jar
-cp -p $RPM_BUILD_ROOT%{_javadir}/xalan.jar $RPM_BUILD_ROOT%{repodirlib}/xalan.jar
-
-%package repolib
-Summary:        Artifacts to be uploaded to a repository library
-Group:          Development/Java
-
-%description repolib
-Artifacts to be uploaded to a repository library.
-This package is not meant to be installed but so its contents
-can be extracted through rpm2cpio.
-
-%files repolib
-%{_javadir}/repository.jboss.com
-%endif
 !."\n");
 
 # in fedora
