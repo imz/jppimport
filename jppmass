@@ -62,10 +62,8 @@ jetty6-core
 my @DESTSKIPEXTRA=qw/jpackage-utils/;
 my @DESTSKIPNOORIGIN=qw/
 drawswf
-je
 jed
 jikes
-xsdlib
 /;
 
 @DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);

@@ -62,10 +62,6 @@ sub new {
     my $self=$class->SUPER::new();
     if (grep {$_->[1] =~ m!/jpackage/!} @RPM::Source::Transform::INSRC) {
 	print STDERR "I: jpackage mode\n";
-	my %map_jpp=qw/
-aqute-bndlib	aqute-bnd
-/;
-	map {$RPM::Source::Convert::Plugins::DistroMap::Packages::DEP_SUBST{$_}=$map_jpp{$_}} keys (%map_jpp);
     } else {
 	print STDERR "I: fedora mode\n";
     }
