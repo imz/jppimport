@@ -1,168 +1,30 @@
 #!/usr/bin/perl -w
 
 package RPM::Source::Convert::ALTLinuxJPPImport;
+
 use strict;
 use warnings;
-
-use File::Temp qw/tempfile/;
-use RPM qw/vercmp/;
-
-use RPM::Source::Transformation::Factory::RaiseRelease;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
 use RPM::Source::Transformation::GenericUtility;
+
 our @ISA=q/RPM::Source::Transform/;
-
-
-$RPM::Source::Transformation::Factory::RaiseRelease::nextrel='jppimport';
-$RPM::Source::Transformation::Factory::RaiseRelease::defaultchangelog='- new jppimport release';
-$DistroMap::default_originrepo='jpackage';
-
-&RPM::Source::Transformation::Factory::RaiseRelease::register_nextrel_method(
-    -name => 'jppimport',
-    -nextrel_method => \&nextrel_jppimport,
-    -initrel_method => \&initrel_jppimport,
-    );
-
-# TODO: share the stem with RPM::Source::Convert::Plugins::JPackage2ALT?
-my $jvm=7;
-push @RPM::Source::Transform::LONGOPT,
-    "jvm=s" => \$jvm;
-
 # keep in util
 $RPM::Source::Transform::cleanup=0;
-$RPM::Source::Transformation::Factory::RaiseRelease::packager='auto';
 
 my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
 $converter->transform();
 
-sub usage {
-    my ($self)=@_;
-    $self->SUPER::usage();
-    print "--jvm jvm JVM required for the build. values are: 5 6 7. Default is java 6.\n";
-}
-
-sub process_options {
-    my ($self)=@_;
-    $self->SUPER::process_options();
-    $RPM::Source::Convert::Plugins::JPackage2ALT::jvm=$jvm;
-}
-
-sub verify_options {
-    my ($self)=@_;
-    $self->SUPER::verify_options();
-    if (not $jvm or ($jvm <4 or $jvm > 7)) {
-	print "ERROR: invalid jvm option $jvm\n";
-	$self->usage();
-	exit (5);
-    }
-}
-
 sub new {
     my ($class)=@_;
-    my $self=$class->SUPER::new();
-    if (grep {$_->[1] =~ m!/jpackage/!} @RPM::Source::Transform::INSRC) {
+    if (grep {$_ =~ m!/jpackage/!} @ARGV) {
+	$DistroMap::default_originrepo='jpackage';
 	print STDERR "I: jpackage mode\n";
     } else {
 	print STDERR "I: fedora mode\n";
     }
+    my $self=$class->SUPER::new();
     return $self;
 }
 
-sub initrel_jppimport {
-    my ($spec,$parent)=@_;
-    my $jpprel = $spec->get_section('package','')->get_tag('Release');
-    die "jpp release is undefined" unless defined $jpprel;
-    warn "initrel_jppimport:alt_ found! wrong tool is used? " if $jpprel=~/^alt/;
-    return 'alt'.($1+1).$2 if $jpprel=~/^alt(\d+)[^_]*(_.+jpp.*)$/;
-
-# $jppsubrel is used to keep branch of fedora or mandriva
-    my $jppsubrel='';
-# for new jpackage 5.0
-    $jpprel=~s/\%\{dist\}//;
-# for fedora-based imports (hack :()
-    if ($jpprel=~/\%\{\?dist\}/) {
-	$jpprel=~s/\%\{\?dist\}//;
-	$jpprel=~s/jpp(\.\d+)?//;
-	$jppsubrel=$1 if $1;
-    }
-    $jpprel=~s/jpp\d.\d$//;
-    $jpprel=~s/.jpp5$//;
-    $jpprel=~s/jpp//;
-  
-    my $altrel="alt1";
-    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$jvm;
-    return $newrel;
-}
-
-sub nextrel_jppimport {
-    my ($rel,$spec,$parent)=@_;
-    my $jppmain= $spec->get_section('package','');
-    my $jppver = $jppmain->get_tag('Version');
-    my $jpprel = $jppmain->get_tag('Release');
-    warn "nextrel_jppimport:alt_ found! wrong tool is used? " if $jpprel=~/^alt/;
-    die "jpp release is undefined" unless defined $jpprel;
-# $jppsubrel is used to keep branch of fedora or mandriva
-    my $jppsubrel='';
-# for new jpackage 5.0
-    $jpprel=~s/\%\{dist\}//;
-# for fedora-based imports (hack :()
-    if ($jpprel=~/\%\{\?dist\}/) {
-	$jpprel=~s/\%\{\?dist\}//;
-	$jpprel=~s/jpp(\.\d+)?//;
-	$jppsubrel=$1 if $1;
-    }
-    $jpprel=~s/jpp\d.\d$//;
-    $jpprel=~s/.jpp5$//;
-    $jpprel=~s/jpp//;
-    
-    my $altrel="alt1";
-    if ($parent) {
-	$altrel = $parent->get_section('package','')->get_tag('Release');
-	my $altver = $parent->get_section('package','')->get_tag('Version');
-	my $vercmp = `rpmvercmp $altver $jppver`;
-	chomp $vercmp;
-	if ($altrel=~/^alt([^_]+)_(.+)jpp(\d(?:\.\d)?)?$/) {
-	    my $relcore = $1;
-	    my $jppfrom = $2;
-	    my $java= $3;
-	    $java||=0;
-	    my $subrel='';
-	    $subrel=$1 if ($relcore=~s/(\.\d+)$//);
-	    # hack -- cleanup (undefined in jpp) macro in alt release:
-	    $relcore=~s/.?\%\w+//g;
-	    $relcore=~s/.?\%\{\w+\}+//g;
-	    print STDERR "new alt release: jpprel=$jpprel rel=$relcore subrel=$subrel jppfrom=$jppfrom jppsubrel=$jppsubrel $java\n" if $RPM::Source::Transform::verbose>1;
-	    if ($relcore=~/^0\./ or $vercmp != 0) {
-		print STDERR "set rel=1\n" if $RPM::Source::Transform::verbose>1;
-		$relcore=1;
-	    } elsif (($jppfrom eq $jpprel) and $subrel and $jppsubrel and $subrel < $jppsubrel) {
-		# nothing to do
-		print STDERR "nothing to do: new subrel is higher\n" if $RPM::Source::Transform::verbose>1;
-	    } elsif (not $subrel and &vercmp(0,$jpprel,0,$jppfrom) >0) {
-		# nothing to do
-		print STDERR "nothing to do: new jppfrom is higher\n" if $RPM::Source::Transform::verbose>1;
-	    } elsif (($jppfrom eq $jpprel) and not $subrel and $java and ($java < $jvm)) {
-		# nothing to do
-		print STDERR "nothing to do: new java is higher\n" if $RPM::Source::Transform::verbose>1;
-	    } else {
-		$relcore=~/^(\d+)/;
-		$relcore=$1+1;
-		print STDERR "++rel=$relcore\n" if $RPM::Source::Transform::verbose>1;
-	    }
-	    $altrel='alt'.$relcore;
-	} else {
-	    print STDERR "first alt release $altrel\n" if $RPM::Source::Transform::verbose>1;
-	    $altrel=~s/.?\%\w+//g;
-	    $altrel=~s/.?\%\{\w+\}+//g;
-	    if ($altrel=~/^alt0\./ or $vercmp != 0) {
-		$altrel='alt1';
-	    } elsif ($altrel=~/^alt(\d+)\./) {
-		$altrel='alt'.($1+1);
-	    }
-	}
-    }
-    my $newrel = $altrel.$jppsubrel."_".$jpprel.'jpp'.$jvm;
-    return $newrel;
-}
 
 __END__
