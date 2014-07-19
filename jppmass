@@ -110,6 +110,8 @@ sub jppimport_release_comparator {
     return -1 unless $origin;
     my $originrelease=$origin->release;
     my $destrelease=$dest->release;
+    # qa does not count
+    $destrelease=~s/\.qa\d+$//;
     # (?=(?:\.|$)) due to smth like Release: 7%{?dist}.1
     $originrelease=~s/\.fc\d+(\.R)?(?=(?:\.|$))//;
     $originrelease=~s/\.(?:fc|jpp)\d+$//;
