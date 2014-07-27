@@ -2,7 +2,6 @@
 
 require 'set_osgi.pl';
 require 'set_manual_no_dereference.pl';
-#require 'set_add_fc_osgi_manifest.pl';
 # not tested, just in case
 require 'set_dos2unix_scripts.pl';
 

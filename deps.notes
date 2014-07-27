@@ -8,9 +8,12 @@ export MAVEN_OPTS=-XX:MaxPermSize=512m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
 #-Dmaven.test.failure.ignore=true \
-#-Dmaven.compile.target=1.5
 #-Dmaven.javadoc.source=1.5
+# old
 #-Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5 \
+new maven-compiler-plugin
+#-Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5 -Dmaven.javadoc.source=1.5 \
+
 #http://maven.apache.org/maven-1.x/plugins/test/properties.html
 #-Dmaven.junit.jvmargs='-Xmx256m -verbose'
 # does not work :(
@@ -150,26 +153,6 @@ sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %bui
 
 -----
 
-TODO: drop fest-assembly in favor of fest-common,
-
-
-
-TODO:!!! maven-one-plugin see apache-commons-jcs
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-one-plugin:1.2:convert (default-cli) on project jcs: Execution default-cli of goal org.apache.maven.plugins:maven-one-plugin:1.2:convert failed: Unable to load the mojo 'convert' (or one of its required components) from the plugin 'org.apache.maven.plugins:maven-one-plugin:1.2': com.google.inject.ProvisionException: Guice provision errors:
-[ERROR]
-[ERROR] 1) No implementation for org.apache.maven.model.converter.Maven1Converter was bound.
-[ERROR] while locating org.apache.maven.plugins.mavenone.PomV3ConvertMojo
-[ERROR] at ClassRealm[plugin>org.apache.maven.plugins:maven-one-plugin:latest, parent: sun.misc.Launcher$AppClassLoader@34780af5]
-[ERROR] while locating org.apache.maven.plugin.Mojo annotated with @com.google.inject.name.Named(value=org.apache.maven.plugins:maven-one-plugin:1.2:convert)
-[ERROR]
-[ERROR] 1 error
-[ERROR] role: org.apache.maven.plugin.Mojo
-[ERROR] roleHint: org.apache.maven.plugins:maven-one-plugin:1.2:convert
-[ERROR] -> [Help 1]
-at that 
-maven-shared-model-converter-2.3-alt9_23jpp7.noarch|/usr/share/java/maven-shared/model-converter.jar|org/apache/maven/model/converter/Maven1Converter.class
-maybe plexus descriptor is missing...
 
 DONE: jacoco-> No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle ...
 ThxGoodness, fixed with -Dtycho.targetPlatform=%_libdir/eclipse
@@ -184,5 +167,9 @@ eclipse-linuxtools -> eclipse-swtbot -> log4j osgi
 tycho:
 -Dtycho.targetPlatform=/usr/lib64/eclipse
 
-TODO: jtidy (jpp6) has cleaned pom (coooented garbage like xerces:dom3-xml-api) out.
+TODO: jtidy (jpp6) has cleaned pom (commented garbage like xerces:dom3-xml-api) out.
 either add those depmaps to xml-commons-apis or clean up jtidy pom too.
+
+killed exact version 3.0 in
+/usr/share/maven-poms/JPP.maven-shared-dependency-analyzer.pom 
+and it helped to build tycho!!!
