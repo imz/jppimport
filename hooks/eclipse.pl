@@ -14,7 +14,7 @@ sub {
     my ($jpp, $parent) = @_;
 
     # bootstrap
-    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-pack'."\n");
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-pack'."\n");
 
     # 4.2.0-alt1_7jpp7. Do we need it?
     #&add_missingok_config($jpp, '/etc/eclipse.ini','swt');
