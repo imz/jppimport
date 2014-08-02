@@ -49,6 +49,19 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 find maven2-brew \! -path '*/org/jboss/security/*' -type f -print -delete ||:
 find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 
+%if 0%{?rhel}
+export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
+mkdir -p $MAVEN_REPO_LOCAL
+
+mvn-jpp \
+    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+%else
+mvn-rpmbuild \
+%endif
+    package
+
+
+
 # http://comments.gmane.org/gmane.comp.finance.mifos.devel/8362
 # Failed to retrieve numeric file attributes using: '/bin/sh -c ls -1nlaR /'
 # I should have not specified <directory>/<directory> in the descriptor.
