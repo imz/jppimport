@@ -61,6 +61,12 @@ mvn-rpmbuild \
     package
 
 
+# Maven 2 -> Maven 3
+%pom_remove_dep :maven-project
+%pom_add_dep org.apache.maven:maven-core
+%pom_add_dep org.apache.maven:maven-compat
+%pom_xpath_set "pom:dependency[pom:groupId[text()='org.apache.maven']]/pom:version" 3.0.4
+
 
 # http://comments.gmane.org/gmane.comp.finance.mifos.devel/8362
 # Failed to retrieve numeric file attributes using: '/bin/sh -c ls -1nlaR /'

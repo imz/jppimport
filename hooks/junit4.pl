@@ -71,8 +71,8 @@ Group:          Development/Java
 Summary:        %{oldname} provider
 BuildArch: noarch
 Requires: %name = %epoch:%{version}-%{release}
-#Provides: junit = 0:%{version}
-#Provides: junit = %{epoch}:%{version}-%{release}
+Provides: junit = 0:%{version}
+Provides: junit = %{epoch}:%{version}-%{release}
 #Provides: %_javadir/junit.jar
 
 %description -n junit-junit4
