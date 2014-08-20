@@ -161,7 +161,9 @@ print SPEC q!
 %changelog
 !;
 if ($alt) {
-    print SPEC @{$alt->get_section('changelog')->get_bodyref()};
+    my @changelog_alt=@{$alt->get_section('changelog')->get_bodyref()};
+    shift @changelog_alt; # %changelog header
+    print SPEC @changelog_alt;
 }
 
 system ('add_changelog', '-e',$changelog,$specfile);

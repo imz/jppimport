@@ -144,24 +144,7 @@ an example for null assembly id (cargo0)
 maven3: maven-plugin-descriptor from maven22
 maven3: mvn-jpp: TODO: drop -s settings.xml, see jung2.pl hook - useless and dangerous.
 
-TODO: drop fake osgi provides for oscar due to
-       x86_64: NEW unmet dependencies detected:
-eclipse-mylyn-tasks-bugzilla#3.6.4-alt1_2jpp6   osgi(org.apache.xmlrpc)
-
-DONE:aspectj group. aspectj -> org.aspectj
-# alt; aspectj 1.5.4
-sed -i 's,<groupId>aspectj</groupId>,<groupId>org.aspectj</groupId>,' 
-
-TODO: compare and check maven-archetype2 and maven-release plexus components in jpp and alt.
-
 TODO: %{_libdir}/*: generic fix (at least, exclude debug)
-TODO: throw away velocity15 (safe to use velocity14)
-TODO: velocity14 has velocity:velocity in jpp
-but our velocity14 has apache..velocity:velocity.
-try to add compat; try to rebuild plexus-velocity and check
-what velocity it requires in pom
-
-TODO: jtidy: jpp5ver=8 jpp6ver=7 fc15ver=1.0; but fedora is fresher!
 
 
       
@@ -186,9 +169,10 @@ eclipse-linuxtools -> eclipse-swtbot -> log4j osgi
 tycho:
 -Dtycho.targetPlatform=/usr/lib64/eclipse
 
-TODO: jtidy (jpp6) has cleaned pom (commented garbage like xerces:dom3-xml-api) out.
-either add those depmaps to xml-commons-apis or clean up jtidy pom too.
+DONE: jtidy has cleaned pom (commented garbage like xerces:dom3-xml-api) out.
 
 killed exact version 3.0 in
 /usr/share/maven-poms/JPP.maven-shared-dependency-analyzer.pom 
 and it helped to build tycho!!!
+
+todo: jline2 2.10 will break gshell/gmaven. use compat gline25?
