@@ -26,7 +26,7 @@ our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
 $DistroMap::default_originrepo='jpackage';
 $DistroMap::default_destrepo='altlinux';
 
-$Source::Repository::Mass::strategy='all';
+$Source::Repository::Mass::strategy='notolder';
 my $origintoolsdir=dirname($0);
 $Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir/jppimport";
 $Source::Repository::Mass::version_comparator=\&Source::Package::Comparators::rpm_plus_perl_version_comparator;
@@ -71,13 +71,7 @@ jikes
 my ($jvm,$target);
 
 my $verbose=0;
-my $convert=RPM::Source::Convert::JPPMass->new(
-'-cliargs' => [
-	"jpp=s" => \$ORIGINPATH,
-	"alt=s"   => \$DESTPATH,
-	"target=s"=> \$target,
-],
-);
+my $convert=RPM::Source::Convert::JPPMass->new();
 
 $convert->process();
 
@@ -90,6 +84,16 @@ sub new {
     }
     return $self;
 }
+
+sub get_longopt {
+    my $class = shift;
+    return $class->SUPER::get_longopt(@_),
+	"jpp=s" => \$ORIGINPATH,
+	"alt=s"   => \$DESTPATH,
+	"target=s"=> \$target
+    ;
+}
+
 
 # NOTE: PassThrough specific!!!
 sub process_pair_hook {
