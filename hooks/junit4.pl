@@ -73,6 +73,9 @@ BuildArch: noarch
 Requires: %name = %epoch:%{version}-%{release}
 Provides: junit = 0:%{version}
 Provides: junit = %{epoch}:%{version}-%{release}
+Conflicts: junit < 1:3.8.2-alt8
+Obsoletes: junit < 1:3.8.2-alt8
+
 #Provides: %_javadir/junit.jar
 
 %description -n junit-junit4

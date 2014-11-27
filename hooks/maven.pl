@@ -14,7 +14,7 @@ sub {
     # for /etc/mavenrc
     #%add_findreq_skiplist /usr/share/maven/bin/*
 
-    $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+yum-utils\s*$');
+#    $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+yum-utils\s*$');
 
     $jpp->add_section('pre','')->push_body(q'# https://bugzilla.altlinux.org/show_bug.cgi?id=27807 (upgrade from maven1)
 [ -d %_datadir/maven/repository/JPP ] && rm -rf %_datadir/maven/repository/JPP ||:'."\n");
@@ -31,6 +31,11 @@ BuildArch: noarch
     $jpp->get_section('install')->push_body(q!# maven-filesystem
 rm -f %buildroot%_datadir/%{name}/repository-jni/JPP!."\n");
 
+};
+
+
+__END__
+    $jpp->get_section('posttrans','')->exclude_body(qr'^ln -sf `rpm .*/repository-jni/JPP');
     # maven-filesystem obsoletes 'ugly as hell' hack
     $jpp->get_section('preun','')->multi_exclude_body(
 qr'^\s*if',
@@ -39,11 +44,6 @@ qr'^\s*rm\s.*/repository-jni/JPP',
 qr'^\s*fi',
 qr'^\s*fi',
 );
-    $jpp->get_section('posttrans','')->exclude_body(qr'^ln -sf `rpm .*/repository-jni/JPP');
-};
-
-
-__END__
     # we are not ready for it yet - todo enable with a-c-p upgrade
 #    $jpp->get_section('package','')->exclude_body(qr'^Requires:\s+apache-commons-parent\s*$');
 

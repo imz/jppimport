@@ -99,6 +99,8 @@ PROVIDENAME
 REQUIRENAME
 / {
     my @tagval=$jpp->multiquery($tag);
+    @tagval=grep {$_!~/^.+\(/ or /^mvn\(/} @tagval;
+    #print STDERR "DEBUG: $tag: ",join(' ',@tagval),"\n";
     my $tagname=ucfirst(lc($tag));
     $tagname=~s/name/s/;
     foreach my $val (@tagval) {
@@ -187,7 +189,7 @@ sub eval {
 
 }
 
-sub query {
+sub query{
     my $self=shift;
     my $tag=shift;
     my $query=`rpmquery -p --queryformat '\%{$tag}' $self->{RPM}`;
@@ -198,7 +200,7 @@ sub query {
 sub multiquery {
     my $self=shift;
     my $tag=shift;
-    return grep {$_ and $_!~/^.+\(/} split (/\s+/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
+    return grep {$_} split (/\s+/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
 }
 
 

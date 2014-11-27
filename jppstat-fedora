@@ -1,6 +1,8 @@
 #!/bin/sh
 
 PREFIX=/var/ftp/pub/Linux/fedora/linux/development/rawhide/
+PREFIX=/var/ftp/pub/Linux/fedora/linux/releases/19/Everything/
+
 NAME=java-fc-packages
 DEST=`pwd`
 

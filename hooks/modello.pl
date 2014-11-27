@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'add_missingok_config.pl';
+require 'set_skip_usr_bin_run.pl';
 
 push @SPECHOOKS, 
 sub {

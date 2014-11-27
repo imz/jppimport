@@ -176,3 +176,6 @@ killed exact version 3.0 in
 and it helped to build tycho!!!
 
 todo: jline2 2.10 will break gshell/gmaven. use compat gline25?
+TODO: xml-commons-resolver: xml-resolver jar symlink! 
+see glassfish-jaxb -- requires xml-resolver, not xml-commons-resolver
+jnidir: example jinput, see xmvn code
