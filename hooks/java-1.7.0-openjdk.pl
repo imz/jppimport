@@ -116,8 +116,8 @@ $jpp->spec_apply_patch(PATCHSTRING=>q!
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
-BuildRequires: libXext-devel libXrender-devel libfreetype-devel
-BuildRequires(pre): browser-plugins-npapi-devel
+BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
+BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-build-java
 BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
 ');
@@ -156,6 +156,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 %endif
 ');
 
+    # TODO drop
     # parasyte -Werror breaks build on x86_64
     $jpp->add_patch('java-1.7.0-openjdk-alt-no-Werror.patch',STRIP=>1);
 
@@ -353,6 +354,9 @@ done
 %{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 %{_jvmjardir}/java-%{javaver}	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 EOF
+##### TODO --- 
+#%{_jvmdir}/java-%{javaver}-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
+
 # ----- end: JPackage compatibility alternatives ------
 
 %if_enabled moz_plugin
