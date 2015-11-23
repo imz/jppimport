@@ -1,0 +1,53 @@
+
+# HG changeset patch
+# User mgerdin
+# Date 1403781618 -7200
+# Node ID 5d0a13adec23e58cf912dee0e9e1163e743d78e2
+# Parent  d40349452eba36c05039ead83de95075c2471731
+8048214: Linker error when compiling G1SATBCardTableModRefBS after include order changes
+Reviewed-by: stefank, brutisso, tschatzl
+
+diff -r d40349452eba -r 5d0a13adec23 src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.cpp
+--- openjdk/hotspot/src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.cpp	Wed Apr 29 12:23:48 2015 -0700
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.cpp	Thu Jun 26 13:20:18 2014 +0200
+@@ -76,6 +76,17 @@
+   }
+ }
+ 
++void G1SATBCardTableModRefBS::write_ref_array_pre(oop* dst, int count, bool dest_uninitialized) {
++  if (!dest_uninitialized) {
++    write_ref_array_pre_work(dst, count);
++  }
++}
++void G1SATBCardTableModRefBS::write_ref_array_pre(narrowOop* dst, int count, bool dest_uninitialized) {
++  if (!dest_uninitialized) {
++    write_ref_array_pre_work(dst, count);
++  }
++}
++
+ bool G1SATBCardTableModRefBS::mark_card_deferred(size_t card_index) {
+   jbyte val = _byte_map[card_index];
+   // It's already processed
+diff -r d40349452eba -r 5d0a13adec23 src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.hpp
+--- openjdk/hotspot/src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.hpp	Wed Apr 29 12:23:48 2015 -0700
++++ openjdk/hotspot/src/share/vm/gc_implementation/g1/g1SATBCardTableModRefBS.hpp	Thu Jun 26 13:20:18 2014 +0200
+@@ -85,16 +85,8 @@
+   }
+ 
+   template <class T> void write_ref_array_pre_work(T* dst, int count);
+-  virtual void write_ref_array_pre(oop* dst, int count, bool dest_uninitialized) {
+-    if (!dest_uninitialized) {
+-      write_ref_array_pre_work(dst, count);
+-    }
+-  }
+-  virtual void write_ref_array_pre(narrowOop* dst, int count, bool dest_uninitialized) {
+-    if (!dest_uninitialized) {
+-      write_ref_array_pre_work(dst, count);
+-    }
+-  }
++  virtual void write_ref_array_pre(oop* dst, int count, bool dest_uninitialized);
++  virtual void write_ref_array_pre(narrowOop* dst, int count, bool dest_uninitialized);
+ 
+ /*
+    Claimed and deferred bits are used together in G1 during the evacuation
+

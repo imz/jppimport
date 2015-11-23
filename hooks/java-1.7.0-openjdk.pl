@@ -16,7 +16,7 @@ push @PREHOOKS, sub {
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
     # TODO: javadoc alternatives: not provided.
     # TODO: add proper alternatives to javadoc manually (and check java-1.7.0-oracle too!)
-    my %pkg=map {$_=>1} '', 'devel', 'headless';
+    my %pkg=map {$_=>1} '', 'devel', 'headless', 'javadoc';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
     $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
@@ -55,6 +55,9 @@ push @SPECHOOKS, sub {
 Provides: java-javadoc = 1:1.7.0
 ');
 
+    # or BR: gcc4.9-c++ + %set_gcc_version 4.9
+    $jpp->add_patch(q!java-1.7.0-openjdk-gcc-cxx-5-5d0a13adec23.patch!, STRIP=>0);
+
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
     $jpp->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
@@ -62,10 +65,6 @@ Provides: java-javadoc = 1:1.7.0
     # i586 build is not included :(
     #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
-
-    # Sisyphus unmet
-    $mainsec->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
-    #$spec->get_section('package','headless')->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
 $jpp->spec_apply_patch(PATCHSTRING=>q!
  # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
@@ -178,7 +177,10 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    # DISTRO_PACKAGE_VERSION="fedora-...
     $jpp->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
+    # DISTRO_NAME="Fedora"
+    $jpp->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
 
     # hack for sun-based build (i586) only!!!
     $jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
@@ -384,17 +386,50 @@ for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
     [ -f $i ] && gzip -9 $i
 done
 
-%post
-%force_update_alternatives
-
 ##################################################
 # - END alt linux specific, shared with openjdk -#
 ##################################################
 
 
 !);
+    $jpp->get_section('install')->push_body(q!
+##### javadoc Alt specific #####
+echo java-javadoc >java-javadoc-buildreq-substitute
+mkdir -p %buildroot%_sysconfdir/buildreqs/packages/substitute.d
+install -m644 java-javadoc-buildreq-substitute \
+    %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
+install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/%altname-javadoc<<EOF
+%{_javadocdir}/java	%{_javadocdir}/%{uniquejavadocdir}/api	%{priority}
+### end javadoc Alt specific ###
+EOF
+!);
+    $jpp->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
+%_sysconfdir/buildreqs/packages/substitute.d/%name
+');
 
-    $jpp->_reset_speclist();
+    #$jpp->_reset_speclist();
+
+    $jpp->add_section('post','headless')->push_body(q!
+%force_update_alternatives
+
+%ifarch %{jit_arches}
+#see https://bugzilla.redhat.com/show_bug.cgi?id=513605
+%{jrebindir}/java -Xshare:dump >/dev/null 2>/dev/null
+%endif
+!);
+
+    #### Misterious bug:
+    # java -version work with JAVA_HOME=/usr/lib/jvm/java-1.7.0
+    # but does not work with JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk
+    # both are alternatives, former one works, but later one somehow is broken :(
+    $jpp->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
+
+
+# their 
+#error: File not found: /usr/src/tmp/java-1.7.0-openjdk-buildroot/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/server/classes.jsa
+#error: File not found: /usr/src/tmp/java-1.7.0-openjdk-buildroot/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/client/classes.jsa
+#%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/classes.jsa
+#%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/client/classes.jsa
 
     #ppc support
     $jpp->get_section('package','devel')->push_body('
@@ -430,12 +465,6 @@ Provides: java-devel = 1.5.0
 
 
 __END__
-    # for M40; can(should?) be disabled on M41
-    #$mainsec->subst_body(qr'lesstif-devel','openmotif-devel');
-    $mainsec->subst_body(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    #$mainsec->subst_body(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
-    #$jpp->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
-
     # builds end up randomly :(
     $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
