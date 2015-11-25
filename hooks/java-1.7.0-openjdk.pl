@@ -43,6 +43,7 @@ sub __subst_systemtap {
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
+    my $spec=$jpp;
     my $mainsec=$jpp->main_section;
 
     # jpp7
@@ -132,6 +133,15 @@ BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
 %define label -%{name}
 %define javaws_ver      %{javaver}
 
+%def_with gcc49
+%if_with gcc49
+%set_gcc_version 4.9
+BuildRequires: gcc4.9-c++
+%endif
+# gcc5? links in a strange way that generates additional requires :(
+# findprov below did not help at all :(
+%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall
+%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/jli
 # it is needed for those apps which links with libjvm.so
 %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/server
 %ifnarch x86_64
@@ -170,10 +180,12 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     #$mainsec->subst_body(qr'^\%define _libdir','# define _libdir');
     #$mainsec->subst_body(qr'^\%define syslibdir','# define syslibdir');
-    $mainsec->push_body('Requires: java-common'."\n");
-    $mainsec->push_body('Requires: /proc'."\n");
 
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
+
+    my $headlsec=$spec->get_section('package','headless');
+    $headlsec->push_body('Requires: java-common'."\n");
+    $headlsec->push_body('Requires: /proc'."\n");
 
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
@@ -222,6 +234,27 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
 %__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
 !);
+
+    $jpp->get_section('install')->push_body(q!
+##### javadoc Alt specific #####
+echo java-javadoc >java-javadoc-buildreq-substitute
+mkdir -p %buildroot%_sysconfdir/buildreqs/packages/substitute.d
+install -m644 java-javadoc-buildreq-substitute \
+    %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
+install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/%altname-javadoc<<EOF
+%{_javadocdir}/java	%{_javadocdir}/%{uniquejavadocdir}/api	%{priority}
+EOF
+!);
+    $jpp->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
+%_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
+');
+
+    $jpp->get_section('install')->push_body(q!# move soundfont to java
+grep /audio/default.sf2 java-1.7.0-openjdk.files-headless >> java-1.7.0-openjdk.files
+grep -v /audio/default.sf2 java-1.7.0-openjdk.files-headless > java-1.7.0-openjdk.files-headless-new
+mv java-1.7.0-openjdk.files-headless-new java-1.7.0-openjdk.files-headless
+!."\n");
+    $jpp->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
 
     # NOTE: s,sdklnk,sdkdir,g
     $jpp->get_section('install')->push_body(q!
@@ -391,30 +424,18 @@ done
 ##################################################
 
 
+echo "install passed past alt linux specific."
 !);
-    $jpp->get_section('install')->push_body(q!
-##### javadoc Alt specific #####
-echo java-javadoc >java-javadoc-buildreq-substitute
-mkdir -p %buildroot%_sysconfdir/buildreqs/packages/substitute.d
-install -m644 java-javadoc-buildreq-substitute \
-    %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
-install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/%altname-javadoc<<EOF
-%{_javadocdir}/java	%{_javadocdir}/%{uniquejavadocdir}/api	%{priority}
-### end javadoc Alt specific ###
-EOF
-!);
-    $jpp->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
-%_sysconfdir/buildreqs/packages/substitute.d/%name
-');
 
     #$jpp->_reset_speclist();
 
-    $jpp->add_section('post','headless')->push_body(q!
+    $jpp->add_section('post','headless')->push_body(q!# java should be available ASAP
 %force_update_alternatives
 
 %ifarch %{jit_arches}
 #see https://bugzilla.redhat.com/show_bug.cgi?id=513605
-%{jrebindir}/java -Xshare:dump >/dev/null 2>/dev/null
+java=%{jrebindir}/java
+$java -Xshare:dump >/dev/null 2>/dev/null
 %endif
 !);
 
@@ -424,12 +445,12 @@ EOF
     # both are alternatives, former one works, but later one somehow is broken :(
     $jpp->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
 
-
-# their 
-#error: File not found: /usr/src/tmp/java-1.7.0-openjdk-buildroot/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/server/classes.jsa
-#error: File not found: /usr/src/tmp/java-1.7.0-openjdk-buildroot/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/client/classes.jsa
+#error: writeable files in /usr: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/server/classes.jsa
+#error: writeable files in /usr: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/client/classes.jsa
 #%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/classes.jsa
 #%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/client/classes.jsa
+    $jpp->get_section('files','headless')->subst_body_if(qr/664,/,'644,',qr!classes.jsa!);
+
 
     #ppc support
     $jpp->get_section('package','devel')->push_body('
