@@ -69,13 +69,13 @@ sub package {
 
     open SPEC, '>', $specfile;
 
-    foreach my $tag qw/
+    foreach my $tag (qw/
 NAME
 VERSION
 SUMMARY
 LICENSE
 URL
-/ {
+/) {
     my $tagval=$jpp->query($tag);
     &print_tag(\*SPEC, $tag,$tagval);
 }
@@ -94,10 +94,23 @@ URL
 
     my $pkgname=$jpp->query('NAME');
 
-    foreach my $tag qw/
-PROVIDENAME
+    foreach my $triplet (
+[qw/PROVIDENAME PROVIDEFLAGS PROVIDEVERSION/]
+	) {
+	my @tagval=$jpp->triquery(@$triplet);
+	@tagval=grep {$_!~/^.+\(/ or /^mvn\(/} @tagval;
+	my $tag=$triplet->[0];
+	#print STDERR "DEBUG: $triplet->[0]: ",join(' ',@tagval),"\n";
+	my $tagname=ucfirst(lc($tag));
+	$tagname=~s/name/s/;
+	foreach my $val (@tagval) {
+	    print SPEC $tagname.": ".$val."\n" if $val ne $pkgname and not $skip{$tag}->{$val};
+	}
+    }
+
+    foreach my $tag (qw/
 REQUIRENAME
-/ {
+/) {
     my @tagval=$jpp->multiquery($tag);
     @tagval=grep {$_!~/^.+\(/ or /^mvn\(/} @tagval;
     #print STDERR "DEBUG: $tag: ",join(' ',@tagval),"\n";
@@ -107,6 +120,7 @@ REQUIRENAME
 	print SPEC $tagname.": ".$val."\n" if $val ne $pkgname and not $skip{$tag}->{$val};
     }
 }
+
 
     $release='alt'.$release unless $release=~/^alt/;
     $release=$release.'jpp' unless $release=~/jpp/;
@@ -120,8 +134,8 @@ Source: '.$trippletname.".cpio\n\n";
     print SPEC 'Requires: '.join(' ',@addrequires)."\n" if @addrequires;
     print SPEC 'Obsoletes: '.join(' ',@addobsoletes)."\n" if @addobsoletes;
 
-    foreach my $tag qw/DESCRIPTION
-/ {
+    foreach my $tag (qw/DESCRIPTION
+/) {
     my $query = $jpp->query($tag);
     print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
 }
@@ -142,12 +156,15 @@ for i in usr var etc; do
 done
 !;
 
-foreach my $sec qw/
+#PRETRANS
+#POSTTRANS
+
+foreach my $sec (qw/
 PREIN
 PREUN
 POSTIN
 POSTUN
-/ {
+/) {
     my $secname=lc($sec);
     $secname=~s/in$//;
     my $val=$jpp->query($sec);
@@ -203,6 +220,34 @@ sub multiquery {
     return grep {$_} split (/\s+/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
 }
 
+sub triquery {
+    my ($self,$tag1,$tag2,$tag3)=@_;
+    my @triplets=grep {$_} split (/\n/, `rpmquery -p --queryformat '[\%{$tag1} %{$tag2} %{$tag3}\n]' $self->{RPM}`);
+    my @out;
+    foreach my $triplet (@triplets) {
+	my @triple=split (/\s+/, $triplet);
+	my $rel=&__rpmflag_to_string($triple[1]);
+	if ($rel) {
+	    push @out, $triple[0].' '.$rel.' '.$triple[2];
+	} else {
+	    push @out, $triple[0];
+	}
+    }
+    return @out;
+}
+
+sub __rpmflag_to_string {
+    my $flag=shift;
+    $flag||=0;
+    $flag &= 0xf;
+    return '' if $flag == 0;
+    return '<' if $flag == 2;
+    return '>' if $flag == 4;
+    return '=' if $flag == 8;
+    return '<=' if $flag == 10;
+    return '>=' if $flag == 12;
+    return '';
+}
 
 __END__
 SERIAL
