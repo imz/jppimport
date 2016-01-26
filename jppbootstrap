@@ -41,7 +41,10 @@ my %skip;
 $skip{PROVIDENAME}={map {$_=>1} split(',',join(',',@skipprovides))};
 $skip{REQUIRENAME}={map {$_=>1} split(',',join(',',@skiprequires))};
 
-map {&package($_)} @ARGV;
+foreach (@ARGV) {
+    die "Oops: $_ not found" unless -e $_;
+    &package($_);
+}
 
 sub print_tag {
     my ($fn,$tag,$tagval)=@_;
