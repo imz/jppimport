@@ -1,0 +1,62 @@
+diff --git a/python/javapackages/cache/cache.py b/python/javapackages/cache/cache.py
+index 1aacd26..c5e943e 100644
+--- a/python/javapackages/cache/cache.py
++++ b/python/javapackages/cache/cache.py
+@@ -70,11 +70,6 @@ class Cache(object):
+             cachefile = open(cachepath, 'rb')
+             cached_pid, cache = pickle.load(cachefile)
+             cachefile.close()
+-            # check if the cache was most likely created during current build
+-            if cached_pid != self._rpm_pid:
+-                logging.warning("Cache in {path} is outdated, skipping"
+-                                .format(path=cachepath))
+-                return None
+         except IOError:
+             return None
+         return cache
+diff --git a/python/javapackages/common/util.py b/python/javapackages/common/util.py
+index d9b349a..1903bc0 100644
+--- a/python/javapackages/common/util.py
++++ b/python/javapackages/common/util.py
+@@ -51,12 +51,6 @@ def kill_parent_process(rpmconf):
+     # flush any pending output before trying to kill parent.
+     sys.stdout.flush()
+     sys.stderr.flush()
+-    # rpmbuild ignores non-zero exit codes, but this is bad. Make sure
+-    # the build fails and doesn't silently ignore problems
+-    try:
+-        os.kill(rpmconf.rpm_pid, signal.SIGTERM)
+-    except OSError:
+-        pass
+     sys.exit(1)
+ 
+ 
+@@ -88,8 +82,7 @@ def init_rpmgen(argv):
+ 
+ def _parse_argv(argv):
+     parser = OptionParser()
+-    parser.add_option("--cachedir", dest="cachedir")
+-    parser.add_option("--rpm-pid", dest="rpm_pid")
++    parser.add_option("--cachedir", dest="cachedir", default=None)
+     parser.add_option("--scl", dest="scl", default=None)
+ 
+     return parser.parse_args()
+@@ -97,13 +90,16 @@ def _parse_argv(argv):
+ 
+ def _parse_rpmgen_args(argv):
+     options = _parse_argv(argv)[0]
++    if not options.cachedir:
++        options.cachedir=os.getenv('RPM_JAVAPACKAGES_CACHEDIR')
++    if not options.scl:
++        options.scl=os.getenv('RPM_JAVAPACKAGES_SCL')
+ 
+     if not options.cachedir:
+         raise JavaPackagesToolsException("Missing option: --cachedir")
+     options.cachedir = _get_cachedir(options.cachedir)
+ 
+-    if not options.rpm_pid:
+-        raise JavaPackagesToolsException("Missing option: --rpm-pid")
++    options.rpm_pid=os.getpid()
+     options.rpm_pid = int(options.rpm_pid)
+ 
+     return options

@@ -1,0 +1,132 @@
+diff --git a/macros.d/macros.fjava b/macros.d/macros.fjava
+index 75969b1..acd7720 100644
+--- a/macros.d/macros.fjava
++++ b/macros.d/macros.fjava
+@@ -254,8 +254,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_remove_dep(rf)     %{expand: %{__pom_call}remove_dep %**
+-}
++%pom_remove_dep(rf)     %{expand: %{__pom_call}remove_dep %**}
+ 
+ 
+ # %pom_remove_plugin - remove Maven plugin invocation from POM file
+@@ -273,8 +272,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_remove_plugin(rf)  %{expand: %{__pom_call}remove_plugin  %**
+-}
++%pom_remove_plugin(rf)  %{expand: %{__pom_call}remove_plugin  %**}
+ 
+ 
+ # %pom_disable_module - disable given project module in POM file
+@@ -291,8 +289,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_disable_module() %{expand: %{__pom_call}disable_module %*
+-}
++%pom_disable_module() %{expand: %{__pom_call}disable_module %*}
+ 
+ 
+ # %pom_xpath_remove - remove an XML node from POM file
+@@ -316,11 +313,9 @@ sort -u -o ${_filelist} ${_filelist} \
+ # because it selects nodes from pom namespace, but "environment/os" won't find
+ # anything because it looks for nodes that don't belong to any XML namespace.
+ #
+-%pom_xpath_remove(rf)   %{expand: %{__pom_call}xpath_remove   %**
+-}
++%pom_xpath_remove(rf)   %{expand: %{__pom_call}xpath_remove   %**}
+ 
+-%pom_xpath_disable()   %{expand: %{__pom_call}xpath_disable   %**
+-}
++%pom_xpath_disable()   %{expand: %{__pom_call}xpath_disable   %**}
+ 
+ # %pom_xpath_inject - inject XML code into POM file
+ #
+@@ -337,8 +332,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_xpath_inject()   %{expand: %{__pom_call}xpath_inject   %*
+-}
++%pom_xpath_inject()   %{expand: %{__pom_call}xpath_inject   %*}
+ 
+ 
+ # %pom_xpath_replace - replace XML node from POM file with given XML code
+@@ -356,8 +350,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_xpath_replace(rf)  %{expand: %{__pom_call}xpath_replace  %**
+-}
++%pom_xpath_replace(rf)  %{expand: %{__pom_call}xpath_replace  %**}
+ 
+ 
+ # %pom_xpath_set - set text contents of XML node from POM file
+@@ -375,8 +368,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_xpath_set(rf)      %{expand: %{__pom_call}xpath_set      %**
+-}
++%pom_xpath_set(rf)      %{expand: %{__pom_call}xpath_set      %**}
+ 
+ 
+ # %pom_add_parent - add parent POM reference to POM file
+@@ -394,8 +386,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_add_parent()     %{expand: %{__pom_call}add_parent     %*
+-}
++%pom_add_parent()     %{expand: %{__pom_call}add_parent     %*}
+ 
+ 
+ # %pom_remove_parent - remove parent POM reference from POM file
+@@ -408,8 +399,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # directory containing pom.xml. If POM location is not given then pom.xml from
+ # current working directory is used.
+ #
+-%pom_remove_parent()  %{expand: %{__pom_call}remove_parent  %*
+-}
++%pom_remove_parent()  %{expand: %{__pom_call}remove_parent  %*}
+ 
+ 
+ # %pom_set_parent - set parent POM reference in POM file
+@@ -424,8 +414,7 @@ sort -u -o ${_filelist} ${_filelist} \
+ # invocation of %pom_add_parent. See documentation for these macros for more
+ # information about parameters.
+ #
+-%pom_set_parent()     %{expand: %{__pom_call}set_parent     %*
+-}
++%pom_set_parent()     %{expand: %{__pom_call}set_parent     %*}
+ 
+ 
+ # %pom_add_dep[_mgmt] - add dependency to POM file
+@@ -452,10 +441,8 @@ sort -u -o ${_filelist} ${_filelist} \
+ # Extra XML is additional XML code to be added into the <dependency> node. This
+ # parameter can be ommited, in which case no extra XML is appended.
+ #
+-%pom_add_dep()        %{expand: %{__pom_call}add_dep        %*
+-}
+-%pom_add_dep_mgmt()   %{expand: %{__pom_call}add_dep_mgmt   %*
+-}
++%pom_add_dep()        %{expand: %{__pom_call}add_dep        %*}
++%pom_add_dep_mgmt()   %{expand: %{__pom_call}add_dep_mgmt   %*}
+ 
+ 
+ # %pom_add_plugin - add plugin invocation to POM file
+@@ -478,8 +465,6 @@ sort -u -o ${_filelist} ${_filelist} \
+ # Extra XML is additional XML code to be added into the <plugin> node. This
+ # parameter can be ommited, in which case no extra XML is appended.
+ #
+-%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*
+-}
++%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*}
+ 
+-%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**
+-}
++%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**}

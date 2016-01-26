@@ -1,0 +1,13 @@
+diff --git a/etc/javapackages-config.json b/etc/javapackages-config.json
+index 767fb7a..fd0e991 100644
+--- a/etc/javapackages-config.json
++++ b/etc/javapackages-config.json
+@@ -5,7 +5,7 @@
+         ],
+         "java_requires": {
+             "package_name": "java-headless",
+-            "always_generate": true,
++            "always_generate": false,
+             "skip": false
+         },
+         "java_devel_requires": {

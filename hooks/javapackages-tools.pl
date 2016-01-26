@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+
+push @SPECHOOKS, 
+sub {
+    my ($spec, $parent) = @_;
+    $spec->get_section('install')->subst_body_if(qr'/\&\.gz/','/&.*/',qr'^sed');
+
+    $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
+    my $mpid=$spec->add_source('maven.prov.files');
+    my $meid=$spec->add_source('maven.env');
+    $spec->add_patch('javapackages-tools-4.6.0-alt-use-enviroment.patch',STRIP=>1);
+    $spec->add_patch('javapackages-tools-4.6.0-alt-req-headless-off.patch',STRIP=>1);
+    $spec->add_patch('macros.fjava-to-alt-rpm404.patch',STRIP=>1);
+    # makes it arch
+    $spec->add_patch('macros.jpackage-to-alt.patch',STRIP=>0);
+    $spec->get_section('build')->unshift_body_after(qr'configure','sed -i -e s,jnidir=/java,jnidir=%_libdir/java, config.status'."\n");
+    map {if ($_->get_type() eq 'package') {
+	$_->push_body('BuildArch: noarch'."\n") if !
+	$_->match_body(qr'^BuildArch:\s+noarch');
+	 }
+    } $spec->get_sections();
+    $spec->main_section->exclude_body(qr'^BuildArch:\s+noarch');
+    $spec->main_section->push_body('
+Conflicts:       jpackage-utils < 0:5.0.1
+Obsoletes:       jpackage-utils < 0:5.0.1
+Provides:       jpackage-utils = 1:5.0.0'."\n")
+
+$spec->get_section('prep')->push_body(q!
+# alt specific shabang
+sed -i -e 1,1s,/bin/bash,/bin/sh, java-utils/java-wrapper bin/*
+!."\n");
+
+$spec->get_section('install')->push_body(q@
+install -m755 -D %{SOURCE'.$mpid.'} %buildroot/usr/lib/rpm/maven.prov.files
+install -m755 -D %{SOURCE'.$mpid.'} %buildroot/usr/lib/rpm/maven.req.files
+
+install -m755 -D %{SOURCE'.$mpid.'} %buildroot/usr/lib/rpm/javadoc.req.files
+sed -i -e s,/usr/share/maven-metadata/,/usr/share/javadoc/, %buildroot/usr/lib/rpm/javadoc.req.files
+
+chmod 755 %buildroot/usr/lib/rpm/*.req* %buildroot/usr/lib/rpm/*.prov*
+sed -i -e 's,^#!python,#!/usr/bin/python,' %buildroot/usr/lib/rpm/*.req* %buildroot/usr/lib/rpm/*.prov*
+
+install -m755 -D %{SOURCE'.$meid.'} %buildroot%_rpmmacrosdir/maven.env
+@."\n");
+
+$spec->get_section('install')->push_body(q!
+# in rpm-build-java
+sed -i -e '/usr\/lib\/rpm/d' files-common
+# move /usr/share/xmvn/* to maven-local
+grep /usr/share/xmvn files-common >> files-maven
+sed -i -e '/usr\/share\/xmvn/d' files-common
+
+rm -rf %buildroot/usr/lib/rpm/fileattrs
+
+pushd %buildroot%_rpmmacrosdir/
+mv macros.fjava javapackages-fjava
+mv macros.jpackage javapackages-jpackage
+popd
+!."\n");
+
+$spec->get_section('description','')->push_body(q!
+%package -n rpm-macros-java
+Summary: RPM helper macros to build Java packages
+Group: Development/Java
+Conflicts: rpm-build-java < 0:5.0.0-alt34
+
+# can't due to the jni path
+#BuildArch:      noarch
+
+%description -n rpm-macros-java
+These helper macros facilitate creation of RPM packages containing Java
+bytecode archives and Javadoc documentation.
+
+%package -n rpm-build-java
+Summary: RPM build helpers for Java packages
+Group: Development/Java
+BuildArch:      noarch
+Requires:       javapackages-tools = %{epoch}:%{version}-%{release}
+Requires: 	rpm-macros-java >= %{epoch}:%{version}-%{release}
+#Requires: rpm-build-java-osgi >= %{epoch}:%{version}-%{release}
+
+%description -n rpm-build-java
+RPM build helpers for Java packages.
+
+!."\n");
+
+$spec->get_section('files','doc')->push_body('
+%files -n rpm-macros-java
+%_rpmmacrosdir/javapackages-fjava
+%_rpmmacrosdir/javapackages-jpackage
+
+%files -n rpm-build-java
+/usr/lib/rpm/maven.*
+/usr/lib/rpm/javadoc.*
+%_rpmmacrosdir/maven.env
+
+'."\n");
+
+};
+
+__END__
