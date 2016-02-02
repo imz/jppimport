@@ -13,6 +13,9 @@ push @SPECHOOKS, sub {
 	$jpp->get_section('package','')->push_body('Provides: xalan-j = %{name}-%{version}'."\n");
 	$jpp->get_section('package','')->push_body('Obsoletes: xalan-j <= 2.7.0-alt3'."\n");
     }
+};
+
+__END__
 
     # jpp compat symlinks
     $jpp->get_section('install')->push_body('# jpp compat
@@ -46,7 +49,4 @@ EOF
 
 
 
-};
-
-__END__
 

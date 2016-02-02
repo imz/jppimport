@@ -3,6 +3,8 @@
 require 'set_osgi.pl';
 #require 'set_add_fc_osgi_manifest.pl';
 
+__END__
+
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
 # already in spec
@@ -14,4 +16,3 @@ ln -s %{short_name}.jar %buildroot%_javadir/jakarta-%{short_name}.jar
 '."\n");
     #$jpp->get_section('files','')->push_body('%exclude %_javadir/repository.jboss.com'."\n");
 }
-__END__

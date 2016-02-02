@@ -7,6 +7,3 @@ sub {
 };
 
 __END__
-    $jpp->get_section('build')->subst_body(qr'/junit.jar','/junit4.jar');
-    $jpp->get_section('build')->subst_body(qr'/ant-junit.jar','/ant-junit4.jar');
-    $jpp->get_section('package','')->subst_body_if(qr'ant-junit','ant-junit4',qr'^BuildRequires');

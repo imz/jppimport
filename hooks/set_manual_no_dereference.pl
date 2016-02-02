@@ -7,6 +7,7 @@ push @SPECHOOKS, sub {
 	$jpp->applied_block(
 	    "set_manual_no_dereference hook",
 	    sub {
+		$manualsec->subst(qr'^\s*%doc\s+manual','%doc --no-dereference manual');
 		$manualsec->subst(qr'^\s*%doc\s+target/dist','%doc --no-dereference target/dist');
 		$manualsec->subst(qr'^\s*%doc\s+build/docs','%doc --no-dereference build/docs');
 		$manualsec->subst(qr'^\s*%doc\s+build/javadocs','%doc --no-dereference build/javadocs');

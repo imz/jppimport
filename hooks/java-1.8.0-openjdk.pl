@@ -19,7 +19,6 @@ push @PREHOOKS, sub {
     my %pkg=map {$_=>1} '', 'devel', 'headless', 'javadoc';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
     $jpp->set_sections(\@newsec);
-    $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
 
     #### cleaning up macros for devel subpackages
 
@@ -77,9 +76,25 @@ push @PREHOOKS, sub {
 		}
 	    }
 	    );
+#%global sdkdir()        %{expand:%{uniquesuffix %%1}}
+#%global jrelnk()        %{expand:jre-%{javaver}-%{origin}-%{version}-%{release}.%{_arch}%1}
+#%global jredir()        %{expand:%{sdkdir %%1}/jre}
+#%global sdkbindir()     %{expand:%{_jvmdir}/%{sdkdir %%1}/bin}
+#%global jrebindir()     %{expand:%{_jvmdir}/%{jredir %%1}/bin}
+#%global jvmjardir()     %{expand:%{_jvmjardir}/%{uniquesuffix %%1}}
+	$sec->map_body(
+	    sub {
+		s,\%\{(buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir)\s+[^\}]+\},%{$1},g;
+	    });
+
     }
     $jpp->applied_on();
-
+    $jpp->main_section->map_body(
+	sub {
+	    s,[\%]+[1],, if s,^(\%global\s+(?:buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir))\(\)\s+\%\{expand:(.+)\}\s*$,$1 $2\n,;
+	}
+	);
+    $jpp->_reset_speclist();
 };
 
 sub __subst_systemtap {
@@ -106,6 +121,11 @@ push @SPECHOOKS, sub {
     my $spec=$jpp;
     my $mainsec=$jpp->main_section;
 
+# TODO: current hack:
+# 1) drop custom optflags? 
+# 2) add
+#sed -i -e 's, -m32, -m32 %optflags_shared -fpic -D_BLA_BLA_BLA1,' openjdk/hotspot/make/linux/makefiles/gcc.make
+
     # for %{__global_ldflags} -- might be dropped in the future
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
@@ -116,6 +136,13 @@ push @SPECHOOKS, sub {
 
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
+
+    # 1core build (16core build is out of memory)
+    # export NUM_PROC=%(/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :)
+    $jpp->get_section('build')->subst_body_if(qr'^export\s+NUM_PROC=','#export NUM_PROC=','_NPROCESSORS_ONLN');
+
+    # no debug build in 1.8.65
+    $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
     $jpp->get_section('package','javadoc')->push_body('# fc provides
 Provides: java-javadoc = 1:1.9.0
@@ -132,11 +159,17 @@ Provides: java-javadoc = 1:1.9.0
     #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
-
     $mainsec=$jpp->main_section;
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk');
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj');
     $mainsec->exclude_body(qr'^Obsoletes:\s+sinjdoc');
+    $jpp->get_section('package','headless')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-headless');
+    $jpp->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-devel');
+    $jpp->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj-devel');
+    $jpp->get_section('package','demo')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-demo');
+    $jpp->get_section('package','src')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-src');
+    $jpp->get_section('package','javadoc')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-javadoc');
+    $jpp->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
@@ -210,6 +243,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     my $headlsec=$spec->get_section('package','headless');
+    $headlsec->exclude_body('^Requires: maven-local'."\n");
     $headlsec->push_body('Requires: java-common'."\n");
     $headlsec->push_body('Requires: /proc'."\n");
 
@@ -220,11 +254,15 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # DISTRO_NAME="Fedora"
     $jpp->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
 
+    ## TODO: check if it still valid
     # hack for sun-based build (i586) only!!!
-    $jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
+    #$jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
 
     $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
-    $jpp->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
+
+    # why do we need it?
+    #$jpp->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi',':; #mv bin/java-rmi.cgi sample/rmi');
+
     # just to suppress warnings on %
     $jpp->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
     $jpp->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
@@ -232,9 +270,6 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # TODO: fix caserts generation!!!
     # for proper symlink requires ? 
     $mainsec->unshift_body('BuildRequires: ca-certificates-java'."\n");
-
-    # no need in 1.7.0.1
-    #$jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
     #$mainsec->subst_body(qr'--enable-systemtap','%{subst_enable systemtap}');
@@ -244,7 +279,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     &__subst_systemtap($jpp->get_section('files','devel'));
 
     # big changelog
-    $jpp->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
+    #$jpp->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
     $jpp->get_section('files','')->unshift_body('%_altdir/%altname-java
@@ -274,13 +309,6 @@ EOF
     $jpp->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
 %_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
 ');
-
-    $jpp->get_section('install')->push_body(q!# move soundfont to java
-grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
-grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
-mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
-!."\n");
-    $jpp->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
 
     # NOTE: s,sdklnk,sdkdir,g
     $jpp->get_section('install')->push_body(q!
@@ -486,7 +514,6 @@ Provides: java-devel = 1.5.0
 %endif
 ') if 0; # jdk 1.6 already provides
 
-    $jpp->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
     $jpp->spec_apply_patch(PATCHSTRING=> q!
 --- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
@@ -512,6 +539,19 @@ Provides: java-devel = 1.5.0
 
 
 __END__
+    # no need in 1.7.0.1
+    #$jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+
+    $jpp->get_section('install')->push_body(q!# move soundfont to java
+grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
+grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
+mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
+!."\n");
+    $jpp->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
+
+    $jpp->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
+    $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
+
     # builds end up randomly :(
     $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 

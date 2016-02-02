@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+
+__END__
     $jpp->get_section('build')->push_body(q!
 # Build rss -- needed by struts
 export CLASSPATH=$(build-classpath commons-beanutils commons-collections commons-logging junit)
@@ -22,6 +25,3 @@ ln -s %{name}-rss-%{version}.jar %{buildroot}%{_javadir}/jakarta-%{short_name}-r
 ln -s %{name}-rss-%{version}.jar %{buildroot}%{_javadir}/jakarta-%{short_name}-rss.jar
 !."\n");
     $jpp->get_section('files','')->push_body(q!#%{_javadir}/*-rss*.jar!."\n");
-};
-
-__END__

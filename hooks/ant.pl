@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_manual_no_dereference.pl';
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
@@ -13,28 +15,55 @@ ant-apache-resolver	ant-xml-resolver
 #ant-apache-oro		ant-jakarta-oro
 #ant-apache-regexp	ant-jakarta-regexp
     $jpp->get_section('package','javamail')->subst_if(qr'>= 0:1.2-5jpp','',qr'Requires');
-    $jpp->get_section('package','javamail')->subst_if(qr'>=\s+0:1.0.1-5jpp','',qr'Requires');
 
     foreach my $pkg (keys(%pkg_rename)) {
-	print "renaming: $pkg -> $pkg_rename{$pkg}\n";
-	$jpp->get_section('package',"-n ".$pkg)->push_body('Provides: '.$pkg_rename{$pkg}.' = %{epoch}:%version-%release
+#	print "renaming: $pkg -> $pkg_rename{$pkg}\n";
+	$jpp->get_section('package',"-n ".$pkg)->push_body('
+#Provides: '.$pkg_rename{$pkg}.' = %{epoch}:%version-%release
 Obsoletes: '.$pkg_rename{$pkg}.' < 1.8.0
 ');
     }
-    $jpp->get_section('package','manual')->push_body('Provides: ant-task-reference = %{epoch}:%version-%release
-Obsoletes: ant-task-reference < 1.8.0
-');
+    $jpp->get_section('package','manual')->push_body('Obsoletes: ant-task-reference < 1.8.0'."\n");
 
-    # add compat jarmaps
-    $jpp->get_section('install')->map_body(
-	sub{
-	    if (/^\%add_to_maven_depmap org.apache.ant\s/) {
-		my $old=$_;
-		s/^\%add_to_maven_depmap org.apache.ant\s/\%add_to_maven_depmap ant /;
-		$_=$old.$_;
-	    }
-	});
+    $jpp->get_section('package','')->push_body('
+Obsoletes:      %{name}-style-xsl < %{version}
+Obsoletes:      %{name}-nodeps < %{version}
+Provides:       %{name}-nodeps = %{version}
+Obsoletes:      %{name}-trax < %{version}
+Provides:       %{name}-trax = %{version}
+'."\n");
 
+    $jpp->get_section('description','')->push_body('
+
+%package optional
+Summary: Optional tasks for Ant
+Group: Development/Java
+
+Requires: %name = %{?epoch:%epoch:}%version-%release
+Requires: %name-antlr = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-bcel = %{?epoch:%epoch:}%version-%release
+Requires: %name-commons-logging = %{?epoch:%epoch:}%version-%release
+Requires: %name-commons-net = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-oro = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-regexp = %{?epoch:%epoch:}%version-%release
+Requires: %name-javamail = %{?epoch:%epoch:}%version-%release
+Requires: %name-jdepend = %{?epoch:%epoch:}%version-%release
+Requires: %name-jmf = %{?epoch:%epoch:}%version-%release
+Requires: %name-jsch = %{?epoch:%epoch:}%version-%release
+Requires: %name-junit = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-log4j = %{?epoch:%epoch:}%version-%release
+Requires: %name-swing = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-resolver = %{?epoch:%epoch:}%version-%release
+Requires: %name-apache-bsf = %{?epoch:%epoch:}%version-%release
+#Requires: %name-jai = %{?epoch:%epoch:}%version-%release
+#Requires: %name-stylebook = %{?epoch:%epoch:}%version-%release
+
+%description optional
+Optional build tasks for ant, a platform-independent build tool for Java.
+
+%files optional
+
+'."\n");
 
 }
 
@@ -46,6 +75,4 @@ ant-jai
 ant-stylebook
 ant-optional
 # subpackages
-ant-style-xsl
-# TODO: merge with manual
-ant-task-reference
+##ant-style-xsl
