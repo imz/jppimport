@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+
+__END__
     $jpp->get_section('package','')->push_body('
 #Provides:       jta_1_1_api = %{version}-%{release}
 #Provides:       jta_api = 0:1.1
@@ -28,9 +31,6 @@ EOF
 #%{_javadir}/jta_1_1_api.jar	%{_javadir}/geronimo-jta.jar	10200
 #EOF
 !."\n");
-};
-
-__END__
 %files -n geronimo-jta-1.1-api
 %_altdir/jta_1_1_api_geronimo-jta-1.1-api
 %_altdir/jta_api_geronimo-jta-1.1-api

@@ -3,6 +3,8 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+__END__
     $jpp->get_section('package','')->push_body('
 #Provides:       jms_1_1_api = %{version}-%{release}
 #Provides:       jms_api = 0:1.1
@@ -28,9 +30,7 @@ EOF
 #%{_javadir}/jms_1_1_api.jar	%{_javadir}/geronimo-jms.jar	10200
 #EOF
 !."\n");
-};
 
-__END__
 Provides:       jms_1_1_api = %{version}-%{release}
 Provides:       jms_api = 0:1.1
 # drop the following asap

@@ -5,8 +5,8 @@ sub {
     my ($spec, $parent) = @_;
     $spec->get_section('package','')->push_body('
 Provides: ws-commons-%name = 0:%version-%release
-Conflicts:  ws-commons-%name <= 0:3.0.1-alt2_6jpp7
-Obsoletes:  ws-commons-%name <= 0:3.0.1-alt2_6jpp7
+Conflicts:  ws-commons-%name <= 0:1.4.7-alt3_7jpp7
+Obsoletes:  ws-commons-%name <= 0:1.4.7-alt3_7jpp7
 '."\n");
 };
 

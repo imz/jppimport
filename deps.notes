@@ -8,11 +8,13 @@ export MAVEN_OPTS=-XX:MaxPermSize=512m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
 #-Dmaven.test.failure.ignore=true \
+#-Dmaven.javadoc.skip=true
 #-Dmaven.javadoc.source=1.5
 # old
 #-Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5 \
 new maven-compiler-plugin
 #-Dmaven.compiler.source=1.5 -Dmaven.compiler.target=1.5 -Dmaven.javadoc.source=1.5 \
+#-Dproject.build.sourceEncoding=UTF-8
 
 #http://maven.apache.org/maven-1.x/plugins/test/properties.html
 #-Dmaven.junit.jvmargs='-Xmx256m -verbose'
@@ -77,20 +79,6 @@ mvn-rpmbuild \
 
 #--------------------------------------------------------------
 
-### HOW TO ADD synonims in pom ###
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>itext</groupId>
-  <artifactId>itext</artifactId>
-  <name>itext</name>
-  <version>1.3</version>
-
-  <distributionManagement>
-    <relocation>
-      <groupId>com.lowagie</groupId>
-    </relocation>
-  </distributionManagement>
-</project>
 
 #--------------------------------------------------------------
 
@@ -109,28 +97,10 @@ indicate that velocity14/15 should be used. (deprecated!!! now just use velocity
 # conflict with smc
 smc -> jsmc
 
-# wersiondowns
-bcel(let be up)
-
-============
-
-=========== maven 2.0.8 ==========================
-========================================
+=======================================
 ---
 UP:
 TODO: jcalendar, jgoodies-* asked msp, no need to rush
-
-TODO: (robot?)
-eclipse-callgraph unmet on systemtap
-
-maven2->3: deploy example:
-export MAVEN_REPO_LOCAL=`pwd`/.m2/repository
-export URL=file:`pwd`/maven2-brew
-mvn-jpp -e -Dmaven.compile.target=1.5 -Dmaven.javadoc.source=1.5  deploy:deploy-file -Dmaven.repo.local=${MAVEN_REPO_LOCAL} -DpomFile=%{SOURCE1}  -Dfile=ecj.jar -Durl=${URL} -DrepositoryId=oss-releases
-%{__cp} -pr maven2-brew %{buildroot}%{_javadir}/repository.jboss.com
-
-# also exception :( in
-maven-3.0.4-alt0.2jpp.x86_64|/usr/share/java/maven/maven-compat.jar|org/apache/maven/artifact/deployer/ArtifactDeploymentException.class
 
 maven3: todo: fix plugins to allow cmdline override 
 apache-commons-lang: -Dmaven.javadoc.source=1.4 was ignored by javadoc plugin defaults (1.5)
@@ -140,20 +110,6 @@ an example for null assembly id (cargo0)
 > sed -i -e 's,<assembly>,<assembly><id>ALT</id>,' core/uberjar/src/assemble/main.xml
 <    core/uberjar/target/%{oldname}-core-uberjar-%{version}.jar \
 >    core/uberjar/target/%{oldname}-core-uberjar-%{version}-ALT.jar \
-
-maven3: maven-plugin-descriptor from maven22
-maven3: mvn-jpp: TODO: drop -s settings.xml, see jung2.pl hook - useless and dangerous.
-
-TODO: %{_libdir}/*: generic fix (at least, exclude debug)
-
-
-      
-TODO: objectweb-asm: poms: see hook:
-# poms use asm group now - incompatible with oweb-asm 3.2 and confilcts with asm2 :( 
-# seems like we need to patch asm2 to have asm2 group.
-sed -i -e 's,<groupId>asm</groupId>,<groupId>org.objectweb.asm</groupId>,g' %buildroot/usr/share/maven2/poms/JPP.objectweb-asm-asm*
-
------
 
 
 DONE: jacoco-> No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle ...
@@ -169,13 +125,34 @@ eclipse-linuxtools -> eclipse-swtbot -> log4j osgi
 tycho:
 -Dtycho.targetPlatform=/usr/lib64/eclipse
 
-DONE: jtidy has cleaned pom (commented garbage like xerces:dom3-xml-api) out.
+[ERROR] Then, install it using the command:
+[ERROR] mvn install:install-file -DgroupId=jdepend -DartifactId=jdepend -Dversion=2.9.1 -Dpackaging=jar -Dfile=/path/to/file
 
-killed exact version 3.0 in
-/usr/share/maven-poms/JPP.maven-shared-dependency-analyzer.pom 
-and it helped to build tycho!!!
+TODO: 16core=outofmemory -- -Dmaven.test.skip.exec=true
+simple
+disruptor
+bean-validation-api
+grizzly
 
-todo: jline2 2.10 will break gshell/gmaven. use compat gline25?
-TODO: xml-commons-resolver: xml-resolver jar symlink! 
-see glassfish-jaxb -- requires xml-resolver, not xml-commons-resolver
-jnidir: example jinput, see xmvn code
+(unbootstrap:)
+jetty8  (breaks on maven-jar-plugin)
+jetty -> jetty-alpn-api (breaks on maven-jar-plugin)
+qpid-proton-java (breaks)
+derby -> (breaks)
+jruby (missing subdirs)TODO devel + rpm-macros-jruby
+grizzly-npn ([ERROR] Failed to execute goal org.apache.maven.plugins:maven-jar-plugin:2.6:jar (default-jar) on project grizzly-npn-osgi: Error assembling JAR: Manifest file: /usr/src/RPM/BUILD/grizzly-npn-1.2/osgi/target/classes/META-INF/MANIFEST.MF does not exist)
+springframework -> jruby
+jbossws-cxf -> cxf
+
+OSGi-bundle-ant-task -> depend on old aqute-bnd classes
+OSGi-bundle-ant-task: --no need (del?)
+
+apacheds -> (breaks)(api)(disable protocol kerberos)(fc24newver)
+avro -> hadoop (bin?)
+narayana -> hornetq -> with_narayana=0 -> netty
+pki-core -> resteasy -> netty
+netty-tcnative -> netty -> protobuf(other c)
+jboss-negotiation(rawhide) -> picketbox -> infinicpan -> protostream -> protobuf-c
+gradle -> 
+
+

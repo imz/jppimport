@@ -1,0 +1,25 @@
+diff --git a/macros.d/macros.jpackage b/macros.d/macros.jpackage
+index 6b6646c..2f451ec 100644
+--- a/macros.d/macros.jpackage
++++ b/macros.d/macros.jpackage
+@@ -154,7 +154,7 @@
+ %jpackage_script() \
+ install -d -m 755 %{buildroot}%{_bindir} \
+ cat > %{buildroot}%{_bindir}/%5 << EOF \
+-#!/bin/bash\
++#!/bin/sh\
+ #\
+ # %{name} script\
+ # JPackage Project <http://www.jpackage.org/>\
+@@ -164,8 +164,9 @@ _prefer_jre="%{?6}"\
+ . %{_javadir}-utils/java-functions\
+ \
+ # Source system prefs\
+-if [ -f %{_sysconfdir}/java/%{name}.conf ] ; then\
+-  . %{_sysconfdir}/java/%{name}.conf\
++_sysconf_file=%{_sysconfdir}/java/%{name}.conf\
++if [ -f \\\$_sysconf_file ] ; then\
++  . \\\$_sysconf_file\
+ fi\
+ \
+ # Source user prefs\

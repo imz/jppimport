@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+
+__END__
     $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-saaj'."\n");
     $jpp->get_section('package','')->push_body('
 #Provides:       jaxrpc = 0:1.1
@@ -28,9 +31,6 @@ EOF
 #%{_javadir}/jaxrpc_1_1_api.jar	%{_javadir}/geronimo-jaxrpc.jar	10000
 #EOF
 !."\n");
-};
-
-__END__
 
 Provides:       jaxrpc = 0:1.1
 # TODO: drop asap

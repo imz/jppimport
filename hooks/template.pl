@@ -9,6 +9,7 @@ sub {
     $spec->get_section('prep')->push_body(q!!."\n");
     $spec->get_section('install')->push_body(q!!."\n");
     $spec->get_section('package','')->unshift_body('BuildRequires: '."\n");
+    $spec->get_section('package','')->push_body('Provides: '."\n");
 };
 
 __END__

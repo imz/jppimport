@@ -1,0 +1,11 @@
+--- macros.d/macros.jpackage	2016-01-14 21:17:59.000000000 +0200
++++ macros.d/macros.jpackage	2016-01-14 21:37:25.000000000 +0200
+@@ -86,7 +86,7 @@
+ #   - jars for Java standard x.y.z (usually symlinks to  %{_jnidir}-ext)
+ # To simplify things only %{_jnidir} is defined.
+ #
+-%_jnidir        %{_prefix}/lib/java
++%_jnidir        %{_libdir}/java
+ 
+ #
+ # Root directory where all javadoc is installed. Also already in RH macros.

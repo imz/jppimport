@@ -9,6 +9,7 @@ sub {
     # Следующие пакеты имеют неудовлетворенные зависимости:
     # maven: Требует: /etc/mavenrc но пакет не может быть установлен
     &add_missingok_config($jpp,'/etc/mavenrc');
+    &add_missingok_config($jpp,'/etc/java/maven.conf');
 
     # alternatively
     # for /etc/mavenrc

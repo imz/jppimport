@@ -8,7 +8,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_remove_dep(rf)     %{expand: %{__pom_call}remove_dep %**
 -}
-+%pom_remove_dep(rf)     %{expand: %{__pom_call}remove_dep %**}
++%pom_remove_dep     %{__pom_call}remove_dep 
  
  
  # %pom_remove_plugin - remove Maven plugin invocation from POM file
@@ -18,7 +18,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_remove_plugin(rf)  %{expand: %{__pom_call}remove_plugin  %**
 -}
-+%pom_remove_plugin(rf)  %{expand: %{__pom_call}remove_plugin  %**}
++%pom_remove_plugin  %{__pom_call}remove_plugin 
  
  
  # %pom_disable_module - disable given project module in POM file
@@ -28,7 +28,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_disable_module() %{expand: %{__pom_call}disable_module %*
 -}
-+%pom_disable_module() %{expand: %{__pom_call}disable_module %*}
++%pom_disable_module %{__pom_call}disable_module 
  
  
  # %pom_xpath_remove - remove an XML node from POM file
@@ -38,11 +38,11 @@ index 75969b1..acd7720 100644
  #
 -%pom_xpath_remove(rf)   %{expand: %{__pom_call}xpath_remove   %**
 -}
-+%pom_xpath_remove(rf)   %{expand: %{__pom_call}xpath_remove   %**}
++%pom_xpath_remove   %{__pom_call}xpath_remove 
  
 -%pom_xpath_disable()   %{expand: %{__pom_call}xpath_disable   %**
 -}
-+%pom_xpath_disable()   %{expand: %{__pom_call}xpath_disable   %**}
++%pom_xpath_disable   %{__pom_call}xpath_disable 
  
  # %pom_xpath_inject - inject XML code into POM file
  #
@@ -52,7 +52,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_xpath_inject()   %{expand: %{__pom_call}xpath_inject   %*
 -}
-+%pom_xpath_inject()   %{expand: %{__pom_call}xpath_inject   %*}
++%pom_xpath_inject   %{__pom_call}xpath_inject 
  
  
  # %pom_xpath_replace - replace XML node from POM file with given XML code
@@ -62,7 +62,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_xpath_replace(rf)  %{expand: %{__pom_call}xpath_replace  %**
 -}
-+%pom_xpath_replace(rf)  %{expand: %{__pom_call}xpath_replace  %**}
++%pom_xpath_replace  %{__pom_call}xpath_replace  
  
  
  # %pom_xpath_set - set text contents of XML node from POM file
@@ -72,7 +72,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_xpath_set(rf)      %{expand: %{__pom_call}xpath_set      %**
 -}
-+%pom_xpath_set(rf)      %{expand: %{__pom_call}xpath_set      %**}
++%pom_xpath_set      %{__pom_call}xpath_set  
  
  
  # %pom_add_parent - add parent POM reference to POM file
@@ -82,7 +82,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_add_parent()     %{expand: %{__pom_call}add_parent     %*
 -}
-+%pom_add_parent()     %{expand: %{__pom_call}add_parent     %*}
++%pom_add_parent     %{__pom_call}add_parent    
  
  
  # %pom_remove_parent - remove parent POM reference from POM file
@@ -92,7 +92,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_remove_parent()  %{expand: %{__pom_call}remove_parent  %*
 -}
-+%pom_remove_parent()  %{expand: %{__pom_call}remove_parent  %*}
++%pom_remove_parent  %{__pom_call}remove_parent  
  
  
  # %pom_set_parent - set parent POM reference in POM file
@@ -102,7 +102,7 @@ index 75969b1..acd7720 100644
  #
 -%pom_set_parent()     %{expand: %{__pom_call}set_parent     %*
 -}
-+%pom_set_parent()     %{expand: %{__pom_call}set_parent     %*}
++%pom_set_parent     %{__pom_call}set_parent  
  
  
  # %pom_add_dep[_mgmt] - add dependency to POM file
@@ -114,8 +114,8 @@ index 75969b1..acd7720 100644
 -}
 -%pom_add_dep_mgmt()   %{expand: %{__pom_call}add_dep_mgmt   %*
 -}
-+%pom_add_dep()        %{expand: %{__pom_call}add_dep        %*}
-+%pom_add_dep_mgmt()   %{expand: %{__pom_call}add_dep_mgmt   %*}
++%pom_add_dep        %{__pom_call}add_dep  
++%pom_add_dep_mgmt   %{__pom_call}add_dep_mgmt 
  
  
  # %pom_add_plugin - add plugin invocation to POM file
@@ -125,8 +125,8 @@ index 75969b1..acd7720 100644
  #
 -%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*
 -}
-+%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*}
++%pom_add_plugin     %{__pom_call}add_plugin 
  
 -%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**
 -}
-+%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**}
++%pom_change_dep     %{__pom_call}change_dep 

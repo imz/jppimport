@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+};
+
+__END__
     $jpp->get_section('package','')->push_body('
 #Provides:       jpa_3_0_api = %{version}-%{release}
 #Provides:       jpa_api = 0:3.0
@@ -21,9 +24,6 @@ sub {
 #%{_javadir}/jpa_3_0_api.jar	%{_javadir}/geronimo-jpa.jar	30100
 #EOF
 !."\n");
-};
-
-__END__
 
 %files -n geronimo-jpa-3.0-api
 %_altdir/jpa_3_0_api_geronimo-jpa-3.0-api

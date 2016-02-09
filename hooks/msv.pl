@@ -19,9 +19,4 @@ __END__
 #    $jpp->get_section('package','msv')->push_body('Obsoletes: msv < 1.3'."\n");
 #    $jpp->get_section('package','xsdlib')->push_body('Conflicts: msv < 1.3'."\n");
 #    $jpp->get_section('package','xsdlib')->push_body('Provides: xsdlib'."\n");
-#    $jpp->get_section('install')->push_body('ln -s msv-core.jar %buildroot%_javadir/msv.jar'."\n");
-#    $jpp->get_section('install')->push_body('# compat depmap
-#%add_to_maven_depmap msv msv %{version} JPP %{name}
-#%add_to_maven_depmap msv xsdlib %{version} JPP %{name}-xsdlib
-#'."\n");
 

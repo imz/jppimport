@@ -47,39 +47,6 @@ then
 fi || :
 ');
 
-#');
-#    $jpp->get_section('preun','')->push_body('
-
-    # for fedora jython lacking pom
-    if (!$jpp->get_section('package','')->match_body(qr'^Source.:.+jython.*\.pom')) {
-	$jpp->get_section('install')->push_body(q!
-%add_to_maven_depmap %{name} %{name} %{version} JPP %{name}                     
-%add_to_maven_depmap org.python %{name} %{version} JPP %{name}                  
-
-# poms
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
-cat > $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.%{name}.pom <<'EOF'
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>jython</groupId>
-  <artifactId>jython</artifactId>
-  <version>%version</version>
-
-  <distributionManagement>
-    <relocation>
-      <groupId>org.python</groupId>
-    </relocation>
-  </distributionManagement>
-
-</project>
-EOF
-!);
-	
-	$jpp->get_section('files','')->push_body(q!# pom
-%{_datadir}/maven2/poms/*
-%{_mavendepmapfragdir}/*
-!);
-    }
 }
 
 __END__

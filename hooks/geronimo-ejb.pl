@@ -3,8 +3,10 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-annotation geronimo-interceptor'."\n");
+#    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-annotation geronimo-interceptor'."\n");
+};
 
+__END__
     $jpp->get_section('package','')->push_body('
 #Provides:       ejb = 0:3.1
 #Provides:       ejb_api = 0:3.1
@@ -33,9 +35,7 @@ EOF
 # %{_javadir}/ejb_3_1_api.jar	%{_javadir}/geronimo-ejb.jar	30100
 # EOF
 !."\n");
-};
 
-__END__
 Provides:       ejb = 0:3.0
 # TODO: drop asap
 Provides:       ejb_3_0_api = %{version}-%{release}

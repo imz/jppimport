@@ -5,7 +5,8 @@
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
-
+};
+__END__
     # Следующие пакеты имеют неудовлетворенные зависимости:
     # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
     #&add_missingok_config($jpp,'/etc/mavenrc');
@@ -34,13 +35,4 @@ Obsoletes:       maven2-plugin-release <= 0:2.0.4
 # before some plugins are
 if [ -d %{_javadir}/%{name} ] ; then rmdir --ignore-fail-on-non-empty %{_javadir}/%{name} >& /dev/null; fi
 !."\n");
-
-};
-
-__END__
-
-# Items in %%{_bindir}
-install -Dm 755 %{SOURCE!.$srcid.q!} $RPM_BUILD_ROOT%{_bindir}/mvn-jpp
-
-    $jpp->add_section('files')->push_body(q!%attr(0755,root,root) %{_bindir}/mvn-jpp!."\n");
 
