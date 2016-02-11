@@ -101,7 +101,7 @@ URL
 [qw/PROVIDENAME PROVIDEFLAGS PROVIDEVERSION/]
 	) {
 	my @tagval=$jpp->triquery(@$triplet);
-	@tagval=grep {$_!~/^.+\(/ or /^mvn\(/} @tagval;
+	@tagval=grep {$_!~/^.+\(/ or /^mvn\(/ or /^osgi\(/} @tagval;
 	my $tag=$triplet->[0];
 	#print STDERR "DEBUG: $triplet->[0]: ",join(' ',@tagval),"\n";
 	my $tagname=ucfirst(lc($tag));
@@ -115,7 +115,7 @@ URL
 REQUIRENAME
 /) {
     my @tagval=$jpp->multiquery($tag);
-    @tagval=grep {$_!~/^.+\(/ or /^mvn\(/} @tagval;
+    @tagval=grep {$_!~/^.+\(/ or /^mvn\(/ or /^osgi\(/} @tagval;
     #print STDERR "DEBUG: $tag: ",join(' ',@tagval),"\n";
     my $tagname=ucfirst(lc($tag));
     $tagname=~s/name/s/;
