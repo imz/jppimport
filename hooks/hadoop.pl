@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+push @SPECHOOKS, 
+sub {
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: avro-maven-plugin'."\n");
+    $spec->get_section('package','')->unshift_body('BuildRequires: zlib-devel'."\n");
+    my $sec=$spec->get_section('pretrans','hdfs');
+    if (not $sec or not $sec->get_flag('-p')) {
+	die "WARNING: lua pretrans not found!";
+    } else {
+	$sec->delete;
+	$spec->get_section('pre','hdfs')->push_body(q!
+# from pretrans
+path = "%{_datadir}/%{name}/hdfs/webapps"
+if [ -L $path ]; then
+  rm -f $path
+fi ||:
+
+!."\n");
+    }
+    # don't do: 2 post's
+    #$spec->get_section('posttrans','hdfs')->set_type('post');
+    $sec=$spec->get_section('posttrans','hdfs');
+    my @body1=@{$sec->get_bodyref};
+    shift @body1;
+    my $sec2=$spec->get_section('post','hdfs');
+    $sec2->push_body (@body1);
+    $sec->delete;
+
+};
+
+__END__

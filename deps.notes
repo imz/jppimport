@@ -7,7 +7,7 @@ export MAVEN_OPTS=-XX:MaxPermSize=512m
 #-Dmaven.javadoc.additionalparam=-J-Xmx512m
 #-Dmaven.test.skip=true
 #-Dmaven.test.skip.exec=true
-#-Dmaven.test.failure.ignore=true \
+#-Dmaven.test.failure.ignore=true
 #-Dmaven.javadoc.skip=true
 #-Dmaven.javadoc.source=1.5
 # old
@@ -128,31 +128,45 @@ tycho:
 [ERROR] Then, install it using the command:
 [ERROR] mvn install:install-file -DgroupId=jdepend -DartifactId=jdepend -Dversion=2.9.1 -Dpackaging=jar -Dfile=/path/to/file
 
+TODO: ant -> move patches
+
 TODO: 16core=outofmemory -- -Dmaven.test.skip.exec=true
 simple
 disruptor
 bean-validation-api
 grizzly
 
-(unbootstrap:)
-jetty8  (breaks on maven-jar-plugin)
-jetty -> jetty-alpn-api (breaks on maven-jar-plugin)
-qpid-proton-java (breaks)
-derby -> (breaks)
-jruby (missing subdirs)TODO devel + rpm-macros-jruby
-grizzly-npn ([ERROR] Failed to execute goal org.apache.maven.plugins:maven-jar-plugin:2.6:jar (default-jar) on project grizzly-npn-osgi: Error assembling JAR: Manifest file: /usr/src/RPM/BUILD/grizzly-npn-1.2/osgi/target/classes/META-INF/MANIFEST.MF does not exist)
-springframework -> jruby
-jbossws-cxf -> cxf
-
+no fc24
 OSGi-bundle-ant-task -> depend on old aqute-bnd classes
 OSGi-bundle-ant-task: --no need (del?)
+pdf-renderer -
+metadata-extractor
+
+jbossws-cxf -> fc21 no fc24
+invokebinder
+owasp-esapi-java
+maven-checkstyle-plugin
+
+(unbootstrap:)
+tika -> (breaks,api mismatch, fc24=tika-1.11)
+derby -> (breaks)
+jruby (missing subdirs)TODO devel + rpm-macros-jruby
+springframework -> jruby
+gradle -> sbt(customized),
+gradle -> js-jquery -> web-assets(fcmass)
+spring-ldap -> springframework-batch -> springframework-data-commons -> querydsl -> avro -> hadoop -> bookkeeper -> (build fails (internal?)package org.apache.hedwig.protocol does not exist)
+hibernate -> infinicpan
+hibernate-hql -> avro
+hibernate-search -> avro
+tomcat -> (build fails)
+netcdf (bin, netcdf-java)
+sisu -> lot of osgi provides
+jetty -> 
+
 
 apacheds -> (breaks)(api)(disable protocol kerberos)(fc24newver)
-avro -> hadoop (bin?)
-narayana -> hornetq -> with_narayana=0 -> netty
-pki-core -> resteasy -> netty
-netty-tcnative -> netty -> protobuf(other c)
-jboss-negotiation(rawhide) -> picketbox -> infinicpan -> protostream -> protobuf-c
-gradle -> 
-
+narayana -> hornetq -> with_narayana=0 -> 
+pki-core -> resteasy -> infinicpan
+netty-tcnative -> 
+jboss-negotiation(rawhide) -> picketbox -> infinicpan -> 
 

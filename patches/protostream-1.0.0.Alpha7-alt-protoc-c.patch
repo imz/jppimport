@@ -1,0 +1,22 @@
+--- protostream-1.0.0.Alpha7/core/pom.xml	2016-02-10 19:24:33.099612429 +0000
++++ protostream-1.0.0.Alpha7/core/pom.xml	2016-02-10 19:26:31.489620020 +0000
+@@ -70,7 +70,7 @@
+                         <configuration>
+                             <target>
+                                 <mkdir dir="${project.build.directory}/protobuf-descriptors/"/>
+-                                <exec executable="protoc" failonerror="true">
++                                <exec executable="protoc-c" failonerror="true">
+                                     <arg value="--proto_path=${project.basedir}/src/main/resources"/>
+                                     <arg value="--descriptor_set_out=${project.build.directory}/protobuf-descriptors/message-wrapping.protobin"/>
+                                     <arg value="${project.basedir}/src/main/resources/message-wrapping.proto"/>
+--- protostream-1.0.0.Alpha7/sample-domain-definition/pom.xml	2013-09-27 13:45:12.000000000 +0000
++++ protostream-1.0.0.Alpha7/sample-domain-definition/pom.xml	2016-02-10 19:36:02.946656663 +0000
+@@ -51,7 +51,7 @@
+                 </executions>
+                 <configuration>
+                     <!-- please make sure protoc is installed and available in your path -->
+-                    <executable>protoc</executable>
++                    <executable>protoc-c</executable>
+                     <workingDirectory>${project.build.directory}</workingDirectory>
+                     <arguments>
+                         <argument>--proto_path=${project.basedir}/src/main/resources</argument>

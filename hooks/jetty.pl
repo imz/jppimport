@@ -5,11 +5,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
-    &add_missingok_config($jpp, '/etc/default/jetty8','');
-
-    if ($jpp->main_section->get_tag('Version') eq '8.1.5') {
-	# TODO drop jetty-orbit-maven-depmap when it will be deprecated
-    }
+    &add_missingok_config($jpp, '/etc/default/jetty','');
 
     $jpp->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%{rundir}');
 
