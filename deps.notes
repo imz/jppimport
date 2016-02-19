@@ -42,7 +42,6 @@ $jpp->get_section('build')->subst(qr'export MAVEN_OPTS="','export MAVEN_OPTS="-D
 
 export MAVEN_OPTS="-Xbootclasspath/p:$(build-classpath objectweb-asm)"
 
-
 subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 
 +      install:install-file -DgroupId=xpp3 -DartifactId=xpp3_min \
@@ -51,24 +50,11 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 find maven2-brew \! -path '*/org/jboss/security/*' -type f -print -delete ||:
 find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 
-%if 0%{?rhel}
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mkdir -p $MAVEN_REPO_LOCAL
-
-mvn-jpp \
-    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-%else
-mvn-rpmbuild \
-%endif
-    package
-
-
 # Maven 2 -> Maven 3
 %pom_remove_dep :maven-project
 %pom_add_dep org.apache.maven:maven-core
 %pom_add_dep org.apache.maven:maven-compat
 %pom_xpath_set "pom:dependency[pom:groupId[text()='org.apache.maven']]/pom:version" 3.0.4
-
 
 # http://comments.gmane.org/gmane.comp.finance.mifos.devel/8362
 # Failed to retrieve numeric file attributes using: '/bin/sh -c ls -1nlaR /'
@@ -115,13 +101,6 @@ an example for null assembly id (cargo0)
 DONE: jacoco-> No solution found because the problem is unsatisfiable.": ["Unable to satisfy dependency from org.jacoco.core 0.5.9.201207300726 to bundle ...
 ThxGoodness, fixed with -Dtycho.targetPlatform=%_libdir/eclipse
 
-lucene3 update: build with eclipse, then eclipse dtp
-
-# todo: fix rpm-build-java-osgi to auto get from eclipse-dtp
-Provides: osgi(org.eclipse.datatools.sqltools.result) = 1.1.3 
-
-eclipse-linuxtools -> eclipse-swtbot -> log4j osgi
-
 tycho:
 -Dtycho.targetPlatform=/usr/lib64/eclipse
 
@@ -138,35 +117,32 @@ grizzly
 
 no fc24
 OSGi-bundle-ant-task -> depend on old aqute-bnd classes
+OSGi-bundle-ant-task -> package aQute.lib.osgi does not exist [javac] import aQute.lib.osgi.Analyzer;]
 OSGi-bundle-ant-task: --no need (del?)
-pdf-renderer -
 metadata-extractor
+pdf-renderer -
 
 jbossws-cxf -> fc21 no fc24
 invokebinder
 owasp-esapi-java
 maven-checkstyle-plugin
 
+# eclipse
+#jetty -> [  artifact org.eclipse.equinox.http:servlet:jar:1.0.0-v20070606 ] <> eclipse-platform
+#jgit from eclipse-jgit
+# eclipse-swt, eclipse-equinox-osgi
+
 (unbootstrap:)
-tika -> (breaks,api mismatch, fc24=tika-1.11)
-derby -> (breaks)
 jruby (missing subdirs)TODO devel + rpm-macros-jruby
-springframework -> jruby
-gradle -> sbt(customized),
+avro -> thrift
+sisu -> (eclipse stuff?)
 gradle -> js-jquery -> web-assets(fcmass)
-spring-ldap -> springframework-batch -> springframework-data-commons -> querydsl -> avro -> hadoop -> bookkeeper -> (build fails (internal?)package org.apache.hedwig.protocol does not exist)
-hibernate -> infinicpan
-hibernate-hql -> avro
-hibernate-search -> avro
-tomcat -> (build fails)
-netcdf (bin, netcdf-java)
-sisu -> lot of osgi provides
-jetty -> 
+gradle -> 
 
+pki-core -> 
+jspecview -> icedtea-web + eclipse -> to checkout with jars
+sdljava -> (fix swig generation or re-use generated.tar hack)
 
-apacheds -> (breaks)(api)(disable protocol kerberos)(fc24newver)
-narayana -> hornetq -> with_narayana=0 -> 
-pki-core -> resteasy -> infinicpan
-netty-tcnative -> 
-jboss-negotiation(rawhide) -> picketbox -> infinicpan -> 
+spock+gpars -> breaks fresh javapackages-tools
+0002 gradle patch or update to xmvn 2.5+maven 3.3.9
 

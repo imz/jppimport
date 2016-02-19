@@ -1,0 +1,15 @@
+--- tomcat.spec0	2016-02-12 02:44:23.248000641 +0200
++++ tomcat.spec	2016-02-12 17:24:52.000556647 +0200
+@@ -414,9 +414,9 @@
+ 
+ pushd ${RPM_BUILD_ROOT}%{libdir}
+     # symlink JSP and servlet API jars
+-    %{__ln_s} ../%{name}-jsp-%{jspspec}-api.jar .
+-    %{__ln_s} ../%{name}-servlet-%{servletspec}-api.jar .
+-    %{__ln_s} ../%{name}-el-%{elspec}-api.jar .
++    %{__ln_s} ../../java/%{name}-jsp-%{jspspec}-api.jar .
++    %{__ln_s} ../../java/%{name}-servlet-%{servletspec}-api.jar .
++    %{__ln_s} ../../java/%{name}-el-%{elspec}-api.jar .
+     %{__ln_s} $(build-classpath apache-commons-collections) commons-collections.jar
+     %{__ln_s} $(build-classpath apache-commons-dbcp) commons-dbcp.jar
+     %{__ln_s} $(build-classpath apache-commons-pool) commons-pool.jar

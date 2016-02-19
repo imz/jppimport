@@ -2,11 +2,13 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->add_patch('jss-link-alt.patch',STRIP=>1);
-    $jpp->get_section('build')->unshift_body_before(qr'The Makefile is not thread-safe',q@
+    my ($spec, $parent) = @_;
+    $spec->add_patch('jss-link-alt.patch',STRIP=>1);
+    $spec->get_section('build')->subst_body(qr'\%if 0\%\{\?__isa_bits\} == 64','%ifarch x86_64 ppc64 ia64 s390x sparc64');
+
+    $spec->get_section('build')->unshift_body_before(qr'The Makefile is not thread-safe',q@
 # 3.0(t6), 3.5(SIS) kernels support
-for i in 0 3 4 5 6 7 8 9 10; do
+for i in 0 `seq 3 20`; do
 cp -p mozilla/security/coreconf/Linux3.1.mk mozilla/security/coreconf/Linux3.$i.mk
 sed -i -e 's;LINUX3_1;LINUX3_'$i';' mozilla/security/coreconf/Linux3.$i.mk
 done
@@ -24,9 +26,9 @@ fix_kversion
 
 @);
     # compat symlink
-    $jpp->get_section('install')->push_body(q!mkdir -p %buildroot%_javadir/
-ln -s %_libdir/java/jss4.jar %buildroot%_javadir/jss4.jar!."\n");
-    $jpp->get_section('files')->push_body(q!%_javadir/jss4.jar!."\n");
+    $spec->get_section('install')->push_body(q!mkdir -p %buildroot%_javadir/
+ln -s %_jnidir/jss4.jar %buildroot%_javadir/jss4.jar!."\n");
+    $spec->get_section('files')->push_body(q!%_javadir/jss4.jar!."\n");
 
 };
 

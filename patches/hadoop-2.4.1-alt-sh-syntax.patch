@@ -1,0 +1,7 @@
+--- hadoop-yarn-project/hadoop-yarn/bin/yarn	2014-06-30 07:04:57.000000000 +0000
++++ hadoop-yarn-project/hadoop-yarn/bin/yarn	2016-02-13 17:34:45.380339137 +0000
+@@ -249,4 +249,3 @@
+ fi  
+ 
+ exec "$JAVA" -Dproc_$COMMAND $JAVA_HEAP_MAX $YARN_OPTS -classpath "$CLASSPATH" $CLASS "$@"
+-fi

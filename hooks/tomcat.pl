@@ -1,8 +1,11 @@
 #!/usr/bin/perl -w
 
+require 'set_osgi_fc.pl';
+
 push @SPECHOOKS, 
 sub {
     my ($jpp, $alt) = @_;
+    $spec->spec_apply_patch(PATCHFILE => '%name.spec.diff');
     # sisyphus_check
 #    $jpp->get_section('files','')->subst_body(qr'0664,tomcat,tomcat','0644,tomcat,tomcat');
     $jpp->get_section('files','')->subst_body(qr'^\%doc','%attr(0755,root,root) %doc');

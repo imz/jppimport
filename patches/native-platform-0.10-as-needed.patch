@@ -1,0 +1,11 @@
+--- native-platform-0.10/Makefile~	2016-02-04 11:35:33.000000000 +0000
++++ native-platform-0.10/Makefile	2016-02-13 00:14:06.861592842 +0000
+@@ -44,7 +44,7 @@
+ 	$(STRIP) $@
+ 
+ $(ODIR)/libnative-platform-curses.so: $(OBJ_CURSES)
+-	$(CXX) $(CFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) -lcurses -shared -fPIC -o $@ $^
++	$(CXX) $(CFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) -shared -fPIC -o $@ $^ -lcurses
+ 	$(STRIP) $@
+ 
+ $(JCLASSESDIR)/%.class: javafiles-list
