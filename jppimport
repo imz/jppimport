@@ -9,7 +9,7 @@ use RPM::Source::Transformation::GenericUtility;
 
 our @ISA=q/RPM::Source::Transform/;
 # keep in util
-$RPM::Source::Transform::cleanup=0;
+$RPM::Source::Transformation::RPMEditorProvider::cleanup=0;
 
 my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
 $converter->transform();
