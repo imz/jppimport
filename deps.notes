@@ -134,10 +134,7 @@ maven-checkstyle-plugin
 
 (unbootstrap:)
 jruby (missing subdirs)TODO devel + rpm-macros-jruby
-avro -> thrift
 sisu -> (eclipse stuff?)
-gradle -> js-jquery -> web-assets(fcmass)
-gradle -> 
 
 pki-core -> 
 jspecview -> icedtea-web + eclipse -> to checkout with jars
