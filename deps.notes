@@ -107,8 +107,6 @@ tycho:
 [ERROR] Then, install it using the command:
 [ERROR] mvn install:install-file -DgroupId=jdepend -DartifactId=jdepend -Dversion=2.9.1 -Dpackaging=jar -Dfile=/path/to/file
 
-TODO: ant -> move patches
-
 TODO: 16core=outofmemory -- -Dmaven.test.skip.exec=true
 simple
 disruptor
@@ -117,10 +115,11 @@ grizzly
 
 no fc24
 OSGi-bundle-ant-task -> depend on old aqute-bnd classes
-OSGi-bundle-ant-task -> package aQute.lib.osgi does not exist [javac] import aQute.lib.osgi.Analyzer;]
-OSGi-bundle-ant-task: --no need (del?)
-metadata-extractor
-pdf-renderer -
+OSGi-bundle-ant-task -> package aQute.lib.osgi does not exist
+OSGi-bundle-ant-task: did not help: sed -i 's/aQute\.lib\.osgi/aQute.bnd.osgi/g' 
+OSGi-bundle-ant-task: --no need (del)
+
+TODO: ant -> move patches
 
 jbossws-cxf -> fc21 no fc24
 invokebinder
@@ -140,6 +139,6 @@ pki-core ->
 jspecview -> icedtea-web + eclipse -> to checkout with jars
 sdljava -> (fix swig generation or re-use generated.tar hack)
 
-spock+gpars -> breaks fresh javapackages-tools
-0002 gradle patch or update to xmvn 2.5+maven 3.3.9
+javapackages-tools: 0002 gradle patch breaks gradle
+ or update to xmvn 2.5+maven 3.3.9
 

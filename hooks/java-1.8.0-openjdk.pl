@@ -126,6 +126,11 @@ push @SPECHOOKS, sub {
 # 2) add
 #sed -i -e 's, -m32, -m32 %optflags_shared -fpic -D_BLA_BLA_BLA1,' openjdk/hotspot/make/linux/makefiles/gcc.make
 
+    #Zerg: А у меня  java-1.8.0-openjdk-devel при установленным
+    # java-1.8.0-openjdk-headless вытащил java-1.6.0-sun-headless через зависимость
+    # на /usr/bin/java и не дает удалить.
+    $mainsec->unshift_body('%filter_from_requires /.usr.bin.java/d'."\n");
+
     # for %{__global_ldflags} -- might be dropped in the future
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 

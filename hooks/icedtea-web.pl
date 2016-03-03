@@ -34,7 +34,10 @@ push @SPECHOOKS, sub {
 
 # --- alt linux specific, shared with openjdk ---#
 
-    $jpp->get_section('package','')->push_body(q!
+    $jpp->get_section('package','')->push_body(q!Provides: icedtea-web = %version-%release
+Obsoletes: mozilla-plugin-java-1.7.0-openjdk < 1.5
+!);
+    $jpp->get_section('description','')->push_body(q!
 %if_enabled javaws
 %package -n %altname-javaws
 Summary: Java Web Start
