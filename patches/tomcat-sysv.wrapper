@@ -1,0 +1,85 @@
+#!/bin/sh
+
+if [ -r /usr/share/java-utils/java-functions ]; then
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't read Java functions library, aborting"
+  exit 1
+fi
+
+# Get the tomcat config (use this for environment specific settings)
+
+if [ -z "${TOMCAT_CFG_LOADED}" ]; then
+  if [ -z "${TOMCAT_CFG}" ]; then
+    TOMCAT_CFG="/etc/tomcat/tomcat.conf"
+  fi
+  . $TOMCAT_CFG
+fi
+
+## todo: viy@; does not correlate well with NAME usage below
+# Get instance specific config file
+if [ -r "/etc/sysconfig/tomcat" ]; then
+    . /etc/sysconfig/tomcat
+fi
+
+if [ -z "$CATALINA_BASE" ]; then
+  if [ -n "$NAME" ]; then
+    if [ -z "$TOMCATS_BASE" ]; then
+      TOMCATS_BASE="/var/lib/tomcats/"
+    fi
+    CATALINA_BASE="${TOMCATS_BASE}${NAME}"
+  else
+    CATALINA_BASE="${CATALINA_HOME}"
+  fi
+fi
+VERBOSE=1
+set_javacmd
+# CLASSPATH munging
+if [ -n "$JSSE_HOME" ]; then
+  CLASSPATH="${CLASSPATH}:$(build-classpath jcert jnet jsse 2>/dev/null)"
+fi
+CLASSPATH="${CLASSPATH}:${CATALINA_HOME}/bin/bootstrap.jar"
+CLASSPATH="${CLASSPATH}:${CATALINA_HOME}/bin/tomcat-juli.jar"
+CLASSPATH="${CLASSPATH}:$(build-classpath commons-daemon 2>/dev/null)"
+
+if [ -z "$LOGGING_PROPERTIES" ] ; then
+  LOGGING_PROPERTIES="${CATALINA_BASE}/conf/logging.properties"
+  if [ ! -f "${LOGGING_PROPERTIES}" ] ; then
+    LOGGING_PROPERTIES="${CATALINA_HOME}/conf/logging.properties"
+  fi
+fi
+
+MAIN_CLASS=org.apache.catalina.startup.Bootstrap
+
+FLAGS="$JAVA_OPTS"
+OPTIONS="-Dcatalina.base=$CATALINA_BASE \
+-Dcatalina.home=$CATALINA_HOME \
+-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS \
+-Djava.io.tmpdir=$CATALINA_TMPDIR \
+-Djava.util.logging.config.file=${LOGGING_PROPERTIES} \
+-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+
+if [ "$1" = "start" ]; then
+  if [ "${SECURITY_MANAGER}" = "true" ] ; then
+    FLAGS="${FLAGS} $CATALINA_OPTS"
+    OPTIONS="${OPTIONS} \
+    -Djava.security.manager \
+    -Djava.security.policy==${CATALINA_BASE}/conf/catalina.policy"
+  fi
+  ${JAVACMD} ${FLAGS} -classpath "$CLASSPATH" ${OPTIONS} \
+    ${MAIN_CLASS} start \
+    >> ${CATALINA_BASE}/logs/catalina.out 2>&1 &
+    if [ ! -z "$CATALINA_PID" ]; then
+      echo $! > $CATALINA_PID
+    fi
+elif [ "$1" = "stop" ]; then
+  ${JAVACMD} ${FLAGS} -classpath "$CLASSPATH" ${OPTIONS} \
+    ${MAIN_CLASS} stop \
+    >> ${CATALINA_BASE}/logs/catalina.out 2>&1
+elif [ "$1" = "version" ]; then
+  ${JAVACMD} -classpath ${CATALINA_HOME}/lib/catalina.jar \
+    org.apache.catalina.util.ServerInfo
+else
+  echo "Usage: $0 {start|stop|version}"
+  exit 1
+fi

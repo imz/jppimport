@@ -14,6 +14,9 @@ push @SPECHOOKS, sub {
     $mainsec->unshift_body('%set_compress_method none'."\n");
     $mainsec->unshift_body(q'BuildRequires(pre): browser-plugins-npapi-devel'."\n");
 
+    # remnants?
+    $mainsec->exclude_body(qr'^Requires.*:\s+maven-local'."\n");
+
     $mainsec->unshift_body(q'%def_enable javaws
 %def_enable moz_plugin
 ');
