@@ -17,6 +17,11 @@ Conflicts: xmlgraphics-batik-ttf2svg < 0:%version
 ');
     }
 
+    $jpp->get_section('package','css')->push_body('#32067
+Conflicts: batik < 0:1.8-alt1_1
+');
+
+
     &add_missingok_config($jpp, '/etc/rasterizer.conf','rasterizer');
     &add_missingok_config($jpp, '/etc/slideshow.conf','slideshow');
     &add_missingok_config($jpp, '/etc/squiggle.conf','squiggle');

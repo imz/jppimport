@@ -10,6 +10,9 @@ sub {
     my $initN=$spec->add_source('tomcat.init');
     $spec->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
     $filesec->push_body('%attr(0755,root,root) %_initdir/%name'."\n");
+
+    # see https://bugzilla.altlinux.org/show_bug.cgi?id=31853#c20
+    $spec->source_apply_patch(PATCHFILE=>'tomcat-8.0.logrotate.diff',SOURCEFILE=>'tomcat-8.0.logrotate');
     my $sysVwrapper=$spec->add_source('tomcat-sysv.wrapper');
     $spec->get_section('install')->push_body('install -D -m 755 %{S:'.$sysVwrapper.'} %buildroot%_sbindir/%{name}-sysv'."\n");
     $filesec->push_body('%attr(0755,root,root) %_sbindir/%{name}-sysv'."\n");

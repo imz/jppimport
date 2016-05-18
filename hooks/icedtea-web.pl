@@ -2,7 +2,10 @@
 
 push @PREHOOKS, sub {
     my ($jpp, $alt) = @_;
-    $jpp->get_section('posttrans','')->delete();
+    # contain alternatives that we add manually;
+    # also, (see https://bugzilla.altlinux.org/32043)
+    # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
+    $jpp->get_section($_,'')->delete()} qw/post postun posttrans/;
 };
 
 push @SPECHOOKS, sub {

@@ -251,6 +251,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $headlsec->exclude_body('^Requires: maven-local'."\n");
     $headlsec->push_body('Requires: java-common'."\n");
     $headlsec->push_body('Requires: /proc'."\n");
+    $headlsec->push_body(q!Requires(post): /proc!."\n");
 
     # unrecognized option; TODO: check the list
     #$jpp->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
@@ -488,15 +489,17 @@ echo "install passed past alt linux specific."
 
     #$jpp->_reset_speclist();
 
-    $jpp->add_section('post','headless')->push_body(q!# java should be available ASAP
+    $jpp->add_section('post','headless')->push_body(q@# java should be available ASAP
 %force_update_alternatives
 
 %ifarch %{jit_arches}
 #see https://bugzilla.redhat.com/show_bug.cgi?id=513605
 java=%{jrebindir}/java
-$java -Xshare:dump >/dev/null 2>/dev/null
+if [ -f /proc/cpuinfo ] && ! [ -d /.ours ] ; then #real workstation; not a mkimage-profile, etc
+    $java -Xshare:dump >/dev/null 2>/dev/null
+fi
 %endif
-!);
+@);
 
     #### Misterious bug:
     # java -version work with JAVA_HOME=/usr/lib/jvm/java-1.7.0

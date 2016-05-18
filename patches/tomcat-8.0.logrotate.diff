@@ -1,0 +1,8 @@
+--- tomcat-8.0.logrotate~	2016-03-02 19:56:25.000000000 +0200
++++ tomcat-8.0.logrotate	2016-03-13 15:28:53.000000000 +0200
+@@ -5,4 +5,5 @@
+     compress
+     missingok
+     create 0644 tomcat tomcat
++    su tomcat tomcat
+ }
