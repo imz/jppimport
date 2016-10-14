@@ -1,0 +1,13 @@
+diff --git a/jogl/make/build-newt.xml b/jogl/make/build-newt.xml
+index 7b9a518..f6e744c 100644
+--- a/jogl/make/build-newt.xml
++++ b/jogl/make/build-newt.xml
+@@ -72,7 +72,7 @@
+     <target name="base.init" depends="common.init">
+ 
+         <condition property="setup.addNativeBroadcom">
+-           <isset property="isLinux"/>
++           <not><isset property="isLinux"/></not>
+         </condition>
+ 
+         <condition property="setup.nonatives">
