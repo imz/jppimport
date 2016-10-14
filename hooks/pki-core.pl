@@ -4,6 +4,7 @@ push @SPECHOOKS,
 sub {
     my ($spec, $parent) = @_;
 
+    $spec->add_patch('pki-core-alt-local-urllib3.patch',STRIP=>1);
     $spec->get_section('pretrans','-n pki-base')->delete;
     $spec->get_section('files','-n pki-base')->push_body('%dir %{_datadir}/pki/key'."\n");
     foreach my $pkg (qw/pki-base pki-server/) {
