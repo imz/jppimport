@@ -232,6 +232,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     # as-needed link order
     $jpp->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
+    $jpp->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
 
 #map {if ($_->get_type() eq 'package') {
 #	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
