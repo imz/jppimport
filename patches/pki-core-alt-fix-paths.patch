@@ -1,0 +1,97 @@
+diff --git a/base/java-tools/src/com/netscape/cmstools/cli/HelpCLI.java b/base/java-tools/src/com/netscape/cmstools/cli/HelpCLI.java
+index b348ffc..5250fa3 100644
+--- a/base/java-tools/src/com/netscape/cmstools/cli/HelpCLI.java
++++ b/base/java-tools/src/com/netscape/cmstools/cli/HelpCLI.java
+@@ -77,7 +77,7 @@ public class HelpCLI extends CLI {
+         while (true) {
+             // display man page for the command
+             ProcessBuilder pb = new ProcessBuilder(
+-                    "/bin/man",
++                    "/usr/bin/man",
+                     manPage);
+ 
+             pb.inheritIO();
+diff --git a/base/java-tools/src/com/netscape/cmstools/client/ClientCertImportCLI.java b/base/java-tools/src/com/netscape/cmstools/client/ClientCertImportCLI.java
+index afa91d6..e46c7d6 100644
+--- a/base/java-tools/src/com/netscape/cmstools/client/ClientCertImportCLI.java
++++ b/base/java-tools/src/com/netscape/cmstools/client/ClientCertImportCLI.java
+@@ -282,7 +282,7 @@ public class ClientCertImportCLI extends CLI {
+         }
+ 
+         String[] command = {
+-                "/bin/certutil", "-A",
++                "/usr/bin/certutil", "-A",
+                 "-d", dbPath,
+                 "-i", certPath,
+                 "-n", nickname,
+@@ -304,7 +304,7 @@ public class ClientCertImportCLI extends CLI {
+             String pkcs12PasswordPath) throws Exception {
+ 
+         String[] command = {
+-                "/bin/pk12util",
++                "/usr/bin/pk12util",
+                 "-d", dbPath,
+                 "-K", dbPassword,
+                 "-i", pkcs12Path,
+diff --git a/base/java-tools/src/com/netscape/cmstools/client/ClientCertShowCLI.java b/base/java-tools/src/com/netscape/cmstools/client/ClientCertShowCLI.java
+index e44fae7..06fc221 100644
+--- a/base/java-tools/src/com/netscape/cmstools/client/ClientCertShowCLI.java
++++ b/base/java-tools/src/com/netscape/cmstools/client/ClientCertShowCLI.java
+@@ -196,7 +196,7 @@ public class ClientCertShowCLI extends CLI {
+             String nickname) throws Exception {
+ 
+         String[] command = {
+-                "/bin/pk12util",
++                "/usr/bin/pk12util",
+                 "-d", dbPath,
+                 "-K", dbPassword,
+                 "-o", pkcs12Path,
+@@ -218,7 +218,7 @@ public class ClientCertShowCLI extends CLI {
+             String certPath) throws Exception {
+ 
+         String[] command = {
+-                "/bin/openssl",
++                "/usr/bin/openssl",
+                 "pkcs12",
+                 "-clcerts", // certificate only
+                 "-nokeys",
+@@ -241,7 +241,7 @@ public class ClientCertShowCLI extends CLI {
+             String privateKeyPath) throws Exception {
+ 
+         String[] command = {
+-                "/bin/openssl",
++                "/usr/bin/openssl",
+                 "pkcs12",
+                 "-nocerts", // private key only
+                 "-nodes",   // no encryption
+@@ -264,7 +264,7 @@ public class ClientCertShowCLI extends CLI {
+             String clientCertPath) throws Exception {
+ 
+         String[] command = {
+-                "/bin/openssl",
++                "/usr/bin/openssl",
+                 "pkcs12",
+                 "-clcerts", // client certificate and private key
+                 "-nodes",   // no encryption
+diff --git a/base/server/python/pki/server/deployment/pkihelper.py b/base/server/python/pki/server/deployment/pkihelper.py
+index 5bc4ffa..4787e69 100644
+--- a/base/server/python/pki/server/deployment/pkihelper.py
++++ b/base/server/python/pki/server/deployment/pkihelper.py
+@@ -3043,7 +3043,7 @@ class KRAConnector:
+     def execute_using_pki(
+             self, caport, cahost, subsystemnick,
+             token_pwd, krahost, kraport, critical_failure=False):
+-        command = ["/bin/pki",
++        command = ["/usr/bin/pki",
+                    "-p", str(caport),
+                    "-h", cahost,
+                    "-n", subsystemnick,
+@@ -3193,7 +3193,7 @@ class TPSConnector:
+     def execute_using_pki(
+             self, tkshost, tksport, subsystemnick,
+             token_pwd, tpshost, tpsport, critical_failure=False):
+-        command = ["/bin/pki",
++        command = ["/usr/bin/pki",
+                    "-p", str(tksport),
+                    "-h", tkshost,
+                    "-n", subsystemnick,

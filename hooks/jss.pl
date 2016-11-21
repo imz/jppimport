@@ -4,6 +4,7 @@ push @SPECHOOKS,
 sub {
     my ($spec, $parent) = @_;
     $spec->add_patch('jss-link-alt.patch',STRIP=>1);
+    $spec->add_patch('jss-alt-sem-as-needed.patch',STRIP=>1);
     $spec->get_section('build')->subst_body(qr'\%if 0\%\{\?__isa_bits\} == 64','%ifarch x86_64 ppc64 ia64 s390x sparc64');
 
     $spec->get_section('build')->unshift_body_before(qr'The Makefile is not thread-safe',q@

@@ -9,7 +9,7 @@ sub {
 # TODO: why catalog does not work? it is ant xslt task
 sed -i 's,http://docbook.org/xml/simple/1.1b1/sdocbook.dtd,http://www.oasis-open.org/docbook/xml/simple/1.1/sdocbook.dtd,g' `grep -rl 'http://docbook.org/xml/simple/1.1b1/sdocbook.dtd' .`
 !."\n");
-    $jpp->get_section('package','')->subst('bcond_without manual','bcond_with manual');
+    $jpp->get_section('package','')->subst_body('bcond_without manual','bcond_with manual');
 };
 
 __END__

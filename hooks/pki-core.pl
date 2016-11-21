@@ -6,9 +6,23 @@ sub {
 
     # Mikhail Efremov to Igor
     # Hello!
-    # Возможно проблема в python-module-requests, но без этого патча pki-core
-    # был не рабочий совсем. (for pki-core-10.2.6)
+    # У меня в бранче sem есть исправления: исправлен предыдущий патч
+    # (requests все-таки нужен), еще один патч и изменения в спеке.
+    # С этими исправлениями (и исправленным jss) у меня оно вроде заработало с
+    # freeipa: при установке выписались сертификаты.
     $spec->add_patch('pki-core-alt-local-urllib3.patch',STRIP=>1);
+    $spec->add_patch('pki-core-alt-fix-paths.patch',STRIP=>1);
+    $spec->get_section('package','')->unshift_body('BuildRequires: sh4'."\n");
+    $spec->get_section('prep')->push_body(q{# from sem@:
+# At least one script required bash4.
+# Just use sh4 for all scripts.
+egrep -rH '^#!/bin/(sh|bash)' . | cut -f1 -d: | sort -u | \
+	xargs sed -r -i 's;^#!/bin/(sh|bash)( -X)?;#!/bin/sh4;'
+});
+    $spec->get_section('install')->push_body(q!# from sem@:
+# This file should be sourced only
+chmod -x %buildroot%_datadir/pki/scripts/operations
+!);
 
     $spec->get_section('pretrans','-n pki-base')->delete;
     $spec->get_section('files','-n pki-base')->push_body('%dir %{_datadir}/pki/key'."\n");
