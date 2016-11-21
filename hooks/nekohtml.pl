@@ -7,6 +7,6 @@ push @SPECHOOKS,
 sub {
     my ($jpp, $alt) = @_;
 # bugfix; to be commited in bugzilla
-    $jpp->get_section('files','')->subst(qr'^\%doc ','%doc --no-dereference ');
+    $jpp->get_section('files','')->subst_body(qr'^\%doc ','%doc --no-dereference ');
     &add_missingok_config($jpp, '/etc/java/%{name}.conf','');
 }
