@@ -25,6 +25,7 @@ chmod -x %buildroot%_datadir/pki/scripts/operations
 !);
 
     $spec->get_section('pretrans','-n pki-base')->delete;
+    $spec->get_section('package','-n pki-base')->exclude_body(qr'^Confilcts:.*freeipa');
     $spec->get_section('files','-n pki-base')->push_body('%dir %{_datadir}/pki/key'."\n");
     foreach my $pkg (qw/pki-base pki-server/) {
 	$spec->get_section('post','-n '.$pkg)->subst_body(qr'(^|\s)/sbin/',' /usr/sbin/');
