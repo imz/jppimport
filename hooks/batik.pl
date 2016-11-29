@@ -47,6 +47,9 @@ pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
     }
     $spec->get_section('install')->push_body('popd'."\n");
 
+}
+
+__END__
     $spec->get_section('install')->push_body('
 # due to #19119
 #1: xmlgraphics-batik         error: unpacking of archive failed on file
@@ -58,6 +61,3 @@ pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
     $spec->get_section('files','')->push_body('%_javadir/batik
 %dir %_javadir/xmlgraphics-batik
 ');
-}
-
-__END__
