@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
  sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # tmp hack till ant18 migration
-    $jpp->get_section('package','')->unshift_body('BuildRequires: ant-log4j'."\n");
+    $spec->get_section('package','')->unshift_body('BuildRequires: ant-log4j'."\n");
 }

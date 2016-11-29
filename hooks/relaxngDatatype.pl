@@ -2,6 +2,6 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-#    $jpp->get_section('package','')->subst_if(qr'Obsoletes:','#Obsoletes:',qr'msv');
+    my ($spec, $parent) = @_;
+#    $spec->get_section('package','')->subst_if(qr'Obsoletes:','#Obsoletes:',qr'msv');
 }

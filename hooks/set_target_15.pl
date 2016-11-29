@@ -5,8 +5,8 @@ push @SPECHOOKS, \&set_target_15;
 my $build_repo_mode;
 
 sub section_set_target {
-    my ($jpp,$secname,$target)=@_;
-    my $section=$jpp->get_section($secname);
+    my ($spec,$secname,$target)=@_;
+    my $section=$spec->get_section($secname);
     return unless $section;
     $build_repo_mode=0;
     $section->map_body(
@@ -31,28 +31,28 @@ sub section_set_target {
 
 
 sub set_target_15 {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     my $target='1.5';
-    return if $jpp->{__::HOOKS::set_target};
-    my $prepsec=$jpp->get_section('prep');
-    my $buildsec=$jpp->get_section('build');
+    return if $spec->{__::HOOKS::set_target};
+    my $prepsec=$spec->get_section('prep');
+    my $buildsec=$spec->get_section('build');
     if ($buildsec and $buildsec->match_body(qr'-Dmaven.compile.target') || $buildsec->match_body(qr'-Dant.build.javac.source')) {
 	warn "target hook detected\n";
 	return;
     }
-    $jpp->{__::HOOKS::set_target}=1;
-	$jpp->applied_block(
+    $spec->{__::HOOKS::set_target}=1;
+	$spec->applied_block(
 	"set_target_$target hook",
 	sub {
     $prepsec->subst(qr'^export JAVA_HOME=','#export JAVA_HOME=') if $prepsec;
     $buildsec->subst(qr'^export JAVA_HOME=','#export JAVA_HOME=') if $buildsec;
-#    $jpp->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
-    $jpp->clear_applied();
-    &section_set_target($jpp,'prep',$target);
-    &section_set_target($jpp,'build',$target);
+#    $spec->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
+    $spec->clear_applied();
+    &section_set_target($spec,'prep',$target);
+    &section_set_target($spec,'build',$target);
 
     # tomcat 5 :( but breaks felix :(
-    $jpp->get_section('install')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ") if $jpp->main_section->get_tag('Name') eq 'tomcat5';
+    $spec->get_section('install')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ") if $spec->main_section->get_tag('Name') eq 'tomcat5';
 
 
 	    });

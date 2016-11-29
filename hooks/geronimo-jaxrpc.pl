@@ -2,25 +2,25 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 };
 
 __END__
-    $jpp->get_section('package','')->unshift_body('BuildRequires: geronimo-saaj'."\n");
-    $jpp->get_section('package','')->push_body('
+    $spec->get_section('package','')->unshift_body('BuildRequires: geronimo-saaj'."\n");
+    $spec->get_section('package','')->push_body('
 #Provides:       jaxrpc = 0:1.1
 #Provides:       jaxrpc_1_1_api = %{version}-%{release}
 #Provides:       jaxrpc_api = 0:1.1
 ');
 
-    $jpp->get_section('files','')->push_body(q!
+    $spec->get_section('files','')->push_body(q!
 #%_altdir/jaxrpc_1_1_api_geronimo-jaxrpc
 #%_altdir/jaxrpc_api_geronimo-jaxrpc
 %_altdir/jaxrpc_geronimo-jaxrpc
 %exclude %{_javadir}*/jaxrpc.jar
 !."\n");
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/jaxrpc_geronimo-jaxrpc<<EOF
 %{_javadir}/jaxrpc.jar	%{_javadir}/geronimo-jaxrpc.jar	10000
 EOF

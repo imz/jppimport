@@ -4,18 +4,18 @@ require 'set_osgi.pl';
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    &add_missingok_config($jpp, '/etc/default/jetty','');
+    my ($spec, $parent) = @_;
+    &add_missingok_config($spec, '/etc/default/jetty','');
 
-    $jpp->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%{rundir}');
+    $spec->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%{rundir}');
 
-    my $initN=$jpp->add_source('jetty.init');
-    $jpp->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
-    $jpp->get_section('files','')->push_body('%_initdir/%name'."\n");
+    my $initN=$spec->add_source('jetty.init');
+    $spec->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
+    $spec->get_section('files','')->push_body('%_initdir/%name'."\n");
 
-    $jpp->get_section('pre','')->subst_body(qr'-(?:g|u)\s+\%jtuid','');
-    $jpp->get_section('pre','')->subst_body(qr'-s\s+/sbin/nologin','-s /bin/sh');
-    my $postun=$jpp->get_section('postun','');
+    $spec->get_section('pre','')->subst_body(qr'-(?:g|u)\s+\%jtuid','');
+    $spec->get_section('pre','')->subst_body(qr'-s\s+/sbin/nologin','-s /bin/sh');
+    my $postun=$spec->get_section('postun','');
     if ($postun) {
 	$postun->subst_body(qr'^userdel','# userdel');
 	$postun->subst_body(qr'^groupdel','# groupdel');
@@ -33,9 +33,9 @@ TODO: apply
 
 
 
-   $jpp->apply_to_sources(SOURCEFILE=>'jetty.init', PATCHFILE=>'jetty.init.diff');
-    #if ($jpp->get_section('package','')->match_body(qr'Source7:\s+jetty.init\s*$')) {
-    #	$jpp->get_section('prep')->push_body("sed -i 's,daemon --user,start_daemon --user,' %SOURCE7"."\n");
+   $spec->apply_to_sources(SOURCEFILE=>'jetty.init', PATCHFILE=>'jetty.init.diff');
+    #if ($spec->get_section('package','')->match_body(qr'Source7:\s+jetty.init\s*$')) {
+    #	$spec->get_section('prep')->push_body("sed -i 's,daemon --user,start_daemon --user,' %SOURCE7"."\n");
     #}
 
 
@@ -46,11 +46,11 @@ TODO: apply
     #предупреждение: Macro %__fe_userdel not found
     #предупреждение: Macro %__fe_groupdel not found
     # BuildRequires:\s+fedora-usermgmt-devel
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s+fedora-usermgmt-devel','');
-    $jpp->applied_block(
+    $spec->get_section('package','')->subst(qr'BuildRequires:\s+fedora-usermgmt-devel','');
+    $spec->applied_block(
 	"tmp hack TODO fix in import",
 	sub {
-	    foreach my $section ($jpp->get_sections()) {
+	    foreach my $section ($spec->get_sections()) {
 		if ($section->get_type() =~ '^(pre|post)') {
 		    $section->subst(qr'\%__fe_','');
 		    $section->subst(qr'fedora-user','user');

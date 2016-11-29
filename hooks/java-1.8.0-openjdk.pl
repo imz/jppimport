@@ -12,13 +12,13 @@
 #symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
 
 push @PREHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
     # TODO: javadoc alternatives: not provided.
     # TODO: add proper alternatives to javadoc manually (and check java-1.7.0-oracle too!)
     my %pkg=map {$_=>1} '', 'devel', 'headless', 'javadoc';
-    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $jpp->get_sections();
-    $jpp->set_sections(\@newsec);
+    my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $spec->get_sections();
+    $spec->set_sections(\@newsec);
 
     #### cleaning up macros for devel subpackages
 
@@ -26,7 +26,7 @@ push @PREHOOKS, sub {
     my @filtered;
     my $multidrop=0;
     my $multisave;
-    my $mainsec=$jpp->main_section;
+    my $mainsec=$spec->main_section;
     foreach my $line (@{$mainsec->get_bodyref}) {
 	if ($multidrop) {
 	    if ($line=~/^\}\s*$/) {
@@ -60,12 +60,12 @@ push @PREHOOKS, sub {
     }
     $mainsec->set_body(\@filtered);
 
-    foreach my $sec ($jpp->get_sections()) {
+    foreach my $sec ($spec->get_sections()) {
 	$sec->delete() if ($sec->get_raw_package() =~ /debug$/);
     }
 
-    $jpp->applied_off();
-    foreach my $sec ($jpp->get_sections()) {
+    $spec->applied_off();
+    foreach my $sec ($spec->get_sections()) {
 	$sec->apply_body(
 	    sub {
 		my ($line)=@_;
@@ -88,13 +88,13 @@ push @PREHOOKS, sub {
 	    });
 
     }
-    $jpp->applied_on();
-    $jpp->main_section->map_body(
+    $spec->applied_on();
+    $spec->main_section->map_body(
 	sub {
 	    s,[\%]+[1],, if s,^(\%global\s+(?:buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir))\(\)\s+\%\{expand:(.+)\}\s*$,$1 $2\n,;
 	}
 	);
-    $jpp->_reset_speclist();
+    $spec->_reset_speclist();
 };
 
 sub __subst_systemtap {
@@ -117,9 +117,9 @@ sub __subst_systemtap {
 }
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    my $spec=$jpp;
-    my $mainsec=$jpp->main_section;
+    my ($spec, $parent) = @_;
+    my $spec=$spec;
+    my $mainsec=$spec->main_section;
 
 # TODO: current hack:
 # 1) drop custom optflags? 
@@ -144,37 +144,37 @@ push @SPECHOOKS, sub {
 
     # 1core build (16core build is out of memory)
     # export NUM_PROC=%(/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :)
-    $jpp->get_section('build')->subst_body_if(qr'^export\s+NUM_PROC=','#export NUM_PROC=','_NPROCESSORS_ONLN');
+    $spec->get_section('build')->subst_body_if(qr'^export\s+NUM_PROC=','#export NUM_PROC=','_NPROCESSORS_ONLN');
 
     # no debug build in 1.8.65
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
-    $jpp->get_section('package','javadoc')->push_body('# fc provides
+    $spec->get_section('package','javadoc')->push_body('# fc provides
 Provides: java-javadoc = 1:1.9.0
 ');
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
-    $jpp->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' jdk8/hotspot/make/linux/makefiles/defs.make!."\n");
+    $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' jdk8/hotspot/make/linux/makefiles/defs.make!."\n");
 
     # it resolves gcc, g++,  ... etc to gcc_wrapper that breaks c++ linkage (java8 newer bugfixes)
-    $jpp->get_section('prep')->push_body(q!sed -i -e /BASIC_REMOVE_SYMBOLIC_LINKS/d jdk8/common/autoconf/toolchain.m4!."\n");
+    $spec->get_section('prep')->push_body(q!sed -i -e /BASIC_REMOVE_SYMBOLIC_LINKS/d jdk8/common/autoconf/toolchain.m4!."\n");
 
     # i586 build is not included :(
     #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
-    $mainsec=$jpp->main_section;
+    $mainsec=$spec->main_section;
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk');
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj');
     $mainsec->exclude_body(qr'^Obsoletes:\s+sinjdoc');
-    $jpp->get_section('package','headless')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-headless');
-    $jpp->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-devel');
-    $jpp->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj-devel');
-    $jpp->get_section('package','demo')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-demo');
-    $jpp->get_section('package','src')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-src');
-    $jpp->get_section('package','javadoc')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-javadoc');
-    $jpp->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
+    $spec->get_section('package','headless')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-headless');
+    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-devel');
+    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj-devel');
+    $spec->get_section('package','demo')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-demo');
+    $spec->get_section('package','src')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-src');
+    $spec->get_section('package','javadoc')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-javadoc');
+    $spec->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
@@ -228,17 +228,17 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
     # TODO drop
     # parasyte -Werror breaks build on x86_64
-    $jpp->add_patch('java-1.8.0-openjdk-alt-no-Werror.patch',STRIP=>1);
+    $spec->add_patch('java-1.8.0-openjdk-alt-no-Werror.patch',STRIP=>1);
 
     # as-needed link order
-    $jpp->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
-    $jpp->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
+    $spec->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
+    $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
 
 #map {if ($_->get_type() eq 'package') {
 #	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
 #	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 # }
-#} $jpp->get_sections();
+#} $spec->get_sections();
     
     # already 0
     #$mainsec->subst_body(qr'define runtests 1','define runtests 0');
@@ -255,24 +255,24 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $headlsec->push_body(q!Requires(post): /proc!."\n");
 
     # unrecognized option; TODO: check the list
-    #$jpp->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     # DISTRO_PACKAGE_VERSION="fedora-...
-    $jpp->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
+    $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
     # DISTRO_NAME="Fedora"
-    $jpp->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
+    $spec->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
 
     ## TODO: check if it still valid
     # hack for sun-based build (i586) only!!!
-    #$jpp->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
+    #$spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
 
-    $jpp->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
+    $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
 
     # why do we need it?
-    #$jpp->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi',':; #mv bin/java-rmi.cgi sample/rmi');
+    #$spec->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi',':; #mv bin/java-rmi.cgi sample/rmi');
 
     # just to suppress warnings on %
-    $jpp->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
-    $jpp->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
+    $spec->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
+    $spec->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
 
     # TODO: fix caserts generation!!!
     # for proper symlink requires ? 
@@ -281,29 +281,29 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # to disable --enable-systemtap
     #$mainsec->subst_body(qr'--enable-systemtap','%{subst_enable systemtap}');
     &__subst_systemtap($mainsec);
-    &__subst_systemtap($jpp->get_section('prep'));
-    &__subst_systemtap($jpp->get_section('install'));
-    &__subst_systemtap($jpp->get_section('files','devel'));
+    &__subst_systemtap($spec->get_section('prep'));
+    &__subst_systemtap($spec->get_section('install'));
+    &__subst_systemtap($spec->get_section('files','devel'));
 
     # big changelog
-    #$jpp->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
+    #$spec->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
-    $jpp->get_section('files','')->unshift_body('%_altdir/%altname-java
+    $spec->get_section('files','')->unshift_body('%_altdir/%altname-java
 %_sysconfdir/buildreqs/packages/substitute.d/%name
 ');
-    $jpp->get_section('files','devel')->unshift_body('%_altdir/%altname-javac
+    $spec->get_section('files','devel')->unshift_body('%_altdir/%altname-javac
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 ');
-    $jpp->_reset_speclist();
-    $mainsec=$jpp->main_section;
+    $spec->_reset_speclist();
+    $mainsec=$spec->main_section;
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 %__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
 %__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
 !);
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 ##### javadoc Alt specific #####
 echo java-javadoc >java-javadoc-buildreq-substitute
 mkdir -p %buildroot%_sysconfdir/buildreqs/packages/substitute.d
@@ -313,12 +313,12 @@ install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/%altname-java
 %{_javadocdir}/java	%{_javadocdir}/%{uniquejavadocdir}/api	%{priority}
 EOF
 !);
-    $jpp->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
+    $spec->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
 %_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
 ');
 
     # NOTE: s,sdklnk,sdkdir,g
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 
 ##################################################
 # --- alt linux specific, shared with openjdk ---#
@@ -488,9 +488,9 @@ done
 echo "install passed past alt linux specific."
 !);
 
-    #$jpp->_reset_speclist();
+    #$spec->_reset_speclist();
 
-    $jpp->add_section('post','headless')->push_body(q@# java should be available ASAP
+    $spec->add_section('post','headless')->push_body(q@# java should be available ASAP
 %force_update_alternatives
 
 %ifarch %{jit_arches}
@@ -506,24 +506,24 @@ fi
     # java -version work with JAVA_HOME=/usr/lib/jvm/java-1.7.0
     # but does not work with JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk
     # both are alternatives, former one works, but later one somehow is broken :(
-    $jpp->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
+    $spec->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
 
 #error: writeable files in /usr: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/server/classes.jsa
 #error: writeable files in /usr: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.79-2.5.5.0.x86_64/jre/lib/amd64/client/classes.jsa
 #%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/classes.jsa
 #%attr(664, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/client/classes.jsa
-    $jpp->get_section('files','headless')->subst_body_if(qr/664,/,'644,',qr!classes.jsa!);
+    $spec->get_section('files','headless')->subst_body_if(qr/664,/,'644,',qr!classes.jsa!);
 
 
     #ppc support
-    $jpp->get_section('package','devel')->push_body('
+    $spec->get_section('package','devel')->push_body('
 # hack for missing java 1.5.0 on ppc
 %ifarch ppc ppc64
 Provides: java-devel = 1.5.0
 %endif
 ') if 0; # jdk 1.6 already provides
 
-    $jpp->spec_apply_patch(PATCHSTRING=> q!
+    $spec->spec_apply_patch(PATCHSTRING=> q!
 --- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
 @@ -869,6 +869,7 @@
@@ -549,20 +549,20 @@ Provides: java-devel = 1.5.0
 
 __END__
     # no need in 1.7.0.1
-    #$jpp->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+    #$spec->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
-    $jpp->get_section('install')->push_body(q!# move soundfont to java
+    $spec->get_section('install')->push_body(q!# move soundfont to java
 grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
 grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
 mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
 !."\n");
-    $jpp->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
+    $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
 
-    $jpp->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
-    $jpp->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
+    $spec->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
+    $spec->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
 
     # builds end up randomly :(
-    $jpp->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
+    $spec->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     # chrpath hack (disabled)
     if (0) {
@@ -571,7 +571,7 @@ BuildRequires: chrpath
 # todo: remove after as-needed fix
 %set_verify_elf_method unresolved=relaxed
 ');
-	$jpp->get_section('install')->push_body(q!
+	$spec->get_section('install')->push_body(q!
 # chrpath hack :(
 find $RPM_BUILD_ROOT -name '*.so' -exec chrpath -d {} \;
 find $RPM_BUILD_ROOT/%{sdkbindir}/ -exec chrpath -d {} \;
@@ -580,7 +580,7 @@ find $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin/ -exec chrpath -d {} \;
     }
     # end chrpath hack
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 # HACK around find-requires
 %define __find_requires    $RPM_BUILD_ROOT/.find-requires
 cat > $RPM_BUILD_ROOT/.find-requires <<EOF

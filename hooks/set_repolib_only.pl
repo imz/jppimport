@@ -2,10 +2,10 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    my $oldname = $jpp->get_section('package','')->get_tag('Name');
-    $jpp->rename_main_package($oldname.'-repolib');
-    foreach my $section ($jpp->get_sections()) {
+    my ($spec, $parent) = @_;
+    my $oldname = $spec->get_section('package','')->get_tag('Name');
+    $spec->rename_main_package($oldname.'-repolib');
+    foreach my $section ($spec->get_sections()) {
 	my $type = $section->get_type();
 	if ($type=~/^(pre|post|preun|postun|trigger.*)$/) {
 	    $section->delete();

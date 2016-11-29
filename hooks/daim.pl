@@ -3,10 +3,10 @@
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # jython scripts
-    $jpp->get_section('package','scripts')->push_body('AutoReq: yes,nopython'."\n");
-    &add_missingok_config($jpp, '/etc/%{name}.conf','');
+    $spec->get_section('package','scripts')->push_body('AutoReq: yes,nopython'."\n");
+    &add_missingok_config($spec, '/etc/%{name}.conf','');
 }
 
 

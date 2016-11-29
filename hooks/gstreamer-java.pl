@@ -2,8 +2,8 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildArch: noarch'."\n");
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildArch: noarch'."\n");
 };
 
 __END__

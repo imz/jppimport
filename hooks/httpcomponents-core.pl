@@ -2,8 +2,8 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->push_body('
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->push_body('
 Obsoletes: hc-httpcore < 4.1.1
 Provides: hc-httpcore = %version'."\n");
 };

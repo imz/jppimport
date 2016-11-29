@@ -4,8 +4,8 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 };
 
 __END__
-    $jpp->get_section('package','javadoc')->push_body(q!Provides:       jakarta-%{short_name}-javadoc = 0:%{version}-%{release}!."\n");
+    $spec->get_section('package','javadoc')->push_body(q!Provides:       jakarta-%{short_name}-javadoc = 0:%{version}-%{release}!."\n");

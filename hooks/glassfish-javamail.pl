@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # jbossas42 compat repolib
-    $jpp->get_section('install')->push_body('
+    $spec->get_section('install')->push_body('
 %if %with repolib
 %define compatrepodir %{_javadir}/repository.jboss.com/glassfish/javamail/%{version}-brew
 install -d -m 755 $RPM_BUILD_ROOT%{compatrepodir}/

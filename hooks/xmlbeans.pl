@@ -3,8 +3,8 @@
 push @SPECHOOKS, \&fix_svn;
 
 sub fix_svn {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: subversion'."\n");
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: subversion'."\n");
 }
 
 1;

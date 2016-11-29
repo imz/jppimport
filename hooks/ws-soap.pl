@@ -2,6 +2,6 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: servletapi4'."\n");
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: servletapi4'."\n");
 }

@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    my $manualsec=$jpp->get_section('files','manual');
+    my ($spec, $parent) = @_;
+    my $manualsec=$spec->get_section('files','manual');
     if ($manualsec) {
-	$jpp->applied_block(
+	$spec->applied_block(
 	    "set_manual_no_dereference hook",
 	    sub {
 		$manualsec->subst_body(qr'^\s*%doc\s+manual','%doc --no-dereference manual');
@@ -25,18 +25,18 @@ push @SPECHOOKS, sub {
 
 __END__
 # push @SPECHOOKS, sub {
-#     my ($jpp, $alt) = @_;
-#     my $manualsec=$jpp->get_section('files','manual');
+#     my ($spec, $parent) = @_;
+#     my $manualsec=$spec->get_section('files','manual');
 #     if ($manualsec) {
-# 	$jpp->clear_applied();
-# 	$jpp->applied_off();
+# 	$spec->clear_applied();
+# 	$spec->applied_off();
 # 	$manualsec->subst_body(qr'^\s*%doc\s+target/dist','%doc --no-dereference target/dist');
 # 	$manualsec->subst_body(qr'^\s*%doc\s+build/docs','%doc --no-dereference build/docs');
 # 	$manualsec->subst_body(qr'^\s*%doc\s+build/javadocs','%doc --no-dereference build/javadocs');
 # 	$manualsec->subst_body(qr'^\s*%doc\s+dist/docs','%doc --no-dereference dist/docs');
 # 	$manualsec->subst_body(qr'^\s*%doc\s+docs/','%doc --no-dereference docs/');
-# 	$jpp->applied_on();
-# 	$jpp->report_applied_flags("set_manual_no_dereference hook");
+# 	$spec->applied_on();
+# 	$spec->report_applied_flags("set_manual_no_dereference hook");
 #     } else {
 # 	die "\%files manual not found!\n";
 #     }

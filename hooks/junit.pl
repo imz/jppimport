@@ -4,10 +4,10 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 
-    $jpp->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
-    $jpp->main_section->push_body('
+    $spec->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
+    $spec->main_section->push_body('
 Provides: junit = 0:%{version}
 Provides: junit4 = %{epoch}:%{version}-%{release}
 Conflicts: junit4 < 1:4.11-alt3_1jpp7

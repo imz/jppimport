@@ -4,6 +4,6 @@ require 'set_osgi.pl';
 require 'set_add_java_bin.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 };
 __END__

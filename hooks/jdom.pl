@@ -4,6 +4,6 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 }
 __END__

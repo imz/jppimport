@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $alt) = @_;
+    my ($spec, $parent) = @_;
     $spec->spec_apply_patch(PATCHFILE => 'azureus.spec.diff');
     $spec->get_section('package','')->unshift_body('Requires: java'."\n");
     $spec->get_section('package','')->unshift_body('Conflicts: vuse < 4.2.0.3'."\n");

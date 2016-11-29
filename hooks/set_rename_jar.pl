@@ -1,12 +1,12 @@
 sub rename_jar {
-    my ($jpp, $alt, $oldname, $newname) = @_;
-    $jpp->applied_off();
-    for my $sect ($jpp->get_sections()) {
+    my ($spec, $parent, $oldname, $newname) = @_;
+    $spec->applied_off();
+    for my $sect ($spec->get_sections()) {
 	if ($sect->get_type() eq 'files') {
 	    $sect->subst_if(qr'%{?oldname}?','%{name}',qr'_javadir');
 	}
     }
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 pushd $RPM_BUILD_ROOT%{_javadir}
 rename !."$oldname $newname".q! `find . -name '!.$oldname.q!*' -type d`
 for i in `find . -name '!.$oldname.q!*' -type f`; do
@@ -24,7 +24,7 @@ for i in `find . -name '!.$oldname.q!' -type l`; do
 done
 popd
 !);
-    $jpp->applied_on();
+    $spec->applied_on();
 }
 
 1;

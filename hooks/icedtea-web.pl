@@ -1,17 +1,17 @@
 #!/usr/bin/perl -w
 
 push @PREHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # contain alternatives that we add manually;
     # also, (see https://bugzilla.altlinux.org/32043)
     # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
-    $jpp->get_section($_,'')->delete()} qw/post postun posttrans/;
+    $spec->get_section($_,'')->delete()} qw/post postun posttrans/;
 };
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    #$jpp->rename_main_package('mozilla-plugin-java-1.8.0-openjdk');
-    my $mainsec=$jpp->main_section;
+    my ($spec, $parent) = @_;
+    #$spec->rename_main_package('mozilla-plugin-java-1.8.0-openjdk');
+    my $mainsec=$spec->main_section;
 
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
@@ -35,15 +35,15 @@ push @SPECHOOKS, sub {
 #BuildRequires: java-%javaver-%origin-devel
 ');
 
-    #$jpp->get_section('build')->subst(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
-    $jpp->get_section('build')->subst(qr'fedora-','ALTLinux-');
+    #$spec->get_section('build')->subst(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
+    $spec->get_section('build')->subst(qr'fedora-','ALTLinux-');
 
 # --- alt linux specific, shared with openjdk ---#
 
-    $jpp->get_section('package','')->push_body(q!Provides: icedtea-web = %version-%release
+    $spec->get_section('package','')->push_body(q!Provides: icedtea-web = %version-%release
 Obsoletes: mozilla-plugin-java-1.7.0-openjdk < 1.5
 !);
-    $jpp->get_section('description','')->push_body(q!
+    $spec->get_section('description','')->push_body(q!
 %if_enabled javaws
 %package -n %altname-javaws
 Summary: Java Web Start
@@ -71,17 +71,17 @@ with %{name} J2SE Runtime Environment.
 %endif # enabled javaws
 !);
 
-    $jpp->add_section('files','-n %altname-javaws');
-    #map{$_->describe()} $jpp->get_sections();
+    $spec->add_section('files','-n %altname-javaws');
+    #map{$_->describe()} $spec->get_sections();
 
-    $jpp->get_section('files','-n %altname-javaws')->unshift_body('#
+    $spec->get_section('files','-n %altname-javaws')->unshift_body('#
 %_altdir/%altname-javaws
 %{_desktopdir}/%{altname}-javaws.desktop
 %{_datadir}/pixmaps/javaws.png
 %{_man1dir}/javaws-itweb.1.gz
 %_bindir/javaws.itweb
 ');
-    $jpp->get_section('files','')->push_body('# alt linux specific
+    $spec->get_section('files','')->push_body('# alt linux specific
 %_altdir/%altname-plugin
 %{_desktopdir}/%{altname}-control-panel.desktop
 # replace by local variants
@@ -93,9 +93,9 @@ with %{name} J2SE Runtime Environment.
 %exclude %{_man1dir}/javaws-itweb.1.gz
 %exclude %_bindir/javaws.itweb'."\n");
 
-    $jpp->_reset_speclist();
+    $spec->_reset_speclist();
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 install -d -m 755 %buildroot/etc/icedtea-web
 cat > %buildroot/etc/icedtea-web/javaws.policy << EOF
 // Based on Oracle JDK policy file
@@ -107,12 +107,12 @@ sed -e 's,^JAVA_ARGS=,JAVA_ARGS="-Djava.security.policy=/etc/icedtea-web/javaws.
 %buildroot%_bindir/javaws.itweb
 !);
 
-    $jpp->get_section('files')->push_body(q!# security policy
+    $spec->get_section('files')->push_body(q!# security policy
 %dir /etc/icedtea-web
 /etc/icedtea-web/javaws.policy
 !);
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 
 ##################################################
 # --- alt linux specific, shared with openjdk ---#

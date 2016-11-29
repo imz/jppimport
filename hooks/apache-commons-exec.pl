@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package')->unshift_body('BuildRequires: /bin/ping'."\n");
+    my ($spec, $parent) = @_;
+    $spec->get_section('package')->unshift_body('BuildRequires: /bin/ping'."\n");
 }
 
 __END__

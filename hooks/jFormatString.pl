@@ -2,8 +2,8 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->push_body('
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->push_body('
 Obsoletes: jformatstring <= 0:0-alt1_0.3.20081016svnjpp6
 Conflicts: jformatstring <= 0:0-alt1_0.3.20081016svnjpp6
 '."\n");

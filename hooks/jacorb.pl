@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('build')->unshift_body(q!
+    my ($spec, $parent) = @_;
+    $spec->get_section('build')->unshift_body(q!
 # due to javadoc x86_64 out of memory
 subst 's,maxmemory="256m",maxmemory="512m",' build.xml
 !);

@@ -5,16 +5,16 @@ use warnings;
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    	$jpp->applied_block(
+    my ($spec, $parent) = @_;
+    	$spec->applied_block(
 	"set quote source tag hook",
 	sub {
-	    my $main = $jpp->get_section('package','');
+	    my $main = $spec->get_section('package','');
 	    my @body;
 	    foreach my $line (@{$main->get_bodyref()}) {
 		if ($line=~/^Source\d*:/) {
 		    $line=~s/\%/\%\%/g;
-		    $jpp->set_applied();
+		    $spec->set_applied();
 		}
 		push @body, $line;
 	    }

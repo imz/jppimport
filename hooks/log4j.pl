@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    &add_missingok_config($jpp,'/etc/chainsaw.conf');
+    my ($spec, $parent) = @_;
+    &add_missingok_config($spec,'/etc/chainsaw.conf');
 }
 __END__

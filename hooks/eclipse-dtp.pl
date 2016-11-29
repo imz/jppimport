@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package')->subst_if(qr'xml-commons-resolver','xml-commons-resolver12',qr'Requires:');
+    my ($spec, $parent) = @_;
+    $spec->get_section('package')->subst_if(qr'xml-commons-resolver','xml-commons-resolver12',qr'Requires:');
 
 
 };
 
 __END__
-+    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-emf-sdk'."\n");
++    $spec->get_section('package','')->unshift_body('BuildRequires: eclipse-emf-sdk'."\n");
 
 
 --- eclipse-dtp.spec	2012-09-28 19:50:42.000000000 +0300

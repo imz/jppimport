@@ -3,6 +3,6 @@
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    &add_missingok_config($jpp, '/etc/opengrok.conf','');
+    my ($spec, $parent) = @_;
+    &add_missingok_config($spec, '/etc/opengrok.conf','');
 }

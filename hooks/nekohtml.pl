@@ -5,8 +5,8 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 # bugfix; to be commited in bugzilla
-    $jpp->get_section('files','')->subst_body(qr'^\%doc ','%doc --no-dereference ');
-    &add_missingok_config($jpp, '/etc/java/%{name}.conf','');
+    $spec->get_section('files','')->subst_body(qr'^\%doc ','%doc --no-dereference ');
+    &add_missingok_config($spec, '/etc/java/%{name}.conf','');
 }

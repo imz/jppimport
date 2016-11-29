@@ -2,24 +2,24 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 };
 __END__
-    $jpp->get_section('package','')->push_body('
+    $spec->get_section('package','')->push_body('
 #Provides:       jms_1_1_api = %{version}-%{release}
 #Provides:       jms_api = 0:1.1
 # drop the following asap
 #Provides:       jms = 0:1.1
 ');
 
-    $jpp->get_section('files','')->push_body(q!
+    $spec->get_section('files','')->push_body(q!
 #%_altdir/jms_1_1_api_geronimo-jms
 #%_altdir/jms_api_geronimo-jms
 %_altdir/jms_geronimo-jms
 %exclude %{_javadir}*/jms.jar
 !."\n");
 
-    $jpp->get_section('install')->push_body(q!
+    $spec->get_section('install')->push_body(q!
 install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/jms_geronimo-jms<<EOF
 %{_javadir}/jms.jar	%{_javadir}/geronimo-jms.jar	10200
 EOF

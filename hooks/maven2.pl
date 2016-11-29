@@ -4,26 +4,26 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 };
 __END__
     # Следующие пакеты имеют неудовлетворенные зависимости:
     # maven2: Требует: /etc/mavenrc но пакет не может быть установлен
-    #&add_missingok_config($jpp,'/etc/mavenrc');
+    #&add_missingok_config($spec,'/etc/mavenrc');
 
-    #$jpp->get_section('package')->set_tag(q!Epoch:!,1);
+    #$spec->get_section('package')->set_tag(q!Epoch:!,1);
 
-    $jpp->get_section('package','-n maven-model')->push_body(q!# it was a tmp package during migration
+    $spec->get_section('package','-n maven-model')->push_body(q!# it was a tmp package during migration
 Obsoletes:       maven-model22 < 0:%{version}-%{release}!."\n");
 
-    $jpp->main_section->push_body(q!
+    $spec->main_section->push_body(q!
 Obsoletes:       maven2-plugin-jxr <= 0:2.0.4 
 Obsoletes:       maven2-plugin-surefire <= 0:2.0.4 
 Obsoletes:       maven2-plugin-surefire-report <= 0:2.0.4 
 Obsoletes:       maven2-plugin-release <= 0:2.0.4 
 !."\n");
-    $srcid=$jpp->add_source('maven3-jpp-script');
-    $jpp->get_section('install')->push_body(q!
+    $srcid=$spec->add_source('maven3-jpp-script');
+    $spec->get_section('install')->push_body(q!
 %post
 # clear the old links
 [ -d %{_datadir}/%{name}/boot/ ] && find %{_datadir}/%{name}/boot/ -type l -exec rm -f '{}' \; ||:

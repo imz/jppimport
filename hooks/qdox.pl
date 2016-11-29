@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # when upgrade is finished
-    $jpp->get_section('package','')->push_body('Obsoletes: qdox16-poms < 1.1'."\n");
+    $spec->get_section('package','')->push_body('Obsoletes: qdox16-poms < 1.1'."\n");
 }

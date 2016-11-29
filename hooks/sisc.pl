@@ -3,8 +3,8 @@
 push @SPECHOOKS, \&fix_xsltproc;
 
 sub fix_xsltproc {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: xsltproc'."\n");
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: xsltproc'."\n");
 }
 
 1;

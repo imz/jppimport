@@ -3,13 +3,13 @@
 push @SPECHOOKS, \&set_split_gcj_support;
 
 sub set_split_gcj_support {
-    my ($jpp, $alt) = @_;
-	$jpp->applied_block(
+    my ($spec, $parent) = @_;
+	$spec->applied_block(
 	"set_split_gcj_support hook",
 	sub {
-    $jpp->get_section('package','')->subst(qr'(?<=\?_without_gcj)\s$','');
-    $jpp->get_section('package','')->subst(qr'(?<=\?_gcj_sup)\s$','');
-    $jpp->get_section('package','')->subst(qr'(?<=_gcj_support}}\%{!\?_g)\s$','');
+    $spec->get_section('package','')->subst(qr'(?<=\?_without_gcj)\s$','');
+    $spec->get_section('package','')->subst(qr'(?<=\?_gcj_sup)\s$','');
+    $spec->get_section('package','')->subst(qr'(?<=_gcj_support}}\%{!\?_g)\s$','');
 	    });
 
 #_gcj_support}}%{!?_g

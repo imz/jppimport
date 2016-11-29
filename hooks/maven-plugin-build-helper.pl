@@ -2,8 +2,8 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->push_body(q!
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->push_body(q!
 Provides: mojo-maven2-plugin-build-helper = %version
 Obsoletes: mojo-maven2-plugin-build-helper = 17
 !."\n");

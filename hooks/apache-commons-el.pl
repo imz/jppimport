@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 require 'set_apache_obsoletes_epoch1.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 }
 
 __END__

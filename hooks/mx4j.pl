@@ -6,11 +6,11 @@ require 'set_without_tests.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->unshift_body('BuildRequires: docbook-dtds'."\n");
-    $jpp->get_section('package','')->subst(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: docbook-dtds'."\n");
+    $spec->get_section('package','')->subst(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
 }
 
 __END__
 # no network; hm... maybe altspecific...
-#$jpp->add_patch('mx4j-3.0.1-alt-local-xsl-stylesheets.patch', STRIP=>1);
+#$spec->add_patch('mx4j-3.0.1-alt-local-xsl-stylesheets.patch', STRIP=>1);
