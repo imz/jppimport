@@ -4,12 +4,12 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
 
     # drop junit4-* provides/obsoletes
-    $jpp->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
+    $spec->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
 
-    $jpp->spec_apply_patch(PATCHSTRING=>q!
+    $spec->spec_apply_patch(PATCHSTRING=>q!
 --- junit.spec	2014-07-10 13:42:48.000000000 +0300
 +++ junit.spec	2014-07-10 13:48:17.000000000 +0300
 @@ -117,39 +117,39 @@
@@ -65,7 +65,7 @@ sub {
  %doc LICENSE README CODING_STYLE
 !);
 
-    $jpp->get_section('description','manual')->push_body('
+    $spec->get_section('description','manual')->push_body('
 %package -n junit-junit4
 Group:          Development/Java
 Summary:        %{oldname} provider
@@ -82,11 +82,11 @@ Obsoletes: junit < 1:3.8.2-alt8
 Virtual junit package based on %{name}.
 
 ');
-    $jpp->get_section('files','manual')->push_body('
+    $spec->get_section('files','manual')->push_body('
 %files -n junit-junit4
 %_altdir/%{name}
 ');
-    $jpp->get_section('install')->push_body('
+    $spec->get_section('install')->push_body('
 mkdir -p %buildroot%_altdir
 cat >>%buildroot%_altdir/%{name}<<EOF
 %{_javadir}/junit.jar	%{_javadir}/%{name}.jar	4110

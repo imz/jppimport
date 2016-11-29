@@ -4,20 +4,20 @@ require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($jpp, $alt) = @_;
+    my ($spec, $parent) = @_;
     # alt sppecific - removed ghosted alternatives symlink
-    $jpp->get_section('install')->subst(qr'ln -s %\{_sysconfdir\}/alternatives/%\{name\}-apis-javadoc \$RPM_BUILD_ROOT%\{_javadocdir\}/%\{name\}-apis','#ln -s %{_sysconfdir}/alternatives/%{name}-apis-javadoc $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis');
-    $jpp->get_section('files','jaxp-1.1-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
-    $jpp->get_section('files','jaxp-1.2-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
-    $jpp->get_section('files','jaxp-1.3-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
+    $spec->get_section('install')->subst(qr'ln -s %\{_sysconfdir\}/alternatives/%\{name\}-apis-javadoc \$RPM_BUILD_ROOT%\{_javadocdir\}/%\{name\}-apis','#ln -s %{_sysconfdir}/alternatives/%{name}-apis-javadoc $RPM_BUILD_ROOT%{_javadocdir}/%{name}-apis');
+    $spec->get_section('files','jaxp-1.1-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
+    $spec->get_section('files','jaxp-1.2-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
+    $spec->get_section('files','jaxp-1.3-apis-javadoc')->exclude(qr'\%{_javadocdir}/\%{name}-apis');
 
-    $jpp->get_section('package','')->subst_body(qr'global _extension \.gz','global _extension .bz2');
+    $spec->get_section('package','')->subst_body(qr'global _extension \.gz','global _extension .bz2');
 
-    $jpp->applied_block(
+    $spec->applied_block(
 	"from %post to %install (not to break provides) hook",
 	sub {
     # from %post to %install (not to break provides)
-    foreach my $sec ($jpp->get_sections()) {
+    foreach my $sec ($spec->get_sections()) {
 	my $type=$sec->get_type();
 	my $name=$sec->get_raw_package();
 	next if $name=~/javadoc$/;
@@ -29,18 +29,18 @@ sub {
 
 	});
 
-    $jpp->get_section('install')->push_body(q'
+    $spec->get_section('install')->push_body(q'
 chmod 755 %buildroot%{_bindir}/*
 ');
-    $jpp->get_section('files','jaxp-1.3-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp13.jar');
-    $jpp->get_section('files','jaxp-1.2-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp12.jar');
-    $jpp->get_section('files','jaxp-1.1-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp11.jar');
+    $spec->get_section('files','jaxp-1.3-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp13.jar');
+    $spec->get_section('files','jaxp-1.2-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp12.jar');
+    $spec->get_section('files','jaxp-1.1-apis')->subst_if(qr'\%exclude ','',qr'{_javadir}\*?/jaxp11.jar');
 
     #  ghost alternatives. as a hook?
-    $jpp->applied_block(
+    $spec->applied_block(
 	"ghost alternatives in bin hook",
 	sub {
-	    foreach my $sec ($jpp->get_sections()) {
+	    foreach my $sec ($spec->get_sections()) {
 		my $type=$sec->get_type();
 		if ($type eq 'files') {
 		    $sec->exclude(qr'\%attr\(0755,root,root\)\s+\%ghost\s+\%{_bindir}');
@@ -48,9 +48,9 @@ chmod 755 %buildroot%{_bindir}/*
 	    }
 	});
 
-    $jpp->get_section('install')->push_body(q'# fc compatibility: xml-commons-apis-ext.jar
+    $spec->get_section('install')->push_body(q'# fc compatibility: xml-commons-apis-ext.jar
 ln -s xml-commons-jaxp-1.3-apis-ext-%{version}.jar %buildroot%{_javadir}/xml-commons-apis-ext.jar'."\n");
-    $jpp->get_section('files','jaxp-1.3-apis')->push_body(q'# fc compatibility: 
+    $spec->get_section('files','jaxp-1.3-apis')->push_body(q'# fc compatibility: 
 %{_javadir}/xml-commons-apis-ext.jar'."\n");
 }
 

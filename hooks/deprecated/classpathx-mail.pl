@@ -4,12 +4,12 @@
 require 'set_sasl_hook.pl';
 
 push @SPECHOOKS, sub {
-    my ($jpp, $alt) = @_;
-    $jpp->get_section('package','')->push_body('# required for fedora tomcat
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->push_body('# required for fedora tomcat
 Provides: javamail = 0:1.3.1
 Provides: javamail-monolithic = 0:1.3.1
 ');
-    $jpp->get_section('package','')->subst(qr'BuildRequires:\s*classpathx-jaf','#BuildRequires: classpathx-jaf');
+    $spec->get_section('package','')->subst(qr'BuildRequires:\s*classpathx-jaf','#BuildRequires: classpathx-jaf');
 }
 __END__
 --- classpathx-mail.spec.0      2010-10-23 13:44:46.098206697 +0000

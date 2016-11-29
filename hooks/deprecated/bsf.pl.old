@@ -1,8 +1,0 @@
-#!/usr/bin/perl -w
-
-$spechook = sub {
-    my ($jpp, $alt) = @_;
-    'Obsoletes: jakarta-bsf
-    BuildRequires: servletapi5 tomcat5-jsp-2.0-api'
-    $jpp->get_section('package','')->subst(qr'tomcat5-jsp-2.0-api', 'servletapi5');
-}
