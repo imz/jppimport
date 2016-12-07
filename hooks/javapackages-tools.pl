@@ -10,6 +10,7 @@ sub {
     # dependency on python3-module-setuptools - add
 
     $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
+    my $opid=$spec->add_source('osgi-fc.prov.files');
     my $mpid=$spec->add_source('maven.prov.files');
     my $meid=$spec->add_source('maven.env');
     $spec->add_patch('javapackages-tools-4.6.0-alt-use-enviroment.patch',STRIP=>1);
@@ -18,7 +19,7 @@ sub {
     $spec->add_patch('macros.fjava-to-alt-rpm404.patch',STRIP=>1);
     $spec->add_patch('macros.jpackage-alt-script.patch',STRIP=>1);
 
-    $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight'."\n");
+    $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight python3-module-nose python3-module-setuptools-tests'."\n");
 
     # if set _jnidir = %_libdir/java
     #$spec->main_section->exclude_body(qr'^BuildArch:\s+noarch');
@@ -55,6 +56,9 @@ install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/maven.req.files
 install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/javadoc.req.files
 sed -i -e s,/usr/share/maven-metadata/,/usr/share/javadoc/, %buildroot/usr/lib/rpm/javadoc.req.files
 
+install -m755 -D %{SOURCE@.$opid.q@} %buildroot/usr/lib/rpm/osgi-fc.prov.files
+install -m755 -D %{SOURCE@.$opid.q@} %buildroot/usr/lib/rpm/osgi-fc.req.files
+
 chmod 755 %buildroot/usr/lib/rpm/*.req* %buildroot/usr/lib/rpm/*.prov*
 sed -i -e 's,^#!python,#!/usr/bin/python,' %buildroot/usr/lib/rpm/*.req* %buildroot/usr/lib/rpm/*.prov*
 
@@ -75,6 +79,11 @@ rm -rf %buildroot/usr/lib/rpm/fileattrs
 pushd %buildroot%_rpmmacrosdir/
 mv macros.fjava javapackages-fjava
 mv macros.jpackage javapackages-jpackage
+popd
+
+pushd %buildroot/usr/lib/rpm/
+mv osgi.prov osgi-fc.prov
+mv osgi.req osgi-fc.req
 popd
 !."\n");
 
@@ -116,12 +125,22 @@ RPM build helpers for Java packages.
 %files -n rpm-build-java
 /usr/lib/rpm/maven.*
 /usr/lib/rpm/javadoc.*
+/usr/lib/rpm/osgi-fc.*
 %_rpmmacrosdir/maven.env
 %_datadir/java-utils/maven_depmap.py
 %_datadir/java-utils/pom_editor.py
 %_datadir/java-utils/request-artifact.py
 %_bindir/xmvn-builddep
+%_datadir/java-utils/__pycache__/maven_depmap.*
+%_datadir/java-utils/__pycache__/pom_editor.*
+%_datadir/java-utils/__pycache__/request-artifact.*
+'."\n");
 
+    $spec->get_section('files','-n javapackages-local')->push_body('
+%_datadir/java-utils/__pycache__
+%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
+%exclude %_datadir/java-utils/__pycache__/pom_editor.*
+%exclude %_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
 
 };

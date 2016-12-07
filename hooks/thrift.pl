@@ -1,0 +1,1 @@
+../../fcimport.git/hooks/thrift.pl
