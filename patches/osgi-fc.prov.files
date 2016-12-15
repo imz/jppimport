@@ -1,0 +1,5 @@
+#!/bin/sh -efu
+while IFS=$'\t' read -r f t; do
+	[ -z "${f##${RPM_BUILD_ROOT-}*.jar}" -a -z "${t##*Zip archive*}" ] && echo "$f" ||:
+	[ -z "${f##${RPM_BUILD_ROOT-}*/META-INF/MANIFEST.MF}" -a -z "${t##*text*}" ] && echo "$f" ||:
+done

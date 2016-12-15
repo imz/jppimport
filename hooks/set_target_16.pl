@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, \&set_target_15;
+push @SPECHOOKS, \&set_target_16;
 
 my $build_repo_mode;
 
@@ -24,15 +24,15 @@ sub section_set_target {
 	    s!bin/javac !bin/javac  -target $target -source $target ! or
 	    s!\%\{javac\} !%{javac}  -target $target -source $target ! or
 	    s!^javac !javac  -target $target -source $target ! or
-	    s!^\s*(?:\%\{_bindir\}/)?(maven|mvn|mvn-jpp|mvn-jpp22|mvn-rpmbuild)(?=\s|$)!$1 -Dmaven.compile.source=1.5 -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
+	    s!^\s*(?:\%\{_bindir\}/)?(maven|mvn|mvn-jpp|mvn-jpp22|mvn-rpmbuild)(?=\s|$)!$1 -Dmaven.compile.source=1.6 -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
 	    s!^(\s*\%?\{?ant(?:17)?\}?)(?=\s)!$1 -Dant.build.javac.source=$target -Dant.build.javac.target=$target !;
 	})
 }
 
 
-sub set_target_15 {
+sub set_target_16 {
     my ($spec, $parent) = @_;
-    my $target='1.5';
+    my $target='1.6';
     return if $spec->{__::HOOKS::set_target};
     my $prepsec=$spec->get_section('prep');
     my $buildsec=$spec->get_section('build');

@@ -113,11 +113,6 @@ disruptor
 bean-validation-api
 grizzly
 
-no fc24
-OSGi-bundle-ant-task -> depend on old aqute-bnd classes
-OSGi-bundle-ant-task -> package aQute.lib.osgi does not exist
-OSGi-bundle-ant-task: did not help: sed -i 's/aQute\.lib\.osgi/aQute.bnd.osgi/g' 
-OSGi-bundle-ant-task: --no need (del)
 
 TODO: ant -> move patches
 
