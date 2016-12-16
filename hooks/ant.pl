@@ -14,7 +14,6 @@ ant-apache-resolver	ant-xml-resolver
 #alteady contained
 #ant-apache-oro		ant-jakarta-oro
 #ant-apache-regexp	ant-jakarta-regexp
-    $spec->get_section('package','javamail')->subst_if(qr'>= 0:1.2-5jpp','',qr'Requires');
 
     foreach my $pkg (keys(%pkg_rename)) {
 #	print "renaming: $pkg -> $pkg_rename{$pkg}\n";

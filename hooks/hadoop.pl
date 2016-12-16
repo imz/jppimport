@@ -3,7 +3,6 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
-    $spec->spec_apply_patch(PATCHFILE => '%name.spec.diff');
     $spec->add_patch('hadoop-2.4.1-alt-sh-syntax.patch',STRIP=>0);
     $spec->get_section('package','')->unshift_body('BuildRequires: avro-maven-plugin'."\n");
     $spec->get_section('package','')->unshift_body('BuildRequires: zlib-devel'."\n");
