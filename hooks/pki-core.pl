@@ -12,6 +12,8 @@ sub {
     # freeipa: при установке выписались сертификаты.
     $spec->add_patch('pki-core-alt-local-urllib3.patch',STRIP=>1);
     $spec->add_patch('pki-core-alt-fix-paths.patch',STRIP=>1);
+    $spec->add_patch('pki-core-alt-change-port.patch',STRIP=>1);
+    $spec->add_patch('pki-core-alt-fix-gcc6-build.patch',STRIP=>1);
     $spec->get_section('package','')->unshift_body('BuildRequires: sh4'."\n");
     $spec->get_section('prep')->push_body(q{# from sem@:
 # At least one script required bash4.

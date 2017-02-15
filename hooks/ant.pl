@@ -64,6 +64,8 @@ Optional build tasks for ant, a platform-independent build tool for Java.
 
 '."\n");
 
+    $spec->get_section('install')->push_body(q{sed -i -e '1s,^#! *,#!,' %buildroot/%_bindir/*}."\n");
+
 }
 
 

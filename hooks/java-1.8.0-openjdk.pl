@@ -104,13 +104,13 @@ sub __subst_systemtap {
     my $i;
     for ($i=0; $i<@oldbody;$i++) {
 	my $line=$oldbody[$i];
-	if ($line=~/\%ifarch\s+\%{jit_arches}/ && (
+	if ($line=~/\%ifarch\s+\%\{jit_arches\}/ && (
 		$i < $#oldbody &&
 		$oldbody[$i+1]=~/systemtap|\.stp|tapset/) &&
 	    $oldbody[$i+1]!~/Where to install systemtap tapset/) {
-	    $line=~s/\%ifarch\s+\%{jit_arches}/\%if_enabled systemtap/g;
+	    $line=~s/\%ifarch\s+\%\{jit_arches\}/\%if_enabled systemtap/g;
 	}
-	$line=~s/\%if\s+\%{with_systemtap}/\%if_enabled systemtap/g;
+	$line=~s/\%if\s+\%\{with_systemtap\}/\%if_enabled systemtap/g;
 	push @newbody, $line;
     }
     $section->set_body(\@newbody);
@@ -118,7 +118,6 @@ sub __subst_systemtap {
 
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
-    my $spec=$spec;
     my $mainsec=$spec->main_section;
 
 # TODO: current hack:

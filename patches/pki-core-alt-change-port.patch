@@ -1,0 +1,562 @@
+diff --git a/base/ca/shared/conf/CS.cfg.in b/base/ca/shared/conf/CS.cfg.in
+index 53e65de..7966729 100644
+--- a/base/ca/shared/conf/CS.cfg.in
++++ b/base/ca/shared/conf/CS.cfg.in
+@@ -287,7 +287,7 @@ ca.Policy.impl.SubjectDirectoryAttributesExt.class=com.netscape.cms.policy.exten
+ ca.Policy.impl.SubjectKeyIdentifierExt.class=com.netscape.cms.policy.extensions.SubjectKeyIdentifierExt
+ ca.Policy.impl.UniqueSubjectNameConstraints.class=com.netscape.cms.policy.constraints.UniqueSubjectNameConstraints
+ ca.Policy.impl.ValidityConstraints.class=com.netscape.cms.policy.constraints.ValidityConstraints
+-ca.Policy.rule.AuthInfoAccessExt.ad0_location=http://[PKI_HOSTNAME]:8080/ocsp
++ca.Policy.rule.AuthInfoAccessExt.ad0_location=http://[PKI_HOSTNAME]:8090/ocsp
+ ca.Policy.rule.AuthInfoAccessExt.ad0_location_type=URL
+ ca.Policy.rule.AuthInfoAccessExt.ad0_method=ocsp
+ ca.Policy.rule.AuthInfoAccessExt.enable=false
+@@ -769,7 +769,7 @@ cmsgateway._028=##       already been reset.
+ cmsgateway._029=##
+ cmsgateway.enableAdminEnroll=false
+ https.port=8443
+-http.port=8080
++http.port=8090
+ dbs.enableSerialManagement=[PKI_ENABLE_RANDOM_SERIAL_NUMBERS]
+ dbs.enableRandomSerialNumbers=[PKI_ENABLE_RANDOM_SERIAL_NUMBERS]
+ dbs.randomSerialNumberCounter=0
+diff --git a/base/ca/shared/conf/server-minimal.xml b/base/ca/shared/conf/server-minimal.xml
+index 7b542b6..1bed1e0 100644
+--- a/base/ca/shared/conf/server-minimal.xml
++++ b/base/ca/shared/conf/server-minimal.xml
+@@ -10,7 +10,7 @@
+   </GlobalNamingResources>
+ 
+   <Service name="Catalina">
+-    <Connector port="8080" />
++    <Connector port="8090" />
+ 
+     <!-- This is here for compatibility only, not required -->
+     <Connector port="8009" protocol="AJP/1.3" />
+diff --git a/base/ca/shared/conf/tomcat6.conf b/base/ca/shared/conf/tomcat6.conf
+index 2d7def5..73a5ac4 100644
+--- a/base/ca/shared/conf/tomcat6.conf
++++ b/base/ca/shared/conf/tomcat6.conf
+@@ -50,8 +50,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat6 instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat6 instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
+diff --git a/base/common/python/pki/client.py b/base/common/python/pki/client.py
+index b2b2d12..331d04b 100644
+--- a/base/common/python/pki/client.py
++++ b/base/common/python/pki/client.py
+@@ -50,7 +50,7 @@ class PKIConnection:
+     subsystem.
+     """
+ 
+-    def __init__(self, protocol='http', hostname='localhost', port='8080',
++    def __init__(self, protocol='http', hostname='localhost', port='8090',
+                  subsystem='ca', accept='application/json'):
+         """
+         Set the parameters for a python-requests based connection to a
+diff --git a/base/common/python/pki/nssdb.py b/base/common/python/pki/nssdb.py
+index 0f9e13d..0f8a8dc 100644
+--- a/base/common/python/pki/nssdb.py
++++ b/base/common/python/pki/nssdb.py
+@@ -309,7 +309,7 @@ class NSSDatabase(object):
+ 
+         # TODO: replace with actual hostname name and port number
+         # Enter data:
+-        keystroke += 'http://server.example.com:8080/ca/ocsp\n'
++        keystroke += 'http://server.example.com:8090/ca/ocsp\n'
+ 
+         # Select one of the following general name type:
+         keystroke += '0\n'
+diff --git a/base/common/src/com/netscape/certsrv/client/PKICertificateApprovalCallback.java b/base/common/src/com/netscape/certsrv/client/PKICertificateApprovalCallback.java
+index 3ec46f5..4822cef 100644
+--- a/base/common/src/com/netscape/certsrv/client/PKICertificateApprovalCallback.java
++++ b/base/common/src/com/netscape/certsrv/client/PKICertificateApprovalCallback.java
+@@ -100,7 +100,7 @@ public class PKICertificateApprovalCallback implements SSLCertificateApprovalCal
+             if (!line.equals("") && !line.equalsIgnoreCase("Y"))
+                 return false;
+ 
+-            String caServerURI = "http://" + client.getConfig().getServerURI().getHost() + ":8080/ca";
++            String caServerURI = "http://" + client.getConfig().getServerURI().getHost() + ":8090/ca";
+ 
+             System.out.print("CA server URI [" + caServerURI + "]: ");
+             System.out.flush();
+diff --git a/base/common/src/com/netscape/certsrv/system/DomainInfo.java b/base/common/src/com/netscape/certsrv/system/DomainInfo.java
+index 32e64bf..58e5c11 100644
+--- a/base/common/src/com/netscape/certsrv/system/DomainInfo.java
++++ b/base/common/src/com/netscape/certsrv/system/DomainInfo.java
+@@ -150,7 +150,7 @@ public class DomainInfo {
+         SecurityDomainHost host = new SecurityDomainHost();
+         host.setId("CA localhost 8443");
+         host.setHostname("localhost");
+-        host.setPort("8080");
++        host.setPort("8090");
+         host.setSecurePort("8443");
+ 
+         before.addHost("CA", host);
+diff --git a/base/common/src/com/netscape/certsrv/system/SecurityDomainHost.java b/base/common/src/com/netscape/certsrv/system/SecurityDomainHost.java
+index 730e36c..cdb9b08 100644
+--- a/base/common/src/com/netscape/certsrv/system/SecurityDomainHost.java
++++ b/base/common/src/com/netscape/certsrv/system/SecurityDomainHost.java
+@@ -244,7 +244,7 @@ public class SecurityDomainHost {
+         SecurityDomainHost before = new SecurityDomainHost();
+         before.setId("CA localhost 8443");
+         before.setHostname("localhost");
+-        before.setPort("8080");
++        before.setPort("8090");
+         before.setSecurePort("8443");
+ 
+         String string = before.toString();
+diff --git a/base/common/src/com/netscape/certsrv/system/SecurityDomainSubsystem.java b/base/common/src/com/netscape/certsrv/system/SecurityDomainSubsystem.java
+index eec37a0..f062e20 100644
+--- a/base/common/src/com/netscape/certsrv/system/SecurityDomainSubsystem.java
++++ b/base/common/src/com/netscape/certsrv/system/SecurityDomainSubsystem.java
+@@ -122,7 +122,7 @@ import javax.xml.bind.annotation.XmlRootElement;
+         SecurityDomainHost host = new SecurityDomainHost();
+         host.setId("CA localhost 8443");
+         host.setHostname("localhost");
+-        host.setPort("8080");
++        host.setPort("8090");
+         host.setSecurePort("8443");
+ 
+         before.addHost(host);
+diff --git a/base/java-tools/man/man1/pki.1 b/base/java-tools/man/man1/pki.1
+index 60c19f4..cd0d984 100644
+--- a/base/java-tools/man/man1/pki.1
++++ b/base/java-tools/man/man1/pki.1
+@@ -58,7 +58,7 @@ Folder to store HTTP messages.
+ Specifies the protocol (default: http).
+ .TP
+ .B -p <port>
+-Specifies the port (default: 8080).
++Specifies the port (default: 8090).
+ .TP
+ .B --reject-cert-status <list>
+ Comma-separated list of rejected certificate validity statuses.
+@@ -91,7 +91,7 @@ A client security database is needed to execute commands that require SSL connec
+ for authentication. See \fBpki-client\fR(1) for more information.
+ 
+ .SS Connection
+-By default, the CLI connects to a server running on the local machine via the non-secure HTTP port 8080.  To specify a different server location, use the appropriate arguments to give a different host (\fB-h\fP), port (\fB-p\fP), or connection protocol (\fB-P\fP).
++By default, the CLI connects to a server running on the local machine via the non-secure HTTP port 8090.  To specify a different server location, use the appropriate arguments to give a different host (\fB-h\fP), port (\fB-p\fP), or connection protocol (\fB-P\fP).
+ 
+ .B pki -P <protocol> -h <hostname> -p <port> <command>
+ 
+diff --git a/base/java-tools/src/com/netscape/cmstools/OCSPClient.java b/base/java-tools/src/com/netscape/cmstools/OCSPClient.java
+index 67f7b6e..fadcc8c 100644
+--- a/base/java-tools/src/com/netscape/cmstools/OCSPClient.java
++++ b/base/java-tools/src/com/netscape/cmstools/OCSPClient.java
+@@ -63,7 +63,7 @@ public class OCSPClient {
+         option.setArgName("hostname");
+         options.addOption(option);
+ 
+-        option = new Option("p", true, "OCSP server port number (default: 8080)");
++        option = new Option("p", true, "OCSP server port number (default: 8090)");
+         option.setArgName("port");
+         options.addOption(option);
+ 
+@@ -103,7 +103,7 @@ public class OCSPClient {
+         System.out.println("Options:");
+         System.out.println("  -d <database>        Security database location (default: current directory)");
+         System.out.println("  -h <hostname>        OCSP server hostname (default: "+ InetAddress.getLocalHost().getCanonicalHostName() + ")");
+-        System.out.println("  -p <port>            OCSP server port number (default: 8080)");
++        System.out.println("  -p <port>            OCSP server port number (default: 8090)");
+         System.out.println("  -t <path>            OCSP service path (default: /ocsp/ee/ocsp)");
+         System.out.println("  -c <nickname>        CA certificate nickname (defaut: CA Signing Certificate)");
+         System.out.println("  -n <times>           Number of submissions (default: 1)");
+@@ -144,7 +144,7 @@ public class OCSPClient {
+ 
+         String databaseDir = cmd.getOptionValue("d", ".");
+         String hostname = cmd.getOptionValue("h", InetAddress.getLocalHost().getCanonicalHostName());
+-        int port = Integer.parseInt(cmd.getOptionValue("p", "8080"));
++        int port = Integer.parseInt(cmd.getOptionValue("p", "8090"));
+         String path = cmd.getOptionValue("t", "/ocsp/ee/ocsp");
+         String caNickname = cmd.getOptionValue("c", "CA Signing Certificate");
+         int times = Integer.parseInt(cmd.getOptionValue("n", "1"));
+diff --git a/base/java-tools/src/com/netscape/cmstools/cli/MainCLI.java b/base/java-tools/src/com/netscape/cmstools/cli/MainCLI.java
+index 797f3cb..d3d6aaf 100644
+--- a/base/java-tools/src/com/netscape/cmstools/cli/MainCLI.java
++++ b/base/java-tools/src/com/netscape/cmstools/cli/MainCLI.java
+@@ -143,7 +143,7 @@ public class MainCLI extends CLI {
+         option.setArgName("hostname");
+         options.addOption(option);
+ 
+-        option = new Option("p", true, "Port (default: 8080)");
++        option = new Option("p", true, "Port (default: 8090)");
+         option.setArgName("port");
+         options.addOption(option);
+ 
+@@ -314,7 +314,7 @@ public class MainCLI extends CLI {
+ 
+         String protocol = cmd.getOptionValue("P", "http");
+         String hostname = cmd.getOptionValue("h", InetAddress.getLocalHost().getCanonicalHostName());
+-        String port = cmd.getOptionValue("p", "8080");
++        String port = cmd.getOptionValue("p", "8090");
+         String subsystem = cmd.getOptionValue("t");
+ 
+         if (uri == null)
+diff --git a/base/kra/shared/conf/server-minimal.xml b/base/kra/shared/conf/server-minimal.xml
+index 7b542b6..1bed1e0 100644
+--- a/base/kra/shared/conf/server-minimal.xml
++++ b/base/kra/shared/conf/server-minimal.xml
+@@ -10,7 +10,7 @@
+   </GlobalNamingResources>
+ 
+   <Service name="Catalina">
+-    <Connector port="8080" />
++    <Connector port="8090" />
+ 
+     <!-- This is here for compatibility only, not required -->
+     <Connector port="8009" protocol="AJP/1.3" />
+diff --git a/base/kra/shared/conf/tomcat6.conf b/base/kra/shared/conf/tomcat6.conf
+index 2d7def5..73a5ac4 100644
+--- a/base/kra/shared/conf/tomcat6.conf
++++ b/base/kra/shared/conf/tomcat6.conf
+@@ -50,8 +50,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat6 instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat6 instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
+diff --git a/base/ocsp/shared/conf/server-minimal.xml b/base/ocsp/shared/conf/server-minimal.xml
+index 0df50b5..25bd4b5 100644
+--- a/base/ocsp/shared/conf/server-minimal.xml
++++ b/base/ocsp/shared/conf/server-minimal.xml
+@@ -14,7 +14,7 @@
+   </GlobalNamingResources>
+ 
+   <Service name="Catalina">
+-    <Connector port="8080" />
++    <Connector port="8090" />
+ 
+     <!-- This is here for compatibility only, not required -->
+     <Connector port="8009" protocol="AJP/1.3" />
+diff --git a/base/ocsp/shared/conf/tomcat6.conf b/base/ocsp/shared/conf/tomcat6.conf
+index 2d7def5..73a5ac4 100644
+--- a/base/ocsp/shared/conf/tomcat6.conf
++++ b/base/ocsp/shared/conf/tomcat6.conf
+@@ -50,8 +50,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat6 instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat6 instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
+diff --git a/base/ocsp/src/com/netscape/ocsp/EOCSPException.java b/base/ocsp/src/com/netscape/ocsp/EOCSPException.java
+index 3057489..47c13fe 100644
+--- a/base/ocsp/src/com/netscape/ocsp/EOCSPException.java
++++ b/base/ocsp/src/com/netscape/ocsp/EOCSPException.java
+@@ -30,7 +30,7 @@ public class EOCSPException extends EBaseException {
+     /**
+      *
+      */
+-    private static final long serialVersionUID = 2152152848080759882L;
++    private static final long serialVersionUID = 2152152848090759882L;
+     /**
+      * CA resource class name.
+      */
+diff --git a/base/server/cms/src/com/netscape/cms/servlet/csadmin/SecurityDomainProcessor.java b/base/server/cms/src/com/netscape/cms/servlet/csadmin/SecurityDomainProcessor.java
+index 08b11c6..4567df6 100644
+--- a/base/server/cms/src/com/netscape/cms/servlet/csadmin/SecurityDomainProcessor.java
++++ b/base/server/cms/src/com/netscape/cms/servlet/csadmin/SecurityDomainProcessor.java
+@@ -368,7 +368,7 @@ public class SecurityDomainProcessor extends CAProcessor {
+         SecurityDomainHost host = new SecurityDomainHost();
+         host.setId("CA localhost 8443");
+         host.setHostname("localhost");
+-        host.setPort("8080");
++        host.setPort("8090");
+         host.setSecurePort("8443");
+         host.setDomainManager("TRUE");
+ 
+diff --git a/base/server/cmscore/src/com/netscape/cmscore/usrgrp/UGSubsystem.java b/base/server/cmscore/src/com/netscape/cmscore/usrgrp/UGSubsystem.java
+index d127727..fa81177 100644
+--- a/base/server/cmscore/src/com/netscape/cmscore/usrgrp/UGSubsystem.java
++++ b/base/server/cmscore/src/com/netscape/cmscore/usrgrp/UGSubsystem.java
+@@ -71,7 +71,7 @@ import com.netscape.cmsutil.ldap.LDAPUtil;
+  */
+ public final class UGSubsystem implements IUGSubsystem {
+ 
+-    private static final long serialVersionUID = 8080165044652629774L;
++    private static final long serialVersionUID = 8090165044652629774L;
+     public static final String ID = "usrgrp";
+     private String mId = ID;
+ 
+diff --git a/base/server/etc/default.cfg b/base/server/etc/default.cfg
+index 9bc27cb..7f31103 100644
+--- a/base/server/etc/default.cfg
++++ b/base/server/etc/default.cfg
+@@ -61,7 +61,7 @@ destroy_scriplets=
+ # Tomcat instances:
+ # pki_instance_name=pki-tomcat
+ # pki_https_port=8443
+-# pki_http_port=8080
++# pki_http_port=8090
+ 
+ pki_admin_cert_file=%(pki_client_dir)s/ca_admin.cert
+ pki_admin_cert_request_type=pkcs10
+diff --git a/base/server/man/man1/pkidaemon.1 b/base/server/man/man1/pkidaemon.1
+index 35c04e5..d6adae4 100644
+--- a/base/server/man/man1/pkidaemon.1
++++ b/base/server/man/man1/pkidaemon.1
+@@ -51,7 +51,7 @@ REPORT STATUS OF 'tomcat' INSTANCE(S):
+ Status for pki-tomcat: pki-tomcat is running ..
+ 
+     [CA Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/ca/ee/ca
++    Unsecure URL        = http://pki.example.com:8090/ca/ee/ca
+     Secure Agent URL    = https://pki.example.com:8443/ca/agent/ca
+     Secure EE URL       = https://pki.example.com:8443/ca/ee/ca
+     Secure Admin URL    = https://pki.example.com:8443/ca/services
+@@ -65,7 +65,7 @@ Status for pki-tomcat: pki-tomcat is running ..
+     Tomcat Port         = 8005 (for shutdown)
+ 
+     [OCSP Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/ocsp/ee/ocsp/<ocsp request blob>
++    Unsecure URL        = http://pki.example.com:8090/ocsp/ee/ocsp/<ocsp request blob>
+     Secure Agent URL    = https://pki.example.com:8443/ocsp/agent/ocsp
+     Secure EE URL       = https://pki.example.com:8443/ocsp/ee/ocsp/<ocsp request blob>
+     Secure Admin URL    = https://pki.example.com:8443/ocsp/services
+@@ -79,10 +79,10 @@ Status for pki-tomcat: pki-tomcat is running ..
+     Tomcat Port         = 8005 (for shutdown)
+ 
+     [TPS Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/tps
++    Unsecure URL        = http://pki.example.com:8090/tps
+     Secure URL          = https://pki.example.com:8443/tps
+     Tomcat Port         = 8005 (for shutdown)
+-    Unsecure PHONE HOME = http://pki.example.com:8080/tps/phoneHome
++    Unsecure PHONE HOME = http://pki.example.com:8090/tps/phoneHome
+     Secure PHONE HOME   = https://pki.example.com:8443/tps/phoneHome
+ 
+     [CA Configuration Definitions]
+@@ -143,7 +143,7 @@ Status for pki-tomcat: pki-tomcat is running ..
+ Status for pki-tomcat-2: pki-tomcat-2 is running ..
+ 
+     [CA Status Definitions]
+-    Unsecure URL        = http://pki.example.com:18080/ca/ee/ca
++    Unsecure URL        = http://pki.example.com:18090/ca/ee/ca
+     Secure Agent URL    = https://pki.example.com:18443/ca/agent/ca
+     Secure EE URL       = https://pki.example.com:18443/ca/ee/ca
+     Secure Admin URL    = https://pki.example.com:18443/ca/services
+@@ -171,7 +171,7 @@ FINISHED REPORTING STATUS OF 'tomcat' INSTANCE(S).
+ Status for pki-tomcat: pki-tomcat is running ..
+ 
+     [CA Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/ca/ee/ca
++    Unsecure URL        = http://pki.example.com:8090/ca/ee/ca
+     Secure Agent URL    = https://pki.example.com:8443/ca/agent/ca
+     Secure EE URL       = https://pki.example.com:8443/ca/ee/ca
+     Secure Admin URL    = https://pki.example.com:8443/ca/services
+@@ -185,7 +185,7 @@ Status for pki-tomcat: pki-tomcat is running ..
+     Tomcat Port         = 8005 (for shutdown)
+ 
+     [OCSP Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/ocsp/ee/ocsp/<ocsp request blob>
++    Unsecure URL        = http://pki.example.com:8090/ocsp/ee/ocsp/<ocsp request blob>
+     Secure Agent URL    = https://pki.example.com:8443/ocsp/agent/ocsp
+     Secure EE URL       = https://pki.example.com:8443/ocsp/ee/ocsp/<ocsp request blob>
+     Secure Admin URL    = https://pki.example.com:8443/ocsp/services
+@@ -199,10 +199,10 @@ Status for pki-tomcat: pki-tomcat is running ..
+     Tomcat Port         = 8005 (for shutdown)
+ 
+     [TPS Status Definitions]
+-    Unsecure URL        = http://pki.example.com:8080/tps
++    Unsecure URL        = http://pki.example.com:8090/tps
+     Secure URL          = https://pki.example.com:8443/tps
+     Tomcat Port         = 8005 (for shutdown)
+-    Unsecure PHONE HOME = http://pki.example.com:8080/tps/phoneHome
++    Unsecure PHONE HOME = http://pki.example.com:8090/tps/phoneHome
+     Secure PHONE HOME   = https://pki.example.com:8443/tps/phoneHome
+ 
+     [CA Configuration Definitions]
+@@ -268,7 +268,7 @@ Status for pki-tomcat: pki-tomcat is running ..
+ Status for pki-tomcat-2: pki-tomcat-2 is running ..
+ 
+     [CA Status Definitions]
+-    Unsecure URL        = http://pki.example.com:18080/ca/ee/ca
++    Unsecure URL        = http://pki.example.com:18090/ca/ee/ca
+     Secure Agent URL    = https://pki.example.com:18443/ca/agent/ca
+     Secure EE URL       = https://pki.example.com:18443/ca/ee/ca
+     Secure Admin URL    = https://pki.example.com:18443/ca/services
+diff --git a/base/server/man/man5/pki_default.cfg.5 b/base/server/man/man5/pki_default.cfg.5
+index 4e2c13b..714aaca 100644
+--- a/base/server/man/man5/pki_default.cfg.5
++++ b/base/server/man/man5/pki_default.cfg.5
+@@ -50,7 +50,7 @@ Name of the instance. The instance is located at /var/lib/pki/<instance_name>.
+ .TP
+ .B pki_https_port, pki_http_port
+ .IP
+-Secure and unsecure ports.  Defaults to standard Tomcat ports 8443 and 8080, respectively, for Java subsystems.
++Secure and unsecure ports.  Defaults to standard Tomcat ports 8443 and 8090, respectively, for Java subsystems.
+ .TP
+ .B pki_ajp_port, pki_tomcat_server_port
+ .IP
+diff --git a/base/server/man/man8/pkispawn.8 b/base/server/man/man8/pkispawn.8
+index 411d93f..bb36e73 100644
+--- a/base/server/man/man8/pkispawn.8
++++ b/base/server/man/man8/pkispawn.8
+@@ -120,7 +120,7 @@ the name of the tomcat instance in which the subsystem is to be installed. The d
+ \fBNote:\fP Only one subsystem of a given type (CA, KRA, OCSP, TKS, TPS) can exist within a given instance.
+ .TP
+ \fIHTTP port:\fP
+-the HTTP port of the Tomcat instance. The default value is 8080.
++the HTTP port of the Tomcat instance. The default value is 8090.
+ .TP
+ \fISecure HTTP port:\fP
+ the HTTPS port of the Tomcat instance. The default value is 8443.
+@@ -231,7 +231,7 @@ its default configuration:
+ 
+ .PP
+ This invocation of \fBpkispawn\fP creates a Tomcat instance containing a CA
+-running on the local machine with secure port 8443 and unsecure port 8080.
++running on the local machine with secure port 8443 and unsecure port 8090.
+ To access this CA, simply point a browser to https://<hostname>:8443.
+ 
+ .PP
+diff --git a/base/server/python/pki/server/deployment/pkiconfig.py b/base/server/python/pki/server/deployment/pkiconfig.py
+index 5ffed76..00830db 100644
+--- a/base/server/python/pki/server/deployment/pkiconfig.py
++++ b/base/server/python/pki/server/deployment/pkiconfig.py
+@@ -85,7 +85,7 @@ PKI_DEPLOYMENT_EXTERNAL_CA = "External"
+ PKI_DEPLOYMENT_SUBORDINATE_CA = "Subordinate"
+ 
+ # default ports (for defined selinux policy)
+-PKI_DEPLOYMENT_DEFAULT_TOMCAT_HTTP_PORT = 8080
++PKI_DEPLOYMENT_DEFAULT_TOMCAT_HTTP_PORT = 8090
+ PKI_DEPLOYMENT_DEFAULT_TOMCAT_HTTPS_PORT = 8443
+ PKI_DEPLOYMENT_DEFAULT_TOMCAT_SERVER_PORT = 8005
+ PKI_DEPLOYMENT_DEFAULT_TOMCAT_AJP_PORT = 8009
+diff --git a/base/server/python/pki/server/deployment/pkiparser.py b/base/server/python/pki/server/deployment/pkiparser.py
+index 80f3b55..9c0874f 100644
+--- a/base/server/python/pki/server/deployment/pkiparser.py
++++ b/base/server/python/pki/server/deployment/pkiparser.py
+@@ -181,7 +181,7 @@ class PKIConfigParser:
+         jni_jar_dir = str(jni_jar_dir).strip()
+ 
+         default_instance_name = 'pki-tomcat'
+-        default_http_port = '8080'
++        default_http_port = '8090'
+         default_https_port = '8443'
+ 
+         application_version = str(pki.upgrade.Version(
+diff --git a/base/server/share/conf/tomcat.conf b/base/server/share/conf/tomcat.conf
+index 83a6cf1..e8706c0 100644
+--- a/base/server/share/conf/tomcat.conf
++++ b/base/server/share/conf/tomcat.conf
+@@ -56,8 +56,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
+diff --git a/base/server/tomcat7/conf/server.xml b/base/server/tomcat7/conf/server.xml
+index 7deb8a2..a2c7f05 100644
+--- a/base/server/tomcat7/conf/server.xml
++++ b/base/server/tomcat7/conf/server.xml
+@@ -118,7 +118,7 @@ Tomcat Port         = [TOMCAT_SERVER_PORT] (for shutdown)
+          Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
+          Java AJP  Connector: /docs/config/ajp.html
+          APR (HTTP/AJP) Connector: /docs/apr.html
+-         Define a non-SSL HTTP/1.1 Connector on port 8080
++         Define a non-SSL HTTP/1.1 Connector on port 8090
+     -->
+ 
+     [PKI_UNSECURE_PORT_SERVER_COMMENT]
+diff --git a/base/tks/shared/conf/server-minimal.xml b/base/tks/shared/conf/server-minimal.xml
+index 0df50b5..25bd4b5 100644
+--- a/base/tks/shared/conf/server-minimal.xml
++++ b/base/tks/shared/conf/server-minimal.xml
+@@ -14,7 +14,7 @@
+   </GlobalNamingResources>
+ 
+   <Service name="Catalina">
+-    <Connector port="8080" />
++    <Connector port="8090" />
+ 
+     <!-- This is here for compatibility only, not required -->
+     <Connector port="8009" protocol="AJP/1.3" />
+diff --git a/base/tks/shared/conf/tomcat6.conf b/base/tks/shared/conf/tomcat6.conf
+index 2d7def5..73a5ac4 100644
+--- a/base/tks/shared/conf/tomcat6.conf
++++ b/base/tks/shared/conf/tomcat6.conf
+@@ -50,8 +50,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat6 instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat6 instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
+diff --git a/base/tps-client/man/man1/tpsclient.1 b/base/tps-client/man/man1/tpsclient.1
+index cef2344..fe059df 100644
+--- a/base/tps-client/man/man1/tpsclient.1
++++ b/base/tps-client/man/man1/tpsclient.1
+@@ -73,7 +73,7 @@ Output> op=var_set name=<name> value=<value> - Set Value to Variable
+ op=var_set name=ra_host value=localhost.localdomain
+ 
+ # Set the port where the TPS server is listening
+-op=var_set name=ra_port value=8080
++op=var_set name=ra_port value=8090
+ 
+ # Set the URL on the TPS that responds to client token operation requests
+ op=var_set name=ra_uri value=/tps/tps
+@@ -111,7 +111,7 @@ op=exit
+ op=var_set name=ra_host value=localhost.localdomain
+ 
+ # Set the port where the TPS server is listening
+-op=var_set name=ra_port value=8080
++op=var_set name=ra_port value=8090
+ 
+ # Set the URL on the TPS that responds to client token operation requests
+ op=var_set name=ra_uri value=/tps/tps
+diff --git a/base/tps/shared/conf/server-minimal.xml b/base/tps/shared/conf/server-minimal.xml
+index fc855c6..3683d0d 100644
+--- a/base/tps/shared/conf/server-minimal.xml
++++ b/base/tps/shared/conf/server-minimal.xml
+@@ -14,7 +14,7 @@
+   </GlobalNamingResources>
+ 
+   <Service name="Catalina">
+-    <Connector port="8080" />
++    <Connector port="8090" />
+ 
+     <!-- This is here for compatibility only, not required -->
+     <Connector port="8009" protocol="AJP/1.3" />
+diff --git a/base/tps/shared/conf/tomcat6.conf b/base/tps/shared/conf/tomcat6.conf
+index 2d7def5..73a5ac4 100644
+--- a/base/tps/shared/conf/tomcat6.conf
++++ b/base/tps/shared/conf/tomcat6.conf
+@@ -50,8 +50,8 @@ CATALINA_PID="[TOMCAT_PIDFILE]"
+ # Set the tomcat log file
+ TOMCAT_LOG="[TOMCAT_LOG_DIR]/tomcat-initd.log"
+ 
+-# Connector port is 8080 for this tomcat6 instance
+-#CONNECTOR_PORT="8080"
++# Connector port is 8090 for this tomcat6 instance
++#CONNECTOR_PORT="8090"
+ 
+ # If you wish to further customize your tomcat environment,
+ # put your own definitions here
