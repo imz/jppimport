@@ -3,6 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
+    # Оба содержат /usr/bin/pki и маны к ним.
+    #https://bugzilla.altlinux.org/show_bug.cgi?id=33037
+    $spec->get_section('package','-n pki-tools')->push_body('Conflicts: strongswan'."\n");
 
     # Mikhail Efremov to Igor
     # Hello!
