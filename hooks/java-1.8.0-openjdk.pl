@@ -234,8 +234,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
 
 #map {if ($_->get_type() eq 'package') {
-#	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
-#	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
+#	$_->subst_body_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
+#	$_->subst_body_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 # }
 #} $spec->get_sections();
     
@@ -270,8 +270,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$spec->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi',':; #mv bin/java-rmi.cgi sample/rmi');
 
     # just to suppress warnings on %
-    $spec->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
-    $spec->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%dir','%%dir','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%doc','%%doc','sed');
 
     # TODO: fix caserts generation!!!
     # for proper symlink requires ? 
@@ -548,7 +548,7 @@ Provides: java-devel = 1.5.0
 
 __END__
     # no need in 1.7.0.1
-    #$spec->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+    #$spec->get_section('install')->subst_body_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     $spec->get_section('install')->push_body(q!# move soundfont to java
 grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files

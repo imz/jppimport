@@ -8,7 +8,7 @@ sub set_fix_maven_bootstrap {
 	"set_fix_maven_bootstrap",
 	sub {
 	    foreach my $sec ($spec->get_sections()) {
-		$sec->subst(qr'^Requires:\s*maven2-bootstrap','#Requires: maven2-bootstrap');
+		$sec->subst_body(qr'^Requires:\s*maven2-bootstrap','#Requires: maven2-bootstrap');
 	    }
 	    });
 }

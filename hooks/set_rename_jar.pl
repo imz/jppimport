@@ -3,7 +3,7 @@ sub rename_jar {
     $spec->applied_off();
     for my $sect ($spec->get_sections()) {
 	if ($sect->get_type() eq 'files') {
-	    $sect->subst_if(qr'%{?oldname}?','%{name}',qr'_javadir');
+	    $sect->subst_body_if(qr'%{?oldname}?','%{name}',qr'_javadir');
 	}
     }
     $spec->get_section('install')->push_body(q!

@@ -6,7 +6,7 @@ require 'add_missingok_config.pl';
 push @PREHOOKS, sub {
     my ($jpp, $parent) = @_;
     my $presec=$jpp->get_section('pre','jdt');
-    $presec->exclude(qr'^rm -rf \%{_bindir}/efj/');
+    $presec->exclude_body(qr'^rm -rf \%{_bindir}/efj/');
 };
 
 push @SPECHOOKS, 
@@ -44,7 +44,7 @@ sub {
     $jpp->get_section('package','')->unshift_body('BuildRequires: java-devel-openjdk'."\n");
 
     $jpp->get_section('package','')->unshift_body('BuildRequires: xorg-proto-devel libGLU-devel'."\n");
-    #$jpp->get_section('package','')->subst_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
+    #$jpp->get_section('package','')->subst_body_if(qr'libmesa-devel','libGLU-devel', qr'Requires:');
 
     # or rm %buildroot%_libdir/eclipse/plugins/org.apache.ant_*/bin/runant.py
     $jpp->get_section('package','')->unshift_body('AutoReqProv: yes,nopython'."\n");
@@ -73,7 +73,7 @@ find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 
 
     if ('build' eq 'use openjdk instead of default') {
-	$jpp->get_section('package','')->subst(qr'jpackage-1.?-compat','jpackage-generic-compat');
+	$jpp->get_section('package','')->subst_body(qr'jpackage-1.?-compat','jpackage-generic-compat');
 	$jpp->get_section('package','')->unshift_body('BuildRequires: java-1.6.0-openjdk-devel');
     } 
 
@@ -85,8 +85,8 @@ find . -name build.sh -exec sed -i 's,uname -p,uname -m,' {} \;
 	"support for alt feature",
 	sub {
 	    foreach my $section ($jpp->get_sections()) {
-		$section->subst(qr'org.fedoraproject','org.altlinux');
-		$section->subst(qr'Fedora Eclipse','ALT Linux Eclipse');
+		$section->subst_body(qr'org.fedoraproject','org.altlinux');
+		$section->subst_body(qr'Fedora Eclipse','ALT Linux Eclipse');
 	    }
 	});
     $jpp->get_section('prep')->push_body(q!subst s,org.fedoraproject,org.altlinux, %{SOURCE28}
@@ -105,14 +105,14 @@ fi
 !);
 
     # RPM macros file
-    $jpp->get_section('install')->exclude(qr'^install.*RPM_BUILD_ROOT\%{_sysconfdir}/rpm/');
+    $jpp->get_section('install')->exclude_body(qr'^install.*RPM_BUILD_ROOT\%{_sysconfdir}/rpm/');
     $jpp->applied_block(
 	"platform files hook",
 	sub {
 	    foreach my $sec ($jpp->get_sections()) {
 		next if $sec->get_type ne 'files';
 		next if $sec->get_raw_package ne 'platform';
-		$sec->exclude(qr'\%{_sysconfdir}/rpm/macros.\%{name}');
+		$sec->exclude_body(qr'\%{_sysconfdir}/rpm/macros.\%{name}');
 	    }
 	});
 
@@ -154,17 +154,17 @@ q!
     if (0) {
 
     # seamonkey provides mozilla too
-    #$jpp->get_section('package','swt')->subst(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
+    #$jpp->get_section('package','swt')->subst_body(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
 
     # lucene
     #$jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
-    #$jpp->get_section('install')->subst('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
+    #$jpp->get_section('install')->subst_body('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
 
 
 
     # TODO: remove bootstrap
     if (0) { # bootstrap
-	$jpp->get_section('package','')->subst('global bootstrap 0','global bootstrap 1');
+	$jpp->get_section('package','')->subst_body('global bootstrap 0','global bootstrap 1');
 	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
 BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
 '."\n");
@@ -190,10 +190,10 @@ subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './
     # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
     # hack around added in -15 exact versions
 
-    $jpp->get_section('package','')->subst_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
-    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
-    $jpp->get_section('package','platform')->subst(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
-    $jpp->get_section('package','platform')->subst(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
+    $jpp->get_section('package','')->subst_body_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
+    $jpp->get_section('package','platform')->subst_body(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
+    $jpp->get_section('package','platform')->subst_body(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
+    $jpp->get_section('package','platform')->subst_body(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
 
 
     # reconsiler filetrigger.
@@ -215,5 +215,5 @@ echo /usr/lib/rpm/%{name}-%{_arch}.filetrigger >> %{name}-platform.install
 @);
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
-    $jpp->get_section('package','swt')->subst_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
+    $jpp->get_section('package','swt')->subst_body_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
 

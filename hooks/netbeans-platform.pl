@@ -7,7 +7,7 @@ sub {
 #+ Requires: /usr/sbin/scutil
 %add_findreq_skiplist /usr/share/netbeans/platform*/lib/nbexec
 !);
-#    $spec->get_section('package','')->subst_if(qr/\%{nb_platform_ver}/,'{nb_ver}', qr/^Summary:/);
+#    $spec->get_section('package','')->subst_body_if(qr/\%{nb_platform_ver}/,'{nb_ver}', qr/^Summary:/);
     $spec->get_section('package','')->unshift_body(q!%set_verify_elf_method fhs=relaxed
 !);
 

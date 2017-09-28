@@ -12,7 +12,7 @@ cat >>$RPM_BUILD_ROOT/%_altdir/jaf_%{name}<<EOF
 EOF
 ');
     # slightly decrease the priority over glassfish-jaf
-    $spec->get_section('install')->subst(qr'\.jar\s+10100','.jar	10099');
+    $spec->get_section('install')->subst_body(qr'\.jar\s+10100','.jar	10099');
 
 }
 

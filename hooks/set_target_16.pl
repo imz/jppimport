@@ -46,13 +46,13 @@ sub set_target_16 {
 	sub {
     $prepsec->subst_body(qr'^export JAVA_HOME=','#export JAVA_HOME=') if $prepsec;
     $buildsec->subst_body(qr'^export JAVA_HOME=','#export JAVA_HOME=') if $buildsec;
-#    $spec->get_section('package')->subst(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
+#    $spec->get_section('package')->subst_body(qr'jpackage-compat','jpackage-1.6-compat') if $target eq '1.5';
     $spec->clear_applied();
     &section_set_target($spec,'prep',$target);
     &section_set_target($spec,'build',$target);
 
     # tomcat 5 :( but breaks felix :(
-    $spec->get_section('install')->subst(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ") if $spec->main_section->get_tag('Name') eq 'tomcat5';
+    $spec->get_section('install')->subst_body(qr'^(\s*\%?\{?ant\}?\s)',"ant -Dant.build.javac.source=$target -Dant.build.javac.target=$target ") if $spec->main_section->get_tag('Name') eq 'tomcat5';
 
 
 	    });

@@ -4,7 +4,7 @@ push @PREHOOKS, sub {
     my ($spec, $parent) = @_;
     $spec->get_section('package','')->unshift_body('BuildArch: noarch'."\n");
     # macros body
-    $spec->get_section('files','')->subst(qr'Text Editors/Integrated Development Environments \(IDE\)', 'System/Internationalization '."\\\nProvides: eclipse-i18n-\%1");
+    $spec->get_section('files','')->subst_body(qr'Text Editors/Integrated Development Environments \(IDE\)', 'System/Internationalization '."\\\nProvides: eclipse-i18n-\%1");
 };
 
 push @SPECHOOKS, sub {

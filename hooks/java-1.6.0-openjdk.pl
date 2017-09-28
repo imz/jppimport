@@ -66,7 +66,7 @@ Provides: java-javadoc = 1:1.6.0
     $spec->del_section('postun','javadoc');
 
     # Sisyphus unmet
-    $mainsec->subst(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
+    $mainsec->subst_body(qr'Requires: libjpeg = 6b','#Requires: libjpeg = 6b');
 
     $mainsec->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static 
 BuildRequires: libXext-devel libXrender-devel
@@ -104,62 +104,62 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 ');
 
     map {if ($_->get_type() eq 'package') {
-	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
-	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
+	$_->subst_body_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
+	$_->subst_body_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 	 }
     } $spec->get_sections();
     
     # already 0
-    #$mainsec->subst(qr'define runtests 1','define runtests 0');
+    #$mainsec->subst_body(qr'define runtests 1','define runtests 0');
 
-    $mainsec->subst(qr'^\%define _libdir','# define _libdir');
-    $mainsec->subst(qr'^\%define syslibdir','# define syslibdir');
+    $mainsec->subst_body(qr'^\%define _libdir','# define _libdir');
+    $mainsec->subst_body(qr'^\%define syslibdir','# define syslibdir');
     $mainsec->push_body('Requires: java-common'."\n");
     $mainsec->push_body('Requires: /proc'."\n");
 
     # for M40; can(should?) be disabled on M41
-    #$mainsec->subst(qr'lesstif-devel','openmotif-devel');
-    $mainsec->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    #$mainsec->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst_body(qr'lesstif-devel','openmotif-devel');
+    $mainsec->subst_body(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
+    #$mainsec->subst_body(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $spec->get_section('build')->unshift_body(q!unset JAVA_HOME
 %autoreconf!."\n");
     #$spec->get_section('build')->unshift_body(q!sed -i 's,libxul-unstable,libxul,g' configure.ac!."\n");
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     # unrecognized option; TODO: check the list
-    #$spec->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    $spec->get_section('build')->subst(qr'fedora-','ALTLinux-');
+    #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
+    $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
 
     # hack for sun-based build (i586) only!!!
-    $spec->get_section('build')->subst(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
+    $spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # builds end up randomly :(
-    $spec->get_section('build')->subst(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
+    $spec->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 
     $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
-    $spec->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
+    $spec->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
     # just to suppress warnings on %
-    $spec->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
-    $spec->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%dir','%%dir','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%doc','%%doc','sed');
 
     # TODO: fix caserts generation!!!
     # for proper symlink requires ? 
     $mainsec->unshift_body('BuildRequires: ca-certificates-java'."\n");
 
-    $spec->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+    $spec->get_section('install')->subst_body_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
-    $mainsec->subst(qr'--enable-systemtap','%{subst_enable systemtap}');
+    $mainsec->subst_body(qr'--enable-systemtap','%{subst_enable systemtap}');
     &__subst_systemtap($mainsec);
     &__subst_systemtap($spec->get_section('install'));
     &__subst_systemtap($spec->get_section('files','devel'));
 
     # big changelog
-    $spec->get_section('files','')->subst(qr'^\%doc ChangeLog','#doc ChangeLog');
+    $spec->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
 
     if (0 and 'has plugin') {
-	$spec->get_section('package','plugin')->subst_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
+	$spec->get_section('package','plugin')->subst_body_if(qr'mozilla-filesystem','browser-plugins-npapi',qr'^Requires:');
 	$spec->rename_package('plugin','-n mozilla-plugin-%name');
 	$spec->get_section('files','-n mozilla-plugin-%name')->unshift_body('%_altdir/%altname-mozilla
 %{_datadir}/applications/%{name}-control-panel.desktop

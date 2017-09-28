@@ -170,8 +170,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $spec->add_patch('java-1.7.0-openjdk-alt-no-Werror.patch',STRIP=>1);
 
 #map {if ($_->get_type() eq 'package') {
-#	$_->subst_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
-#	$_->subst_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
+#	$_->subst_body_if(qr'^Provides:','#Provides:','java-1.7.0-icedtea');
+#	$_->subst_body_if(qr'^Obsoletes:','#Obsoletes:','java-1.7.0-icedtea');
 # }
 #} $spec->get_sections();
     
@@ -200,15 +200,15 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
     $spec->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
     # just to suppress warnings on %
-    $spec->get_section('install')->subst_if(qr'\%dir','%%dir','sed');
-    $spec->get_section('install')->subst_if(qr'\%doc','%%doc','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%dir','%%dir','sed');
+    $spec->get_section('install')->subst_body_if(qr'\%doc','%%doc','sed');
 
     # TODO: fix caserts generation!!!
     # for proper symlink requires ? 
     $mainsec->unshift_body('BuildRequires: ca-certificates-java'."\n");
 
     # no need in 1.7.0.1
-    #$spec->get_section('install')->subst_if(qr'--vendor=fedora','', qr'desktop-file-install');
+    #$spec->get_section('install')->subst_body_if(qr'--vendor=fedora','', qr'desktop-file-install');
 
     # to disable --enable-systemtap
     #$mainsec->subst_body(qr'--enable-systemtap','%{subst_enable systemtap}');

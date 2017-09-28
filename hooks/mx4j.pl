@@ -8,7 +8,7 @@ push @SPECHOOKS,
 sub {
     my ($spec, $parent) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: docbook-dtds'."\n");
-    $spec->get_section('package','')->subst(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
+    $spec->get_section('package','')->subst_body(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
 }
 
 __END__

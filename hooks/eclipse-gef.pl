@@ -13,5 +13,5 @@ push @SPECHOOKS, sub {
 ');
 
     # different noarches due to .qualifier in version (is replaced by timestamp)
-    $spec->get_section('build')->subst(qr'pdebuild -f org.eclipse.gef.examples','pdebuild -f org.eclipse.gef.examples -a "-DforceContextQualifier=%{contextQualifier} -DJAVADOC14_HOME=%{java_home}/bin"');
+    $spec->get_section('build')->subst_body(qr'pdebuild -f org.eclipse.gef.examples','pdebuild -f org.eclipse.gef.examples -a "-DforceContextQualifier=%{contextQualifier} -DJAVADOC14_HOME=%{java_home}/bin"');
 };

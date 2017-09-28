@@ -5,6 +5,6 @@ require 'set_add_java_bin.pl';
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
     # alt specific
-    $spec->get_section('package','')->subst_if(qr'gcc-gfortran','gcc-fortran',qr'Requires:');
+    $spec->get_section('package','')->subst_body_if(qr'gcc-gfortran','gcc-fortran',qr'Requires:');
 };
 

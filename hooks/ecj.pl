@@ -59,5 +59,5 @@ AutoProv: yes, noosgi
 
     # hack -- exclude pom as it breaks builds due 
     # to strange deps on eclipse (moreover, eclipse does not have poms)
-#    $spec->get_section('files','')->exclude('maven');
+#    $spec->get_section('files','')->exclude_body('maven');
 };

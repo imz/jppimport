@@ -46,15 +46,15 @@ TODO: apply
     #предупреждение: Macro %__fe_userdel not found
     #предупреждение: Macro %__fe_groupdel not found
     # BuildRequires:\s+fedora-usermgmt-devel
-    $spec->get_section('package','')->subst(qr'BuildRequires:\s+fedora-usermgmt-devel','');
+    $spec->get_section('package','')->subst_body(qr'BuildRequires:\s+fedora-usermgmt-devel','');
     $spec->applied_block(
 	"tmp hack TODO fix in import",
 	sub {
 	    foreach my $section ($spec->get_sections()) {
 		if ($section->get_type() =~ '^(pre|post)') {
-		    $section->subst(qr'\%__fe_','');
-		    $section->subst(qr'fedora-user','user');
-		    $section->subst(qr'fedora-group','group');
+		    $section->subst_body(qr'\%__fe_','');
+		    $section->subst_body(qr'fedora-user','user');
+		    $section->subst_body(qr'fedora-group','group');
 		}
 	    }
 	}

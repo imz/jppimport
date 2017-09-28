@@ -16,21 +16,21 @@ BuildArch: noarch
 java jcj ahead-of-time compile scripts
 !);
     # tmp hack due t obroken Sisyphus!!!
-    #$spec->get_section('package','')->subst_if(qr'libssl-devel','ca-certificates',qr'BuildRequires:');
+    #$spec->get_section('package','')->subst_body_if(qr'libssl-devel','ca-certificates',qr'BuildRequires:');
 
     # ARM-friendly deps...
-    $spec->get_section('package','')->exclude(qr'BuildRequires: jpackage.*-compat');
+    $spec->get_section('package','')->exclude_body(qr'BuildRequires: jpackage.*-compat');
     $spec->get_section('package','')->unshift_body('BuildRequires(pre): rpm-build-java'."\n");
 
-    $spec->get_section('package','')->subst_if(qr'openssl','ca-certificates',qr'BuildRequires:');
-    $spec->get_section('package','')->subst(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
-    $spec->get_section('package','')->subst(qr'^\%define gccver\s.*','%define gccver          '.$gccsuffix.'-alt1'."\n");
-    $spec->get_section('package','')->subst(qr'^\%define gccsuffix\s.*','%define gccsuffix       -'.$gccsuffix."\n");
+    $spec->get_section('package','')->subst_body_if(qr'openssl','ca-certificates',qr'BuildRequires:');
+    $spec->get_section('package','')->subst_body(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
+    $spec->get_section('package','')->subst_body(qr'^\%define gccver\s.*','%define gccver          '.$gccsuffix.'-alt1'."\n");
+    $spec->get_section('package','')->subst_body(qr'^\%define gccsuffix\s.*','%define gccsuffix       -'.$gccsuffix."\n");
     $spec->get_section('package','')->unshift_body('%define gccrpmsuffix    '.$gccsuffix."\n");
-    $spec->get_section('package','')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
-    $spec->get_section('package','devel')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
+    $spec->get_section('package','')->subst_body_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
+    $spec->get_section('package','devel')->subst_body_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
     $spec->get_section('package','devel')->push_body('Requires: %name-aot-compile = %version-%release'."\n");
-    $spec->get_section('package','src')->subst_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
+    $spec->get_section('package','src')->subst_body_if(qr'gccsuffix','gccrpmsuffix',qr'Requires:\s+(gcc|libgc)');
 
     foreach my $section ($spec->get_sections()) {
 	if ($section->get_type() eq 'triggerin') {
@@ -48,11 +48,11 @@ done
     $spec->get_section('install')->push_body('install -d -m755 %buildroot/usr/lib/jvm-exports/%{sdkdir}'."\n");
 
     # ghosts. kill?
-    #$spec->get_section('install')->subst(qr'^touch \$RPM_BUILD_ROOT','#touch $RPM_BUILD_ROOT');
+    #$spec->get_section('install')->subst_body(qr'^touch \$RPM_BUILD_ROOT','#touch $RPM_BUILD_ROOT');
     # or
-    $spec->get_section('files','')->subst(qr'#%ghost','#ghost');
-    $spec->get_section('files','devel')->subst(qr'#%ghost','#ghost');
-    $spec->get_section('files','src')->subst(qr'#%ghost','#ghost');
+    $spec->get_section('files','')->subst_body(qr'#%ghost','#ghost');
+    $spec->get_section('files','devel')->subst_body(qr'#%ghost','#ghost');
+    $spec->get_section('files','src')->subst_body(qr'#%ghost','#ghost');
     
     $spec->get_section('files','')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");
     $spec->get_section('files','devel')->push_body('%dir /usr/lib/jvm-exports/%{sdkdir}'."\n");

@@ -9,6 +9,6 @@ sub set_without_maven {
 ');
     # helped for maven surefire
     # not yet enabled (no other customers are known)
-    #$spec->get_section('package','')->exclude(qr'^\%define with_maven \%{!\?_without_maven:1}\%{\?_without_maven:0}\s*$');
+    #$spec->get_section('package','')->exclude_body(qr'^\%define with_maven \%{!\?_without_maven:1}\%{\?_without_maven:0}\s*$');
 
 }

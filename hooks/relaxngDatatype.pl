@@ -3,5 +3,5 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
-#    $spec->get_section('package','')->subst_if(qr'Obsoletes:','#Obsoletes:',qr'msv');
+#    $spec->get_section('package','')->subst_body_if(qr'Obsoletes:','#Obsoletes:',qr'msv');
 }

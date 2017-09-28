@@ -3,6 +3,6 @@
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: h2database'."\n");
-    $spec->get_section('prep')->subst_if(qr'_javadir}/h2.jar','_javadir}/h2database.jar',qr'ln -s');
+    $spec->get_section('prep')->subst_body_if(qr'_javadir}/h2.jar','_javadir}/h2database.jar',qr'ln -s');
 };
 

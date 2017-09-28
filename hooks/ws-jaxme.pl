@@ -4,7 +4,7 @@ push @PREHOOKS,
 sub {
     my ($spec, $parent) = @_;
     # hack around hsqldb and dual core CPU (ws-jaxme 0.5.2)
-    #$spec->get_section('build')->subst(qr'ant all javadoc', "ant all\nant javadoc");
+    #$spec->get_section('build')->subst_body(qr'ant all javadoc', "ant all\nant javadoc");
 };
 
 

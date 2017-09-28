@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
-    $spec->get_section('package')->subst_if(qr'xml-commons-resolver','xml-commons-resolver12',qr'Requires:');
+    $spec->get_section('package')->subst_body_if(qr'xml-commons-resolver','xml-commons-resolver12',qr'Requires:');
 
 
 };

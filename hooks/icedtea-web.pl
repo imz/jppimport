@@ -35,8 +35,8 @@ push @SPECHOOKS, sub {
 #BuildRequires: java-%javaver-%origin-devel
 ');
 
-    #$spec->get_section('build')->subst(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
-    $spec->get_section('build')->subst(qr'fedora-','ALTLinux-');
+    #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
+    $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
 
 # --- alt linux specific, shared with openjdk ---#
 

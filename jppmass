@@ -23,7 +23,8 @@ use Source::Repository::Mass::Transform::PassThrough;
 
 our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
 
-$DistroMap::default_originrepo='jpackage';
+#$DistroMap::default_originrepo='jpackage';
+$DistroMap::default_originrepo='fedora';
 $DistroMap::default_destrepo='altlinux';
 
 $Source::Repository::Mass::strategy='notolder';
@@ -32,41 +33,41 @@ $Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir
 $Source::Repository::Mass::version_comparator=\&Source::Package::Comparators::rpm_plus_perl_version_comparator;
 $Source::Repository::Mass::release_comparator=\&jppimport_release_comparator;
 
-$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/t7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-$ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
+$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/p8/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
+#$ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
 
-@ORIGINSKIP=qw/
-useless:
-daytrader
+# @ORIGINSKIP=qw/
+# useless:
+# daytrader
 
-fractalish:
-jorm
-jorm-rdb-adapter
-medor
-perseus-cache
-perseus-concurrency
-perseus-persistence
-perseus-pool
+# fractalish:
+# jorm
+# jorm-rdb-adapter
+# medor
+# perseus-cache
+# perseus-concurrency
+# perseus-persistence
+# perseus-pool
 
-dead-or-deprecated:
-maven2-stylus-skin
-maven2-default-skin
-maven2-classic-skin
-(appeared_again)saxon7
-jetty6-core
-/
-;
+# dead-or-deprecated:
+# maven2-stylus-skin
+# maven2-default-skin
+# maven2-classic-skin
+# (appeared_again)saxon7
+# jetty6-core
+# /
+# ;
 
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
-my @DESTSKIPEXTRA=qw/jpackage-utils/;
-my @DESTSKIPNOORIGIN=qw/
-drawswf
-jed
-jikes
-/;
+# my @DESTSKIPEXTRA=qw/jpackage-utils/;
+# my @DESTSKIPNOORIGIN=qw/
+# drawswf
+# jed
+# jikes
+# /;
 
-@DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);
+# @DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);
 
 my ($jvm,$target);
 
@@ -75,24 +76,21 @@ my $convert=RPM::Source::Convert::JPPMass->new();
 
 $convert->process();
 
-sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new(@_);
-    if ($ORIGINPATH =~ m!/fedora/linux/!) {
-	#print STDERR "I: jppmass: setting fedora\n";
-	$DistroMap::default_originrepo='fedora';
-    }
-    return $self;
-}
+# sub new {
+#     my $class = shift;
+#     my $self = $class->SUPER::new(@_);
+#     if ($ORIGINPATH =~ m!/fedora/linux/!) {
+# 	#print STDERR "I: jppmass: setting fedora\n";
+# 	$DistroMap::default_originrepo='fedora';
+#     }
+#     return $self;
+# }
 
-sub get_longopt {
-    my $class = shift;
-    return $class->SUPER::get_longopt(@_),
+our @LONGOPT = (
 	"jpp=s" => \$ORIGINPATH,
-	"alt=s"   => \$DESTPATH,
+#	"alt=s"   => \$DESTPATH,
 	"target=s"=> \$target
-    ;
-}
+    );
 
 
 # NOTE: PassThrough specific!!!

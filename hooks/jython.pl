@@ -7,7 +7,7 @@ push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
 
     $spec->get_section('package','')->set_tag('Summary','Jython is an implementation of Python written in pure Java.');
-    #$spec->get_section('package','')->subst(qr'cpython_version\s+2.3','cpython_version	2.4');
+    #$spec->get_section('package','')->subst_body(qr'cpython_version\s+2.3','cpython_version	2.4');
 
     $spec->get_section('package','')->push_body('BuildArch: noarch'."\n") unless $spec->get_section('package','')->match_body(qr'BuildArch:\s*noarch');
 
