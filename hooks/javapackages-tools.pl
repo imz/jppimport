@@ -117,7 +117,14 @@ RPM build helpers for Java packages.
     # moved to rpm-build-java
     $spec->main_section->exclude_body(qr'Requires:\s+python3');
 
-    $spec->get_section('files','doc')->push_body('
+    $spec->get_section('files','-n javapackages-local')->push_body('
+%_datadir/java-utils/__pycache__
+%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
+%exclude %_datadir/java-utils/__pycache__/pom_editor.*
+%exclude %_datadir/java-utils/__pycache__/request-artifact.*
+'."\n");
+   
+    $spec->get_section('files','-n javapackages-local')->push_body('
 %files -n rpm-macros-java
 %_rpmmacrosdir/javapackages-fjava
 %_rpmmacrosdir/javapackages-jpackage
@@ -134,13 +141,6 @@ RPM build helpers for Java packages.
 %_datadir/java-utils/__pycache__/maven_depmap.*
 %_datadir/java-utils/__pycache__/pom_editor.*
 %_datadir/java-utils/__pycache__/request-artifact.*
-'."\n");
-
-    $spec->get_section('files','-n javapackages-local')->push_body('
-%_datadir/java-utils/__pycache__
-%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
-%exclude %_datadir/java-utils/__pycache__/pom_editor.*
-%exclude %_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
 
 };

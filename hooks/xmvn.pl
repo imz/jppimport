@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-require 'set_bin_755.pl';
+#require 'set_bin_755.pl';
 
 push @SPECHOOKS, 
 sub {
