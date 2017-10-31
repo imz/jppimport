@@ -13,8 +13,7 @@ use RPM::Source::Convert::Plugins::JPackage2ALT;
 use Source::Repository::Mass::Transform::PassThrough;
 use RPM::Source::Transformation::GenericUtility;
 our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
-my $origintoolsdir=dirname($0);
-$Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir/jppimport";
+$Source::Repository::Mass::Transform::PassThrough::originimport='srpmconvert-jpp';
 ## PassThrough ---------------------------------------------
 # uncomment if use embedded
 #use Source::Repository::Mass::Transform::Embedded;
@@ -50,5 +49,3 @@ sub jppimport_release_comparator {
     }
     return 1;
 }
-
-1;
