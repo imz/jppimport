@@ -1,30 +1,9 @@
 #!/usr/bin/perl -w
 
-package RPM::Source::Convert::ALTLinuxJPPImport;
-
 use strict;
 use warnings;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
 use RPM::Source::Transformation::GenericUtility;
 
-our @ISA=q/RPM::Source::Transform/;
-# keep in util
-$RPM::Source::Transformation::RPMEditorProvider::cleanup=0;
-
-my $converter=RPM::Source::Convert::ALTLinuxJPPImport->new();
+my $converter=RPM::Source::Transform->new();
 $converter->transform();
-
-sub new {
-    my ($class)=@_;
-    if (grep {$_ =~ m!/jpackage/!} @ARGV) {
-	$DistroMap::default_originrepo='jpackage';
-	print STDERR "I: jpackage mode\n";
-    } else {
-#	print STDERR "I: fedora mode\n";
-    }
-    my $self=$class->SUPER::new();
-    return $self;
-}
-
-
-__END__

@@ -4,108 +4,33 @@ package RPM::Source::Convert::JPPMass;
 
 use strict;
 use warnings;
-use Carp;
-use Getopt::Long;
 use File::Basename;
-use RPM qw/evrcmp/;
-
-use Source::Repository::Mass;
+use Source::Repository::Mass::ALTLinuxImport qw!fcimport/Sisyphus!;
 use Source::Repository::Mass::SkipName::Listed;
-use Source::Repository::Matcher;
-use Source::Repository::Matcher::DistroMap;
-use RPM::Source::Convert::ALTLinuxImport;
+use Source::Repository::Mass::FedoraOrigin;
 use RPM::Source::Convert::Plugins::JPackage2ALT;
+## PassThrough ---------------------------------------------
 use Source::Repository::Mass::Transform::PassThrough;
-# uncomment if use embedded
-#use Source::Repository::Mass::ALTLinuxImport;
-#use Source::Repository::Mass::Transform::Embedded;
-
-
+use RPM::Source::Transformation::GenericUtility;
 our @ISA = qw/Source::Repository::Mass::Transform::PassThrough/;
-
-#$DistroMap::default_originrepo='jpackage';
-$DistroMap::default_originrepo='fedora';
-$DistroMap::default_destrepo='altlinux';
-
-$Source::Repository::Mass::strategy='notolder';
 my $origintoolsdir=dirname($0);
 $Source::Repository::Mass::Transform::PassThrough::originimport="$origintoolsdir/jppimport";
+## PassThrough ---------------------------------------------
+# uncomment if use embedded
+#use Source::Repository::Mass::Transform::Embedded;
+
+$Source::Repository::Mass::strategy='notolder';
 $Source::Repository::Mass::version_comparator=\&Source::Package::Comparators::rpm_plus_perl_version_comparator;
 $Source::Repository::Mass::release_comparator=\&jppimport_release_comparator;
-
-$DESTPATH='~/hasher/repo/SRPMS.hasher:~/hasher/repo/SRPMS.hasher.S:/var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS:/var/ftp/pub/Linux/ALT/p8/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p7/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/t6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/p6/branch/files/SRPMS:/var/ftp/pub/Linux/ALT/5.1/branch/files/SRPMS';
-#$ORIGINPATH='/var/ftp/pub/Linux/jpackage/6.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/6.0/fedora-10/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0-updates/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/generic/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/redhat-el-5.0/free/SRPMS:/var/ftp/pub/Linux/jpackage/5.0/fedora-9/free/SRPMS:/var/ftp/pub/Linux/jpackage/1.7/generic/free/SRPMS';
-
-# @ORIGINSKIP=qw/
-# useless:
-# daytrader
-
-# fractalish:
-# jorm
-# jorm-rdb-adapter
-# medor
-# perseus-cache
-# perseus-concurrency
-# perseus-persistence
-# perseus-pool
-
-# dead-or-deprecated:
-# maven2-stylus-skin
-# maven2-default-skin
-# maven2-classic-skin
-# (appeared_again)saxon7
-# jetty6-core
-# /
-# ;
-
-# not so simple... hands required!
-#jsvc jakarta-commons-daemon
-# my @DESTSKIPEXTRA=qw/jpackage-utils/;
-# my @DESTSKIPNOORIGIN=qw/
-# drawswf
-# jed
-# jikes
-# /;
-
-# @DESTSKIP = (@DESTSKIPNOORIGIN, @DESTSKIPEXTRA);
-
-my ($jvm,$target);
 
 my $verbose=0;
 my $convert=RPM::Source::Convert::JPPMass->new();
 
 $convert->process();
 
-# sub new {
-#     my $class = shift;
-#     my $self = $class->SUPER::new(@_);
-#     if ($ORIGINPATH =~ m!/fedora/linux/!) {
-# 	#print STDERR "I: jppmass: setting fedora\n";
-# 	$DistroMap::default_originrepo='fedora';
-#     }
-#     return $self;
-# }
-
-our @LONGOPT = (
-	"jpp=s" => \$ORIGINPATH,
-#	"alt=s"   => \$DESTPATH,
-	"target=s"=> \$target
-    );
-
-
-# NOTE: PassThrough specific!!!
-sub process_pair_hook {
-    my ($self,$argsptr)=@_;
-    my $hook;
-    if ($target) {
-	$hook="$origintoolsdir/hooks/set_target_1$target.pl";
-	push @$argsptr, '--hook', $hook if (-e $hook);
-    }
-    push @$argsptr, '--originrepo', $DistroMap::default_originrepo;
-}
-
 ############## Static #############
 
+use RPM::Vercmp;
 sub jppimport_release_comparator {
     my ($origin,$dest) =@_;
     return 1 unless $dest;
@@ -119,7 +44,7 @@ sub jppimport_release_comparator {
     $originrelease=~s/\.(?:fc|jpp)\d+$//;
     if ($destrelease=~/^alt([^_]+)_(.+)jpp[\d.]+$/) {
 	my $altjppsubrel=$2;
-	my $cmp=RPM::evrcmp($originrelease, $altjppsubrel);
+	my $cmp=RPM::Vercmp::evrcmp($originrelease, $altjppsubrel);
 	print STDERR "jppmass: $originrelease cmp $altjppsubrel = $cmp\n" if $verbose;
 	return $cmp;
     }
@@ -127,4 +52,3 @@ sub jppimport_release_comparator {
 }
 
 1;
- 
