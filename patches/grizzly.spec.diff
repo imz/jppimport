@@ -1,0 +1,11 @@
+--- grizzly-2.3.24-alt1_2jpp8/grizzly.spec	2016-12-20 08:10:26.000000000 +0000
++++ grizzly-2.3.24-alt1_4jpp8/grizzly.spec	2017-10-30 19:06:05.000000000 +0000
+@@ -190,6 +190,7 @@ done
+  -f -- \
+ %else
+  -- -Dmaven.test.failure.ignore=true \
++  -Dmaven.test.skip.exec=true \
+ %endif
+  -Dmaven.local.depmap.file="%{_mavendepmapfragdir}/glassfish-servlet-api.xml"
+ 
+
