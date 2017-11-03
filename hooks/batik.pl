@@ -33,6 +33,9 @@ export ANT_OPTS="-Xmx512m"
 subst 's,maxmemory="128m",maxmemory="512m",' build.xml
 !);
 
+}
+
+__END__
     $spec->get_section('install')->push_body('
 mkdir -p $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik
 pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
@@ -46,18 +49,3 @@ pushd $RPM_BUILD_ROOT%_javadir/xmlgraphics-batik'."\n");
 	$spec->get_section('files','rasterizer')->push_body("%_javadir/xmlgraphics-batik/$i.jar\n");
     }
     $spec->get_section('install')->push_body('popd'."\n");
-
-}
-
-__END__
-    $spec->get_section('install')->push_body('
-# due to #19119
-#1: xmlgraphics-batik         error: unpacking of archive failed on file
-#/usr/share/java/batik: cpio: rename failed - Is a directory
-#E: Some errors occurred while running transaction
-%pre
-[ -d /usr/share/java/batik ] && rm -rf /usr/share/java/batik ||:
-');
-    $spec->get_section('files','')->push_body('%_javadir/batik
-%dir %_javadir/xmlgraphics-batik
-');

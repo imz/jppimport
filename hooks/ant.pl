@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+require 'set_osgi.pl';
 require 'set_manual_no_dereference.pl';
 
 push @SPECHOOKS, 

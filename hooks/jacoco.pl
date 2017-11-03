@@ -4,5 +4,5 @@
 
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
-#    $spec->get_section('package','')->unshift_body('%filter_from_requires /osgi(org.apache.ant*/d'."\n");
+    $spec->get_section('package','')->unshift_body('%filter_from_requires /osgi(org.apache.ant*/d'."\n");
 }

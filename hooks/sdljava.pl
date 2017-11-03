@@ -3,6 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: bsh'."\n");
     $spec->get_section('package','')->unshift_body('BuildRequires: ruby-stdlibs zlib-devel'."\n");
 };
 
