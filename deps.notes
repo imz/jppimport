@@ -65,6 +65,11 @@ find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 
 #--------------------------------------------------------------
 
+# Don't install javadoc and sources jars
+%mvn_package ":{*}::{sources,javadoc}:" __noinstall
+то же через
+%pom_remove_plugin :maven-source-plugin
+%pom_remove_plugin :maven-javadoc-plugin
 
 #--------------------------------------------------------------
 
@@ -112,14 +117,6 @@ simple
 disruptor
 bean-validation-api
 grizzly
-
-
-TODO: ant -> move patches
-
-jbossws-cxf -> fc21 no fc24
-invokebinder
-owasp-esapi-java
-maven-checkstyle-plugin
 
 # eclipse
 #jetty -> [  artifact org.eclipse.equinox.http:servlet:jar:1.0.0-v20070606 ] <> eclipse-platform

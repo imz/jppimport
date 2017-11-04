@@ -26,8 +26,8 @@ sub {
     $filesec->subst_body(qr'0660,tomcat,tomcat','0640,tomcat,tomcat');
     $filesec->subst_body(qr'^\%doc','%attr(0755,root,root) %doc');
     $filesec->push_body('%attr(0755,root,root) %dir %{bindir}'."\n");
-#   $filesec->subst_body(qr'^\%{bindir}/','%attr(0644,root,root) %{bindir}/');
-    $filesec->subst_body(qr'^\%dir %{apphomedir}','%attr(0755,root,root) %dir %{apphomedir}');
+#   $filesec->subst_body(qr'^\%\{bindir\}/','%attr(0644,root,root) %{bindir}/');
+    $filesec->subst_body(qr'^\%dir %\{apphomedir\}','%attr(0755,root,root) %dir %{apphomedir}');
 };
 
 __END__

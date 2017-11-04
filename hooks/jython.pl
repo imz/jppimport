@@ -23,14 +23,14 @@ AutoReq: yes, nopython
     &add_missingok_config($spec,'/etc/jython.conf');
 
     $spec->get_section('install')->push_body('
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/jython/cachedir/packages
-ln -s $(relative %{_localstatedir}/jython/cachedir %{_datadir}/jython/) $RPM_BUILD_ROOT%{_datadir}/jython/
+mkdir -p $RPM_BUILD_ROOT%{_var}/lib/jython/cachedir/packages
+ln -s $(relative %{_var}/lib/jython/cachedir %{_datadir}/jython/) $RPM_BUILD_ROOT%{_datadir}/jython/
 ');
 
-    $spec->get_section('files','')->push_body('
-%{_localstatedir}/jython
+    $spec->get_section('files','')->push_body('# package cache
+%{_var}/lib/jython
 # is it worth ghosting?
-#%ghost %{_localstatedir}/jython/cachedir/packages
+#%ghost %{_var}/lib/jython/cachedir/packages
 %{_datadir}/jython/cachedir
 ');
 
@@ -42,7 +42,7 @@ echo | /usr/bin/jython ||:
 # cleanup
 if [ "$1" -eq 0 ]
 then
-    rm %{_localstatedir}/jython/cachedir/packages/*.{pkc,idx}
+    rm %{_var}/lib/jython/cachedir/packages/*.{pkc,idx}
     find /usr/share/jython/Lib -name "*py.class" -delete
 fi || :
 ');

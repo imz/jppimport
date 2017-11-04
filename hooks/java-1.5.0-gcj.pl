@@ -23,7 +23,7 @@ java jcj ahead-of-time compile scripts
     $spec->get_section('package','')->unshift_body('BuildRequires(pre): rpm-build-java'."\n");
 
     $spec->get_section('package','')->subst_body_if(qr'openssl','ca-certificates',qr'BuildRequires:');
-    $spec->get_section('package','')->subst_body(qr'^\%define origin\s+gcj\%{gccsuffix}','%define origin          gcj');
+    $spec->get_section('package','')->subst_body(qr'^\%define origin\s+gcj\%\{gccsuffix\}','%define origin          gcj');
     $spec->get_section('package','')->subst_body(qr'^\%define gccver\s.*','%define gccver          '.$gccsuffix.'-alt1'."\n");
     $spec->get_section('package','')->subst_body(qr'^\%define gccsuffix\s.*','%define gccsuffix       -'.$gccsuffix."\n");
     $spec->get_section('package','')->unshift_body('%define gccrpmsuffix    '.$gccsuffix."\n");

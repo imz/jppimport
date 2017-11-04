@@ -9,7 +9,7 @@ sub set_split_gcj_support {
 	sub {
     $spec->get_section('package','')->subst_body(qr'(?<=\?_without_gcj)\s$','');
     $spec->get_section('package','')->subst_body(qr'(?<=\?_gcj_sup)\s$','');
-    $spec->get_section('package','')->subst_body(qr'(?<=_gcj_support}}\%{!\?_g)\s$','');
+    $spec->get_section('package','')->subst_body(qr'(?<=_gcj_support\}\}\%\{!\?_g)\s$','');
 	    });
 
 #_gcj_support}}%{!?_g

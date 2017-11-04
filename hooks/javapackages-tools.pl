@@ -5,11 +5,10 @@ sub {
     my ($spec, $parent) = @_;
     $spec->get_section('install')->subst_body_if(qr'/\&\.gz/','/&.*/',qr'^sed');
 
-    # TODO: with tests and bootstrap=1
-    # dependency on python-devel -> drop
-    # dependency on python3-module-setuptools - add
-
     $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
+    # TODO: tests requires manual fix: our rpm requires GROUP: tag
+    $spec->main_section->subst_body('^\%bcond_without\s+tests','%bcond_with tests');
+
     my $opid=$spec->add_source('osgi-fc.prov.files');
     my $mpid=$spec->add_source('maven.prov.files');
     my $meid=$spec->add_source('maven.env');
@@ -66,14 +65,10 @@ install -m755 -D %{SOURCE@.$meid.q@} %buildroot%_rpmmacrosdir/maven.env
 @."\n");
 
     $spec->get_section('install')->push_body(q!
-# in rpm-build-java
-sed -i -e '/usr\/lib\/rpm/d' files-common
-# move /usr/share/xmvn/* to maven-local
-grep /usr/share/xmvn files-common >> files-maven
-sed -i -e '/usr\/share\/xmvn/d' files-common
-sed -i -e '/usr\/share\/java-utils\/.*\.py/d' files-common
-sed -i -e '/usr\/bin\/xmvn-builddep/d' files-common
-
+# altlinux python support
+sed -i -e 's,python?\.?,python*,' files-python
+# in rpm-build-java or useless in alt
+sed -i -e '/usr\/lib\/rpm/d' files-common files-local
 rm -rf %buildroot/usr/lib/rpm/fileattrs
 
 pushd %buildroot%_rpmmacrosdir/
@@ -114,14 +109,9 @@ Requires:       python3
 RPM build helpers for Java packages.
 
 !."\n");
-    # moved to rpm-build-java
-    $spec->main_section->exclude_body(qr'Requires:\s+python3');
 
-    $spec->get_section('files','-n javapackages-local')->push_body('
+    $spec->get_section('files','-n javapackages-local')->push_body('# alt python3 cache
 %_datadir/java-utils/__pycache__
-%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
-%exclude %_datadir/java-utils/__pycache__/pom_editor.*
-%exclude %_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
    
     $spec->get_section('files','-n javapackages-local')->push_body('
@@ -134,13 +124,6 @@ RPM build helpers for Java packages.
 /usr/lib/rpm/javadoc.*
 /usr/lib/rpm/osgi-fc.*
 %_rpmmacrosdir/maven.env
-%_datadir/java-utils/maven_depmap.py
-%_datadir/java-utils/pom_editor.py
-%_datadir/java-utils/request-artifact.py
-%_bindir/xmvn-builddep
-%_datadir/java-utils/__pycache__/maven_depmap.*
-%_datadir/java-utils/__pycache__/pom_editor.*
-%_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
 
 };

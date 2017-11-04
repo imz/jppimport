@@ -6,7 +6,7 @@ require 'add_missingok_config.pl';
 push @PREHOOKS, sub {
     my ($jpp, $parent) = @_;
     my $presec=$jpp->get_section('pre','jdt');
-    $presec->exclude_body(qr'^rm -rf \%{_bindir}/efj/');
+    $presec->exclude_body(qr'^rm -rf \%\{_bindir\}/efj/');
 };
 
 push @SPECHOOKS, 
@@ -105,14 +105,14 @@ fi
 !);
 
     # RPM macros file
-    $jpp->get_section('install')->exclude_body(qr'^install.*RPM_BUILD_ROOT\%{_sysconfdir}/rpm/');
+    $jpp->get_section('install')->exclude_body(qr'^install.*RPM_BUILD_ROOT\%\{_sysconfdir\}/rpm/');
     $jpp->applied_block(
 	"platform files hook",
 	sub {
 	    foreach my $sec ($jpp->get_sections()) {
 		next if $sec->get_type ne 'files';
 		next if $sec->get_raw_package ne 'platform';
-		$sec->exclude_body(qr'\%{_sysconfdir}/rpm/macros.\%{name}');
+		$sec->exclude_body(qr'\%\{_sysconfdir\}/rpm/macros.\%\{name\}');
 	    }
 	});
 

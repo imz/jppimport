@@ -5,7 +5,7 @@ push @PREHOOKS, sub {
     # contain alternatives that we add manually;
     # also, (see https://bugzilla.altlinux.org/32043)
     # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
-    $spec->get_section($_,'')->delete()} qw/post postun posttrans/;
+    map {$spec->get_section($_,'')->delete()} qw/post postun posttrans/;
 };
 
 push @SPECHOOKS, sub {

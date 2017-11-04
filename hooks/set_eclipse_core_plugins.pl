@@ -7,8 +7,8 @@ push @SPECHOOKS, sub {
 	"{_datadir}/eclipse/plugins fix",
 	sub {
 	    map {
-		$_->subst_body(qr'\%{?_datadir}?/eclipse/plugins/org.eclipse.jdt','%{_libdir}/eclipse/dropins/jdt/plugins/org.eclipse.jdt');
-		$_->subst_body(qr'\%{?_datadir}?/eclipse/plugins','%{_libdir}/eclipse/plugins');
+		$_->subst_body(qr'\%\{?_datadir\}?/eclipse/plugins/org.eclipse.jdt','%{_libdir}/eclipse/dropins/jdt/plugins/org.eclipse.jdt');
+		$_->subst_body(qr'\%\{?_datadir\}?/eclipse/plugins','%{_libdir}/eclipse/plugins');
 	    } $spec->get_section('prep'), $spec->get_section('build');
 	});
 };

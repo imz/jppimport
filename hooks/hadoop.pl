@@ -3,12 +3,9 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
-    $spec->get_section('package','')->unshift_body('BuildRequires: avro-maven-plugin'."\n");
     $spec->get_section('package','')->unshift_body('BuildRequires: zlib-devel'."\n");
     $spec->get_section('package','')->unshift_body('%define _libexecdir %_prefix/libexec'."\n");
     $spec->get_section('files','yarn-security')->subst_body_if(qr'6050,root,yarn','6010,root,yarn',qr'/container-executor');
-    # uncomment if stll needed -- used for -2.4.1-alt1_14
-    $spec->get_section('prep')->push_body(q!%pom_add_dep org.fusesource.leveldbjni:leveldbjni hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice!."\n");
     my $sec=$spec->get_section('pretrans','hdfs');
     if (not $sec or not $sec->get_flag('-p')) {
 	die "WARNING: lua pretrans not found!";
@@ -35,3 +32,6 @@ fi ||:
 };
 
 __END__
+#    $spec->get_section('package','')->unshift_body('BuildRequires: avro-maven-plugin'."\n");
+    # uncomment if stll needed -- used for -2.4.1-alt1_14
+    $spec->get_section('prep')->push_body(q!%pom_add_dep org.fusesource.leveldbjni:leveldbjni hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice!."\n");

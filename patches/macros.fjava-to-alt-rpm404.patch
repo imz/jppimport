@@ -1,8 +1,6 @@
-diff --git a/macros.d/macros.fjava b/macros.d/macros.fjava
-index 75969b1..acd7720 100644
---- a/macros.d/macros.fjava
-+++ b/macros.d/macros.fjava
-@@ -254,8 +254,7 @@ sort -u -o ${_filelist} ${_filelist} \
+--- javapackages-5.0.0/macros.d/macros.fjava	2017-06-21 12:04:13.009318912 +0300
++++ javapackages-5.0.0/macros.d/macros.fjava	2017-11-03 18:55:14.325423624 +0200
+@@ -268,8 +268,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -12,7 +10,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_remove_plugin - remove Maven plugin invocation from POM file
-@@ -273,8 +272,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -287,8 +286,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -22,7 +20,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_disable_module - disable given project module in POM file
-@@ -291,8 +289,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -305,8 +303,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -32,7 +30,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_xpath_remove - remove an XML node from POM file
-@@ -316,11 +313,9 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -330,11 +327,9 @@
  # because it selects nodes from pom namespace, but "environment/os" won't find
  # anything because it looks for nodes that don't belong to any XML namespace.
  #
@@ -46,7 +44,7 @@ index 75969b1..acd7720 100644
  
  # %pom_xpath_inject - inject XML code into POM file
  #
-@@ -337,8 +332,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -351,8 +346,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -56,7 +54,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_xpath_replace - replace XML node from POM file with given XML code
-@@ -356,8 +350,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -370,8 +364,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -66,7 +64,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_xpath_set - set text contents of XML node from POM file
-@@ -375,8 +368,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -389,8 +382,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -76,7 +74,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_add_parent - add parent POM reference to POM file
-@@ -394,8 +386,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -408,8 +400,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -86,7 +84,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_remove_parent - remove parent POM reference from POM file
-@@ -408,8 +399,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -422,8 +413,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
  #
@@ -96,7 +94,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_set_parent - set parent POM reference in POM file
-@@ -424,8 +414,7 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -438,8 +428,7 @@
  # invocation of %pom_add_parent. See documentation for these macros for more
  # information about parameters.
  #
@@ -106,7 +104,7 @@ index 75969b1..acd7720 100644
  
  
  # %pom_add_dep[_mgmt] - add dependency to POM file
-@@ -452,10 +441,8 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -466,10 +455,8 @@
  # Extra XML is additional XML code to be added into the <dependency> node. This
  # parameter can be ommited, in which case no extra XML is appended.
  #
@@ -119,14 +117,17 @@ index 75969b1..acd7720 100644
  
  
  # %pom_add_plugin - add plugin invocation to POM file
-@@ -478,8 +465,6 @@ sort -u -o ${_filelist} ${_filelist} \
+@@ -492,11 +479,9 @@
  # Extra XML is additional XML code to be added into the <plugin> node. This
  # parameter can be ommited, in which case no extra XML is appended.
  #
 -%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*
 -}
-+%pom_add_plugin     %{__pom_call}add_plugin 
++%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*}
  
 -%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**
 -}
-+%pom_change_dep     %{__pom_call}change_dep 
++%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**}
+ 
+ # %javadoc_package - generate javadoc subpackage definition
+ #

@@ -164,16 +164,15 @@ Provides: java-javadoc = 1:1.9.0
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
     $mainsec=$spec->main_section;
-    $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk');
-    $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj');
-    $mainsec->exclude_body(qr'^Obsoletes:\s+sinjdoc');
-    $spec->get_section('package','headless')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-headless');
-    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-devel');
-    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj-devel');
-    $spec->get_section('package','demo')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-demo');
-    $spec->get_section('package','src')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-src');
-    $spec->get_section('package','javadoc')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-javadoc');
-    $spec->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
+    $mainsec->exclude_body(qr'^Obsoletes:\s+(?:java-1.7.0-openjdk|java-1.5.0-gcj|sinjdoc)');
+    # moved to macros definitions
+#    $spec->get_section('package','headless')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-headless');
+#    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-devel');
+#    $spec->get_section('package','devel')->exclude_body(qr'^Obsoletes:\s+java-1.5.0-gcj-devel');
+#    $spec->get_section('package','demo')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-demo');
+#    $spec->get_section('package','src')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-src');
+#    $spec->get_section('package','javadoc')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-javadoc');
+#    $spec->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
@@ -245,6 +244,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$mainsec->subst_body(qr'^\%define _libdir','# define _libdir');
     #$mainsec->subst_body(qr'^\%define syslibdir','# define syslibdir');
 
+    $mainsec=$spec->main_section;
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     my $headlsec=$spec->get_section('package','headless');
@@ -547,9 +547,6 @@ Provides: java-devel = 1.5.0
 
 
 __END__
-    # no need in 1.7.0.1
-    #$spec->get_section('install')->subst_body_if(qr'--vendor=fedora','', qr'desktop-file-install');
-
     $spec->get_section('install')->push_body(q!# move soundfont to java
 grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
 grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new

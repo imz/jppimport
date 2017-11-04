@@ -7,7 +7,7 @@ push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
     &add_missingok_config($spec, '/etc/default/jetty','');
 
-    $spec->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%{rundir}');
+    $spec->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%\{rundir\}');
 
     my $initN=$spec->add_source('jetty.init');
     $spec->get_section('install')->push_body('install -D -m 755 %{S:'.$initN.'} %buildroot%_initdir/%name'."\n");
