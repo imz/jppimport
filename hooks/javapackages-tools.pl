@@ -9,13 +9,13 @@ sub {
     # TODO: tests requires manual fix: our rpm requires GROUP: tag
     $spec->main_section->subst_body('^\%bcond_without\s+tests','%bcond_with tests');
 
-    my $opid=$spec->add_source('osgi-fc.prov.files');
-    my $mpid=$spec->add_source('maven.prov.files');
-    my $meid=$spec->add_source('maven.env');
-
     # shell version of abs2rel
     my $abs2relid=$spec->add_source('abs2rel');
     $spec->main_section->exclude_body(qr'^Requires:\s+lua');
+
+    my $opid=$spec->add_source('osgi-fc.prov.files');
+    my $mpid=$spec->add_source('maven.prov.files');
+    my $meid=$spec->add_source('maven.env');
 
     $spec->add_patch('javapackages-tools-4.6.0-alt-use-enviroment.patch',STRIP=>1);
     $spec->add_patch('javapackages-tools-4.6.0-alt-req-headless-off.patch',STRIP=>1);
@@ -54,7 +54,7 @@ sed -i -e 1,1s,/bin/bash,/bin/sh, java-utils/java-wrapper bin/*
 !."\n");
 
     $spec->get_section('install')->push_body(q@
-install -m755 -D --backup off %{SOURCE@.$abs2relid.q@} %buildroot%_bindir/abs2rel
+install -m755 -D %{SOURCE@.$abs2relid.q@} %buildroot%_bindir/abs2rel
 
 install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/maven.prov.files
 install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/maven.req.files
@@ -77,6 +77,10 @@ sed -i -e 's,python?\.?,python*,' files-python
 # in rpm-build-java or useless in alt
 sed -i -e '/usr\/lib\/rpm/d' files-common files-local
 rm -rf %buildroot/usr/lib/rpm/fileattrs
+
+# useless on alt and requires python
+sed -i -e '/usr\/bin\/xmvn-builddep/d' files-common
+rm -rf %buildroot/usr/bin/xmvn-builddep
 
 pushd %buildroot%_rpmmacrosdir/
 mv macros.fjava javapackages-fjava
@@ -119,6 +123,9 @@ RPM build helpers for Java packages.
 
     $spec->get_section('files','-n javapackages-local')->push_body('# alt python3 cache
 %_datadir/java-utils/__pycache__
+%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
+%exclude %_datadir/java-utils/__pycache__/pom_editor.*
+%exclude %_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
    
     $spec->get_section('files','-n javapackages-local')->push_body('
@@ -131,7 +138,20 @@ RPM build helpers for Java packages.
 /usr/lib/rpm/javadoc.*
 /usr/lib/rpm/osgi-fc.*
 %_rpmmacrosdir/maven.env
+#%_bindir/xmvn-builddep
+%_datadir/java-utils/maven_depmap.py
+%_datadir/java-utils/pom_editor.py
+%_datadir/java-utils/request-artifact.py
+%_datadir/java-utils/__pycache__/maven_depmap.*
+%_datadir/java-utils/__pycache__/pom_editor.*
+%_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
+
+    $spec->get_section('files','-n javapackages-tools')->push_body('# moved to rpm-build-java
+%exclude %_datadir/java-utils/maven_depmap.py
+%exclude %_datadir/java-utils/pom_editor.py
+%exclude %_datadir/java-utils/request-artifact.py
+');
 
 };
 
