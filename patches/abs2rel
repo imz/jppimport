@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# abs2rel (shell version)
+
+# Prints out the relative path between to absolute paths.
+#
+# Parameters:
+# $1 = first path
+# $2 = second path
+#
+# Output: the relative path between 1st and 2nd paths
+relpath() {
+    local pos="${1%%/}" ref="${2%%/}" down=''
+
+    while :; do
+        test "$pos" = '/' && break
+        case "$ref" in $pos/*) break;; esac
+        down="../$down"
+        pos=${pos%/*}
+    done
+
+    echo "$down${ref##$pos/}"
+}
+
+if [ "$#" != 2 ]; then
+   echo "usage: " .. arg[0] .. " <PATH> <BASE>\n"
+   exit 1
+fi
+
+relpath $2 $1

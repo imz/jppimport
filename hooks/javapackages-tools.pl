@@ -12,6 +12,11 @@ sub {
     my $opid=$spec->add_source('osgi-fc.prov.files');
     my $mpid=$spec->add_source('maven.prov.files');
     my $meid=$spec->add_source('maven.env');
+
+    # shell version of abs2rel
+    my $abs2relid=$spec->add_source('abs2rel');
+    $spec->main_section->exclude_body(qr'^Requires:\s+lua');
+
     $spec->add_patch('javapackages-tools-4.6.0-alt-use-enviroment.patch',STRIP=>1);
     $spec->add_patch('javapackages-tools-4.6.0-alt-req-headless-off.patch',STRIP=>1);
     $spec->add_patch('javapackages-tools-4.6.0-alt-shade-jar.patch',STRIP=>1);
@@ -49,6 +54,8 @@ sed -i -e 1,1s,/bin/bash,/bin/sh, java-utils/java-wrapper bin/*
 !."\n");
 
     $spec->get_section('install')->push_body(q@
+install -m755 -D --backup off %{SOURCE@.$abs2relid.q@} %buildroot%_bindir/abs2rel
+
 install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/maven.prov.files
 install -m755 -D %{SOURCE@.$mpid.q@} %buildroot/usr/lib/rpm/maven.req.files
 
