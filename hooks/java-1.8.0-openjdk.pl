@@ -288,12 +288,11 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     #$spec->get_section('files','')->subst_body(qr'^\%doc ChangeLog','#doc ChangeLog');
 
 # --- alt linux specific, shared with openjdk ---#
-    $spec->get_section('files','')->unshift_body('%_altdir/%altname-java
-%_sysconfdir/buildreqs/packages/substitute.d/%name
-');
+    $spec->get_section('files','')->unshift_body('%_sysconfdir/buildreqs/packages/substitute.d/%name'."\n");
+    $spec->get_section('files','headless')->unshift_body('%_altdir/%altname-java
+%_sysconfdir/buildreqs/packages/substitute.d/%name-headless'."\n");
     $spec->get_section('files','devel')->unshift_body('%_altdir/%altname-javac
-%_sysconfdir/buildreqs/packages/substitute.d/%name-devel
-');
+%_sysconfdir/buildreqs/packages/substitute.d/%name-devel'."\n");
     $spec->_reset_speclist();
     $mainsec=$spec->main_section;
 
@@ -368,10 +367,13 @@ EOF
 
 # Install substitute rules for buildreq
 echo java >j2se-buildreq-substitute
+echo java-headless >j2se-headless-buildreq-substitute
 echo java-devel >j2se-devel-buildreq-substitute
 mkdir -p %buildroot%_sysconfdir/buildreqs/packages/substitute.d
 install -m644 j2se-buildreq-substitute \
     %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name
+install -m644 j2se-headless-buildreq-substitute \
+    %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-headless
 install -m644 j2se-devel-buildreq-substitute \
     %buildroot%_sysconfdir/buildreqs/packages/substitute.d/%name-devel
 
