@@ -184,6 +184,7 @@ BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
     $mainsec->unshift_body(q'%def_enable accessibility
 %def_disable javaws
 %def_disable moz_plugin
+%def_disable control_panel
 %def_disable systemtap
 %def_disable desktop
 ');
@@ -336,7 +337,7 @@ Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%
 EOF
 fi
 
-%if_enabled moz_plugin
+%if_enabled control_panel
 # ControlPanel freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
 [Desktop Entry]
@@ -394,6 +395,12 @@ do
 EOF
 done
 
+%if_enabled control_panel
+cat <<EOF >>%buildroot%_altdir/%name-java
+%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
+%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
+EOF
+%endif
 # ----- JPackage compatibility alternatives ------
 cat <<EOF >>%buildroot%_altdir/%name-java
 %{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
@@ -403,12 +410,6 @@ cat <<EOF >>%buildroot%_altdir/%name-java
 %{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 EOF
-%if_enabled moz_plugin
-cat <<EOF >>%buildroot%_altdir/%name-java
-%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
-%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
-EOF
-%endif
 # JPackage specific: alternatives for security policy
 cat <<EOF >>%buildroot%_altdir/%name-java
 %{_jvmdir}/%{jrelnk}/lib/security/local_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar	%{priority}
