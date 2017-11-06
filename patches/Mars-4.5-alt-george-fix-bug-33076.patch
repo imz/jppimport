@@ -1,0 +1,10 @@
+--- Mars-4.5-alt2_5jpp8/build.xml	2017-07-26 01:56:05.000000000 +0000
++++ Mars-4.5-alt2/build.xml	2017-04-03 13:07:58.000000000 +0000
+@@ -10,6 +10,7 @@
+ 		</copy>
+ 		<jar destfile="Mars.jar">
+ 			<fileset dir="build"/>
++			<fileset dir="." includes="*.xml" excludes="build.xml"/>
+ 		</jar>
+ 	</target>
+ </project>
