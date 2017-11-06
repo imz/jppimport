@@ -182,7 +182,7 @@ BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
 %def_disable javaws
 %def_disable moz_plugin
 %def_disable control_panel
-%def_disable systemtap
+%def_enable systemtap
 %def_disable desktop
 ');
     $mainsec->push_body('
