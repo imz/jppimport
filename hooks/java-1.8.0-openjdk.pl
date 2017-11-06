@@ -135,9 +135,6 @@ push @SPECHOOKS, sub {
 
     $mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
 
-    # jpp7
-    $mainsec->unshift_body('%define with_systemtap 0'."\n");
-
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
