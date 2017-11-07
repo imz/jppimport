@@ -6,6 +6,10 @@ push @PREHOOKS, sub {
     # also, (see https://bugzilla.altlinux.org/32043)
     # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
     map {$spec->get_section($_,'')->delete()} qw/post postun posttrans/;
+    #info: Recommends: replaced with Requires:    bash-completion
+    my $mainsec=$spec->main_section;
+    $mainsec->exclude_body(qr'^(?:Recommends|Requires).*:\s+bash-completion');
+    
 };
 
 push @SPECHOOKS, sub {
@@ -16,9 +20,6 @@ push @SPECHOOKS, sub {
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
     $mainsec->unshift_body(q'BuildRequires(pre): browser-plugins-npapi-devel'."\n");
-
-    # remnants?
-    $mainsec->exclude_body(qr'^Requires.*:\s+maven-local'."\n");
 
     $mainsec->unshift_body(q'%def_enable javaws
 %def_enable moz_plugin
