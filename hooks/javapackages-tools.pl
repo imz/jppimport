@@ -25,15 +25,6 @@ sub {
 
     $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight python3-module-nose python3-module-setuptools-tests'."\n");
 
-    # if set _jnidir = %_libdir/java
-    #$spec->main_section->exclude_body(qr'^BuildArch:\s+noarch');
-    #$spec->get_section('build')->unshift_body_after(qr'configure','sed -i -e s,jnidir=/java,jnidir=%_libdir/java, config.status'."\n");
-    #map {if ($_->get_type() eq 'package') {
-    #	$_->push_body('BuildArch: noarch'."\n") if !
-    #	$_->match_body(qr'^BuildArch:\s+noarch');
-    #	 }
-    #} $spec->get_sections();
-
     $spec->main_section->exclude_body(qr'^BuildRequires:\s+scl-utils-build');
 
     $spec->main_section->push_body('
@@ -79,7 +70,7 @@ sed -i -e '/usr\/lib\/rpm/d' files-common files-local
 rm -rf %buildroot/usr/lib/rpm/fileattrs
 
 # useless on alt and requires python
-sed -i -e '/usr\/bin\/xmvn-builddep/d' files-common
+sed -i -e '/usr\/bin\/xmvn-builddep/d' files-common files-local
 rm -rf %buildroot/usr/bin/xmvn-builddep
 
 pushd %buildroot%_rpmmacrosdir/
@@ -156,3 +147,12 @@ RPM build helpers for Java packages.
 };
 
 __END__
+    # if set _jnidir = %_libdir/java
+    #$spec->main_section->exclude_body(qr'^BuildArch:\s+noarch');
+    #$spec->get_section('build')->unshift_body_after(qr'configure','sed -i -e s,jnidir=/java,jnidir=%_libdir/java, config.status'."\n");
+    #map {if ($_->get_type() eq 'package') {
+    #	$_->push_body('BuildArch: noarch'."\n") if !
+    #	$_->match_body(qr'^BuildArch:\s+noarch');
+    #	 }
+    #} $spec->get_sections();
+
