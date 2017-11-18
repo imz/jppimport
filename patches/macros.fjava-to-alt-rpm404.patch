@@ -123,11 +123,11 @@
  #
 -%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*
 -}
-+%pom_add_plugin()     %{expand: %{__pom_call}add_plugin     %*}
++%pom_add_plugin     %{__pom_call}add_plugin 
  
 -%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**
 -}
-+%pom_change_dep(rf)     %{expand: %{__pom_call}change_dep    %**}
++%pom_change_dep     %{__pom_call}change_dep
  
  # %javadoc_package - generate javadoc subpackage definition
  #

@@ -1,17 +1,20 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, 
+push @PREHOOKS,
 sub {
     my ($spec, $parent) = @_;
-    $spec->get_section('install')->subst_body_if(qr'/\&\.gz/','/&.*/',qr'^sed');
+    $spec->macros->set_raw('python_prefix','python3');
+};
 
+push @SPECHOOKS,
+sub {
+    my ($spec, $parent) = @_;
     $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
     # TODO: tests requires manual fix: our rpm requires GROUP: tag
     $spec->main_section->subst_body('^\%bcond_without\s+tests','%bcond_with tests');
 
     # shell version of abs2rel
     my $abs2relid=$spec->add_source('abs2rel');
-    $spec->main_section->exclude_body(qr'^Requires:\s+lua');
 
     my $opid=$spec->add_source('osgi-fc.prov.files');
     my $mpid=$spec->add_source('maven.prov.files');
@@ -24,8 +27,6 @@ sub {
     $spec->add_patch('macros.jpackage-alt-script.patch',STRIP=>1);
 
     $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight python3-module-nose python3-module-setuptools-tests'."\n");
-
-    $spec->main_section->exclude_body(qr'^BuildRequires:\s+scl-utils-build');
 
     $spec->main_section->push_body('
 Conflicts:       jpackage-utils < 0:5.0.1
@@ -113,11 +114,7 @@ RPM build helpers for Java packages.
 !."\n");
 
     $spec->get_section('files','-n javapackages-local')->push_body('# alt python3 cache
-%_datadir/java-utils/__pycache__
-%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
-%exclude %_datadir/java-utils/__pycache__/pom_editor.*
-%exclude %_datadir/java-utils/__pycache__/request-artifact.*
-'."\n");
+%_datadir/java-utils/__pycache__'."\n");
    
     $spec->get_section('files','-n javapackages-local')->push_body('
 %files -n rpm-macros-java
@@ -130,23 +127,30 @@ RPM build helpers for Java packages.
 /usr/lib/rpm/osgi-fc.*
 %_rpmmacrosdir/maven.env
 #%_bindir/xmvn-builddep
-%_datadir/java-utils/maven_depmap.py
-%_datadir/java-utils/pom_editor.py
-%_datadir/java-utils/request-artifact.py
-%_datadir/java-utils/__pycache__/maven_depmap.*
-%_datadir/java-utils/__pycache__/pom_editor.*
-%_datadir/java-utils/__pycache__/request-artifact.*
+#%_datadir/java-utils/maven_depmap.py
+#%_datadir/java-utils/pom_editor.py
+#%_datadir/java-utils/request-artifact.py
+#%_datadir/java-utils/__pycache__/maven_depmap.*
+#%_datadir/java-utils/__pycache__/pom_editor.*
+#%_datadir/java-utils/__pycache__/request-artifact.*
 '."\n");
 
-    $spec->get_section('files','-n javapackages-tools')->push_body('# moved to rpm-build-java
-%exclude %_datadir/java-utils/maven_depmap.py
-%exclude %_datadir/java-utils/pom_editor.py
-%exclude %_datadir/java-utils/request-artifact.py
-');
+#    $spec->get_section('files','-n javapackages-tools')->push_body('# moved to rpm-build-java
+#%exclude %_datadir/java-utils/maven_depmap.py
+#%exclude %_datadir/java-utils/pom_editor.py
+#%exclude %_datadir/java-utils/request-artifact.py
+#');
+#    $spec->get_section('files','-n javapackages-local')->push_body('# moved to rpm-build-java
+#%exclude %_datadir/java-utils/__pycache__/maven_depmap.*
+#%exclude %_datadir/java-utils/__pycache__/pom_editor.*
+#%exclude %_datadir/java-utils/__pycache__/request-artifact.*
+#'."\n");
 
 };
 
 __END__
+    $spec->main_section->exclude_body(qr'^BuildRequires:\s+scl-utils-build');
+    $spec->main_section->exclude_body(qr'^Requires:\s+lua');
     # if set _jnidir = %_libdir/java
     #$spec->main_section->exclude_body(qr'^BuildArch:\s+noarch');
     #$spec->get_section('build')->unshift_body_after(qr'configure','sed -i -e s,jnidir=/java,jnidir=%_libdir/java, config.status'."\n");
@@ -156,3 +160,4 @@ __END__
     #	 }
     #} $spec->get_sections();
 
+    $spec->get_section('install')->subst_body_if(qr'/\&\.gz/','/&.*/',qr'^sed');

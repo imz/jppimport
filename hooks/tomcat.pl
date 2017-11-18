@@ -5,6 +5,7 @@ require 'set_osgi_fc.pl';
 push @SPECHOOKS, 
 sub {
     my ($spec, ) = @_;
+    $spec->add_patch('tomcat-8.0.46-alt-tomcat-jasper.pom.patch',STRIP=>0);
     my $filesec=$spec->get_section('files','');
     $spec->get_section('package','')->unshift_body('%define _libexecdir %_prefix/libexec'."\n");
     my $initN=$spec->add_source('tomcat.init');

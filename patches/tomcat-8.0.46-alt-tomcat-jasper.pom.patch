@@ -1,0 +1,11 @@
+--- res/maven/tomcat-jasper.pom	2017-11-17 10:34:57.000000000 +0000
++++ res/maven/tomcat-jasper.pom	2017-11-17 10:49:36.747630186 +0000
+@@ -55,7 +55,7 @@
+       <scope>compile</scope>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.jdt</groupId>
++      <groupId>org.eclipse.jdt.core.compiler</groupId>
+       <artifactId>ecj</artifactId>
+       <version>3.12.3</version>
+     </dependency>

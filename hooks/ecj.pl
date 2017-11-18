@@ -9,8 +9,23 @@ push @SPECHOOKS, sub {
 # export -D 2013-12-11 eclipse-gcj
 # tar cjf ecj-gcj.tar.bz2 eclipse-gcj
 ');
-    $spec->add_patch('ecj-defaultto1.5.patch',STRIP=>1,NUMBER=>1);
-    $spec->add_patch('eclipse-gcj-nodummysymbol.patch',STRIP=>1,NUMBER=>5,DISABLE=>1);
+    $spec->add_patch('ecj-defaultto1.5.patch',STRIP=>1);
+    $spec->add_patch('eclipse-gcj-nodummysymbol.patch',STRIP=>1,NUMBER=>55,DISABLE=>1);
+    $spec->get_section('prep')->push_body(q!
+# Use ECJ for GCJ's bytecode compiler
+tar jxf %{SOURCE!.$src2.q!}
+mv eclipse-gcj/org/eclipse/jdt/internal/compiler/batch/GCCMain.java \
+  org/eclipse/jdt/internal/compiler/batch/
+%patch55 -p1
+cat eclipse-gcj/gcc.properties >> \
+  org/eclipse/jdt/internal/compiler/batch/messages.properties
+rm -rf eclipse-gcj
+!);
+    $spec->add_patch('ecj-gcj-for-4.6-api.patch',STRIP=>1);
+    ## end gcj support
+
+if (0) {
+    ## native subpackage
     $spec->get_section('package','')->exclude_body('BuildArch:');
     $spec->get_section('package','')->unshift_body('# gcj support
 BuildRequires: gcc-java >= 4.0.0
@@ -28,17 +43,6 @@ Requires(postun): java-gcj-compat
 %description native
 AOT compiled ecj to speed up when running under GCJ.
 ');
-    $spec->get_section('prep')->push_body(q!
-# Use ECJ for GCJ's bytecode compiler
-tar jxf %{SOURCE!.$src2.q!}
-mv eclipse-gcj/org/eclipse/jdt/internal/compiler/batch/GCCMain.java \
-  org/eclipse/jdt/internal/compiler/batch/
-%patch5 -p1
-cat eclipse-gcj/gcc.properties >> \
-  org/eclipse/jdt/internal/compiler/batch/messages.properties
-rm -rf eclipse-gcj
-
-!);
     $spec->get_section('install')->push_body('
 aot-compile-rpm
 ');
@@ -46,8 +50,9 @@ aot-compile-rpm
 %files native
 %{_libdir}/gcj/%{name}
 ');
-    ## end gcj support
-
+    ## end native subpackage
+}
+    
     $spec->get_section('package','')->unshift_body('Obsoletes: ecj-standalone <= 3.4.2-alt4_0jpp6'."\n");
 
     # ecj should not have osgi dependencies.
