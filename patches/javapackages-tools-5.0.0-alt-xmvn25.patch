@@ -1,0 +1,11 @@
+--- 5/gradle/init.gradle	2017-11-21 18:52:27.429759346 +0300
++++ 4/gradle/init.gradle	2017-11-21 18:52:58.526571481 +0300
+@@ -2,7 +2,7 @@
+     dependencies {
+         classpath files('/usr/share/java/xmvn/xmvn-connector-gradle.jar')
+         classpath files('/usr/share/java/xmvn/xmvn-api.jar')
+-        classpath files('/usr/share/java/xmvn/xmvn-core.jar')
++        classpath files('/usr/share/java/xmvn/xmvn-launcher.jar')
+     }
+ }
+ 

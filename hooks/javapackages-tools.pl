@@ -9,6 +9,14 @@ sub {
 push @SPECHOOKS,
 sub {
     my ($spec, $parent) = @_;
+
+    # TODO: drop me after JVM cleanup!
+    $spec->add_patch('macros.jpackage-alt-jvmjardir.patch',STRIP=>1);
+    # TODO: drop me after xmvn update!
+    $spec->add_patch('javapackages-tools-5.0.0-alt-xmvn25.patch',STRIP=>1);
+    
+    $spec->main_section->exclude_body(qr'^Requires:\s+java\S+-openjdk-headless');
+      
     $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
     # TODO: tests requires manual fix: our rpm requires GROUP: tag
     $spec->main_section->subst_body('^\%bcond_without\s+tests','%bcond_with tests');
@@ -77,6 +85,7 @@ rm -rf %buildroot/usr/bin/xmvn-builddep
 pushd %buildroot%_rpmmacrosdir/
 mv macros.fjava javapackages-fjava
 mv macros.jpackage javapackages-jpackage
+#mv macros.scl-java-template javapackages-scl-java-template
 popd
 
 pushd %buildroot/usr/lib/rpm/
@@ -120,6 +129,7 @@ RPM build helpers for Java packages.
 %files -n rpm-macros-java
 %_rpmmacrosdir/javapackages-fjava
 %_rpmmacrosdir/javapackages-jpackage
+#%_rpmmacrosdir/javapackages-scl-java-template
 
 %files -n rpm-build-java
 /usr/lib/rpm/maven.*

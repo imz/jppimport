@@ -1,0 +1,14 @@
+--- a/macros.d/macros.jpackage
++++ b/macros.d/macros.jpackage
+@@ -16,6 +16,11 @@
+ %_jvmdir        %{_prefix}/lib/jvm
+ 
+ #
++# Root directory where all Java VMs/SDK/JREs expose their jars
++#
++%_jvmjardir     %{_prefix}/lib/jvm-exports
++
++#
+ # Root directory for all Java VM/SDK/JRE's private things.
+ #
+ %_jvmprivdir    %{_prefix}/lib/jvm-private

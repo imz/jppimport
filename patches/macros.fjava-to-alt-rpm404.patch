@@ -1,5 +1,14 @@
 --- javapackages-5.0.0/macros.d/macros.fjava	2017-06-21 12:04:13.009318912 +0300
 +++ javapackages-5.0.0/macros.d/macros.fjava	2017-11-03 18:55:14.325423624 +0200
+@@ -195,8 +195,6 @@
+ 
+ %add_maven_depmap(f:a:v:) \
+ set -e \
+-%{lua:io.stderr:write("[WARNING] Deprecated \%add_maven_depmap macro is used. ", \
+-"Please use \%mvn_artifact and %mvn_install instead.\\n")} \
+ # default values \
+ %if %# == 0 \
+    _pompart="JPP-%{?scl:%{pkg_name}}%{!?scl:%{name}}.pom" \
 @@ -268,8 +268,7 @@
  # directory containing pom.xml. If POM location is not given then pom.xml from
  # current working directory is used.
