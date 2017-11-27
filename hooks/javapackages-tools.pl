@@ -12,8 +12,6 @@ sub {
 
     # TODO: drop me after JVM cleanup!
     $spec->add_patch('macros.jpackage-alt-jvmjardir.patch',STRIP=>1);
-    # TODO: drop me after xmvn update!
-    $spec->add_patch('javapackages-tools-5.0.0-alt-xmvn25.patch',STRIP=>1);
     
     $spec->main_section->exclude_body(qr'^Requires:\s+java\S+-openjdk-headless');
       

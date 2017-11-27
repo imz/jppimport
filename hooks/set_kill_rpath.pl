@@ -1,0 +1,1 @@
+../../fcimport.git/hooks/set_kill_rpath.pl

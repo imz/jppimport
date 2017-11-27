@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
-require 'set_osgi.pl';
-#require 'set_fix_repolib_project.pl';
-#require 'set_add_fc_osgi_manifest.pl';
+#require 'set_osgi.pl';
+require 'set_xmvn_notest.pl';
 
 push @SPECHOOKS, sub {
     my ($spec, $parent) = @_;
