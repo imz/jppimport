@@ -3,14 +3,6 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=787513
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
 
-# MADE optional, but what to replace?
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/local_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/local_policy.jar not found under RPM_BUILD_ROOT
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm-private/java-1.6.0-openjdk/jce/vanilla/US_export_policy.jar for /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/lib/security/US_export_policy.jar not found under RPM_BUILD_ROOT
-
-    # NOTABUG, The Right Thing To DO.
-#alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java for /usr/bin/java is in another subpackage
-#symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
-
 push @PREHOOKS, sub {
     my ($spec, $parent) = @_;
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
@@ -288,7 +280,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
 
 # --- alt linux specific, shared with openjdk ---#
     $spec->get_section('files','')->unshift_body('%_sysconfdir/buildreqs/packages/substitute.d/%name'."\n");
-    $spec->get_section('files','headless')->unshift_body('%_altdir/%altname-java
+    $spec->get_section('files','headless')->unshift_body('%_altdir/%altname-java-headless
 %_sysconfdir/buildreqs/packages/substitute.d/%name-headless'."\n");
     $spec->get_section('files','devel')->unshift_body('%_altdir/%altname-javac
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel'."\n");
@@ -379,7 +371,7 @@ install -m644 j2se-devel-buildreq-substitute \
 install -d %buildroot%_altdir
 
 # J2SE alternative
-cat <<EOF >%buildroot%_altdir/%name-java
+cat <<EOF >%buildroot%_altdir/%name-java-headless
 %{_bindir}/java	%{_jvmdir}/%{jredir}/bin/java	%priority
 %_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
@@ -387,7 +379,7 @@ EOF
 for i in keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
-  cat <<EOF >>%buildroot%_altdir/%name-java
+  cat <<EOF >>%buildroot%_altdir/%name-java-headless
 %_bindir/$i	%{_jvmdir}/%{jredir}/bin/$i	%{_jvmdir}/%{jredir}/bin/java
 %_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
 EOF
@@ -400,20 +392,16 @@ cat <<EOF >>%buildroot%_altdir/%name-java
 EOF
 %endif
 # ----- JPackage compatibility alternatives ------
-cat <<EOF >>%buildroot%_altdir/%name-java
+cat <<EOF >>%buildroot%_altdir/%name-java-headless
 %{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmdir}/jre-%{javaver}-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %if_enabled jvmjardir
 %{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
 %endif
-EOF
-# JPackage specific: alternatives for security policy
-cat <<EOF >>%buildroot%_altdir/%name-java
-%{_jvmdir}/%{jrelnk}/lib/security/local_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar	%{priority}
-%{_jvmdir}/%{jrelnk}/lib/security/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/US_export_policy.jar	%{_jvmprivdir}/%{name}/jce/vanilla/local_policy.jar
 EOF
 # ----- end: JPackage compatibility alternatives ------
 
@@ -457,26 +445,6 @@ done
 EOF
 
 # ----- end: JPackage compatibility alternatives ------
-
-%if_enabled moz_plugin
-# Mozilla plugin alternative
-cat <<EOF >%buildroot%_altdir/%name-mozilla
-%browser_plugins_path/libjavaplugin_oji.so	%mozilla_java_plugin_so	%priority
-EOF
-%endif	# enabled moz_plugin
-
-%if_enabled javaws
-# Java Web Start alternative
-cat <<EOF >%buildroot%_altdir/%name-javaws
-%_bindir/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
-%_man1dir/javaws.1.gz	%_man1dir/javaws%label.1.gz	%{_jvmdir}/%{jredir}/bin/java
-EOF
-# ----- JPackage compatibility alternatives ------
-cat <<EOF >>%buildroot%_altdir/%name-javaws
-%{_datadir}/javaws	%{_jvmdir}/%{jredir}/bin/javaws	%{_jvmdir}/%{jredir}/bin/java
-EOF
-# ----- end: JPackage compatibility alternatives ------
-%endif	# enabled javaws
 
 # hack (see #11383) to enshure that all man pages will be compressed
 for i in $RPM_BUILD_ROOT%_man1dir/*.1; do
@@ -557,9 +525,6 @@ grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjd
 mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
 !."\n");
     $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
-
-    $spec->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
-    $spec->main_section->subst_body_if(qr'xorg-x11-utils','xset xhost',qr'^BuildRequires:');
 
     # builds end up randomly :(
     $spec->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
