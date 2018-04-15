@@ -3,6 +3,8 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=787513
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
 
+# TODO: merge 1.7.0 for bootstrap from 1.8.0.144 manual update
+
 push @PREHOOKS, sub {
     my ($spec, $parent) = @_;
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
@@ -166,8 +168,8 @@ Provides: java-javadoc = 1:1.9.0
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
-BuildRequires(pre): rpm-build-java
-BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
+BuildRequires(pre): rpm-macros-java
+BuildRequires: pkgconfig(gtk+-2.0)
 ');
 
     $mainsec->unshift_body(q'%def_enable accessibility
@@ -219,7 +221,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     # parasyte -Werror breaks build on x86_64
     $spec->add_patch('java-1.8.0-openjdk-alt-no-Werror.patch',STRIP=>1);
 
-    # as-needed link order
+    # as-needed link order / better patch over patch system-libjpeg.patch ?
     $spec->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
     $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
 
@@ -288,8 +290,8 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $mainsec=$spec->main_section;
 
     $spec->get_section('install')->push_body(q!
-%__subst 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
-%__subst 's,^Categories=.*,Categories=Development;Profiling;System;Monitor;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
+sed -i 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
+sed -i 's,^Categories=.*,Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
 !);
 
     $spec->get_section('install')->push_body(q!
