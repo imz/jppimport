@@ -1,6 +1,4 @@
 require 'add_missingok_config.pl';
-# for opends
-#require 'set_target_16.pl';
 
 push @SPECHOOKS, 
 sub {

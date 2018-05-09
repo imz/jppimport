@@ -32,7 +32,7 @@ sub {
     $spec->add_patch('macros.fjava-to-alt-rpm404.patch',STRIP=>1);
     $spec->add_patch('macros.jpackage-alt-script.patch',STRIP=>1);
 
-    $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight python3-module-nose python3-module-setuptools-tests'."\n");
+    $spec->get_section('package','')->unshift_body('BuildRequires: source-highlight python3-module-nose python3-module-setuptools'."\n");
 
     $spec->main_section->push_body('
 Conflicts:       jpackage-utils < 0:5.0.1

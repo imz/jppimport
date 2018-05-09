@@ -1,9 +1,10 @@
---- /usr/bin/sbt~	2015-07-10 02:47:37.000000000 +0000
+--- /usr/bin/sbt	2015-07-10 02:47:37.000000000 +0000
 +++ /usr/bin/sbt	2016-02-12 22:55:30.557290422 +0000
-@@ -1,10 +1,6 @@
- #!/bin/sh
+@@ -7,11 +7,7 @@
+ * )       rhel=${relver%%[^0-9]*} fedora= ;;
+ esac
  
--if \[ $(rpm -q --queryformat '%{version}' fedora-release) -ge 21 \] ; then
+-if \[ 0$fedora -ge 21 -o 0$rhel -gt 7 \] ; then
  export JLINE=jline
 -else
 -export JLINE=jline2
