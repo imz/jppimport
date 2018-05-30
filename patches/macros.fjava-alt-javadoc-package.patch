@@ -1,0 +1,15 @@
+--- javapackages-5.0.0/macros.d/macros.fjava	2017-06-21 12:04:13.009318912 +0300
++++ javapackages-5.0.0/macros.d/macros.fjava	2017-11-03 18:55:14.325423624 +0200
+@@ -501,11 +501,8 @@
+ %javadoc_package(L) %if 0%{!?_without_javadoc:1} \
+ %package javadoc \
+ Summary:        API documentation for %{?scl:%{pkg_name}}%{!?scl:%{name}} \
++Group: Development/Documentation \
+ %description javadoc \
+ API documentation for %{?scl:%{pkg_name}}%{!?scl:%{name}}. \
+ %files javadoc -f .mfiles-javadoc \
+-%if 0%{!?-L:1} \
+-%%license %{_licensedir} \
+-%exclude %dir %{_licensedir} \
+-%endif \
+ %endif

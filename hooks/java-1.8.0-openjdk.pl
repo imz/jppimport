@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+require 'set_jvm_preprocess.pl';
+
 # https://bugzilla.redhat.com/show_bug.cgi?id=787513
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
 
@@ -14,81 +16,6 @@ push @PREHOOKS, sub {
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $spec->get_sections();
     $spec->set_sections(\@newsec);
 
-    #### cleaning up macros for devel subpackages
-
-    my %macrosave=map {$_=>[]} qw/files_jre files_jre_headless files_devel files_demo files_src files_javadoc files_accessibility java_rpo java_headless_rpo java_devel_rpo java_demo_rpo java_javadoc_rpo java_src_rpo java_accessibility_rpo/;
-    my @filtered;
-    my $multidrop=0;
-    my $multisave;
-    my $mainsec=$spec->main_section;
-    foreach my $line (@{$mainsec->get_bodyref}) {
-	if ($multidrop) {
-	    if ($line=~/^\}\s*$/) {
-		##warn "E1END: $line";
-		$multidrop=0;
-	    } else {
-		##warn "E1BODY: $line";
-	    }
-	} elsif ($multisave) {
-	    if ($line=~/^\}\s*$/) {
-		##warn "E2END: $line";
-		$multisave=undef;
-	    } else {
-		##warn "E2BODY: $line";
-		$line=~s/\%1//g;
-		push @{$macrosave{$multisave}}, $line;
-	    }
-	} else {
-	    if ($line=~/^\%global\s+(?:post_script|postun_script|post_headless|postun_headless|post_devel|postun_devel|posttrans_devel|posttrans_script|post_javadoc|postun_javadoc)\(\)\s+\%\{expand:/) {
-		$multidrop=1;
-		#warn "E1HEAD: $line";
-	    } elsif ($line=~m!^(?:# not-duplicated scriplets|# not-duplicated requires/provides/obsolate|\%global\s+update_desktop_icons)!) {
-		##warn "E1SKIP: $line";
-	    } elsif ($line=~/^\%global\s+(\w+)\(\)\s+\%\{expand:/ && $macrosave{$1}) {
-		$multisave=$1;
-		#warn "E2HEAD: $line";
-	    } else {
-		push @filtered, $line;
-	    }
-	}
-    }
-    $mainsec->set_body(\@filtered);
-
-    foreach my $sec ($spec->get_sections()) {
-	$sec->delete() if ($sec->get_raw_package() =~ /debug$/);
-    }
-
-    $spec->applied_off();
-    foreach my $sec ($spec->get_sections()) {
-	$sec->apply_body(
-	    sub {
-		my ($line)=@_;
-		if ($line=~/^\%\{(\w+)\s+\%\{nil\}\}/ && $macrosave{$1}) {
-		    return @{$macrosave{$1}};
-		} else {
-		    return $line;
-		}
-	    }
-	    );
-#%global sdkdir()        %{expand:%{uniquesuffix %%1}}
-#%global jrelnk()        %{expand:jre-%{javaver}-%{origin}-%{version}-%{release}.%{_arch}%1}
-#%global jredir()        %{expand:%{sdkdir %%1}/jre}
-#%global sdkbindir()     %{expand:%{_jvmdir}/%{sdkdir %%1}/bin}
-#%global jrebindir()     %{expand:%{_jvmdir}/%{jredir %%1}/bin}
-#%global jvmjardir()     %{expand:%{_jvmjardir}/%{uniquesuffix %%1}}
-	$sec->map_body(
-	    sub {
-		s,\%\{(buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir)\s+[^\}]+\},%{$1},g;
-	    });
-
-    }
-    $spec->applied_on();
-    $spec->main_section->map_body(
-	sub {
-	    s,[\%]+[1],, if s,^(\%global\s+(?:buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir))\(\)\s+\%\{expand:(.+)\}\s*$,$1 $2\n,;
-	}
-	);
-    $spec->_reset_speclist();
 };
 
 sub __subst_systemtap {
@@ -128,6 +55,8 @@ push @SPECHOOKS, sub {
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
     $mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
+    # not built yet
+    $mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
 
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
@@ -467,11 +396,14 @@ echo "install passed past alt linux specific."
 %force_update_alternatives
 
 %ifarch %{jit_arches}
+# MetaspaceShared::generate_vtable_methods not implemented for PPC JIT
+%ifnarch %{power64}
 #see https://bugzilla.redhat.com/show_bug.cgi?id=513605
 java=%{jrebindir}/java
 if [ -f /proc/cpuinfo ] && ! [ -d /.ours ] ; then #real workstation; not a mkimage-profile, etc
     $java -Xshare:dump >/dev/null 2>/dev/null
 fi
+%endif
 %endif
 @);
 

@@ -2,6 +2,8 @@
 
 require 'add_missingok_config.pl';
 
+# TODO: https://docs.gradle.org/current/userguide/command_line_interface.html
+# --max-workers=2 --no-parallel
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
