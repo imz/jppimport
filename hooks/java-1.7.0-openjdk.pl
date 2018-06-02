@@ -104,15 +104,18 @@ $spec->spec_apply_patch(PATCHSTRING=>q!
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
-BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
+BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
+BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
-BuildRequires(pre): rpm-build-java
-BuildRequires: pkgconfig(gtk+-2.0) ant-nodeps
+BuildRequires(pre): rpm-macros-java
+BuildRequires: pkgconfig(gtk+-2.0)
 ');
 
     $mainsec->unshift_body(q'%def_enable accessibility
+%def_disable jvmjardir
 %def_disable javaws
 %def_disable moz_plugin
+%def_disable control_panel
 %def_disable systemtap
 %def_disable desktop
 ');
