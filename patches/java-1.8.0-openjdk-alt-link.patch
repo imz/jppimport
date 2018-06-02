@@ -1,6 +1,6 @@
---- java-1.8.0-openjdk/jdk8/jdk/make/lib/Awt2dLibraries.gmk	2015-12-26 17:36:37.588736648 +0000
-+++ java-1.8.0-openjdk/jdk8/jdk/make/lib/Awt2dLibraries.gmk	2015-12-26 17:37:28.708735363 +0000
-@@ -745,10 +745,10 @@
+--- java-1.8.0-openjdk/jdk8/jdk/make/lib/Awt2dLibraries.gmk	2018-05-31 13:40:58.191063217 +0000
++++ java-1.8.0-openjdk/jdk8/jdk/make/lib/Awt2dLibraries.gmk	2018-05-31 13:41:36.012159641 +0000
+@@ -761,10 +761,10 @@
          $(BUILD_LIBJAVAJPEG_CLOSED_INCLUDES) \
          -I$(JDK_TOPDIR)/src/share/native/sun/awt/image/jpeg, \
      MAPFILE := $(BUILD_LIBJAVAJPEG_MAPFILE), \
@@ -13,22 +13,9 @@
      VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
      RC_FLAGS := $(RC_FLAGS) \
          -D "JDK_FNAME=javajpeg.dll" \
---- java-1.8.0-openjdk/jdk8/jdk/make/CompileLaunchers.gmk	2015-02-05 12:00:26.000000000 +0000
-+++ java-1.8.0-openjdk/jdk8/jdk/make/CompileLaunchers.gmk	2015-12-26 18:23:05.188666573 +0000
-@@ -427,9 +427,11 @@
- # binary (at least on linux) which causes the size to differ between old and new build.
- ifeq ($(USE_EXTERNAL_LIBZ), true)
-   UNPACKEXE_CFLAGS := -DSYSTEM_ZLIB
--  UNPACKEXE_ZIPOBJS := -lz
-+  UNPACKEXE_ZIPLDFLAGS_SUFFIX := -lz
-+  UNPACKEXE_ZIPOBJS :=
- else
-   UNPACKEXE_CFLAGS := -I$(JDK_TOPDIR)/src/share/native/java/util/zip/zlib-1.2.8
-+  UNPACKEXE_ZIPLDFLAGS_SUFFIX := 
-   UNPACKEXE_ZIPOBJS := $(JDK_OUTPUTDIR)/objs/libzip/zcrc32$(OBJ_SUFFIX) \
-       $(JDK_OUTPUTDIR)/objs/libzip/deflate$(OBJ_SUFFIX) \
-       $(JDK_OUTPUTDIR)/objs/libzip/trees$(OBJ_SUFFIX) \
-@@ -490,7 +492,7 @@
+--- java-1.8.0-openjdk/jdk8/jdk/make/CompileLaunchers.gmk	2018-03-23 10:31:07.000000000 +0000
++++ java-1.8.0-openjdk/jdk8/jdk/make/CompileLaunchers.gmk	2018-05-31 13:41:36.012159641 +0000
+@@ -485,7 +485,7 @@
          $(call SET_SHARED_LIBRARY_ORIGIN), \
      LDFLAGS_linux := -lc, \
      LDFLAGS_solaris := $(UNPACKEXE_LDFLAGS_solaris) -lc, \

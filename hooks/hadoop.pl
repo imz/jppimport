@@ -3,6 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($spec, $parent) = @_;
+    $spec->add_patch('hadoop-2.7.3-alt-E2K.patch',STRIP=>1);
     $spec->get_section('package','')->unshift_body('BuildRequires: zlib-devel'."\n");
     $spec->get_section('package','')->unshift_body('%define _libexecdir %_prefix/libexec'."\n");
     $spec->get_section('files','yarn-security')->subst_body_if(qr'6050,root,yarn','6010,root,yarn',qr'/container-executor');

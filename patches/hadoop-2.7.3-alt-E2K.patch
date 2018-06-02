@@ -1,0 +1,22 @@
+--- hadoop-2.7.3-src/hadoop-common-project/hadoop-common/src/main/native/src/org/apache/hadoop/util/bulk_crc32.c	2016-08-12 06:29:35.000000000 +0300
++++ hadoop-2.7.3-src/hadoop-common-project/hadoop-common/src/main/native/src/org/apache/hadoop/util/bulk_crc32.c	2018-05-30 16:28:24.750348005 +0300
+@@ -38,7 +38,7 @@
+ #include "bulk_crc32.h"
+ #include "gcc_optimizations.h"
+ 
+-#if (!defined(__FreeBSD__) && !defined(WINDOWS))
++#if (!defined(__FreeBSD__) && !defined(WINDOWS) && !defined(__e2k__))
+ #define USE_PIPELINED
+ #endif
+ 
+--- hadoop-2.7.3-src/hadoop-hdfs-project/hadoop-hdfs/src/main/native/libhdfs/jni_helper.c	2018-05-30 18:37:06.355076044 +0000
++++ hadoop-2.7.3-src/hadoop-hdfs-project/hadoop-hdfs/src/main/native/libhdfs/jni_helper.c	2018-05-31 05:53:59.609912579 +0000
+@@ -435,6 +435,8 @@
+     const char *arch="mips";
+ #elif defined(__mips__)
+     const char *arch="mips64";
++#elif defined(__e2k__)
++    const char *arch="e2k";
+ #else
+ #error Unknown JVM architecture
+ #endif

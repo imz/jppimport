@@ -95,7 +95,8 @@ Provides: java-javadoc = 1:1.9.0
 #    $spec->get_section('package','accessibility')->exclude_body(qr'^Obsoletes:\s+java-1.7.0-openjdk-accessibility');
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
-BuildRequires: libXext-devel libXrender-devel libfreetype-devel libkrb5-devel
+BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
+BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-macros-java
 BuildRequires: pkgconfig(gtk+-2.0)
