@@ -44,9 +44,6 @@ push @SPECHOOKS, sub {
 Provides: java-javadoc = 1:1.7.0
 ');
 
-    # or BR: gcc4.9-c++ + %set_gcc_version 4.9
-    $spec->add_patch(q!java-1.7.0-openjdk-gcc-cxx-5-5d0a13adec23.patch!, STRIP=>0);
-
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
     $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
@@ -102,7 +99,17 @@ $spec->spec_apply_patch(PATCHSTRING=>q!
 
     $mainsec=$spec->main_section;
     $mainsec->exclude_body(qr'^Obsoletes:\s+java-1.6.0-openjdk');
-
+    $mainsec->subst_body(qr'^BuildRequires:\s+ant','BuildRequires: ant1.9');
+    $spec->add_source(FILE=>'rhino.jar');
+    $spec->get_section('build')->map_body(sub{
+	s,/usr/bin/ant,/usr/bin/ant1.9,;
+	s,/usr/share/java/rhino.jar,\%_sourcedir/rhino.jar,;
+    });
+    $spec->get_section('files','headless')->push_body('# sisyphus_check
+%dir %{_jvmdir}/%{jredir}/lib/security/policy
+%dir %{_jvmdir}/%{jredir}/lib/security/policy/limited
+%dir %{_jvmdir}/%{jredir}/lib/security/policy/unlimited'."\n");
+	
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
 BuildRequires: libfreetype-devel libkrb5-devel
@@ -176,18 +183,18 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     my $headlsec=$spec->get_section('package','headless');
-    $headlsec->exclude_body('^Requires: maven-local'."\n");
     $headlsec->push_body('Requires: java-common'."\n");
     $headlsec->push_body('Requires: /proc'."\n");
     $headlsec->push_body(q!Requires(post): /proc!."\n");
 
     # unrecognized option; TODO: check the list
     #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    # DISTRO_PACKAGE_VERSION="fedora-...
-    $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
-    # DISTRO_NAME="Fedora"
-    $spec->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
-
+    $spec->get_section('build')->map_body(sub{
+	# DISTRO_PACKAGE_VERSION="fedora-...
+	s,(?:fedora|rhel)-,ALTLinux-,;
+	# DISTRO_NAME="Fedora" "Red Hat Enterprise Linux 7"
+	s,"(?:Fedora|Red Hat Enterprise Linux \d+)","ALTLinux",;
+    });
     ## TODO: check if it still valid
     # hack for sun-based build (i586) only!!!
     #$spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
@@ -242,13 +249,6 @@ EOF
     $spec->get_section('files','javadoc')->unshift_body('%_altdir/%altname-javadoc
 %_sysconfdir/buildreqs/packages/substitute.d/%name-javadoc
 ');
-
-    $spec->get_section('install')->push_body(q!# move soundfont to java
-grep /audio/default.sf2 java-1.7.0-openjdk.files-headless >> java-1.7.0-openjdk.files
-grep -v /audio/default.sf2 java-1.7.0-openjdk.files-headless > java-1.7.0-openjdk.files-headless-new
-mv java-1.7.0-openjdk.files-headless-new java-1.7.0-openjdk.files-headless
-!."\n");
-    $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
 
     # NOTE: s,sdklnk,sdkdir,g
     $spec->get_section('install')->push_body(q!
@@ -441,7 +441,7 @@ Provides: java-devel = 1.5.0
 %endif
 ') if 0; # jdk 1.6 already provides
 
-    $spec->get_section('package','')->subst_body(qr'^BuildRequires: libat-spi-devel','#BuildRequires: libat-spi-devel');
+    $spec->get_section('package','')->subst_body(qr'^BuildRequires: at-spi-devel','#BuildRequires: at-spi-devel');
     $spec->spec_apply_patch(PATCHSTRING=> q!
 --- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
@@ -467,6 +467,13 @@ Provides: java-devel = 1.5.0
 
 
 __END__
+    $spec->get_section('install')->push_body(q!# move soundfont to java
+grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
+grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
+mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
+!."\n");
+    $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
+
     # builds end up randomly :(
     $spec->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
 

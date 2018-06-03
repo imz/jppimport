@@ -171,18 +171,18 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $mainsec->set_tag('Epoch','0') if $mainsec->match_body(qr'^Epoch:\s+[1-9]');
 
     my $headlsec=$spec->get_section('package','headless');
-    $headlsec->exclude_body('^Requires: maven-local'."\n");
     $headlsec->push_body('Requires: java-common'."\n");
     $headlsec->push_body('Requires: /proc'."\n");
     $headlsec->push_body(q!Requires(post): /proc!."\n");
 
     # unrecognized option; TODO: check the list
     #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
-    # DISTRO_PACKAGE_VERSION="fedora-...
-    $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
-    # DISTRO_NAME="Fedora"
-    $spec->get_section('build')->subst_body(qr'"Fedora"','"ALTLinux"');
-
+    $spec->get_section('build')->map_body(sub{
+	# DISTRO_PACKAGE_VERSION="fedora-...
+	s,(?:fedora|rhel)-,ALTLinux-,;
+	# DISTRO_NAME="Fedora" "Red Hat Enterprise Linux 7"
+	s,"(?:Fedora|Red Hat Enterprise Linux \d+)","ALTLinux",;
+    });
     ## TODO: check if it still valid
     # hack for sun-based build (i586) only!!!
     #$spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');

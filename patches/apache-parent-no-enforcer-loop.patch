@@ -1,0 +1,28 @@
+--- apache/pom.xml	2018-05-18 14:56:25.000000000 +0300
++++ apache/pom.xml	2017-11-10 06:45:41.000000000 +0200
+@@ -288,25 +303,6 @@
+           </execution>
+         </executions>
+       </plugin>
+-      <plugin>
+-        <groupId>org.apache.maven.plugins</groupId>
+-        <artifactId>maven-enforcer-plugin</artifactId>
+-        <executions>
+-          <execution>
+-            <id>enforce-maven-version</id>
+-            <goals>
+-              <goal>enforce</goal>
+-            </goals>
+-            <configuration>
+-              <rules>
+-                <requireMavenVersion>
+-                  <version>3.0</version>
+-                </requireMavenVersion>
+-              </rules>
+-            </configuration>
+-          </execution>
+-        </executions>
+-      </plugin>
+       </plugins>
+   </build>
+ 
