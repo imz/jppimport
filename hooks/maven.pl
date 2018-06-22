@@ -15,8 +15,35 @@ sub {
     # for /etc/mavenrc
     #%add_findreq_skiplist /usr/share/maven/bin/*
 
+    # deprecated?
     $spec->add_section('pre','')->push_body(q'# https://bugzilla.altlinux.org/show_bug.cgi?id=27807 (upgrade from maven1)
 [ -d %_datadir/maven/repository/JPP ] && rm -rf %_datadir/maven/repository/JPP ||:'."\n");
+
+warn "==============================================================
+#
+#
+#--------------------------- OOPS! new maven alternatives! 
+#
+#
+#
+#
+#
+#
+#
+#
+#   move to maven-lib (or will not work!)
+#   and fix post/un scripts!!!
+#
+#   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+#
+#   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+#
+#   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+#######################################################
+"
 };
 
 push @PREHOOKS, 

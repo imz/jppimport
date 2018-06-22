@@ -186,6 +186,7 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $headlsec->push_body('Requires: java-common'."\n");
     $headlsec->push_body('Requires: /proc'."\n");
     $headlsec->push_body(q!Requires(post): /proc!."\n");
+    $headlsec->map_body(sub{s,^(Requires:),#$1, if /copy-jdk-configs/});
 
     # unrecognized option; TODO: check the list
     #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');

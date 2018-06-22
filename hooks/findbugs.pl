@@ -1,4 +1,10 @@
+#!/usr/bin/perl -w
 require 'set_javadoc_namelink_check.pl';
 
-warn "WARNING!!!: findbug 3.0.1-4 change its sources (remove dep from pom), so upload pristine version!";
+push @SPECHOOKS, 
+sub {
+    my ($spec, $parent) = @_;
+    $spec->get_section('package','')->unshift_body('BuildRequires: tex(pdftex.def)'."\n");
+};
 
+__END__

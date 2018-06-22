@@ -19,7 +19,9 @@ push @SPECHOOKS, sub {
 
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
-    $mainsec->unshift_body(q'BuildRequires(pre): browser-plugins-npapi-devel'."\n");
+    $mainsec->unshift_body(q'BuildRequires(pre): browser-plugins-npapi-devel
+BuildRequires: bc
+'."\n");
 
     $mainsec->unshift_body(q'%def_enable javaws
 %def_enable moz_plugin
@@ -79,7 +81,7 @@ with %{name} J2SE Runtime Environment.
 %_altdir/%altname-javaws
 %{_desktopdir}/%{altname}-javaws.desktop
 %{_datadir}/pixmaps/javaws.png
-%{_man1dir}/javaws-itweb.1.gz
+%{_man1dir}/javaws.itweb.1.gz
 %_bindir/javaws.itweb
 ');
     $spec->get_section('files','')->push_body('# alt linux specific
@@ -91,7 +93,7 @@ with %{name} J2SE Runtime Environment.
 # separate javaws
 %exclude %{_desktopdir}/%{altname}-javaws.desktop
 %exclude %{_datadir}/pixmaps/javaws.png
-%exclude %{_man1dir}/javaws-itweb.1.gz
+%exclude %{_man1dir}/javaws.itweb.1.gz
 %exclude %_bindir/javaws.itweb'."\n");
 
     $spec->_reset_speclist();

@@ -12,7 +12,7 @@ sub {
     my $defined_body=[];
     my %known_expand_define;
     foreach my $line (@$OLDSPEC) {
-	if ($line=~/^\%define\s+(\w+)\(\)\s+\%\{expand:\s*$/) {
+	if ($line=~/^\%(?:define|global)\s+(\w+)\(\)\s+\%\{expand:\s*$/) {
 	    $multiline_define=$1;
 	    #warn "found: \%define $multiline_define\n";
 	} elsif ($multiline_define and $line=~/^\}\s*$/) {
