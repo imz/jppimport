@@ -25,6 +25,8 @@ sub {
 	    $line=~s/\s+--\s+\%\{\?1\}//g;
 	    # Requires: %{name}-headless%{?1}%{?_isa}
 	    $line=~s/\%\{\?1\}//g;
+	    # in centos
+	    $line=~s/\s*\%?\%1//g;
 	    push @$defined_body, $line;
 
 	# %{files_jre -- %{debug_suffix_unquoted}}
@@ -56,14 +58,14 @@ sub {
     foreach my $sec ($spec->get_sections()) {
 	$sec->map_body(
 	    sub {
-		s,\%\{(buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir)\s+--\s+(?:\%\{\?1\}|\$suffix)\},%{$1},g;
+		s,\%\{(buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir)\s+(?:--\s+)?(?:\%\{\?1\}|\$suffix|\%?\%1)\},%{$1},g;
 	    });
 
     }
     $spec->applied_on();
     $spec->main_section->map_body(
 	sub {
-	    s,(?:\s+--\s+)?\%\{\?1\},, if s,^(\%(?:global|define)\s+(?:buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir))\(\)\s+\%\{expand:(.+)\}\s*$,$1 $2\n,;
+	    s,(?:\s+--\s+)?\%\{\?1\},,;s,\s*\%?\%1,,g if s,^(\%(?:global|define)\s+(?:buildoutputdir|uniquejavadocdir|uniquesuffix|sdkdir|jrelnk|jredir|sdkbindir|jrebindir|jvmjardir))\(\)\s+\%\{expand:(.+)\}\s*$,$1 $2\n,;
 	}
 	);
 
