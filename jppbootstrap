@@ -14,6 +14,7 @@ my $verbose=0;
 my $outdir='.';
 my $changelog='- bootstrap pack of jars created with jppbootstrap script
 - temporary package to satisfy circular dependencies';
+my $force_cleanup;
 my (@skiprequires,@skipprovides);
 my (@addprovides,@addrequires,@addobsoletes,$opt_epoch);
 my ($altrpm,$altspec);
@@ -162,7 +163,7 @@ done
 #PRETRANS
 #POSTTRANS
 
-foreach my $sec (qw/
+    foreach my $sec (qw/
 PREIN
 PREUN
 POSTIN
@@ -176,7 +177,7 @@ POSTUN
 }
 
 
-print SPEC q!
+    print SPEC q!
 
 %files -f %name-list
 
@@ -188,10 +189,21 @@ if ($alt) {
     print SPEC @changelog_alt;
 }
 
-system ('add_changelog', '-e',$changelog,$specfile);
-mkpath([$outdir]) unless -d $outdir;
-`rpmbuild --define '_sourcedir $SOURCESDIR' --define '_srcrpmdir $outdir' -bs $specfile`;
-`rm -r $tmpdir`;
+    system ('add_changelog', '-e',$changelog,$specfile)==0 || &cleanup_and_exit($tmpdir);
+    mkpath([$outdir]) unless -d $outdir;
+    system ('rpmbuild', '--define', '_sourcedir '.$SOURCESDIR, '--define', '_srcrpmdir '.$outdir, '-bs', $specfile)==0 || &cleanup_and_exit($tmpdir);
+    &cleanup($tmpdir);
+}
+
+sub cleanup {
+    my $tmpdir=shift;
+    `rm -r $tmpdir`;
+}
+
+sub cleanup_and_exit {
+    my $tmpdir=shift;
+    &cleanup($tmpdir) if $force_cleanup;
+    exit 1;
 }
 
 sub new {
