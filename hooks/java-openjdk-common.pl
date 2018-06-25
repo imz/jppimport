@@ -68,26 +68,23 @@ BuildRequires: pkgconfig(gtk+-2.0)
 %def_disable systemtap
 ');
 
-#%def_without gcc49
-#%if_with gcc49
-#%set_gcc_version 4.9
-#BuildRequires: gcc4.9-c++
-#%endif
-
     $mainsec->push_body('
 %define altname %name
 %define label -%{name}
 %define javaws_ver      %{javaver}
+');
 
-# findprov below did not help at all :(
-%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall
-%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/jli
-# it is needed for those apps which links with libjvm.so
-%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/server
-%ifnarch x86_64
-%add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/client
-%endif
-
+    # gnustep-sqlclient; it follows the symliks and links with
+    # %{_jvmdir}/%{jredir} path, that is version/release sensitive.
+# # findprov below did not help at all :(
+# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall
+# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/jli
+# # it is needed for those apps which links with libjvm.so
+# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/server
+# %ifnarch x86_64
+# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/client
+# %endif
+    $mainsec->push_body('
 %ifarch x86_64
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()(64bit)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)

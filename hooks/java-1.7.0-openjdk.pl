@@ -88,6 +88,31 @@ $spec->spec_apply_patch(PATCHSTRING=>q!
     $spec->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
 
     $spec->get_section('package','')->subst_body(qr'^BuildRequires: at-spi-devel','#BuildRequires: at-spi-devel');
+
+    $spec->spec_apply_patch(PATCHSTRING=>q!
+--- java-1.7.0-openjdk.spec	2018-06-03 13:33:01.396821267 +0300
++++ java-1.7.0-openjdk.spec	2018-06-03 13:34:16.086115317 +0300
+@@ -825,7 +825,7 @@
+   STRIP_POLICY="no_strip" \
+   JAVAC_WARNINGS_FATAL="false" \
+   INSTALL_LOCATION=%{_jvmdir}/%{sdkdir} \
+-  SYSTEM_NSS="true" \
++  SYSTEM_NSS="" \
+   NSS_LIBS="%{NSS_LIBS} -lfreebl" \
+   NSS_CFLAGS="%{NSS_CFLAGS}" \
+   ECC_JUST_SUITE_B="true" \
+@@ -869,7 +869,7 @@
+   STRIP_POLICY="no_strip" \
+   JAVAC_WARNINGS_FATAL="false" \
+   INSTALL_LOCATION=%{_jvmdir}/%{sdkdir} \
+-  SYSTEM_NSS="true" \
++  SYSTEM_NSS="" \
+   NSS_LIBS="%{NSS_LIBS} -lfreebl" \
+   NSS_CFLAGS="%{NSS_CFLAGS}" \
+   ECC_JUST_SUITE_B="true" \
+!);
+
+
 };
 
 __END__

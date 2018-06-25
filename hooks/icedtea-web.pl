@@ -127,7 +127,7 @@ cat >> $RPM_BUILD_ROOT%{_desktopdir}/%{altname}-control-panel.desktop << EOF
 Name=Java Plugin Control Panel (%{name})
 Comment=Java Control Panel
 Exec=itweb-settings.itweb
-Icon=%{name}
+Icon=java-%{javaver}
 Terminal=false
 Type=Application
 Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
@@ -142,7 +142,7 @@ Name=Java Web Start (%{name})
 Comment=Java Application Launcher
 MimeType=application/x-java-jnlp-file;
 Exec=javaws.itweb %%u
-Icon=%{name}
+Icon=java-%{javaver}
 Terminal=false
 Type=Application
 Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};
