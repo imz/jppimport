@@ -150,7 +150,8 @@ EOF
 %endif
 
 
-JAVACANDIDATE=`head -2 /etc/alternatives/packages.d/java-%{javaver}-openjdk-java| tail -1 | awk '{print $3}'`
+JAVACANDIDATE=`head -2 /etc/alternatives/packages.d/java-%{javaver}-openjdk-java-headless| tail -1 | awk '{print $3}'`
+[ -n "JAVACANDIDATE" ] || exit 1
 
 install -d %buildroot%_altdir
 %if_enabled moz_plugin
