@@ -192,8 +192,10 @@ fi
 # ControlPanel freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
 [Desktop Entry]
-Name=Java Plugin Control Panel (%{name})
+Name=Java Control Panel (%{name})
+Name[ru]=Настройка Java (OpenJDK 1.8.0)
 Comment=Java Control Panel
+Comment[ru]=Панель управления Java
 Exec=%{_jvmdir}/%{jredir}/bin/jcontrol
 Icon=%{name}
 Terminal=false
