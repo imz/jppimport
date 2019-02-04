@@ -151,6 +151,10 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $spec->get_section('install')->push_body(q!
 sed -i 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
 sed -i 's,^Categories=.*,Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Name[ru] --set-value='Настройка политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Comment[ru] --set-value='Управление файлами политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Name[ru] --set-value='Консоль OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Comment[ru] --set-value='Мониторинг и управление приложениями OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
 !);
 
     $spec->get_section('install')->push_body(q!
