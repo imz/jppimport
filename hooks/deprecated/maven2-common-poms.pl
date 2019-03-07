@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 $spechook = sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: cglib'."\n");
     $spec->get_section('build')->push_body(q{
 cat > JPP-cglib-full.pom <<EOF

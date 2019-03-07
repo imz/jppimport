@@ -4,7 +4,7 @@ require 'set_manual_no_dereference.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 #    $spec->get_section('install')->push_body(q!# compat for jpp
 #pushd %buildroot%{_javadir}/slf4j
 #for i in *.jar; do
