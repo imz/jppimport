@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # hack against sisyphus check - jar is arch dependent due to 
 #%ifarch x86_64  # get rids the hardlink to hunspell
 #sed -i -e "s|/usr/lib/libhunspell|/usr/lib64/libhunspell|g" src/org/omegat/util/OConsts.java

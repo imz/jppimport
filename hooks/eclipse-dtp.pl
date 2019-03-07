@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package')->subst_body_if(qr'xml-commons-resolver','xml-commons-resolver12',qr'Requires:');
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # altbug#13596
     $spec->get_section('package','')->push_body('
 # due to python2.4(java), python2.4(org)

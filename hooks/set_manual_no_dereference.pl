@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $manualsec=$spec->get_section('files','manual');
     if ($manualsec) {
 	$spec->applied_block(
@@ -25,7 +25,7 @@ push @SPECHOOKS, sub {
 
 __END__
 # push @SPECHOOKS, sub {
-#     my ($spec, $parent) = @_;
+#     my ($spec,) = @_;
 #     my $manualsec=$spec->get_section('files','manual');
 #     if ($manualsec) {
 # 	$spec->clear_applied();

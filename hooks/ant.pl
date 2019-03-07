@@ -5,7 +5,7 @@ require 'set_manual_no_dereference.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my %pkg_rename=qw/
 ant-apache-bcel		ant-bcel
 ant-apache-bsf		ant-bsf

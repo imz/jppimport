@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @PREHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # contain alternatives that we add manually;
     # also, (see https://bugzilla.altlinux.org/32043)
     # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
@@ -13,7 +13,7 @@ push @PREHOOKS, sub {
 };
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     #$spec->rename_main_package('mozilla-plugin-java-1.8.0-openjdk');
     my $mainsec=$spec->main_section;
 

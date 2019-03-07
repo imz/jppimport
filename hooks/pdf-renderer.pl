@@ -1,6 +1,6 @@
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('install')->push_body('
 # compat symlink (requected by @REAL); just let it be (but use pdf-renderer.jar, please!)
 pushd %buildroot%_javadir

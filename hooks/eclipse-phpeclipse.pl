@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # alt specific
     $spec->get_section('prep')->push_body(q'%__subst s,/usr/sbin/httpd,/usr/sbin/httpd2, net.sourceforge.phpeclipse.externaltools/prefs/default_linux.properties'."\n");
     $spec->get_section('package','')->subst_body_if(qr'php-pecl-xdebug','php5-xdebug',qr'Requires:');

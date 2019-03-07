@@ -2,7 +2,7 @@ require 'set_add_java_bin.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 };
 __END__
     # Deprecated?

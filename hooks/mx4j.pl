@@ -6,7 +6,7 @@ require 'set_without_tests.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: docbook-dtds'."\n");
     $spec->get_section('package','')->subst_body(qr'javamail\s+>=\s+0:1.2-5jpp','javamail');
 }

@@ -5,7 +5,7 @@ require 'set_bootstrap.pl';
 my $gccsuffix='4.6';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_section('package','aot-compile');
     $spec->get_section('package','aot-compile')->push_body(q!
 Summary: java jcj ahead-of-time compile scripts

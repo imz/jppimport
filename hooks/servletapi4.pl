@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 # todo: make an extension
     $spec->get_section('install')->push_body('
 cat >>$RPM_BUILD_ROOT/%_altdir/servletapi_%{name}<<EOF

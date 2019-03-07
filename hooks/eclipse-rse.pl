@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: perl(Authen/PAM.pm)'."\n");
 };
 

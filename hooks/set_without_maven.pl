@@ -4,7 +4,7 @@ push @SPECHOOKS, \&set_without_maven;
 #$spechook = \&set_without_maven;
 
 sub set_without_maven {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('%define _without_maven 1
 ');
     # helped for maven surefire

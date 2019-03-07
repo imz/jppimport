@@ -1,5 +1,5 @@
 sub rename_jar {
-    my ($spec, $parent, $oldname, $newname) = @_;
+    my ($spec,, $oldname, $newname) = @_;
     $spec->applied_off();
     for my $sect ($spec->get_sections()) {
 	if ($sect->get_type() eq 'files') {

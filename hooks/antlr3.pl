@@ -3,7 +3,7 @@
 require 'set_skip_usr_bin_run.pl';
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     foreach my $sec ($spec->get_sections()) {
 	next if $sec->get_type ne 'package';
 	next if !$sec->get_raw_package;

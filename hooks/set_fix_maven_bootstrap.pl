@@ -3,7 +3,7 @@
 push @SPECHOOKS, \&set_fix_maven_bootstrap;
 
 sub set_fix_maven_bootstrap {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 	$spec->applied_block(
 	"set_fix_maven_bootstrap",
 	sub {

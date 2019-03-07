@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('Obsoletes: jakarta-regexp = 1.4-alt4'."\n");
     $spec->get_section('package','')->unshift_body('Obsoletes: jakarta-regexp = 1.4-alt3'."\n");
     $spec->get_section('package','')->unshift_body('Obsoletes: jakarta-regexp = 1.4-alt2'."\n");

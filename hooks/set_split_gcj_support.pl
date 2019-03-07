@@ -3,7 +3,7 @@
 push @SPECHOOKS, \&set_split_gcj_support;
 
 sub set_split_gcj_support {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 	$spec->applied_block(
 	"set_split_gcj_support hook",
 	sub {

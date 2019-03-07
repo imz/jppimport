@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub  {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('BuildRequires: dos2unix'."\n");
 #Это чистый #!/bin/sh скрипт, в котором досовские окончания строк \r\n.
 #Именно из-за этого шелл не может его распарсить.

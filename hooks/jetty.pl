@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     &add_missingok_config($spec, '/etc/default/jetty','');
 
     $spec->get_section('files','')->subst_body_if(qr'^#\%ghost','%ghost',qr'\%\{rundir\}');

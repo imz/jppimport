@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 #/.out/eclipse-gef-3.4.1-alt1_2jpp6.noarch.rpm: unpackaged directory: /usr/share/eclipse/dropins/gef/eclipse
 #/.out/eclipse-gef-3.4.1-alt1_2jpp6.noarch.rpm: unpackaged directory: /usr/share/eclipse/dropins/gef/eclipse/features
 #/.out/eclipse-gef-3.4.1-alt1_2jpp6.noarch.rpm: unpackaged directory: /usr/share/eclipse/dropins/gef/eclipse/plugins

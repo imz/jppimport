@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     #$spec->add_patch('',STRIP=>1);
     my $src=$spec->add_source('plexus-resources-1.0-components.xml');
     $spec->get_section('prep')->push_body(q!

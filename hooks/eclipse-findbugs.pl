@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # adaptation for jpp findbugs (old 1.3.5)
     $spec->get_section('package','')->subst_body(qr'ant-findbugs','',qr'Requires:');
     $spec->get_section('install')->subst_body(qr'/ant/ant-findbugs.jar','/findbugs/lib/findbugs-ant.jar');

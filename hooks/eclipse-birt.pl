@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: xml-commons-jaxp-1.3-apis'."\n");
     $spec->get_section('prep')->subst_body(qr'xml-commons-apis-ext.jar','xml-commons-jaxp-1.3-apis-ext.jar');
     $spec->get_section('install')->subst_body(qr'xml-commons-apis-ext.jar','xml-commons-jaxp-1.3-apis-ext.jar');

@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # bad elf symbols - native broadcom
     $spec->add_patch('jogl2-disable-build-native-broadcom.patch',STRIP=>2);
 

@@ -5,7 +5,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # jpp5 bug to report
 #unmets:
 #javahelp2#0:2.0.05-alt1_1jpp5   /etc/jhindexer.conf

@@ -134,3 +134,5 @@ sdljava -> (fix swig generation or re-use generated.tar hack)
 javapackages-tools: 0002 gradle patch breaks gradle
  or update to xmvn 2.5+maven 3.3.9
 
+
+mvn install:install-file -Dfile=../SOURCES/netty-tcnative.jar  -DgroupId=io.netty -DartifactId=netty-tcnative -Dversion=1.1.30.Fork2 -Dpackaging=jar

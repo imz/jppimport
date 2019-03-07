@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('Provides: maven-archetype2 = %version
 Obsoletes: maven-archetype2 < %version
 '."\n");

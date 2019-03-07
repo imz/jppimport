@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 #require 'set_add_fc_osgi_manifest.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body(q!Provides:       %{short_name} = %{epoch}:%{version}-%{release}!."\n");
     $spec->get_section('package','')->push_body(q!Provides:       jakarta-%{short_name} = %{epoch}:%{version}-%{release}!."\n");
 

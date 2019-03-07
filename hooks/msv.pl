@@ -5,7 +5,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub  {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     &add_missingok_config($spec,'/etc/java/msv.conf','msv');
 
     $spec->get_section('description','xsdlib')->push_body('

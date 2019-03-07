@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # 2.2-2
     $spec->get_section('package','')->unshift_body('BuildRequires: xpp3-minimal'."\n");
     $spec->get_section('package','')->unshift_body('Requires: xpp3-minimal'."\n");

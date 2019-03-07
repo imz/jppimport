@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     ## gcj support
     my $src2=$spec->add_source('ecj-gcj.tar.bz2',NUMBER=>2,HEADER=>
 '# Use ECJ for GCJ

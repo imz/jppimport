@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # ALT Compat provides
     if (not $spec->get_section('package','')->match_body(qr'Provides: stylebook = ')) {
 	# NOTE: symlinks seems to be no more needed

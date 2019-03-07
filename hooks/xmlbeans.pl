@@ -3,7 +3,7 @@
 push @SPECHOOKS, \&fix_svn;
 
 sub fix_svn {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: subversion'."\n");
 }
 

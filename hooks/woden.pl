@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('
 Provides: ws-commons-%name = %version-%release
 Conflicts:  ws-commons-%name <= 1.0-alt3_0.5.M9jpp7

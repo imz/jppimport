@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $sec=$spec->get_section('pretrans','javadoc');
     if (not $sec or not $sec->get_flag('-p')) {
 	warn "WARNING: set_javadoc_namelink_check: javadoc lua not found!";

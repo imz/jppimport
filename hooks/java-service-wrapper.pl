@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('prep')->push_body(q!# e2k support
 (cd src/c; cp Makefile-linux-ppc64le-64.make Makefile-linux-e2k-64.make)
 # e2k: lcc is not --pedantic

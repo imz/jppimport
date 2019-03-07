@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('prep')->push_body(q!find . -name '*.orig' -print -delete!."\n");
 };
 

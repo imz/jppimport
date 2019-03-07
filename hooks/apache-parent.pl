@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_patch('apache-parent-no-enforcer-loop.patch',STRIP=>1);
 };
 

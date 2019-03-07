@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_patch('sqlite-jdbc-alt-linkage.patch',STRIP=>0);
 };
 

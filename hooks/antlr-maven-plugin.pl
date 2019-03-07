@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body(q!
 #Provides: mojo-maven2-plugin-antlr = %version
 Obsoletes: mojo-maven2-plugin-antlr = 17

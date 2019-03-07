@@ -3,6 +3,6 @@
 #require 'set_osgi.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('%filter_from_requires /osgi(org.apache.ant*/d'."\n");
 }

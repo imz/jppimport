@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_patch('apache-commons-daemon-e2k.patch',STRIP=>1,INSERT_BEFORE=>'^cd\s');
 };
 

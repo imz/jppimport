@@ -4,7 +4,7 @@ my $verbose=0;
 
 push @PREHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my @NEW_SPEC;
     my $OLDSPEC=$spec->_get_speclist();
     my $multiline_define;

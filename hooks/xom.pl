@@ -3,6 +3,6 @@
 require 'set_target_15.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: dom4j'."\n");
 }

@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $oldname = $spec->get_section('package','')->get_tag('Name');
     $spec->rename_main_package($oldname.'-repolib');
     foreach my $section ($spec->get_sections()) {

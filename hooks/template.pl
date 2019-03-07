@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_patch('',STRIP=>1);
     $spec->get_section('package','')->subst_body(qr'','');
     $spec->get_section('package','')->subst_body_if(qr'','',qr'Requires:');

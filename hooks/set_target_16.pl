@@ -31,7 +31,7 @@ sub section_set_target {
 
 
 sub set_target_16 {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $target='1.6';
     return if $spec->{__::HOOKS::set_target};
     my $prepsec=$spec->get_section('prep');

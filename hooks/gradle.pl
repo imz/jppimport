@@ -6,7 +6,7 @@ require 'add_missingok_config.pl';
 # --max-workers=2 --no-parallel
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     &add_missingok_config($spec, '/etc/java/%name.conf','');
     $spec->get_section('package','')->subst_body(qr'^BuildRequires:\s+js-jquery','#BuildRequires:  js-jquery');
 

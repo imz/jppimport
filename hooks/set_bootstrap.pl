@@ -3,7 +3,7 @@
 push @SPECHOOKS, \&set_bootstrap;
 
 sub set_bootstrap {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('%define _bootstrap 1'."\n");
     $spec->get_section('package','')->unshift_body('%define _with_bootstrap 1'."\n");
     # for fedora

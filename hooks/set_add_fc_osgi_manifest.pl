@@ -8,7 +8,7 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
  sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $fcpath14='/var/ftp/pub/Linux/fedora/linux/releases/14/Everything/x86_64/os/Packages/';
     my $fcpath18='/var/ftp/pub/Linux/fedora/linux/development/18/x86_64/os/Packages/';
     my $fcpathRH='/var/ftp/pub/Linux/fedora/linux/development/rawhide/x86_64/os/Packages/';

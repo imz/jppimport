@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body(q!Obsoletes: java-cup < 2:11b
 Provides: java-cup = %{epoch}:%{version}-%release!."\n");
 };

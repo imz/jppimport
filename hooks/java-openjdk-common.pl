@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @PREHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
     # TODO: javadoc alternatives: not provided.
     # TODO: add proper alternatives to javadoc manually (and check java-1.7.0-oracle too!)
@@ -31,7 +31,7 @@ sub __subst_systemtap {
 }
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $mainsec=$spec->main_section;
 
     #Zerg: А у меня  java-1.8.0-openjdk-devel при установленным

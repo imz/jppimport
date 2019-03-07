@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->add_patch('tanukiwrapper-3.2.3-alt-Makefile.patch', STRIP=>1,INSERT_AFTER=>qr'patch2');
     $spec->add_patch('tanukiwrapper-3.2.3-alt-add-Makefile-for-armh.patch', STRIP=>2);
     # conflict with our patch: hack around

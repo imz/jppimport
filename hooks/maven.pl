@@ -4,7 +4,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 
     # Следующие пакеты имеют неудовлетворенные зависимости:
     # maven: Требует: /etc/mavenrc но пакет не может быть установлен
@@ -48,7 +48,7 @@ warn "==============================================================
 
 push @PREHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # maven-filesystem
     $spec->get_section('package','')->push_body(q!# maven-filesystem
 Requires: maven-filesystem

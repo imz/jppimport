@@ -12,7 +12,7 @@
 #symlinks.req: WARNING: /usr/src/tmp/java-1.6.0-openjdk-buildroot/usr/lib/jvm/java-1.6.0-openjdk.x86_64: directory /usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64 not owned by the package
 
 push @PREHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my %type=map {$_=>1} qw/post postun/;
     my %pkg=map {$_=>1} '', 'devel','plugin';
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $spec->get_sections();
@@ -38,7 +38,7 @@ sub __subst_systemtap {
 }
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $mainsec=$spec->main_section;
 
     $mainsec->push_body('# jpp provides

@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('AutoReqProv: yes,noosgi'."\n");
     $spec->get_section('package','')->push_body('Obsoletes: ivy < 2'."\n");
     #-Provides: mvn(jayasoft:ivy) = 2.4.0.local.20180508174005

@@ -4,7 +4,7 @@ require 'set_skip_usr_bin_run.pl';
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 
     $spec->get_section('package','')->set_tag('Summary','Jython is an implementation of Python written in pure Java.');
     #$spec->get_section('package','')->subst_body(qr'cpython_version\s+2.3','cpython_version	2.4');

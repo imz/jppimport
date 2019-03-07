@@ -3,7 +3,7 @@
 require 'java-openjdk-common.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     my $mainsec=$spec->main_section;
 
     # jpp7

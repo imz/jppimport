@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 
     $spec->main_section->exclude_body(qr'^(Provides|Obsoletes):\s+junit4');
     $spec->main_section->push_body('

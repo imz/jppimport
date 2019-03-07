@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
  sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 #    $spec->add_patch('hsqldb-1.8.0.7-alt-init.patch',STRIP=>1);
     my $initno=$spec->add_source('hsqldb.init');
     $spec->get_section('pre','')->subst_body_if(qr'-g\s+\d+','',qr'groupadd');

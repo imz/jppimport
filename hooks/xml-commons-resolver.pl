@@ -4,7 +4,7 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('# jpackage deprecations
 Conflicts: xml-commons-resolver10 < 0:1.3.05
 Conflicts: xml-commons-resolver11 < 0:1.3.05

@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
 
 sub  {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->subst_body(qr' xsdlib',
 					'msv-xsdlib');
 }

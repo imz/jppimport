@@ -4,7 +4,7 @@ require 'set_osgi.pl';
 require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     foreach $pkg ('','rasterizer','slideshow','squiggle','svgpp','ttf2svg') {
 	$spec->get_section('package',$pkg)->push_body('#19119
 Provides: xmlgraphics-batik'.($pkg ? "-$pkg" : '').' = 0:%version-%release

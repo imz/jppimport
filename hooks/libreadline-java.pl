@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('prep','')->push_body('%__subst s,termcap,tinfo, src/native/Makefile'."\n");
 }
 __END__

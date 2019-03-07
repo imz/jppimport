@@ -4,7 +4,7 @@
 require 'set_xmvn_notest.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 }
 
 __END__

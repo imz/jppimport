@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('# jpackage deprecations
 Conflicts: xml-commons-apis12 < 0:1.2.05
 Obsoletes: xml-commons-apis12 < 0:1.2.05

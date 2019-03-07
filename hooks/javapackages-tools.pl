@@ -2,13 +2,13 @@
 
 push @PREHOOKS,
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->macros->set_raw('python_prefix','python3');
 };
 
 push @SPECHOOKS,
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 
     # TODO: drop me after JVM cleanup!
     $spec->add_patch('macros.jpackage-alt-jvmjardir.patch',STRIP=>1);

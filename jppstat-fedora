@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PREFIX=/var/ftp/pub/Linux/fedora/linux/development/rawhide/
-PREFIX=/var/ftp/pub/Linux/fedora/linux/releases/27/Everything/
+PREFIX=/var/ftp/pub/Linux/fedora/linux/development/rawhide/Everything/
+PREFIX=/var/ftp/pub/Linux/fedora/linux/releases/29/Everything/
 
 NAME=java-fc-packages
 DEST=`pwd`
@@ -11,7 +11,7 @@ DEST=`pwd`
 
 JAVA_PATTERN='/usr/(share/java|share/netbeans|share/eclipse|lib/eclipse|lib64/eclipse)'
 
-[ -d $PREFIX/source/SRPMS ] && SOURCE_RPM_PATH="$PREFIX/source/SRPMS"
+[ -d $PREFIX/source/tree/Packages ] && SOURCE_RPM_PATH="$PREFIX/source/tree/Packages"
 [ -z "$SOURCE_RPM_PATH" ] && exit 2;
 
 get_arch_rpmdir()

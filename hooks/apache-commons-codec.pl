@@ -6,7 +6,7 @@ require 'set_osgi.pl';
 __END__
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 # already in spec
 #    $spec->get_section('package','')->push_body('Provides: jakarta-%{short_name} = %{version}'."\n");
 #    $spec->get_section('package','')->push_body('Provides: %{short_name} = %{version}'."\n");

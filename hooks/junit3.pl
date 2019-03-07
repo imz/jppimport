@@ -4,7 +4,7 @@
 require 'set_fix_repolib_project.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body('Provides: junit = 0:%{version}'."\n");
     $spec->get_section('package','')->push_body('Provides: junit3 = %{epoch}:%{version}-%{release}'."\n");
     $spec->get_section('install')->push_body(q!# symlink

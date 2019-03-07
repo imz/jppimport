@@ -4,7 +4,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 #    $spec->get_section('pretrans','-p <lua>')->delete;
 };
 

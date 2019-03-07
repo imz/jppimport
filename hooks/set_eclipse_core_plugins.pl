@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     # homedir confilct (TODO: report)
     $spec->applied_block(
 	"{_datadir}/eclipse/plugins fix",

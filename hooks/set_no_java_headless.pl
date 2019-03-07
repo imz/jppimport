@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('%filter_from_requires /^java-headless/d'."\n");
     # bootstrap packages
     $spec->applied_off;

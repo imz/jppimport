@@ -5,7 +5,7 @@ use warnings;
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     	$spec->applied_block(
 	"set quote source tag hook",
 	sub {

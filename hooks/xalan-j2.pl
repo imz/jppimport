@@ -6,7 +6,7 @@ require 'set_manual_no_dereference.pl';
 require 'set_dos2unix_scripts.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
 
     # ALT Compat provides
     if (not $spec->get_section('package','')->match_body(qr'Provides: xalan-j = ')) {

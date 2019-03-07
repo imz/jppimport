@@ -3,7 +3,7 @@
 require 'set_osgi.pl';
 
 push @SPECHOOKS, sub {
-    my ($spec, $parent) = @_;
-    $spec->get_section('build')->subst_body(qr'ant -Dant.build.javac.source=1.5 ','ant -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 ');
+    my ($spec,) = @_;
+#    $spec->get_section('build')->subst_body(qr'ant -Dant.build.javac.source=1.5 ','ant -Dant.build.javac.source=1.5 -Dant.build.javac.target=1.5 ');
 }
 __END__

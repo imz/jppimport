@@ -2,7 +2,7 @@
 
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->unshift_body('BuildRequires: docbook-simple'."\n");
     # does not work, let's disable the manual
     $spec->get_section('prep')->push_body(q!# damn the net

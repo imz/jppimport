@@ -1,6 +1,6 @@
 push @SPECHOOKS, 
 sub {
-    my ($spec, $parent) = @_;
+    my ($spec,) = @_;
     $spec->get_section('package','')->push_body(q!
 # macos proxy detection code :(
 #+ Requires: /usr/bin/grep
