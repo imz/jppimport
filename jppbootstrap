@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-package RPM::SpecFile::Bootstrap;
-
 use Getopt::Long;
 use RPM::Source::Editor;
 use RPM::Source::Macros;
@@ -18,9 +16,15 @@ my $force_cleanup;
 my (@skiprequires,@skipprovides);
 my (@addprovides,@addrequires,@addobsoletes,$opt_epoch);
 my ($altrpm,$altspec);
+my ($opt_arch_mode);
 my $altgroup='Development/Java';
 my $release_suffix='jpp';
+
+my (%ARCH_SOURCE);
+my %ARCH_MAP = qw/i386 %ix86 i486 %ix86 i586 %ix86 i686 %ix86 athlon %ix86/;
+
 my $result = GetOptions (
+		      "arch-mode"   => \$opt_arch_mode,
 		      "changelog=s"   => \$changelog,
 		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
@@ -46,9 +50,39 @@ my %skip;
 $skip{PROVIDENAME}={map {$_=>1} split(',',join(',',@skipprovides))};
 $skip{REQUIRENAME}={map {$_=>1} split(',',join(',',@skiprequires))};
 
-foreach (@ARGV) {
-    die "Oops: $_ not found" unless -e $_;
-    &package($_);
+if (not $opt_arch_mode) {
+    foreach (@ARGV) {
+	die "Oops: $_ not found" unless -e $_;
+	&package($_);
+    }
+} else {
+    die "TODO: not implemented: arch mode"
+}
+
+sub package {
+    my ($donor, $tmpdir, $trippletname, $bootstrap, $SOURCESDIR);
+    foreach my $rpmfile (@_) {
+	$donor=RPM::Donor::Query->new(RPM=>$rpmfile);
+	my $next_trippletname=$donor->query('NAME')."-".$donor->query('VERSION')."-".$donor->query('RELEASE');
+	my $arch=$donor->query('ARCH');
+	unless ($bootstrap) {
+	    $trippletname=$next_trippletname;
+	    $tmpdir = $trippletname.$$;
+	    $bootstrap=RPM::SpecFile::Bootstrap->new(-tmpdir=>$tmpdir);
+	} else {
+	    die "tripplet mismatch: $trippletname $next_trippletname" unless $trippletname eq $next_trippletname;
+	}
+	$SOURCESDIR=$bootstrap->get_sourcesdir();
+	`rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
+    }
+
+    my $SPECSDIR=$bootstrap->get_specsdir();
+    my $specfile=$SPECSDIR."/".$donor->query('NAME').'.spec';
+    &write_spec_file($specfile, $donor, $trippletname);
+    system ('add_changelog', '-e',$changelog,$specfile)==0 || &cleanup_and_exit($tmpdir);
+    mkpath([$outdir]) unless -d $outdir;
+    system ('rpmbuild', '--define', '_sourcedir '.$SOURCESDIR, '--define', '_srcrpmdir '.$outdir, '-bs', $specfile)==0 || &cleanup_and_exit($tmpdir);
+    &cleanup($tmpdir);
 }
 
 sub print_tag {
@@ -56,24 +90,12 @@ sub print_tag {
     print $fn ucfirst(lc($tag)).": ".$tagval."\n" if defined $tagval && $tagval ne '(none)';
 }
 
-sub package {
-    my $rpmfile=shift;
-    my $donor=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
-    my $alt;
+sub write_spec_file {
+    my ($specfile, $donor, $trippletname)=@_;
+    my $parent;
     if ($altrpm || $altspec) {
-	$alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
+	$parent=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     }
-
-    my $trippletname=$donor->query('NAME')."-".$donor->query('VERSION')."-".$donor->query('RELEASE');
-    my $tmpdir = $trippletname.$$;
-    my $SOURCESDIR="$tmpdir/SOURCES";
-    my $SPECSDIR="$tmpdir/SPECS";
-    my $specfile=$SPECSDIR."/".$donor->query('NAME').'.spec';
-    mkdir $tmpdir;
-    mkdir $SOURCESDIR;
-    mkdir $SPECSDIR;
-    
-    `rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
 
     open SPEC, '>', $specfile;
 
@@ -89,10 +111,10 @@ URL
 }
 
     my $epoch=$donor->query('EPOCH');
-    if ($alt) {
-	my $altepoch=$alt->main_section->get_tag('Epoch');
-	if (defined $altepoch and (not defined $epoch or $epoch eq '(none)' or $altepoch> $epoch)) {
-	    $epoch=$altepoch;
+    if ($parent) {
+	my $parentepoch=$parent->main_section->get_tag('Epoch');
+	if (defined $parentepoch and (not defined $epoch or $epoch eq '(none)' or $parentepoch> $epoch)) {
+	    $epoch=$parentepoch;
 	}
     }
     $epoch=$opt_epoch if defined $opt_epoch;
@@ -183,23 +205,18 @@ POSTUN
 %'.$secname."\n".$val."\n" if $val and $val ne "(none)";
 }
 
-
     print SPEC q!
 
 %files -f %name-list
 
 %changelog
 !;
-if ($alt) {
-    my @changelog_alt=@{$alt->get_section('changelog')->get_bodyref()};
-    shift @changelog_alt; # %changelog header
-    print SPEC @changelog_alt;
-}
-
-    system ('add_changelog', '-e',$changelog,$specfile)==0 || &cleanup_and_exit($tmpdir);
-    mkpath([$outdir]) unless -d $outdir;
-    system ('rpmbuild', '--define', '_sourcedir '.$SOURCESDIR, '--define', '_srcrpmdir '.$outdir, '-bs', $specfile)==0 || &cleanup_and_exit($tmpdir);
-    &cleanup($tmpdir);
+    if ($parent) {
+	my @changelog_alt=@{$parent->get_section('changelog')->get_bodyref()};
+	shift @changelog_alt; # %changelog header
+	print SPEC @changelog_alt;
+    }
+    close(SPEC);
 }
 
 sub cleanup {
@@ -213,19 +230,81 @@ sub cleanup_and_exit {
     exit 1;
 }
 
+#sub eval {
+#    my $tag = shift;
+#    #%packager
+#    return `rpmquery --eval '$tag' 2>/dev/null`
+#}
+
+package RPM::SpecFile::Bootstrap;
+
+use strict;
+use warnings;
+use File::Path qw(make_path remove_tree);
+
+sub new {
+    my $class=shift;
+    my $self = {
+	-force_cleanup => 0,
+	@_,
+    };
+    my $tmpdir=$self->{-tmpdir};
+    unless ($tmpdir) {
+	die "Oops! no -tmpdir";
+    } else {
+	make_path($tmpdir);
+    }
+    return bless $self, $class;
+}
+
+sub get_sourcesdir {
+    my $self=shift;
+    my $SOURCESDIR=$self->{-sourcesdir};
+    unless ($SOURCESDIR) {
+	my $tmpdir=$self->{-tmpdir};
+	$SOURCESDIR="$tmpdir/SOURCES";
+	$self->{-sourcesdir}=$SOURCESDIR;
+	mkdir $SOURCESDIR;
+    }
+    return $SOURCESDIR;
+}
+
+sub get_specsdir {
+    my $self=shift;
+    my $SPECSDIR=$self->{-specsdir};
+    unless ($SPECSDIR) {
+	my $tmpdir=$self->{-tmpdir};
+	$SPECSDIR="$tmpdir/SPECS";
+	$self->{-specsdir}=$SPECSDIR;
+	mkdir $SPECSDIR;
+    }
+    return $SPECSDIR;
+}
+
+sub cleanup {
+    my $self=shift;
+    my $tmpdir=$self->{-tmpdir};
+    remove_tree($tmpdir);
+}
+
+sub cleanup_and_exit {
+    my $self=shift;
+    my $tmpdir=$self->{-tmpdir};
+    &cleanup($tmpdir) if $self->{-force_cleanup};
+    exit 1;
+}
+
+package RPM::Donor::Query;
+
+use strict;
+use warnings;
+
 sub new {
     my $class=shift;
     my $self = {
 	@_,
     };
     return bless $self, $class;
-}
-
-sub eval {
-    my $tag = shift;
-    #%packager
-    return `rpmquery --eval '$tag' 2>/dev/null`
-
 }
 
 sub query{
