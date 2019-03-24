@@ -18,13 +18,17 @@ my $force_cleanup;
 my (@skiprequires,@skipprovides);
 my (@addprovides,@addrequires,@addobsoletes,$opt_epoch);
 my ($altrpm,$altspec);
+my $altgroup='Development/Java';
+my $release_suffix='jpp';
 my $result = GetOptions (
 		      "changelog=s"   => \$changelog,
 		      "outdir=s"   => \$outdir,
 		      "release=s"   => \$release,
+		      "relsuffix=s"   => \$release_suffix,
 		      "alt=s"   => \$altrpm,
 		      "parent=s"   => \$altrpm,
 		      "epoch=s"   => \$opt_epoch,
+		      "group=s"   => \$altgroup,
 		      "skip-requires=s"   => \@skiprequires,
 		      "skip-provides=s"   => \@skipprovides,
 		      "add-provides=s"   => \@addprovides,
@@ -54,17 +58,17 @@ sub print_tag {
 
 sub package {
     my $rpmfile=shift;
-    my $jpp=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
+    my $donor=RPM::SpecFile::Bootstrap->new(RPM=>$rpmfile);
     my $alt;
     if ($altrpm || $altspec) {
 	$alt=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     }
 
-    my $trippletname=$jpp->query('NAME')."-".$jpp->query('VERSION')."-".$jpp->query('RELEASE');
+    my $trippletname=$donor->query('NAME')."-".$donor->query('VERSION')."-".$donor->query('RELEASE');
     my $tmpdir = $trippletname.$$;
     my $SOURCESDIR="$tmpdir/SOURCES";
     my $SPECSDIR="$tmpdir/SPECS";
-    my $specfile=$SPECSDIR."/".$jpp->query('NAME').'.spec';
+    my $specfile=$SPECSDIR."/".$donor->query('NAME').'.spec';
     mkdir $tmpdir;
     mkdir $SOURCESDIR;
     mkdir $SPECSDIR;
@@ -80,11 +84,11 @@ SUMMARY
 LICENSE
 URL
 /) {
-    my $tagval=$jpp->query($tag);
+    my $tagval=$donor->query($tag);
     &print_tag(\*SPEC, $tag,$tagval);
 }
 
-    my $epoch=$jpp->query('EPOCH');
+    my $epoch=$donor->query('EPOCH');
     if ($alt) {
 	my $altepoch=$alt->main_section->get_tag('Epoch');
 	if (defined $altepoch and (not defined $epoch or $epoch eq '(none)' or $altepoch> $epoch)) {
@@ -96,13 +100,13 @@ URL
 
     print SPEC "Packager: $packager\n" if $packager;
 
-    my $pkgname=$jpp->query('NAME');
+    my $pkgname=$donor->query('NAME');
 
     foreach my $triplet (
 [qw/PROVIDENAME PROVIDEFLAGS PROVIDEVERSION/]
 	) {
-	my @tagval=$jpp->triquery(@$triplet);
-	@tagval=grep {$_!~/^.+\(/ or /^mvn\(/ or /^osgi\(/} @tagval;
+	my @tagval=$donor->triquery(@$triplet);
+	@tagval=grep {$_!~/^.+\(/ or /^(?:mvn|osgi|npm)\(/} @tagval;
 	my $tag=$triplet->[0];
 	#print STDERR "DEBUG: $triplet->[0]: ",join(' ',@tagval),"\n";
 	my $tagname=ucfirst(lc($tag));
@@ -114,23 +118,26 @@ URL
 
     foreach my $tag (qw/
 REQUIRENAME
-/) {
-    my @tagval=$jpp->multiquery($tag);
+		     /) {
+    my @tagval=$donor->multiquery($tag);
     @tagval=grep {$_!~/^.+\(/ or /^mvn\(/ or /^osgi\(/} @tagval;
     #print STDERR "DEBUG: $tag: ",join(' ',@tagval),"\n";
     my $tagname=ucfirst(lc($tag));
     $tagname=~s/name/s/;
     foreach my $val (@tagval) {
+	#(npm(sprintf-js) >= 1 with npm(sprintf-js) < 2)
+	$val=$1 if $val=~m/^\((\S+)\s/;
+	#print STDERR $tagname, ': ', $val, "\n";
 	print SPEC $tagname.": ".$val."\n" if $val ne $pkgname and not $skip{$tag}->{$val};
     }
 }
 
 
     $release='alt'.$release unless $release=~/^alt/;
-    $release=$release.'jpp' unless $release=~/jpp/;
+    $release=$release.$release_suffix if $release_suffix and not $release=~/${release_suffix}$/;
     print SPEC '
 BuildArch: noarch
-Group: Development/Java
+Group: '.$altgroup.'
 Release: '.$release.'
 Source: '.$trippletname.".cpio\n\n";
 
@@ -140,7 +147,7 @@ Source: '.$trippletname.".cpio\n\n";
 
     foreach my $tag (qw/DESCRIPTION
 /) {
-    my $query = $jpp->query($tag);
+    my $query = $donor->query($tag);
     print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
 }
 
@@ -171,7 +178,7 @@ POSTUN
 /) {
     my $secname=lc($sec);
     $secname=~s/in$//;
-    my $val=$jpp->query($sec);
+    my $val=$donor->query($sec);
     print SPEC '
 %'.$secname."\n".$val."\n" if $val and $val ne "(none)";
 }
@@ -232,7 +239,7 @@ sub query{
 sub multiquery {
     my $self=shift;
     my $tag=shift;
-    return grep {$_} split (/\s+/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
+    return grep {$_} split (/\n/, `rpmquery -p --queryformat '[\%{$tag}\n]' $self->{RPM}`);
 }
 
 sub triquery {
