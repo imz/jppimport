@@ -20,7 +20,6 @@ my ($opt_arch_mode);
 my $altgroup='Development/Java';
 my $release_suffix='jpp';
 
-my (%ARCH_SOURCE);
 my %ARCH_MAP = qw/i386 %ix86 i486 %ix86 i586 %ix86 i686 %ix86 athlon %ix86/;
 
 my $result = GetOptions (
@@ -56,33 +55,43 @@ if (not $opt_arch_mode) {
 	&package($_);
     }
 } else {
-    die "TODO: not implemented: arch mode"
+    &package(@ARGV);
 }
 
 sub package {
-    my ($donor, $tmpdir, $trippletname, $bootstrap, $SOURCESDIR);
+    my ($donor, $trippletname, $bootstrap, $SOURCESDIR);
     foreach my $rpmfile (@_) {
 	$donor=RPM::Donor::Query->new(RPM=>$rpmfile);
 	my $next_trippletname=$donor->query('NAME')."-".$donor->query('VERSION')."-".$donor->query('RELEASE');
 	my $arch=$donor->query('ARCH');
 	unless ($bootstrap) {
 	    $trippletname=$next_trippletname;
-	    $tmpdir = $trippletname.$$;
-	    $bootstrap=RPM::SpecFile::Bootstrap->new(-tmpdir=>$tmpdir);
+	    $bootstrap=RPM::SpecFile::Bootstrap->new(-tmpdir=>$trippletname.$$);
 	} else {
 	    die "tripplet mismatch: $trippletname $next_trippletname" unless $trippletname eq $next_trippletname;
 	}
 	$SOURCESDIR=$bootstrap->get_sourcesdir();
-	`rpm2cpio $rpmfile > $SOURCESDIR/$trippletname.cpio`;
+	my $srcname;
+	unless ($opt_arch_mode) {
+	    $srcname=$trippletname.'.cpio';
+	    $bootstrap->set_noarch_source($srcname);
+	} else {
+	    my $arch_subst=$ARCH_MAP{$arch};
+	    $arch_subst//=$arch;
+	    warn "ARCH=$arch SUBST=$arch_subst\n";
+	    $srcname=$trippletname.'.'.$arch.'.cpio';
+	    $bootstrap->set_arch_source($srcname, $arch_subst);
+	}
+	`rpm2cpio $rpmfile > $SOURCESDIR/$srcname`;
     }
 
     my $SPECSDIR=$bootstrap->get_specsdir();
     my $specfile=$SPECSDIR."/".$donor->query('NAME').'.spec';
-    &write_spec_file($specfile, $donor, $trippletname);
-    system ('add_changelog', '-e',$changelog,$specfile)==0 || &cleanup_and_exit($tmpdir);
+    &write_spec_file($specfile, $donor, $bootstrap);
+    system ('add_changelog', '-e',$changelog,$specfile)==0 || $bootstrap->cleanup_and_exit();
     mkpath([$outdir]) unless -d $outdir;
-    system ('rpmbuild', '--define', '_sourcedir '.$SOURCESDIR, '--define', '_srcrpmdir '.$outdir, '-bs', $specfile)==0 || &cleanup_and_exit($tmpdir);
-    &cleanup($tmpdir);
+    system ('rpmbuild', '--define', '_sourcedir '.$SOURCESDIR, '--define', '_srcrpmdir '.$outdir, '-bs', $specfile)==0 || $bootstrap->cleanup_and_exit();
+    $bootstrap->cleanup();
 }
 
 sub print_tag {
@@ -91,24 +100,35 @@ sub print_tag {
 }
 
 sub write_spec_file {
-    my ($specfile, $donor, $trippletname)=@_;
+    my ($specfile, $donor, $bootstrap)=@_;
     my $parent;
     if ($altrpm || $altspec) {
 	$parent=RPM::Source::Editor->new(SOURCERPM => $altrpm, SPECFILE => $altspec, VERBOSE=> $verbose);
     }
+    my $is_noarch=$bootstrap->get_noarch_source();
 
     open SPEC, '>', $specfile;
+    print SPEC q!# fedora builds i586 w/o -fPIC
+%set_verify_elf_method relaxed!."\n" if not $is_noarch;
+
+    print SPEC q!
+# sometimes commpress gets crazy (see maven-scm-javadoc for details)
+%set_compress_method none!."\n\n";
 
     foreach my $tag (qw/
-NAME
-VERSION
-SUMMARY
-LICENSE
-URL
-/) {
-    my $tagval=$donor->query($tag);
-    &print_tag(\*SPEC, $tag,$tagval);
-}
+	NAME
+	VERSION
+	SUMMARY
+	LICENSE
+	URL
+	/) {
+	my $tagval=$donor->query($tag);
+	&print_tag(\*SPEC, $tag,$tagval);
+    }
+    $release='alt'.$release unless $release=~/^alt/;
+    $release=$release.$release_suffix if $release_suffix and not $release=~/${release_suffix}$/;
+    print SPEC 'Group: '.$altgroup.'
+Release: '.$release."\n\n";
 
     my $epoch=$donor->query('EPOCH');
     if ($parent) {
@@ -154,34 +174,57 @@ REQUIRENAME
     }
 }
 
-
-    $release='alt'.$release unless $release=~/^alt/;
-    $release=$release.$release_suffix if $release_suffix and not $release=~/${release_suffix}$/;
-    print SPEC '
+    my %arch2src;
+    if ($is_noarch) {
+	my $noarch_source=$bootstrap->get_noarch_source();
+	print SPEC '
 BuildArch: noarch
-Group: '.$altgroup.'
-Release: '.$release.'
-Source: '.$trippletname.".cpio\n\n";
-
+Source: '.$noarch_source."\n\n";
+    } else {
+	my $src_counter=0;
+	my $arch_source_hash=$bootstrap->get_arch_source_hash();
+	foreach my $arch (sort keys(%$arch_source_hash)) {
+	    $arch2src{$arch}=$src_counter;
+	    print SPEC 'Source'.$src_counter.': '.$arch_source_hash->{$arch}."\n";
+	    $src_counter++;
+	}
+    }
+	
     print SPEC 'Provides: '.join(' ',@addprovides)."\n" if @addprovides;
     print SPEC 'Requires: '.join(' ',@addrequires)."\n" if @addrequires;
     print SPEC 'Obsoletes: '.join(' ',@addobsoletes)."\n" if @addobsoletes;
 
-    foreach my $tag (qw/DESCRIPTION
-/) {
-    my $query = $donor->query($tag);
-    print SPEC '%'.lc($tag)."\n".$query."\n" if $query ne '';
-}
+    foreach my $tag (qw/DESCRIPTION/) {
+	my $query = $donor->query($tag);
+	print SPEC "\n".'%'.lc($tag)."\n".$query."\n" if $query ne '';
+    }
 
-    print SPEC q!
-# sometimes commpress gets crazy (see maven-scm-javadoc for details)
-%set_compress_method none
+    if ($is_noarch) {
+	print SPEC q!
 %prep
 cpio -idmu --quiet --no-absolute-filenames < %{SOURCE0}
 
 %build
 cpio --list < %{SOURCE0} | sed -e 's,^\.,,' > %name-list
-
+!;
+    } else {
+	my $arch_source_hash=$bootstrap->get_arch_source_hash();
+	print SPEC "\n".'%prep'."\n";
+	foreach my $arch (sort keys(%$arch_source_hash)) {
+	    my $src_counter=$arch2src{$arch};
+	    print SPEC '%ifarch ',$arch,"\n",
+		'cpio -idmu --quiet --no-absolute-filenames < %{SOURCE',$src_counter,"}\n",
+		'%endif'."\n";
+	}
+	print SPEC "\n".'%build'."\n";
+	foreach my $arch (sort keys(%$arch_source_hash)) {
+	    my $src_counter=$arch2src{$arch};
+	    print SPEC '%ifarch ',$arch,"\n",
+		'cpio --list < %{SOURCE',$src_counter,q!} | sed -e 's,^\.,,' > %name-list!,"\n",
+		'%endif'."\n";
+	}
+    }
+    print SPEC q!
 %install
 mkdir -p $RPM_BUILD_ROOT
 for i in usr var etc; do
@@ -217,17 +260,6 @@ POSTUN
 	print SPEC @changelog_alt;
     }
     close(SPEC);
-}
-
-sub cleanup {
-    my $tmpdir=shift;
-    `rm -r $tmpdir`;
-}
-
-sub cleanup_and_exit {
-    my $tmpdir=shift;
-    &cleanup($tmpdir) if $force_cleanup;
-    exit 1;
 }
 
 #sub eval {
@@ -279,6 +311,26 @@ sub get_specsdir {
 	mkdir $SPECSDIR;
     }
     return $SPECSDIR;
+}
+
+sub set_noarch_source {
+    my ($self,$srcname)=@_;
+    $self->{-noarch_source}=$srcname;
+}
+
+sub get_noarch_source {
+    my ($self)=@_;
+    return $self->{-noarch_source};
+}
+
+sub set_arch_source {
+    my ($self,$srcname,$arch)=@_;
+    $self->{-arch_source}->{$arch}=$srcname;
+}
+
+sub get_arch_source_hash {
+    my ($self)=@_;
+    return $self->{-arch_source};
 }
 
 sub cleanup {
