@@ -20,6 +20,7 @@ AutoReq: yes, nopython
     $spec->get_section('package','demo')->push_body('AutoReq: yes, nopython
 #AutoProv: yes, nopython
 ');
+    $spec->get_section('package','javadoc')->exclude_body(qr'^(?:Provides|Obsoletes).*manual');
     &add_missingok_config($spec,'/etc/jython.conf');
 
     $spec->get_section('install')->push_body('
