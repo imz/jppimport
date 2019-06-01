@@ -5,7 +5,7 @@ push @PREHOOKS, sub {
     # contain alternatives that we add manually;
     # also, (see https://bugzilla.altlinux.org/32043)
     # fedora alternatives use /mozilla/plugins/libjavaplugin.so - drop!
-    map {$spec->get_section($_,'')->delete()} qw/post postun posttrans/;
+    map {my $sec=$spec->get_section($_,''); $sec->delete() if $sec} qw/post postun posttrans/;
     #info: Recommends: replaced with Requires:    bash-completion
     my $mainsec=$spec->main_section;
     $mainsec->exclude_body(qr'^(?:Recommends|Requires).*:\s+bash-completion');

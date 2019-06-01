@@ -4,7 +4,7 @@ require 'set_apache_obsoletes_epoch1.pl';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
-    $spec->get_section('pretrans','javadoc')->delete;
+    #$spec->get_section('pretrans','javadoc')->delete;
 
 }
 

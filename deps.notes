@@ -72,6 +72,13 @@ find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 %pom_remove_plugin :maven-javadoc-plugin
 
 #--------------------------------------------------------------
+# single test job if test failures on multicore
+# proposed fix?
+#%mvn_build -- -DforkCount=0 -DthreadCount=0
+see https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html
+
+
+#--------------------------------------------------------------
 
 DONE: with old modello, -Dmodel=path/to/file.mdo will help
 DONE: added myfaces-core-api-parent and added Obsoletes:myfaces-core11-api-parent to myfaces-core12-api

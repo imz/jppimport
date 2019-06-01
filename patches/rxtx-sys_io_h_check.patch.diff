@@ -1,0 +1,47 @@
+--- rxtx-sys_io_h_check.patch	2019-02-03 00:10:01.000000000 +0200
++++ rxtx-sys_io_h_check.patch	2019-06-01 22:40:19.936062781 +0300
+@@ -18,7 +18,7 @@
+ ===================================================================
+ --- rxtx.orig/src/RawImp.c	2011-02-23 23:04:29.641932242 -0500
+ +++ rxtx/src/RawImp.c	2011-02-23 23:05:40.487353587 -0500
+-@@ -99,11 +99,9 @@
++@@ -99,11 +99,17 @@
+  #	include <linux/serial.h>
+  #	include <linux/version.h>
+  #endif
+@@ -29,7 +29,35 @@
+ -#endif /* dima */
+ +#ifdef HAVE_SYS_IO_H
+ +#   include <sys/io.h>
+++#else
+++/* stubs for sys/io.h inl, inw, outb ...*/
+++static __inline unsigned char inb (unsigned short int __port) { return 0; }
+++static __inline unsigned short int inw (unsigned short int __port) { return 0; }
+++static __inline unsigned int inl (unsigned short int __port) { return 0; }
+++static __inline void outb (unsigned char __value, unsigned short int __port) {}
+++static __inline void outl (unsigned int __value, unsigned short int __port) {}
+++static int ioperm (unsigned long int __from, unsigned long int __num, int __turn_on) {return 0; }
+ +#endif
+  
+  extern int errno;
+  #include "I2CImp.h"
++--- rxtx/configure	2019-06-01 19:35:32.980610154 +0000
+++++ rxtx/configure	2019-06-01 19:36:46.060942703 +0000
++@@ -21150,6 +21150,17 @@
++ 
++ done
++ 
+++for ac_header in sys/io.h
+++do :
+++  ac_fn_c_check_header_mongrel "$LINENO" "sys/io.h" "ac_cv_header_sys_io_h" "$ac_includes_default"
+++if test "x$ac_cv_header_sys_io_h" = xyes; then :
+++  cat >>confdefs.h <<_ACEOF
+++#define HAVE_SYS_IO_H 1
+++_ACEOF
+++
+++fi
+++
+++done
++ 
++ for ac_header in termios.h
++ do

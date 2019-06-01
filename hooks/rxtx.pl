@@ -6,10 +6,10 @@ sub {
     $spec->source_apply_patch(
 	    PATCHFILE => 'rxtx-2.2-lock.patch.diff',
 	    SOURCEFILE=> 'rxtx-2.2-lock.patch');
-
-    # from http://man7.org/linux/man-pages/man2/inl.2.html:
-    # #include <sys/io.h> ... inl, inw, outb ...
-    $spec->add_patch('rxtx-20100211-alt-hack.patch',STRIP=>1);
+    $spec->source_apply_patch(
+	    PATCHFILE => 'rxtx-sys_io_h_check.patch.diff',
+	    SOURCEFILE=> 'rxtx-sys_io_h_check.patch');
+    #$spec->get_section('build')->unshift_body_before(qr'configure','autoreconf -fisv'."\n");
 
 };
 
