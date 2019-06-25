@@ -85,15 +85,19 @@ BuildRequires: pkgconfig(gtk+-2.0)
 # %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/client
 # %endif
     $mainsec->push_body('
-%ifarch x86_64
+%ifarch x86_64 aarch64
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()(64bit)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
+Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so()(64bit)
+Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so(SUNWprivate_1.1)(64bit)
 %endif
 %ifarch %ix86
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.1)
+Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so()
+Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so(SUNWprivate_1.1)
 %endif
 ');
     $mainsec->unshift_body(q'# ALT arm fix by Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
@@ -151,6 +155,14 @@ Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.
     $spec->get_section('install')->push_body(q!
 sed -i 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
 sed -i 's,^Categories=.*,Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Name --set-value='OpenJDK %javaver Policy Tool' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Comment --set-value='Manage OpenJDK %javaver policy files' %buildroot/usr/share/applications/*policytool.desktop
+#Name=OpenJDK 8 Monitoring & Management Console
+desktop-file-edit --set-key=Name --set-value='OpenJDK %javaver Management Console' %buildroot/usr/share/applications/*jconsole.desktop
+#Comment=Monitor and manage OpenJDK applications
+desktop-file-edit --set-key=Comment --set-value='Monitor and manage OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
+
+export LANG=ru_RU.UTF-8
 desktop-file-edit --set-key=Name[ru] --set-value='Настройка политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
 desktop-file-edit --set-key=Comment[ru] --set-value='Управление файлами политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
 desktop-file-edit --set-key=Name[ru] --set-value='Консоль OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
@@ -182,7 +194,7 @@ install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
 if [ -e $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/bin/jvisualvm ]; then
   cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-jvisualvm.desktop << EOF
 [Desktop Entry]
-Name=Java VisualVM (%{name})
+Name=Java VisualVM (OpenJDK %{javaver})
 Comment=Java Virtual Machine Monitoring, Troubleshooting, and Profiling Tool
 Exec=%{_jvmdir}/%{sdkdir}/bin/jvisualvm
 Icon=%{name}
@@ -196,8 +208,8 @@ fi
 # ControlPanel freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-control-panel.desktop << EOF
 [Desktop Entry]
-Name=Java Control Panel (%{name})
-Name[ru]=Настройка Java (OpenJDK 1.8.0)
+Name=Java Control Panel (OpenJDK %{javaver})
+Name[ru]=Настройка Java (OpenJDK %{javaver})
 Comment=Java Control Panel
 Comment[ru]=Панель управления Java
 Exec=%{_jvmdir}/%{jredir}/bin/jcontrol
@@ -212,7 +224,7 @@ EOF
 # javaws freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
 [Desktop Entry]
-Name=Java Web Start (%{name})
+Name=Java Web Start ((OpenJDK %{javaver}))
 Comment=Java Application Launcher
 MimeType=application/x-java-jnlp-file;
 Exec=%{_jvmdir}/%{jredir}/bin/javaws %%u

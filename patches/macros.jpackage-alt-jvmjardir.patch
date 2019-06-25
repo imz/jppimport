@@ -1,5 +1,5 @@
---- a/macros.d/macros.jpackage
-+++ b/macros.d/macros.jpackage
+--- a/macros.d/macros.javapackages-filesystem
++++ b/macros.d/macros.javapackages-filesystem
 @@ -16,6 +16,11 @@
  %_jvmdir        %{_prefix}/lib/jvm
  

@@ -10,11 +10,12 @@ push @SPECHOOKS,
 sub {
     my ($spec,) = @_;
 
+    
     # TODO: drop me after JVM cleanup!
     $spec->add_patch('macros.jpackage-alt-jvmjardir.patch',STRIP=>1);
     
     $spec->main_section->exclude_body(qr'^Requires:\s+java\S+-openjdk-headless');
-      
+
     $spec->main_section->unshift_body('%add_python3_path /usr/share/java-utils/'."\n");
     # TODO: tests requires manual fix: our rpm requires GROUP: tag
     $spec->main_section->subst_body('^\%bcond_without\s+tests','%bcond_with tests');
@@ -74,15 +75,16 @@ install -m755 -D %{SOURCE@.$meid.q@} %buildroot%_rpmmacrosdir/maven.env
 # altlinux python support
 sed -i -e 's,python?\.?,python*,' files-python
 # in rpm-build-java or useless in alt
-sed -i -e '/usr\/lib\/rpm/d' files-common files-local
+sed -i -e '/usr\/lib\/rpm/d' files-filesystem files-tools files-local
 rm -rf %buildroot/usr/lib/rpm/fileattrs
 
 # useless on alt and requires python
-sed -i -e '/usr\/bin\/xmvn-builddep/d' files-common files-local
+sed -i -e '/usr\/bin\/xmvn-builddep/d' files-local
 rm -rf %buildroot/usr/bin/xmvn-builddep
 
 pushd %buildroot%_rpmmacrosdir/
 mv macros.fjava javapackages-fjava
+mv macros.javapackages-filesystem javapackages-filesystem
 mv macros.jpackage javapackages-jpackage
 #mv macros.scl-java-template javapackages-scl-java-template
 popd
@@ -123,11 +125,12 @@ RPM build helpers for Java packages.
 
     $spec->get_section('files','-n javapackages-local')->push_body('# alt python3 cache
 %_datadir/java-utils/__pycache__'."\n");
-   
+
     $spec->get_section('files','-n javapackages-local')->push_body('
 %files -n rpm-macros-java
 %_rpmmacrosdir/javapackages-fjava
 %_rpmmacrosdir/javapackages-jpackage
+%_rpmmacrosdir/javapackages-filesystem
 #%_rpmmacrosdir/javapackages-scl-java-template
 
 %files -n rpm-build-java
