@@ -1,0 +1,47 @@
+diff --git a/icedtea-web/itweb-settings.desktop.in b/icedtea-web/itweb-settings.desktop.in
+index 31d5191..5fadec5 100644
+--- a/icedtea-web/itweb-settings.desktop.in
++++ b/icedtea-web/itweb-settings.desktop.in
+@@ -3,11 +3,14 @@ Name=IcedTea-Web Control Panel
+ Name[de]=IcedTea-Web Systemsteuerung
+ Name[pl]=Panel sterowania IcedTea-Web
+ Name[cs]=Ovládací panel IcedTea-Web
++Name[ru]=Панель управления IcedTea-Web
+ GenericName=Control Panel
++GenericName[ru]=Панель управления
+ Comment=Configure IcedTea-Web (javaws and plugin)
+ Comment[de]=Konfiguriert IcedTea-Web (javaws und Plug-in)
+ Comment[pl]=Konfiguruj IcedTea-Web (javaws i wtyczkę)
+ Comment[cs]=Konfigurace aplikace IcedTea-Web (javaws a zásuvný modul)
++Comment[ru]=Настройка IcedTea-Web (javaws и подключаемый модуль)
+ Exec=PATH_TO_ITWEB_SETTINGS
+ Icon=javaws
+ Terminal=false
+diff --git a/icedtea-web/javaws.desktop.in b/icedtea-web/javaws.desktop.in
+index b34f84f..cdf2c6d 100644
+--- a/icedtea-web/javaws.desktop.in
++++ b/icedtea-web/javaws.desktop.in
+@@ -2,6 +2,7 @@
+ Name=IcedTea Web Start
+ GenericName=Java Web Start
+ Comment=IcedTea Application Launcher
++Comment[ru]=Средство запуска приложения IcedTea
+ Exec=PATH_TO_JAVAWS %u
+ Icon=javaws
+ Terminal=false
+diff --git a/icedtea-web/policyeditor.desktop.in b/icedtea-web/policyeditor.desktop.in
+index 0155da6..85d0914 100644
+--- a/icedtea-web/policyeditor.desktop.in
++++ b/icedtea-web/policyeditor.desktop.in
+@@ -1,7 +1,10 @@
+ [Desktop Entry]
+ Name=IcedTea-Web Policy Editor
+-GenericName=Policy Tool 
++Name[ru]=Редактор политики IcedTea-Web
++GenericName=Policy Tool
++GenericName[ru]=Средство управления политикой
+ Comment=Edit Java Applet policy and permission settings
++Comment[ru]=Редактирование политики и параметров разрешений приложений Java
+ Exec=PATH_TO_POLICYEDITOR
+ Icon=javaws
+ Terminal=false

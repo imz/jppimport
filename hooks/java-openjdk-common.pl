@@ -9,6 +9,12 @@ push @PREHOOKS, sub {
     my @newsec=grep {not $type{$_->get_type()} or not $pkg{$_->get_raw_package()}} $spec->get_sections();
     $spec->set_sections(\@newsec);
 
+    # fc specific _privatelibs prov/req exclude
+    $spec->main_section->map_body(
+	sub{
+	    s/^\%global\s+_privatelibs/#$1/;
+	    $_='' if m/^\%global\s+__(?:provides|requires)_exclude\s+\^\(\%\{_privatelibs\}\)\$/;
+	});
 };
 
 sub __subst_systemtap {
@@ -58,7 +64,7 @@ BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-macros-java
 BuildRequires: pkgconfig(gtk+-2.0)
 ');
-	
+
     $mainsec->unshift_body(q'%def_enable accessibility
 %def_disable jvmjardir
 %def_disable javaws
@@ -155,18 +161,18 @@ Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so(SUNWprivate_1
     $spec->get_section('install')->push_body(q!
 sed -i 's,^Categories=.*,Categories=Settings;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*policytool.desktop
 sed -i 's,^Categories=.*,Categories=Development;Profiling;Java;X-ALTLinux-Java;X-ALTLinux-Java-%javaver-%{origin};,' %buildroot/usr/share/applications/*jconsole.desktop
-desktop-file-edit --set-key=Name --set-value='OpenJDK %javaver Policy Tool' %buildroot/usr/share/applications/*policytool.desktop
-desktop-file-edit --set-key=Comment --set-value='Manage OpenJDK %javaver policy files' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Name --set-value='OpenJDK %majorver Policy Tool' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Comment --set-value='Manage OpenJDK %majorver policy files' %buildroot/usr/share/applications/*policytool.desktop
 #Name=OpenJDK 8 Monitoring & Management Console
-desktop-file-edit --set-key=Name --set-value='OpenJDK %javaver Management Console' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Name --set-value='OpenJDK %majorver Management Console' %buildroot/usr/share/applications/*jconsole.desktop
 #Comment=Monitor and manage OpenJDK applications
-desktop-file-edit --set-key=Comment --set-value='Monitor and manage OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Comment --set-value='Monitor and manage OpenJDK %majorver' %buildroot/usr/share/applications/*jconsole.desktop
 
 export LANG=ru_RU.UTF-8
-desktop-file-edit --set-key=Name[ru] --set-value='Настройка политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
-desktop-file-edit --set-key=Comment[ru] --set-value='Управление файлами политик OpenJDK %javaver' %buildroot/usr/share/applications/*policytool.desktop
-desktop-file-edit --set-key=Name[ru] --set-value='Консоль OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
-desktop-file-edit --set-key=Comment[ru] --set-value='Мониторинг и управление приложениями OpenJDK %javaver' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Name[ru] --set-value='Настройка политик OpenJDK %majorver' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Comment[ru] --set-value='Управление файлами политик OpenJDK %majorver' %buildroot/usr/share/applications/*policytool.desktop
+desktop-file-edit --set-key=Name[ru] --set-value='Консоль OpenJDK %majorver' %buildroot/usr/share/applications/*jconsole.desktop
+desktop-file-edit --set-key=Comment[ru] --set-value='Мониторинг и управление приложениями OpenJDK %majorver' %buildroot/usr/share/applications/*jconsole.desktop
 !);
 
     $spec->get_section('install')->push_body(q!

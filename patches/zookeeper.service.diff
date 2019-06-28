@@ -1,0 +1,11 @@
+--- zookeeper.service	2019-02-03 15:15:51.000000000 +0200
++++ zookeeper.service	2019-06-28 10:21:46.821418965 +0300
+@@ -9,7 +9,7 @@
+ User=zookeeper
+ SyslogIdentifier=zookeeper
+ WorkingDirectory=/var/lib/zookeeper
+-ExecStart=/usr/bin/zkServer.sh start zoo.cfg
++ExecStart=/usr/bin/zkServer.sh start /etc/zookeeper/zoo.cfg
+ ExecStop=/usr/bin/zkServer.sh stop
+ 
+ User=root

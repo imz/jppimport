@@ -9,7 +9,6 @@ push @PREHOOKS, sub {
     #info: Recommends: replaced with Requires:    bash-completion
     my $mainsec=$spec->main_section;
     $mainsec->exclude_body(qr'^(?:Recommends|Requires).*:\s+bash-completion');
-    
 };
 
 push @SPECHOOKS, sub {
@@ -41,6 +40,14 @@ BuildRequires: bc
     #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-jdk-home=/usr/lib/jvm/java');
     $spec->get_section('build')->subst_body(qr'fedora-','ALTLinux-');
 
+    $mainsec->push_body(q@
+# hack not to forget to rebuild this pkg with every new openjdk
+# JAVACANDIDATE in alternatives below is release-dependent :(
+%define _alt_javacandidate %(head -2 /etc/alternatives/packages.d/java-%{javaver}-openjdk-java-headless| tail -1 | awk '{print $3}')
+%if "%{_alt_javacandidate}" != ""
+Requires: %{_alt_javacandidate}
+%endif
+@."\n");
 # --- alt linux specific, shared with openjdk ---#
 
     $spec->get_section('package','')->push_body(q!Provides: icedtea-web = %version-%release
@@ -124,7 +131,7 @@ sed -e 's,^JAVA_ARGS=,JAVA_ARGS="-Djava.security.policy=/etc/icedtea-web/javaws.
 # ControlPanel freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_desktopdir}/%{altname}-control-panel.desktop << EOF
 [Desktop Entry]
-Name=Java Plugin Control Panel (%{name})
+Name=Java %javaver Plugin Control Panel
 Comment=Java Control Panel
 Exec=itweb-settings.itweb
 Icon=java-%{javaver}
@@ -138,7 +145,7 @@ EOF
 # javaws freedesktop.org menu entry
 cat >> $RPM_BUILD_ROOT%{_desktopdir}/%{altname}-javaws.desktop << EOF
 [Desktop Entry]
-Name=Java Web Start (%{name})
+Name=Java Web Start (%{javaver})
 Comment=Java Application Launcher
 MimeType=application/x-java-jnlp-file;
 Exec=javaws.itweb %%u
@@ -190,5 +197,15 @@ done
 
 };
 
+# Ivan Razzhivin <underwit@altlinux.org> russian translation
+push @SPECHOOKS, sub {
+    my ($spec,) = @_;
+    $spec->add_patch('translation-desktop-files.patch',STRIP=>2);
+    my $id=$spec->add_source('Messages_ru.properties');
+    $spec->get_section('prep')->push_body(q!
+cp -f %SOURCE!.$id.q! netx/net/sourceforge/jnlp/resources/Messages_ru.properties
+sed -i 's/en_US.UTF-8/en_US.UTF-8 ru_RU.UTF-8/' Makefile.am
+!);
+};
 
 __END__

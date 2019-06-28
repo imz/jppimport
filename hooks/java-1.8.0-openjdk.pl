@@ -21,9 +21,10 @@ push @SPECHOOKS, sub {
     # for %{__global_ldflags} -- might be dropped in the future
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
-    $mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
-    # not built yet
-    $mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
+    # no more;
+    #$mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
+    # built!
+    #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
 
     # 1core build (16core build is out of memory)
     # export NUM_PROC=%(/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :)
