@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-push @SPECHOOKS, 
+push @SPECHOOKS,
 sub {
     my ($spec,) = @_;
     $spec->add_patch('',STRIP=>1);
