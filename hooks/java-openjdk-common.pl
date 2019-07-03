@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+$__jre::dir='%{jredir}';
+
 push @PREHOOKS, sub {
     my ($spec,) = @_;
     my %type=map {$_=>1} qw/post postun pretrans posttrans/;
@@ -12,7 +14,7 @@ push @PREHOOKS, sub {
     # fc specific _privatelibs prov/req exclude
     $spec->main_section->map_body(
 	sub{
-	    s/^\%global\s+_privatelibs/#$1/;
+	    s/^(\%global\s+_privatelibs)/#$1/;
 	    $_='' if m/^\%global\s+__(?:provides|requires)_exclude\s+\^\(\%\{_privatelibs\}\)\$/;
 	});
 };
@@ -48,14 +50,10 @@ push @SPECHOOKS, sub {
     # man pages are used in alternatives
     $mainsec->unshift_body('%set_compress_method none'."\n");
 
-    # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
-    #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
-    $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
-
     $spec->get_section('files','headless')->push_body('# sisyphus_check
-%dir %{_jvmdir}/%{jredir}/lib/security/policy
-%dir %{_jvmdir}/%{jredir}/lib/security/policy/limited
-%dir %{_jvmdir}/%{jredir}/lib/security/policy/unlimited'."\n");
+%dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy
+%dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy/limited
+%dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy/unlimited'."\n");
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
@@ -81,29 +79,29 @@ BuildRequires: pkgconfig(gtk+-2.0)
 ');
 
     # gnustep-sqlclient; it follows the symliks and links with
-    # %{_jvmdir}/%{jredir} path, that is version/release sensitive.
+    # %{_jvmdir}/'.$__jre::dir.' path, that is version/release sensitive.
 # # findprov below did not help at all :(
-# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall
-# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/jli
+# %add_findprov_lib_path %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall
+# %add_findprov_lib_path %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/jli
 # # it is needed for those apps which links with libjvm.so
-# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/server
+# %add_findprov_lib_path %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server
 # %ifnarch x86_64
-# %add_findprov_lib_path %{_jvmdir}/%{jredir}/lib/%archinstall/client
+# %add_findprov_lib_path %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/client
 # %endif
     $mainsec->push_body('
 %ifarch x86_64 aarch64
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()(64bit)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
-Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so()(64bit)
-Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so(SUNWprivate_1.1)(64bit)
+Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so()(64bit)
+Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
 %endif
 %ifarch %ix86
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.1)
-Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so()
-Provides: %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so(SUNWprivate_1.1)
+Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so()
+Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
 %endif
 ');
     $mainsec->unshift_body(q'# ALT arm fix by Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
@@ -218,7 +216,7 @@ Name=Java Control Panel (OpenJDK %{javaver})
 Name[ru]=Настройка Java (OpenJDK %{javaver})
 Comment=Java Control Panel
 Comment[ru]=Панель управления Java
-Exec=%{_jvmdir}/%{jredir}/bin/jcontrol
+Exec=%{_jvmdir}/!.$__jre::dir.q!/bin/jcontrol
 Icon=%{name}
 Terminal=false
 Type=Application
@@ -233,7 +231,7 @@ cat >> $RPM_BUILD_ROOT%{_datadir}/applications/%{name}-javaws.desktop << EOF
 Name=Java Web Start ((OpenJDK %{javaver}))
 Comment=Java Application Launcher
 MimeType=application/x-java-jnlp-file;
-Exec=%{_jvmdir}/%{jredir}/bin/javaws %%u
+Exec=%{_jvmdir}/!.$__jre::dir.q!/bin/javaws %%u
 Icon=%{name}
 Terminal=false
 Type=Application
@@ -257,35 +255,35 @@ install -d %buildroot%_altdir
 
 # J2SE alternative
 cat <<EOF >%buildroot%_altdir/%name-java-headless
-%{_bindir}/java	%{_jvmdir}/%{jredir}/bin/java	%priority
-%_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
+%{_bindir}/java	%{_jvmdir}/!.$__jre::dir.q!/bin/java	%priority
+%_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 EOF
 # binaries and manuals
 for i in keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
   cat <<EOF >>%buildroot%_altdir/%name-java-headless
-%_bindir/$i	%{_jvmdir}/%{jredir}/bin/$i	%{_jvmdir}/%{jredir}/bin/java
-%_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/%{jredir}/bin/java
+%_bindir/$i	%{_jvmdir}/!.$__jre::dir.q!/bin/$i	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 EOF
 done
 
 %if_enabled control_panel
 cat <<EOF >>%buildroot%_altdir/%name-java
-%{_bindir}/ControlPanel	%{_jvmdir}/%{jredir}/bin/ControlPanel	%{_jvmdir}/%{jredir}/bin/java
-%{_bindir}/jcontrol	%{_jvmdir}/%{jredir}/bin/jcontrol	%{_jvmdir}/%{jredir}/bin/java
+%{_bindir}/ControlPanel	%{_jvmdir}/!.$__jre::dir.q!/bin/ControlPanel	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_bindir}/jcontrol	%{_jvmdir}/!.$__jre::dir.q!/bin/jcontrol	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 EOF
 %endif
 # ----- JPackage compatibility alternatives ------
 cat <<EOF >>%buildroot%_altdir/%name-java-headless
-%{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
-%{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
-%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
-%{_jvmdir}/jre-%{javaver}-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{javaver}-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 %if_enabled jvmjardir
-%{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
-%{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
-%{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/%{jredir}/bin/java
+%{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 %endif
 EOF
 # ----- end: JPackage compatibility alternatives ------

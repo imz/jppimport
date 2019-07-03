@@ -13,11 +13,11 @@ push @SPECHOOKS, sub {
 Provides: java-javadoc = 1:1.7.0
 ');
 
-    # i586 build is not included :(
-    #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
-    #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
+    # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
+    #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
+    $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
 
-$spec->spec_apply_patch(PATCHSTRING=>q!
+    $spec->spec_apply_patch(PATCHSTRING=>q!
  # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
  # simply be another alternative.
 --- java-1.7.0-openjdk-1.7.0.1-alt1_2.0.3jpp6/java-1.7.0-openjdk.spec   2012-02-

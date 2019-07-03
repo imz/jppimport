@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+#see https://developers.redhat.com/blog/2018/11/05/migrating-from-oracle-jdk-to-openjdk-on-red-hat-enterprise-linux-what-you-need-to-know/
+
 my $centos=1;
 require 'set_jvm_preprocess.pl';
 require 'java-openjdk-common.pl';
@@ -12,7 +14,7 @@ push @SPECHOOKS, sub {
     my $mainsec=$spec->main_section;
 
 # TODO: current hack:
-# 1) drop custom optflags? 
+# 1) drop custom optflags?
 # 2) add
 #sed -i -e 's, -m32, -m32 %optflags_shared -fpic -D_BLA_BLA_BLA1,' openjdk/hotspot/make/linux/makefiles/gcc.make
     # fix textrels on %ix86
@@ -21,8 +23,6 @@ push @SPECHOOKS, sub {
     # for %{__global_ldflags} -- might be dropped in the future
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
-    # no more;
-    #$mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
     # built!
     #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
 
@@ -33,6 +33,10 @@ push @SPECHOOKS, sub {
     # no debug build in 1.8.65
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
+    # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
+    #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
+    $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
+
     $spec->get_section('package','javadoc')->push_body('# fc provides
 Provides: java-javadoc = 1:1.9.0
 ');
@@ -41,8 +45,7 @@ Provides: java-javadoc = 1:1.9.0
     #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
-    $mainsec=$spec->main_section;
-    $mainsec->exclude_body(qr'^Obsoletes:\s+(?:java-1.7.0-openjdk|java-1.5.0-gcj|sinjdoc)');
+    $mainsec->exclude_body(qr'^Obsoletes:\s+(?:java-1.7.0-openjdk)');
 
     # TODO drop
     # parasyte -Werror breaks build on x86_64
@@ -67,7 +70,10 @@ Provides: java-javadoc = 1:1.9.0
     # both are alternatives, former one works, but later one somehow is broken :(
     $spec->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
 
-    # TODO: check if deprecated
+};
+
+
+__END__
     $spec->spec_apply_patch(PATCHSTRING=> q!
 --- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300
@@ -89,10 +95,9 @@ Provides: java-javadoc = 1:1.9.0
  echo "sun.zoneinfo.dir=/usr/share/javazi" >> $JAVA_HOME/jre/lib/tz.properties
 !) if 0;
 
-};
+    # no more;
+    #$mainsec->subst_body_if(qr'java-1.8.0-openjdk','java-1.7.0-openjdk',qr'^BuildRequires:');
 
-
-__END__
     ## TODO: check if it still valid
     # hack for sun-based build (i586) only!!!
     #$spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
