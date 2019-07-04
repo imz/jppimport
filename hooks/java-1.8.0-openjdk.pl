@@ -5,6 +5,8 @@
 my $centos=1;
 require 'set_jvm_preprocess.pl';
 require 'java-openjdk-common.pl';
+$__jre::dir='%{jredir}';
+require 'java-openjdk-common-jobs-parallel.pl';
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=787513
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
@@ -26,10 +28,6 @@ push @SPECHOOKS, sub {
     # built!
     #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
 
-    # 1core build (16core build is out of memory)
-    # export NUM_PROC=%(/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :)
-    $spec->get_section('build')->subst_body_if(qr'^export\s+NUM_PROC=','#export NUM_PROC=','_NPROCESSORS_ONLN');
-
     # no debug build in 1.8.65
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
@@ -40,10 +38,6 @@ push @SPECHOOKS, sub {
     $spec->get_section('package','javadoc')->push_body('# fc provides
 Provides: java-javadoc = 1:1.9.0
 ');
-
-    # i586 build is not included :(
-    #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
-    #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
 
     $mainsec->exclude_body(qr'^Obsoletes:\s+(?:java-1.7.0-openjdk)');
 
@@ -74,6 +68,10 @@ Provides: java-javadoc = 1:1.9.0
 
 
 __END__
+    # i586 build is not included :(
+    #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
+    #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
+
     $spec->spec_apply_patch(PATCHSTRING=> q!
 --- java-1.7.0-openjdk.spec	2012-04-16 23:15:27.000000000 +0300
 +++ java-1.7.0-openjdk.spec	2012-04-16 23:17:56.000000000 +0300

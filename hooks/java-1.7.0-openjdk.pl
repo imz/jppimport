@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 require 'java-openjdk-common.pl';
+$__jre::dir='%{jredir}';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
@@ -8,10 +9,6 @@ push @SPECHOOKS, sub {
 
     # jpp7
     $mainsec->unshift_body('%define with_systemtap 0'."\n");
-
-    $spec->get_section('package','javadoc')->push_body('# fc provides
-Provides: java-javadoc = 1:1.7.0
-');
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");

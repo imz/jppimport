@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-$__jre::dir='%{jredir}';
+$__jre::dir='%{sdkdir}';
 
 push @PREHOOKS, sub {
     my ($spec,) = @_;
@@ -53,14 +53,14 @@ push @SPECHOOKS, sub {
     $spec->get_section('files','headless')->push_body('# sisyphus_check
 %dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy
 %dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy/limited
-%dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy/unlimited'."\n");
+%dir %{_jvmdir}/'.$__jre::dir.'/lib/security/policy/unlimited'."\n") if $__jre::dir eq '%{jredir}';
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
 BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-macros-java
-BuildRequires: pkgconfig(gtk+-2.0)
+#BuildRequires: pkgconfig(gtk+-2.0)
 ');
 
     $mainsec->unshift_body(q'%def_enable accessibility

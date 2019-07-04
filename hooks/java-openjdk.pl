@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-my $centos=1;
+my $centos=0;
 require 'set_jvm_preprocess.pl';
 require 'java-openjdk-common.pl';
 $__jre::dir='%{sdkdir}';
@@ -23,7 +23,7 @@ push @SPECHOOKS, sub {
     $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
     # TODO: drop me!
-    $mainsec->subst_body_if(qr'java-11-openjdk-devel','java-10-openjdk-devel',qr'^BuildRequires:');
+    $mainsec->subst_body_if(qr'java-openjdk-devel','java-9-openjdk-devel',qr'^BuildRequires:');
 
     # 1core build (16core build is out of memory). Disable for faster local builds on ohmu
     # export NUM_PROC=%(/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :)
@@ -43,9 +43,6 @@ push @SPECHOOKS, sub {
 
     # desktop
     $spec->spec_apply_patch(PATCHFILE=>'java-10-openjdk-alt-bug-32463.spec.diff') if not $centos;
-
-    # unrecognized option; TODO: check the list
-    #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
 
     # do we need it?
     $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");

@@ -1,0 +1,11 @@
+--- java-openjdk.spec	2019-07-03 15:55:14.085107697 +0300
++++ java-openjdk.spec	2019-07-03 15:58:01.425211485 +0300
+@@ -814,7 +814,7 @@
+     OUTPUT_FILE=$NAME$suffix.$EXT
+     sed    -e  "s:@JAVA_HOME@:%{sdkbindir}:g" $file > $OUTPUT_FILE
+     sed -i -e  "s:@JRE_HOME@:%{jrebindir}:g" $OUTPUT_FILE
+-    sed -i -e  "s:@ARCH@:%{version}-%{release}.%{_arch}$suffix:g" $OUTPUT_FILE
++    sed -i -e  "s:@ARCH@:%{_arch}$suffix:g" $OUTPUT_FILE
+     sed -i -e  "s:@JAVA_MAJOR_VERSION@:%{majorver}:g" $OUTPUT_FILE
+     sed -i -e  "s:@JAVA_VENDOR@:%{origin}:g" $OUTPUT_FILE
+ done
