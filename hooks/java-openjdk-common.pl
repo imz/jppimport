@@ -57,7 +57,7 @@ push @SPECHOOKS, sub {
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
-BuildRequires: libfreetype-devel libkrb5-devel
+#BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-macros-java
 #BuildRequires: pkgconfig(gtk+-2.0)
@@ -89,24 +89,16 @@ BuildRequires(pre): rpm-macros-java
 # %add_findprov_lib_path %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/client
 # %endif
     $mainsec->push_body('
-%ifarch x86_64 aarch64
+%if "%{_lib}" == "lib64"
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()(64bit)
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
 Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so()(64bit)
 Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)(64bit)
-%endif
-%ifarch %ix86
+%else
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so()
 Provides: /usr/lib/jvm/java/jre/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
-Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so()
-Provides: /usr/lib/jvm/java/jre/lib/%archinstall/client/libjvm.so(SUNWprivate_1.1)
 Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so()
 Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so(SUNWprivate_1.1)
-%endif
-');
-    $mainsec->unshift_body(q'# ALT arm fix by Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-%ifarch %{arm}
-%set_verify_elf_method textrel=relaxed
 %endif
 ');
 

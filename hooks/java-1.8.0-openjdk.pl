@@ -6,7 +6,7 @@ my $centos=1;
 require 'set_jvm_preprocess.pl';
 require 'java-openjdk-common.pl';
 $__jre::dir='%{jredir}';
-require 'java-openjdk-common-jobs-parallel.pl';
+#require 'java-openjdk-common-jobs-parallel.pl';
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=787513
 #alternatives.prov: /usr/src/tmp/java-1.6.0-openjdk-buildroot/etc/alternatives/packages.d/java-1.6.0-openjdk-java: /usr/share/man/man1/policytool-java-1.6.0-openjdk.1.gz for /usr/share/man/man1/policytool.1.gz is in another subpackage
@@ -22,12 +22,6 @@ push @SPECHOOKS, sub {
     # fix textrels on %ix86
     $spec->get_section('prep')->push_body(q!sed -i -e 's, -m32, -m32 %optflags_shared -fpic -D_BLA_BLA_BLA1,' openjdk/hotspot/make/linux/makefiles/gcc.make!."\n");
 
-    # for %{__global_ldflags} -- might be dropped in the future - merged in R::S::C
-    # $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
-
-    # built!
-    #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
-
     # no debug build in 1.8.65
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
@@ -35,7 +29,7 @@ push @SPECHOOKS, sub {
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
     $spec->get_section('prep')->push_body(q!sed -i -e 's,DEF_OBJCOPY=/usr/bin/objcopy,DEF_OBJCOPY=/usr/bin/NO-objcopy,' openjdk/hotspot/make/linux/makefiles/defs.make!."\n");
 
-    $spec->get_section('package','javadoc')->push_body('# fc provides
+    $spec->get_section('package','javadoc')->push_body('# hack till java 9+ will come
 Provides: java-javadoc = 1:1.9.0
 ');
 
@@ -48,6 +42,13 @@ Provides: java-javadoc = 1:1.9.0
     # as-needed link order / better patch over patch system-libjpeg.patch ?
     $spec->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
     $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff') if not $centos;
+};
+
+
+__END__
+
+    # do we need it?
+    $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
 
     # already 0
     #$mainsec->subst_body(qr'define runtests 1','define runtests 0');
@@ -55,12 +56,12 @@ Provides: java-javadoc = 1:1.9.0
     # unrecognized option; TODO: check the list
     #$spec->get_section('build')->subst_body(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
 
-    # do we need it?
-    $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
-};
+    # for %{__global_ldflags} -- might be dropped in the future - merged in R::S::C
+    # $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
+    # built!
+    #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
 
-__END__
 
     #### Misterious bug:
     # java -version work with JAVA_HOME=/usr/lib/jvm/java-1.7.0

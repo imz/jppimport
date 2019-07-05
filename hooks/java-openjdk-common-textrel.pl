@@ -8,6 +8,7 @@ sub {
 # significantly reduce the GC pause time on 32 bit Linux/Unix platforms by
 # compiling without the PIC flag (-fPIC on linux).
 # See 6454213 for more details.
+# for arm it is fix by Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
 %if "%_libsuff" != "64"
 %set_verify_elf_method textrel=relaxed
 %endif
