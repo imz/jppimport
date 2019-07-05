@@ -1,0 +1,14 @@
+--- openjdk/make/common/NativeCompilation.gmk~	2018-01-17 19:25:32.000000000 +0200
++++ openjdk/make/common/NativeCompilation.gmk	2019-07-04 20:46:03.675261592 +0300
+@@ -851,10 +851,7 @@
+           $1_DEBUGINFO_FILES := $$($1_OUTPUT_DIR)/$$($1_NOSUFFIX).debuginfo
+           # Setup the command line creating debuginfo files, to be run after linking.
+           # It cannot be run separately since it updates the original target file
+-          $1_CREATE_DEBUGINFO_CMDS := \
+-              $$($1_OBJCOPY) --only-keep-debug $$($1_TARGET) $$($1_DEBUGINFO_FILES) $$(NEWLINE) \
+-              $(CD) $$($1_OUTPUT_DIR) && \
+-                  $$($1_OBJCOPY) --add-gnu-debuglink=$$($1_DEBUGINFO_FILES) $$($1_TARGET)
++          $1_CREATE_DEBUGINFO_CMDS := $(TOUCH) $$($1_TARGET)
+ 
+         else ifeq ($(OPENJDK_TARGET_OS), macosx)
+           $1_DEBUGINFO_FILES := \

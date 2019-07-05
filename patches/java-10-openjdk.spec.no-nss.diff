@@ -1,0 +1,29 @@
+--- java-9-openjdk.spec	2019-07-04 20:38:39.405894086 +0300
++++ java-9-openjdk.spec	2019-07-04 20:39:08.127350681 +0300
+@@ -1155,7 +1155,7 @@
+     --with-boot-jdk=/usr/lib/jvm/java-openjdk \
+     --with-debug-level=$debugbuild \
+     --enable-unlimited-crypto \
+-    --enable-system-nss \
++    --disable-system-nss \
+     --with-zlib=system \
+     --with-libjpeg=system \
+     --with-giflib=system \
+@@ -1239,7 +1239,7 @@
+ export JAVA_HOME=$(pwd)/%{buildoutputdir}/images/%{jdkimage}
+ 
+ # Install nss.cfg right away as we will be using the JRE above
+-install -m 644 nss.cfg $JAVA_HOME/conf/security/
++#install -m 644 nss.cfg $JAVA_HOME/conf/security/
+ 
+ # Use system-wide tzdata
+ rm $JAVA_HOME/lib/tzdb.dat
+@@ -1523,7 +1523,7 @@
+ %config(noreplace) %{etcjavadir}/conf/security/java.policy
+ %config(noreplace) %{etcjavadir}/conf/security/java.security
+ %config(noreplace) %{etcjavadir}/conf/logging.properties
+-%config(noreplace) %{etcjavadir}/conf/security/nss.cfg
++#%config(noreplace) %{etcjavadir}/conf/security/nss.cfg
+ %config(noreplace) %{etcjavadir}/conf/management/jmxremote.access
+ %config  %{etcjavadir}/conf/management/jmxremote.password.template
+ %config(noreplace) %{etcjavadir}/conf/management/management.properties

@@ -1,0 +1,11 @@
+--- openjdk/jdk/make/lib/Awt2dLibraries.gmk	2018-01-17 19:41:31.000000000 +0200
++++ openjdk/jdk/make/lib/Awt2dLibraries.gmk	2019-07-04 18:56:20.873487927 +0300
+@@ -689,7 +689,7 @@
+     LDFLAGS_macosx := -undefined dynamic_lookup, \
+     LIBS := $(BUILD_LIBFONTMANAGER_FONTLIB), \
+     LIBS_unix := -lawt -ljava -ljvm $(LIBM) $(LIBCXX), \
+-    LIBS_linux := -lc, \
++    LIBS_linux := -lawt_headless -lc, \
+     LIBS_solaris := -lawt_headless -lc, \
+     LIBS_aix := -lawt_headless,\
+     LIBS_windows := $(WIN_JAVA_LIB) advapi32.lib user32.lib gdi32.lib \

@@ -22,8 +22,8 @@ push @SPECHOOKS, sub {
     # fix textrels on %ix86
     $spec->get_section('prep')->push_body(q!sed -i -e 's, -m32, -m32 %optflags_shared -fpic -D_BLA_BLA_BLA1,' openjdk/hotspot/make/linux/makefiles/gcc.make!."\n");
 
-    # for %{__global_ldflags} -- might be dropped in the future
-    $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
+    # for %{__global_ldflags} -- might be dropped in the future - merged in R::S::C
+    # $mainsec->unshift_body('BuildRequires(pre): rpm-macros-fedora-compat'."\n");
 
     # built!
     #$mainsec->subst_body_if(qr'1','0',qr'^\%global\s+with_openjfx_binding');
@@ -57,6 +57,10 @@ Provides: java-javadoc = 1:1.9.0
 
     # do we need it?
     $spec->get_section('install')->unshift_body('unset JAVA_HOME'."\n");
+};
+
+
+__END__
 
     #### Misterious bug:
     # java -version work with JAVA_HOME=/usr/lib/jvm/java-1.7.0
@@ -64,10 +68,7 @@ Provides: java-javadoc = 1:1.9.0
     # both are alternatives, former one works, but later one somehow is broken :(
     $spec->get_section('build')->subst_body_if(qr/\.0-openjdk/,'.0',qr!JDK_TO_BUILD_WITH=/usr/lib/jvm/java-1.[789].0-openjdk!);
 
-};
 
-
-__END__
     # i586 build is not included :(
     #$mainsec->subst_body(qr'ifarch i386','ifarch %ix86');
     #$mainsec->subst_body_if(qr'i686','%ix86',qr'^ExclusiveArch:');
