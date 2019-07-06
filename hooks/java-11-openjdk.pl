@@ -24,6 +24,15 @@ push @SPECHOOKS, sub {
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
 
     $spec->spec_apply_patch(PATCHFILE=>'java-10-openjdk-alt-bug-32463.spec.diff') if not $centos;
+
+    # it does arch dependent :(
+    $spec->get_section('package','javadoc')->exclude_body('BuildArch: noarch');
+
+    if (not $centos) {
+	#$spec->get_section('package','')->push_body('BuildRequires: fluid-soundfont-gm'."\n");
+	$spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{sdkdir}/lib/audio/default.sf2!."\n");
+	$spec->get_section('files','')->push_body(q!%{_jvmdir}/%{sdkdir}/lib/audio/default.sf2!."\n");
+    }
 };
 
 __END__

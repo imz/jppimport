@@ -41,7 +41,15 @@ Provides: java-javadoc = 1:1.9.0
 
     # as-needed link order / better patch over patch system-libjpeg.patch ?
     $spec->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
-    $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff') if not $centos;
+    if (not $centos) {
+	$spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');
+	$spec->get_section('install')->push_body(q!# move soundfont to java
+grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
+grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
+mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
+!."\n");
+    $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
+    }
 };
 
 
@@ -103,12 +111,6 @@ __END__
     #$spec->get_section('build')->subst_body(qr'^\s*make','make MEMORY_LIMIT=-J-Xmx512m');
     # why do we need it?
     #$spec->get_section('install')->subst_body(qr'mv bin/java-rmi.cgi sample/rmi',':; #mv bin/java-rmi.cgi sample/rmi');
-    $spec->get_section('install')->push_body(q!# move soundfont to java
-grep /audio/default.sf2 java-1.8.0-openjdk.files-headless >> java-1.8.0-openjdk.files
-grep -v /audio/default.sf2 java-1.8.0-openjdk.files-headless > java-1.8.0-openjdk.files-headless-new
-mv java-1.8.0-openjdk.files-headless-new java-1.8.0-openjdk.files-headless
-!."\n");
-    $spec->get_section('files','headless')->push_body(q!%exclude %{_jvmdir}/%{jredir}/lib/audio/default.sf2!."\n");
 
     # builds end up randomly :(
     $spec->get_section('build')->subst_body(qr'kill -9 `cat Xvfb.pid`','kill -9 `cat Xvfb.pid` || :');
