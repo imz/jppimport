@@ -64,7 +64,6 @@ BuildRequires(pre): rpm-macros-java
 ');
 
     $mainsec->unshift_body(q'%def_enable accessibility
-%def_disable jvmjardir
 %def_disable javaws
 %def_disable moz_plugin
 %def_disable control_panel
@@ -144,6 +143,7 @@ Provides: %{_jvmdir}/'.$__jre::dir.'/lib/%archinstall/server/libjvm.so(SUNWpriva
     $spec->get_section('files','headless')->unshift_body('%_altdir/%altname-java-headless
 %_sysconfdir/buildreqs/packages/substitute.d/%name-headless'."\n");
     $spec->get_section('files','devel')->unshift_body('%_altdir/%altname-javac
+%_altdir/%altname-javac-versioned
 %_sysconfdir/buildreqs/packages/substitute.d/%name-devel'."\n");
     $spec->_reset_speclist();
     $mainsec=$spec->main_section;
@@ -271,15 +271,10 @@ EOF
 %endif
 # ----- JPackage compatibility alternatives ------
 cat <<EOF >>%buildroot%_altdir/%name-java-headless
-%{_jvmdir}/jre	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%{_jvmdir}/jre-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%{_jvmdir}/jre-%{javaver}-%{origin}	%{_jvmdir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%if_enabled jvmjardir
-%{_jvmjardir}/jre	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%{_jvmjardir}/jre-%{origin}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%{_jvmjardir}/jre-%{javaver}	%{_jvmjardir}/%{jrelnk}	%{_jvmdir}/!.$__jre::dir.q!/bin/java
-%endif
+%{_jvmdir}/jre	%{_jvmdir}/!.$__jre::dir.q!	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{origin}	%{_jvmdir}/!.$__jre::dir.q!	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{javaver}	%{_jvmdir}/!.$__jre::dir.q!	%{_jvmdir}/!.$__jre::dir.q!/bin/java
+%{_jvmdir}/jre-%{javaver}-%{origin}	%{_jvmdir}/!.$__jre::dir.q!	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 EOF
 # ----- end: JPackage compatibility alternatives ------
 
@@ -310,16 +305,13 @@ EOF
 done
 
 # ----- JPackage compatibility alternatives ------
-  cat <<EOF >>%buildroot%_altdir/%name-javac
+cat <<EOF >>%buildroot%_altdir/%name-javac
 %{_jvmdir}/java	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
 %{_jvmdir}/java-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmdir}/java-%{javaver}-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%if_enabled jvmjardir
-%{_jvmjardir}/java	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmjardir}/java-%{origin}	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%{_jvmjardir}/java-%{javaver}	%{_jvmjardir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}/bin/javac
-%endif
+EOF
+cat <<EOF >>%buildroot%_altdir/%name-javac-versioned
+%{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdkdir}	%priority
+%{_jvmdir}/java-%{javaver}-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}
 EOF
 
 # ----- end: JPackage compatibility alternatives ------

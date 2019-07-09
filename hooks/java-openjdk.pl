@@ -6,7 +6,7 @@ require 'java-openjdk-common.pl';
 $__jre::dir='%{sdkdir}';
 require 'java-openjdk-common-textrel.pl';
 require 'java-openjdk-common-man.pl';
-#require 'java-openjdk-common-jobs-parallel.pl';
+require 'java-openjdk-common-jobs-parallel.pl';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
