@@ -18,11 +18,11 @@ push @SPECHOOKS, sub {
     my $mainsec=$spec->main_section;
 
     # TODO: drop me!
-    $mainsec->subst_body_if(qr'java-11-openjdk-devel','java-10-openjdk-devel',qr'^BuildRequires:');
-    $spec->get_section('build')->subst_body_if(qr'java-\%\{majorver\}-openjdk','java-10-openjdk',qr'--with-boot-jdk');
+    $mainsec->subst_body_if(qr'java-\%\{buildjdkver\}-openjdk-devel','java-10-openjdk-devel',qr'^BuildRequires:');
+    $spec->get_section('build')->subst_body_if(qr'java-\%\{buildjdkver\}-openjdk','java-10-openjdk',qr'--with-boot-jdk');
 
-    # https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8196218
-    $spec->add_patch('java-10-openjdk-alt-link-fontmanager.patch',STRIP=>0);
+    # rpm 4.0.4
+    $mainsec->subst_body('^\%global priority','%define priority');
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     $spec->add_patch('java-9-openjdk-alt-no-objcopy.patch',STRIP=>0);

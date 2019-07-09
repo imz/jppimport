@@ -57,11 +57,11 @@ push @SPECHOOKS, sub {
 
     $mainsec->unshift_body(q'BuildRequires: unzip gcc-c++ libstdc++-devel-static
 BuildRequires: libXext-devel libXrender-devel libXcomposite-devel
-#BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires(pre): browser-plugins-npapi-devel lsb-release
 BuildRequires(pre): rpm-macros-java
-#BuildRequires: pkgconfig(gtk+-2.0)
 ');
+#BuildRequires: libfreetype-devel libkrb5-devel
+#BuildRequires: pkgconfig(gtk+-2.0)
 
     $mainsec->unshift_body(q'%def_enable accessibility
 %def_disable javaws
@@ -311,7 +311,7 @@ cat <<EOF >>%buildroot%_altdir/%name-javac
 EOF
 cat <<EOF >>%buildroot%_altdir/%name-javac-versioned
 %{_jvmdir}/java-%{javaver}	%{_jvmdir}/%{sdkdir}	%priority
-%{_jvmdir}/java-%{javaver}-%{origin}	%{_jvmdir}/%{sdkdir}	%{_jvmdir}/%{sdkdir}
+%{_jvmdir}/java-%{javaver}-%{origin}	%{_jvmdir}/%{sdkdir}	%priority
 EOF
 
 # ----- end: JPackage compatibility alternatives ------

@@ -7,6 +7,12 @@ push @SPECHOOKS, sub {
     my ($spec,) = @_;
     my $mainsec=$spec->main_section;
 
+    $mainsec->unshift_body(q'# 1.7.0 - added manually
+BuildRequires: libfreetype-devel libkrb5-devel
+BuildRequires: pkgconfig(gtk+-2.0)
+');
+    $mainsec->push_body(q'ExcludeArch: aarch64 ppc64le'."\n");
+
     # jpp7
     $mainsec->unshift_body('%define with_systemtap 0'."\n");
 
