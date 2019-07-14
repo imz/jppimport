@@ -12,6 +12,9 @@ BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires: pkgconfig(gtk+-2.0)
 ');
     $mainsec->push_body(q'ExcludeArch: aarch64 ppc64le'."\n");
+    $mainsec->push_body(q'# self-deps. gcc8 linkage quirk?
+%filter_from_requires /^.usr.lib.jvm.java-1.7.0-openjdk-1.7.0.*jre.lib/d
+');
 
     # jpp7
     $mainsec->unshift_body('%define with_systemtap 0'."\n");

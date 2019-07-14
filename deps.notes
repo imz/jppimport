@@ -1,6 +1,12 @@
 # debug
 %mvn_build -X
 
+# ignore tests
+%mvn_build -f
+# no javadoc
+%mvn_build -j
+
+
 Note: fix groups for Python, GUI, etc...
 ###########export ANT_OPTS="-mx256m" against blackdown
 #export ANT_OPTS="-Xmx256m" against blackdown (compat)
@@ -148,3 +154,4 @@ javapackages-tools: 0002 gradle patch breaks gradle
 
 
 mvn install:install-file -Dfile=../SOURCES/netty-tcnative.jar  -DgroupId=io.netty -DartifactId=netty-tcnative -Dversion=1.1.30.Fork2 -Dpackaging=jar
+then pack ~/.m2?

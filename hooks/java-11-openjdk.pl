@@ -13,7 +13,7 @@ push @SPECHOOKS, sub {
     # fix me; proper nss
     $spec->spec_apply_patch(PATCHFILE=>'java-10-openjdk.spec.no-nss.diff');
     $spec->spec_apply_patch(PATCHFILE=>'java-openjdk.spec.no-ecc-test.diff');
-    #$spec->get_section('files','headless')->map_body(sub{$_='#'.$_ if m!^\%\{_jvmdir\}/\%\{sdkdir\}/lib/libsunec.so!});
+    $spec->get_section('files','headless')->map_body(sub{$_='#'.$_ if m!^\%\{_jvmdir\}/\%\{sdkdir\}/lib/libsunec.so!});
     #------------------------------------
     my $mainsec=$spec->main_section;
 
@@ -21,8 +21,8 @@ push @SPECHOOKS, sub {
     $mainsec->subst_body_if(qr'java-\%\{buildjdkver\}-openjdk-devel','java-10-openjdk-devel',qr'^BuildRequires:');
     $spec->get_section('build')->subst_body_if(qr'java-\%\{buildjdkver\}-openjdk','java-10-openjdk',qr'--with-boot-jdk');
 
-    # rpm 4.0.4
-    $mainsec->subst_body('^\%global priority','%define priority');
+    # rpm 4.0.4 %global-> %define; priority 1 -> 3
+    $mainsec->map_body(sub{if(/^\%global priority/){s,^\%global ,%define ,;s,'%08d' 1,'%08d' 3,}});
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     $spec->add_patch('java-9-openjdk-alt-no-objcopy.patch',STRIP=>0);

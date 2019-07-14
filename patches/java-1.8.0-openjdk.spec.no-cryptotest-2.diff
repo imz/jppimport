@@ -1,0 +1,13 @@
+--- java-1.8.0-openjdk.spec.1	2019-06-22 20:44:45.076581078 +0300
++++ java-1.8.0-openjdk.spec	2019-06-22 20:45:05.154109675 +0300
+@@ -1173,8 +1173,8 @@
+ $JAVA_HOME/bin/java TestCryptoLevel
+ 
+ # Check ECC is working
+-$JAVA_HOME/bin/javac -d . %{SOURCE14}
+-$JAVA_HOME/bin/java $(echo $(basename %{SOURCE14})|sed "s|\.java||")
++#$JAVA_HOME/bin/javac -d . %{SOURCE14}
++#$JAVA_HOME/bin/java $(echo $(basename %{SOURCE14})|sed "s|\.java||")
+ 
+ # Check debug symbols are present and can identify code
+ find "$JAVA_HOME" -iname '*.so' -print0 | while read -d $'\0' lib

@@ -13,6 +13,8 @@ $__jre::dir='%{jredir}';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
+    $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk.spec.no-system-nss.diff');
+    $spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk.spec.no-cryptotest-2.diff');
     my $mainsec=$spec->main_section;
 
 # TODO: current hack:

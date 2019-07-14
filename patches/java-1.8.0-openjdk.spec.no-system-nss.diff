@@ -1,0 +1,38 @@
+--- java-1.8.0-openjdk.spec.orig	2019-07-14 12:29:08.859174867 +0300
++++ java-1.8.0-openjdk.spec	2019-07-14 12:35:37.053906800 +0300
+@@ -1079,7 +1079,7 @@
+ done
+ 
+ # Setup nss.cfg
+-sed -e "s:@NSS_LIBDIR@:%{NSS_LIBDIR}:g" %{SOURCE11} > nss.cfg
++#sed -e "s:@NSS_LIBDIR@:%{NSS_LIBDIR}:g" %{SOURCE11} > nss.cfg
+ 
+ 
+ %build
+@@ -1138,7 +1138,7 @@
+     --with-boot-jdk=/usr/lib/jvm/java-openjdk \
+     --with-debug-level=$debugbuild \
+     --enable-unlimited-crypto \
+-    --enable-system-nss \
++    --disable-system-nss \
+     --with-zlib=system \
+     --with-libjpeg=system \
+     --with-giflib=system \
+@@ -1181,7 +1181,7 @@
+ export JAVA_HOME=$(pwd)/%{buildoutputdir}/images/%{jdkimage}
+ 
+ # Install nss.cfg right away as we will be using the JRE above
+-install -m 644 nss.cfg $JAVA_HOME/jre/lib/security/
++#install -m 644 nss.cfg $JAVA_HOME/jre/lib/security/
+ 
+ # Use system-wide tzdata
+ rm $JAVA_HOME/jre/lib/tzdb.dat
+@@ -1751,7 +1751,7 @@
+ %{_mandir}/man1/tnameserv-%{uniquesuffix}.1*
+ %{_mandir}/man1/unpack200-%{uniquesuffix}.1*
+ %{_mandir}/man1/policytool-%{uniquesuffix}.1*
+-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
++#%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
+ %ifarch %{jit_arches}
+ %ifnarch %{power64}
+ %attr(444, root, root) %ghost %{_jvmdir}/%{jredir}/lib/%{archinstall}/server/classes.jsa

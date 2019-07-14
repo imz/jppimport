@@ -26,6 +26,9 @@ push @SPECHOOKS, sub {
     $mainsec->subst_body_if(qr'java-openjdk-devel','java-9-openjdk-devel',qr'^BuildRequires:');
     $spec->get_section('build')->subst_body_if(qr'java-\%\{majorver\}-openjdk','java-9-openjdk',qr'--with-boot-jdk');
 
+    # priority 1 -> 2
+    $mainsec->map_body(sub{if(/^\%global priority/){s,00000\%\{minorver\}1,00000%{minorver}2,}});
+
     # https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8196218
     $spec->add_patch('java-10-openjdk-alt-link-fontmanager.patch',STRIP=>0);
 
