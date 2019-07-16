@@ -1,0 +1,1 @@
+~/src/repo/jppimport.git/jppbootstrap --group='Development/Other' --relsuffix=.njs.bootstrap --changelog '- bootstrap' "$@"
