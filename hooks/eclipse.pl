@@ -12,7 +12,7 @@ push @PREHOOKS, sub {
 push @SPECHOOKS, 
 sub {
     my ($jpp, $parent) = @_;
-
+    return;
     # bootstrap
     #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-pack'."\n");
 
@@ -129,91 +129,3 @@ fi
 };
 
 __END__
-
-q!
-     [exec] Model is x86_64
-     [exec] libgnome-2.0 and libgnomeui-2.0 not found:
-     [exec]     *** SWT Program support for GNOME will not be compiled.
-     [exec] Cairo found, compiling SWT support for the cairo graphics library.
-     [exec] WebKit not found:
-     [exec]     *** WebKit embedding support will not be compiled.
-     [exec] libjawt.so found, the SWT/AWT integration library will be compiled.
-     [exec] Building SWT/GTK+ for linux x86_64
-!;
-
-
-#################################
-#
-#  GARBAGE
-#
-#  NOT USED
-#
-################################
-
-
-    if (0) {
-
-    # seamonkey provides mozilla too
-    #$jpp->get_section('package','swt')->subst_body(qr'Conflicts:\s*mozilla','Conflicts:     mozilla < 1.8');
-
-    # lucene
-    #$jpp->get_section('prep')->push_body('sed -i -e s,lucene-contrib/lucene-analyzers.jar,lucene-contrib/analyzers.jar,g ./dependencies.properties'."\n");
-    #$jpp->get_section('install')->subst_body('lucene-contrib/lucene-analyzers.jar','lucene-contrib/analyzers.jar');
-
-
-
-    # TODO: remove bootstrap
-    if (0) { # bootstrap
-	$jpp->get_section('package','')->subst_body('global bootstrap 0','global bootstrap 1');
-	$jpp->get_section('package','')->unshift_body('BuildRequires: jakarta-commons-el jakarta-commons-logging jakarta-commons-codec jakarta-commons-httpclient lucene lucene-contrib icu4j-eclipse jsch objectweb-asm sat4j
-BuildRequires: tomcat6-servlet-2.5-api jetty6-core tomcat5-jsp-2.0-api tomcat5-jasper-eclipse ant-optional
-'."\n");
-    }
-
-    $jpp->get_section('prep')->push_body(q{
-%if 0
-# if enable make_xpcominit ...
-subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA make_xpcominit!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
-subst s,XULRUNNER_INCLUDES,MOZILLA_INCLUDES, './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-# was used for build with firefox
-#subst 's,${XULRUNNER_LIBS},%_libdir/firefox/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-# used for build with xulrunner
-subst 's,${XULRUNNER_LIBS},%_libdir/xulrunner-devel/sdk/lib/libxpcomglue.a,' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/make_linux.mak'
-%endif
-
-# if disable awt
-# subst 's!all $MAKE_GNOME $MAKE_CAIRO $MAKE_AWT $MAKE_MOZILLA!all $MAKE_GNOME $MAKE_CAIRO $MAKE_MOZILLA!' './plugins/org.eclipse.swt/Eclipse SWT PI/gtk/library/build.sh'
-});
-    }################################################### end TODO MAKE AS PATCHES
-
-    # hack around #22839: built-in /usr/lib*/eclipse
-    # $jpp->add_patch('eclipse-3.5.1-alt-syspath-hack.patch', STRIP => 0);
-    # hack around added in -15 exact versions
-
-    $jpp->get_section('package','')->subst_body_if(qr'-\d+jpp(?:\.\d+)?','', qr'^BuildRequires:');
-    $jpp->get_section('package','platform')->subst_body(qr'Requires: jakarta-commons-el >= 1.0-9','Requires: jakarta-commons-el >= 1.0-alt3');
-    $jpp->get_section('package','platform')->subst_body(qr'Requires: jakarta-commons-logging >= 1.0.4-6jpp.3','Requires: jakarta-commons-logging >= 1.1-alt2_3jpp1.7');
-    $jpp->get_section('package','platform')->subst_body(qr'Requires: tomcat5-jasper-eclipse >= 5.5.27-6.3','Requires: tomcat5-jasper-eclipse >= 5.5.27');
-
-
-    # reconsiler filetrigger.
-    # two platform sections :(
-    #$jpp->get_section('files','platform')->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
-    foreach my $section ($jpp->get_sections()) {
-	next unless $section->get_type eq 'files' and $section->get_package eq 'platform';
-	next if $section->get_flag('-f');
-	$section->push_body('/usr/lib/rpm/%{name}-%{_arch}.filetrigger'."\n");
-    }
-    $jpp->get_section('install')->push_body(q@# reconsiler filetrigger
-mkdir -p %buildroot/usr/lib/rpm
-cat > %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger << 'EOF'
-#!/bin/sh -e
-egrep -qs '^%{_libdir}/eclipse' && [ -x /usr/bin/eclipse-reconciler.sh ] && /usr/bin/eclipse-reconciler.sh %{_libdir}/eclipse /var/tmp > /dev/null ||:
-EOF
-chmod 755 %buildroot/usr/lib/rpm/%{name}-%{_arch}.filetrigger
-echo /usr/lib/rpm/%{name}-%{_arch}.filetrigger >> %{name}-platform.install
-@);
-
-    # https://bugzilla.altlinux.org/show_bug.cgi?id=23263
-    $jpp->get_section('package','swt')->subst_body_if(qr'xulrunner','xulrunner-libs', qr'Requires:');
-
