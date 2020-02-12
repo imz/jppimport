@@ -1,0 +1,1 @@
+../../fcimport.git/hooks/set_no_fedora_vendor.pl

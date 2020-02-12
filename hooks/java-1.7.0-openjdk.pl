@@ -10,12 +10,20 @@ push @SPECHOOKS, sub {
     $mainsec->unshift_body(q'# 1.7.0 - added manually
 BuildRequires: libfreetype-devel libkrb5-devel
 BuildRequires: pkgconfig(gtk+-2.0)
+%define majorver 7
 ');
+
     $mainsec->push_body(q'ExcludeArch: aarch64 ppc64le'."\n");
+    $spec->get_section('package','javadoc')->exclude_body(q'^Requires:\s+\%\{name\}-headless');
+
     $mainsec->push_body(q'# self-deps. gcc8 linkage quirk?
 %filter_from_requires /^.usr.lib.jvm.java-1.7.0-openjdk-1.7.0.*jre.lib/d
 ');
 
+    $mainsec->push_body(q'# no more
+Obsoletes:      java-1.7.0-openjdk-javaws < %version
+Obsoletes:      mozilla-plugin-java-1.7.0-openjdk < %version
+');
     # jpp7
     $mainsec->unshift_body('%define with_systemtap 0'."\n");
 

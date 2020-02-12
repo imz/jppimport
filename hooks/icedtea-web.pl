@@ -63,6 +63,8 @@ Requires(post,preun): alternatives
 # --- jpackage compatibility stuff starts here ---
 Provides:       javaws = %{javaws_ver}
 Obsoletes:      javaws-menu
+#Obsoletes:      java-1.7.0-openjdk-javaws
+#Obsoletes:      mozilla-plugin-java-1.7.0-openjdk
 # --- jpackage compatibility stuff ends here ---
 # due to the build specific
 Requires: mozilla-plugin-%altname = %version-%release
