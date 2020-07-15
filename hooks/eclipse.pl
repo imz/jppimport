@@ -237,43 +237,7 @@ sub leave_built_in_lucene {
 }
 
 __END__
-
-12.02.2008 21:16:10 org.mortbay.jetty.servlet.ServletHandler handle             WARNING: Error for /help/index.jsp
-java.lang.IncompatibleClassChangeError: Class org.apache.jasper.servlet.JspServlet does not implement the requested interface javax.servlet.Servlet
-        at org.eclipse.equinox.jsp.jasper.JspServlet.init(JspServlet.java:81)
-        at org.eclipse.equinox.http.registry.internal.ServletManager$ServletWrapper.initializeDelegate(ServletManager.java:195)
-        at org.eclipse.equinox.http.registry.internal.ServletManager$ServletWrapper.service(ServletManager.java:179)
-        at org.eclipse.equinox.http.servlet.internal.ServletRegistration.handleRequest(ServletRegistration.java:90)
-        at org.eclipse.equinox.http.servlet.internal.ProxyServlet.processAlias(ProxyServlet.java:109)
-        at org.eclipse.equinox.http.servlet.internal.ProxyServlet.service(ProxyServlet.java:75)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:803)
-        at org.eclipse.equinox.http.jetty.internal.HttpServerManager$InternalHttpServiceServlet.service(HttpServerManager.java:280)   
-        at org.mortbay.jetty.servlet.ServletHolder.handle(ServletHolder.java:428)
-        at org.mortbay.jetty.servlet.ServletHandler.dispatch(ServletHandler.java:677)
-        at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:568)
-        at org.mortbay.http.HttpContext.handle(HttpContext.java:1530)
-        at org.mortbay.http.HttpContext.handle(HttpContext.java:1482)
-        at org.mortbay.http.HttpServer.service(HttpServer.java:909)
-        at org.mortbay.http.HttpConnection.service(HttpConnection.java:820)
-        at org.mortbay.http.HttpConnection.handleNext(HttpConnection.java:986)
-        at org.mortbay.http.HttpConnection.handle(HttpConnection.java:837)
-        at org.mortbay.http.SocketListener.handleConnection(SocketListener.java:245)
-        at org.mortbay.util.ThreadedServer.handle(ThreadedServer.java:357)
-        at org.mortbay.util.ThreadPool$PoolThread.run(ThreadPool.java:534)
-
-
-
 #plugins/org.eclipse.core.filesystem/natives/unix/linux/Makefile:JAVA_HOME= ~/vm/sun142
-    # note: disabled in 16 and enabled in 18 again
-    if ($apprelease < 18) {
-	# disable java-1.6.0 code
-	$jpp->get_section('package','')->unshift_body('%def_without java6'."\n");
-	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# remove jdt.apt.pluggable.core, jdt.compiler.tool and org.eclipse.jdt.compiler.apt as they require a JVM that supports Java 1.6');
-	$jpp->get_section('prep')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'the ia64 strings with ppc64');
-	$jpp->get_section('build')->subst_after(qr'%if\s+%{gcj_support}','%if_without java6', qr'# Build the rest of Eclipse');
-	$jpp->get_section('files','jdt')->subst(qr'%else','%endif'."\n"."%if_with java6");
-    }
-#    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-bootstrap-bundle'."\n");
 
 # now we use theme
 $jpp->get_section('package','')->subst(qr'%{name}-fedora-splash-3.[0-9].[0-9].png', '%{name}-altlinux-splash-3.3.0.png');

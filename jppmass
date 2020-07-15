@@ -134,6 +134,7 @@ our @ALTSKIPEXTRA=qw/jpackage-utils junit/;
 #xerces-j xerces-j2
 our %ALT2JPPMAP=qw/
 jakarta-crimson crimson
+lucene2 lucene
 /;
 # not so simple... hands required!
 #jsvc jakarta-commons-daemon
@@ -155,13 +156,11 @@ xml-commons-external xml-commons-resolver
 our @ALTSKIPNOJPP=qw/
 drawswf
 eclipse-build-utils
-jdbc-stdext
 je
 jed
 jikes
 jms
 jmx
-jndi
 sax
 xsdlib
 /;

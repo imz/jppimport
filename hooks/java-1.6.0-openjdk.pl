@@ -11,7 +11,7 @@ push @PREHOOKS, sub {
 push @SPECHOOKS, sub {
     my ($jpp, $alt) = @_;
     # added in 16 - TODO - comment out
-    $jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
+    #$jpp->get_section('package','')->unshift_body('BuildRequires: eclipse-ecj'."\n");
 
     $jpp->get_section('package','')->unshift_body(q'BuildRequires: gcc-c++ libstdc++-devel-static
 BuildRequires(pre): browser-plugins-npapi-devel
@@ -44,7 +44,7 @@ BuildRequires(pre): browser-plugins-npapi-devel
     # for M40; can(should?) be disabled on M41
     $jpp->get_section('package','')->subst(qr'lesstif-devel','openmotif-devel');
     $jpp->get_section('package','')->subst(qr'java-1.5.0-gcj-devel','java-1.6.0-sun-devel');
-    $jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
+    #$jpp->get_section('package','')->subst(qr'java-1.6.0-openjdk-devel','java-1.6.0-sun-devel');
     $jpp->get_section('package','')->subst(qr'gecko-devel','firefox-devel');
     $jpp->get_section('package','')->subst(qr'^Epoch:\s+1','Epoch: 0');
 
@@ -56,7 +56,6 @@ Patch34: java-1.6.0-openjdk-alt-as-needed1.patch
 });
 
     $jpp->get_section('build')->unshift_body('unset JAVA_HOME'."\n");
-#    $jpp->get_section('build')->unshift_body('export LDFLAGS="$LDFLAGS -Wl,--no-as-needed"'."\n");
     $jpp->get_section('build')->subst(qr'./configure','./configure --with-openjdk-home=/usr/lib/jvm/java');
     $jpp->get_section('build')->unshift_body_after(q'patch -p1 < %{PATCH33}
 patch -p1 < %{PATCH34}
@@ -70,6 +69,10 @@ patch -p1 < %{PATCH34}
     $jpp->get_section('install')->subst(qr'mv bin/java-rmi.cgi sample/rmi','#mv bin/java-rmi.cgi sample/rmi');
 
     # TODO: fix caserts!!!
+    if ('with static caserts') {
+	$jpp->get_section('install')->unshift_body_before('if /bin/false; then'."\n",qr'# Install cacerts symlink.');
+	$jpp->get_section('install')->unshift_body_before('fi'."\n",qr'# Install extension symlinks.');
+    }
 
     # desktop-file-install is crying! TODO: replace with ALT
     $jpp->get_section('install')->unshift_body_after('install -D -m644 $e.desktop $RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop'."\n",qr'for e in jconsole policytool');

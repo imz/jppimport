@@ -96,12 +96,16 @@ if ($altrpm || $altspec) {
 	my $rel = $1;
 	my $jppfrom = $2;
 	my $jppdist= $3;
+	my $rel_branch='';
+	$rel_branch=$1 if ($rel=~s/(\.\d+)$//);
 	# hack -- cleanup (undefined in jpp) macro in alt release:
 	$rel=~s/.?\%\w+//g;
 	$rel=~s/.?\%\{\w+\}+//g;
-	print STDERR "new alt release: $jpprel $rel $jppfrom $jppdist\n" if $verbose>1;
+	print STDERR "new alt release: jpprel=$jpprel rel=$rel branch=$rel_branch jppfrom=$jppfrom jbranch=$jpprel_branch $jppdist\n" if $verbose>1;
 	if ($rel=~/^0\./ or $vercmp != 0) {
 	    $rel=1;
+	} elsif ($jppfrom eq $jpprel and $rel_branch and $jpprel_branch and $rel_branch < $jpprel_branch) {
+	    # nothing to do
 	} elsif ($jppfrom eq $jpprel) {
 	    $rel=~/^(\d+)/;
 	    $rel=$1+1;
@@ -197,7 +201,7 @@ if ($packager) {
     }
 }
 
-print $jpp->get_spec() if $jppspec or $verbose>1;
+print $jpp->get_spec() if $jppspec or $verbose>2;
 $jpp->write_rpm() if $jpprpm;
 $jpp->cleanup();
 
