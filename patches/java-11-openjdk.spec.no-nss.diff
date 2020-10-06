@@ -1,0 +1,20 @@
+--- java-11-openjdk.spec	2020-10-06 14:48:33.439873314 +0300
++++ java-11-openjdk.spec	2020-10-06 15:21:34.763665786 +0300
+@@ -1101,7 +1102,7 @@
+ export JAVA_HOME=$(pwd)/%{buildoutputdir}/images/%{jdkimage}
+ 
+ # Install nss.cfg right away as we will be using the JRE above
+-install -m 644 nss.cfg $JAVA_HOME/conf/security/
++#install -m 644 nss.cfg $JAVA_HOME/conf/security/
+ 
+ # Use system-wide tzdata
+ rm $JAVA_HOME/lib/tzdb.dat
+@@ -1654,7 +1655,7 @@
+ %config(noreplace) %{etcjavadir}/conf/security/java.policy
+ %config(noreplace) %{etcjavadir}/conf/security/java.security
+ %config(noreplace) %{etcjavadir}/conf/logging.properties
+-%config(noreplace) %{etcjavadir}/conf/security/nss.cfg
++#%config(noreplace) %{etcjavadir}/conf/security/nss.cfg
+ %config(noreplace) %{etcjavadir}/conf/management/jmxremote.access
+ # this is conifg template, thus not config-noreplace
+ %config  %{etcjavadir}/conf/management/jmxremote.password.template

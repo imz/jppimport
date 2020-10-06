@@ -32,6 +32,9 @@ push @SPECHOOKS, sub {
     # https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8196218
     $spec->add_patch('java-10-openjdk-alt-link-fontmanager.patch',STRIP=>0);
 
+    # https://bugs.openjdk.java.net/browse/JDK-8237879
+    $spec->add_patch('java-9-openjdk-alt-JDK-8237879.patch',STRIP=>0);
+
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     $spec->add_patch('java-9-openjdk-alt-no-objcopy.patch',STRIP=>0);
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');

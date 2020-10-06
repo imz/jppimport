@@ -1,0 +1,11 @@
+#pki-core need to be updated together with pki core
+#slev:
+#Это важно, потому что этот стек следует обновлять/патчить синхронно с
+#pki-core и freeipa. Прежде чем, пропускать в sisyphus, я обязательно
+#проверяю их в freeipa ci.
+jss
+ldapjdk
+tomcat
+tomcatjss
+
+

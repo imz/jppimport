@@ -1,0 +1,23 @@
+--- openjdk/make/common/MakeBase.gmk	2018-01-17 19:25:32.000000000 +0200
++++ openjdk/make/common/MakeBase.gmk	2020-10-06 17:59:16.429554537 +0300
+@@ -897,15 +897,16 @@
+ # Param 2 - (optional) name of file to store value in
+ DependOnVariableHelper = \
+     $(strip \
+-        $(eval -include $(call DependOnVariableFileName, $1, $2)) \
++        $(eval $1_filename := $(call DependOnVariableFileName, $1, $2)) \
++        $(if $(wildcard $($1_filename)), $(eval include $($1_filename))) \
+         $(if $(call equals, $(strip $($1)), $(strip $($1_old))),,\
+-          $(call MakeDir, $(dir $(call DependOnVariableFileName, $1, $2))) \
++          $(call MakeDir, $(dir $($1_filename))) \
+           $(if $(findstring $(LOG_LEVEL), trace), \
+               $(info NewVariable $1: >$(strip $($1))<) \
+               $(info OldVariable $1: >$(strip $($1_old))<)) \
+           $(call WriteFile, $1_old:=$(call DoubleDollar,$(call EscapeHash,$($1))), \
+-              $(call DependOnVariableFileName, $1, $2))) \
+-        $(call DependOnVariableFileName, $1, $2) \
++              $($1_filename))) \
++        $($1_filename) \
+     )
+ 
+ # Main macro
