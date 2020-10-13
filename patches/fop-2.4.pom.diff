@@ -1,0 +1,32 @@
+--- fop-2.4.pom.orig	2020-10-13 01:05:16.753868341 +0300
++++ fop-2.4.pom	2020-10-13 01:20:11.446872109 +0300
+@@ -7,14 +7,16 @@
+   <name>Apache FOP All-In-One</name>
+   <description>XML Graphics Format Object Processor All-In-One</description>
+ 
+-  <parent>
+-    <groupId>org.apache.xmlgraphics</groupId>
+-    <artifactId>fop-parent</artifactId>
+     <version>2.4</version>
+-  </parent>
+ 
+   <dependencies>
+-    <!-- fop deps -->
++    <dependency>
++      <groupId>org.apache.xmlgraphics</groupId>
++      <artifactId>xmlgraphics-commons</artifactId>
++      <version>2.3</version>
++    </dependency>
++ 
++    <!-- fop deps 
+     <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>fop-util</artifactId>
+@@ -30,6 +32,7 @@
+       <artifactId>fop-core</artifactId>
+       <version>${project.version}</version>
+     </dependency>
++    -->
+     <!-- test deps -->
+     <dependency>
+       <groupId>junit</groupId>

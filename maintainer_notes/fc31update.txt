@@ -1,0 +1,75 @@
+#pki-core need to be updated together with pki core
+#slev:
+# Это важно, потому что этот стек следует обновлять/патчить синхронно с
+# pki-core и freeipa. Прежде чем, пропускать в sisyphus, я обязательно
+# проверяю их в freeipa ci.
+jss
+ldapjdk
+tomcat
+tomcatjss
+
+#verup.fc30
+jppmass --ch '- new version' --str verup --origin /var/ftp/pub/Linux/fedora/linux/releases/30/Everything/source/tree/Packages --jvm 8 --input-dest --out OUT.verup.fc30 `cat destnames`
+
+#relup.fc30
+jppmass --ch '- update' --str relup --changelog-rebuild-skip --origin /var/ftp/pub/Linux/fedora/linux/releases/30/Everything/source/tree/Packages --jvm 8 --input-dest --out OUT.relup.fc30 `cat destnames`
+
+cp destnames destnames.fc30
+
+#relup.fc31
+jppmass --ch '- update' --str relup --changelog-rebuild-skip --origin /var/ftp/pub/Linux/fedora/linux/releases/31/Everything/source/tree/Packages --jvm 8 --input-dest --out OUT.relup.fc31 `cat destnames`
+
+#verup.fc31
+jppmass --ch '- new version' --str verup --origin /var/ftp/pub/Linux/fedora/linux/releases/31/Everything/source/tree/Packages --jvm 8 --input-dest --out OUT.verup.fc31 `cat destnames`
+
+scp -r OUT.verup.fc31 altair:
+# do build
+cd ~/LP
+repofork-create-addon-repo-from-autorepo-taskgood ~/java/verup.fc31/TASK.GOOD v31-verup
+./do_rebuild.sh 24
+
+repofork-create-addon-repo-from-autorepo-taskgood-subset ~/java/verup.fc31/TASK.GOOD/a*
+for i in */; do pushd $i; repofork-rebuild-helper-failure2list ~/LP/rebuild-verup/failure ; popd; done
+
+# gradle to be deleted
+BuildReq: ----------------------------
+gumtree-2.1.1-alt1.src|gradle-local
+gpars-1.2.1-alt1_13jpp8.src|gradle-local
+sshj-0.13.0-alt1_10jpp8.src|gradle-local
+groovy-2.4.8-alt1_9jpp8.src|gradle-local
+xmvn-3.0.0-alt1_23jpp8.src|gradle
+SimplyHTML-0.16.18-alt1_6jpp8.src|gradle-local
+mnemonicsetter-0.5-alt2_5jpp8.src|gradle-local
+openjfx-8.0.202-alt1_8.b07jpp8.src|gradle-local
+procyon-0.5.33-alt1_0.3.pre02jpp8.src|gradle-local
+rsyntaxtextarea-2.6.1-alt1_6jpp8.src|gradle-local
+fernflower-183.5153.8-alt1_4jpp8.src|gradle-local
+forbidden-apis-2.5-alt1_4jpp8.src|gradle-local
+mongo-java-driver-3.6.4-alt1_4jpp8.src|gradle-local
+gradle-4.4.1-alt2_3jpp8.src|gradle-local
+pdftk-2.02.java-alt1.src|gradle
+linstor-1.7.1-alt1.src|gradle
+Req: ---------------------------------
+gradle-local-5.3.0-alt1_4jpp8.noarch|gradle
+gradle-local-5.3.0-alt1_4jpp8.noarch|xmvn-connector-gradle
+
+#----
+jctools
+ -f -- -Dmaven.test.skip.exec=true
+-%mvn_build -s
++%mvn_build -s -f -- -Dmaven.test.skip.exec=true
+
+batik -> fop
+
+31..tree/Packages $ ls -l --full-time m/maven-3.5.4-12.fc31.src.rpm m/modello-1.10.0-1.fc31.src.rpm m/maven-wagon-3.3.3-4.fc31.src.rpm m/maven-parent-33-2.fc31.src.rpm x/xmvn-3.0.0-26.fc31.src.rpm
+
+авг 16  2019 m/maven-parent-33-2.fc31.src.rpm
+авг 24  2019 m/modello-1.10.0-1.fc31.src.rpm
+авг 25  2019 x/xmvn-3.0.0-26.fc31.src.rpm
+сен  1  2019 m/maven-3.5.4-12.fc31.src.rpm
+сен 14  2019 m/maven-wagon-3.3.3-4.fc31.src.rpm
+
+Broken: proxytoys
+
+Sisyphus/files/SRPMS $ ls *-*-alt*jpp*.src.rpm | sed -e 's,-[^-]*-alt[^-]*,,' | sort > ~/src/repo/jppimport.git/destnames.current
+

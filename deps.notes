@@ -82,6 +82,17 @@ or
 %pom_remove_plugin :maven-source-plugin
 %pom_remove_plugin :maven-javadoc-plugin
 
+# or in specific pom (lang/java/pom.xml)
+%pom_disable_module protobuf lang/java
+%pom_remove_plugin org.apache.maven.plugins:maven-enforcer-plugin lang/java
+
+# Disable javadoc jar
+%pom_xpath_remove "pom:build/pom:plugins/pom:plugin[pom:artifactId='maven-javadoc-plugin']/pom:executions"
+# Disable source jar
+%pom_remove_plugin :maven-source-plugin
+
+
+
 #--------------------------------------------------------------
 # single test job if test failures on multicore
 # proposed fix?

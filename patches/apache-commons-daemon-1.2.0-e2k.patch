@@ -1,0 +1,14 @@
+--- commons-daemon-1.2.0-src/src/native/unix/support/apsupport.m4.orig	2020-10-09 23:50:15.412754237 +0300
++++ commons-daemon-1.2.0-src/src/native/unix/support/apsupport.m4	2020-10-09 23:51:29.697999217 +0300
+@@ -172,6 +172,11 @@
+   sh*)
+     CFLAGS="$CFLAGS -DCPU=\\\"$host_cpu\\\""
+     HOST_CPU=$host_cpu;;
++  e2k*)
++    CFLAGS="$CFLAGS -DCPU=\\\"e2k\\\""
++    supported_os="e2k"
++    HOST_CPU=e2k
++    ;;
+   s390 | s390x)
+     CFLAGS="$CFLAGS -DCPU=\\\"s390\\\""
+     supported_os="s390"

@@ -6,6 +6,7 @@ require 'set_skip_usr_bin_run.pl';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
+    $spec->source_apply_patch(SOURCEFILE=>'fop-2.4.pom', PATCHFILE=>'fop-2.4.pom.diff');
     &add_missingok_config($spec, '/etc/fop.conf','');
     $spec->get_section('package','')->push_body(q!
 Provides: xmlgraphics-fop = %{epoch}:%version-%release
