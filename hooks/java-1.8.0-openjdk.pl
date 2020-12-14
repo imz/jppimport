@@ -26,6 +26,8 @@ push @SPECHOOKS, sub {
 
     # no debug build in 1.8.65
     $mainsec->subst_body(qr'^\%global include_debug_build 1','%global include_debug_build 0');
+    # no fastdebug build in 1.8.272
+    $mainsec->subst_body(qr'^\%global include_fastdebug_build 1','%global include_fastdebug_build 0');
 
     # https://bugzilla.altlinux.org/show_bug.cgi?id=27050
     #$mainsec->unshift_body('%add_verify_elf_skiplist *.debuginfo'."\n");
@@ -42,6 +44,10 @@ Provides: java-javadoc = 1:1.9.0
     $spec->add_patch('java-1.8.0-openjdk-alt-no-Werror.patch',STRIP=>1);
 
     # as-needed link order / better patch over patch system-libjpeg.patch ?
+    # TODO merge in one?
+    $spec->source_apply_patch(
+	SOURCEFILE=>'jdk8043805-allow_using_system_installed_libjpeg.patch',
+	 PATCHFILE=>'jdk8043805-allow_using_system_installed_libjpeg.patch.diff');
     $spec->add_patch('java-1.8.0-openjdk-alt-link.patch',STRIP=>1);
     if (not $centos) {
 	$spec->spec_apply_patch(PATCHFILE=>'java-1.8.0-openjdk-alt-bug-32463.spec.diff');

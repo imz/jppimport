@@ -61,15 +61,22 @@ jctools
 
 batik -> fop
 
-31..tree/Packages $ ls -l --full-time m/maven-3.5.4-12.fc31.src.rpm m/modello-1.10.0-1.fc31.src.rpm m/maven-wagon-3.3.3-4.fc31.src.rpm m/maven-parent-33-2.fc31.src.rpm x/xmvn-3.0.0-26.fc31.src.rpm
+31..tree/Packages $ ls -l --full-time m/maven-3.5.4-12.fc31.src.rpm m/modello-1.10.0-1.fc31.src.rpm m/maven-parent-33-2.fc31.src.rpm x/xmvn-3.0.0-26.fc31.src.rpm
 
 авг 16  2019 m/maven-parent-33-2.fc31.src.rpm
 авг 24  2019 m/modello-1.10.0-1.fc31.src.rpm
 авг 25  2019 x/xmvn-3.0.0-26.fc31.src.rpm
 сен  1  2019 m/maven-3.5.4-12.fc31.src.rpm
-сен 14  2019 m/maven-wagon-3.3.3-4.fc31.src.rpm
 
 Broken: proxytoys
 
 Sisyphus/files/SRPMS $ ls *-*-alt*jpp*.src.rpm | sed -e 's,-[^-]*-alt[^-]*,,' | sort > ~/src/repo/jppimport.git/destnames.current
 
+sourcerepo-mass-compare-import2alt --str orphanedS --origin /var/ftp/pub/Linux/fedora/linux/releases/31/Everything/source/tree/Packages --dest /var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS --input-dest `cat destnames.current` 
+
+sourcerepo-mass-compare-import2alt --str orphanedS --originrepo fedora --queryformat '%{ORIGINNAME}\t\t%{DESTFILE}\n' --origin /var/ftp/pub/Linux/fedora/linux/releases/31/Everything/source/tree/Packages --dest /var/ftp/pub/Linux/ALT/Sisyphus/files/SRPMS --input-dest `cat destnames.current` L
+
+postponed relupdate:
+bsf: built w/o rhino, postponed
+xstream: built w/o hibernate, postponed
+ivy: Disable ssh, bouncycastle, and vfs support, postponed

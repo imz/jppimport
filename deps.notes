@@ -56,6 +56,14 @@ subst 's,mvn-jpp ,mvn-jpp -Dmaven.test.skip=true ,' *.spec
 +      install:install-file -DgroupId=xpp3 -DartifactId=xpp3_min \
 +                -Dversion=1.1.4c -Dpackaging=jar -Dfile=$(build-classpath xpp3)
 
+редактирование
+попробуйте сначала вот так, установить оба вместе:
+mvn install:install-file -DgroupId=com.github.maven-nar -DartifactId=nar-maven-plugin \
+-Dversion=3.2.3 -Dpackaging=jar -Dfile=/home/parus/nar-maven-plugin-3.2.3.jar \
+-DpomFile=/home/parus/nar-maven-plugin-3.2.3.pom
+
+
+
 find maven2-brew \! -path '*/org/jboss/security/*' -type f -print -delete ||:
 find maven2-brew -exec rmdir -p {} \; 2>/dev/null ||:
 
@@ -91,7 +99,12 @@ or
 # Disable source jar
 %pom_remove_plugin :maven-source-plugin
 
+# remove unnecessary dependency on parent POM
+%pom_remove_parent
 
+# compat:
+%mvn_compat_version : 1 %{version}
+%pom_change_dep -r :geronimo-annotation_1.2_spec javax.annotation:javax.annotation-api:1.2
 
 #--------------------------------------------------------------
 # single test job if test failures on multicore

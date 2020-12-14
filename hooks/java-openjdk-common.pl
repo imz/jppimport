@@ -42,6 +42,9 @@ push @SPECHOOKS, sub {
     my ($spec,) = @_;
     my $mainsec=$spec->main_section;
 
+    # in alternatives
+    $spec->get_section('package','headless')->exclude_body(qr'^Provides:\s*/usr/bin/jjs\s*$');
+
     #Zerg: А у меня  java-1.8.0-openjdk-devel при установленным
     # java-1.8.0-openjdk-headless вытащил java-1.6.0-sun-headless через зависимость
     # на /usr/bin/java и не дает удалить.
@@ -252,7 +255,7 @@ cat <<EOF >%buildroot%_altdir/%name-java-headless
 %_man1dir/java.1.gz	%_man1dir/java%{label}.1.gz	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 EOF
 # binaries and manuals
-for i in keytool policytool servertool pack200 unpack200 \
+for i in jjs keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
   if [ -e %{_jvmdir}/!.$__jre::dir.q!/bin/$i ]; then
