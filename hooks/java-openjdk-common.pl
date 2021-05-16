@@ -258,7 +258,7 @@ EOF
 for i in jjs keytool policytool servertool pack200 unpack200 \
 orbd rmid rmiregistry tnameserv
 do
-  if [ -e %{_jvmdir}/!.$__jre::dir.q!/bin/$i ]; then
+  if [ -e %buildroot%{_jvmdir}/!.$__jre::dir.q!/bin/$i ]; then
     cat <<EOF >>%buildroot%_altdir/%name-java-headless
 %_bindir/$i	%{_jvmdir}/!.$__jre::dir.q!/bin/$i	%{_jvmdir}/!.$__jre::dir.q!/bin/java
 %_man1dir/$i.1.gz	%_man1dir/${i}%{label}.1.gz	%{_jvmdir}/!.$__jre::dir.q!/bin/java

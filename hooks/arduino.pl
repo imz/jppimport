@@ -3,7 +3,7 @@
 push @SPECHOOKS, 
 sub {
     my ($spec,) = @_;
-    $spec->source_apply_patch(SOURCEFILE=>'arduino-1.8.3-use-system-avrdude.patch',PATCHFILE=>'arduino-1.8.3-use-system-avrdude.patch.diff');
+    $spec->source_apply_patch(SOURCEFILE=>'arduino-use-system-avrdude.patch',PATCHFILE=>'arduino-1.8.3-use-system-avrdude.patch.diff');
     $spec->add_patch('arduino-1.8.5-use-system-listSerialsj.patch',STRIP=>1);
     $spec->get_section('install')->push_body(q!# unFedorize; ALTize
 if grep 'dialout lock' %buildroot/%_bindir/arduino; then

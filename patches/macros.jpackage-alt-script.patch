@@ -1,8 +1,28 @@
-diff --git a/macros.d/macros.jpackage b/macros.d/macros.jpackage
-index 6b6646c..2f451ec 100644
---- a/macros.d/macros.jpackage
-+++ b/macros.d/macros.jpackage
-@@ -154,7 +154,7 @@
+--- javapackages/java-utils/java-functions	2018-08-06 18:09:06.000000000 +0300
++++ javapackages/java-utils/java-functions	2021-05-10 19:50:14.455480922 +0300
+@@ -250,7 +250,7 @@
+ }
+ 
+ # Run application
+-run()
++jvm_run()
+ {
+     set_javacmd
+ 
+@@ -266,6 +266,10 @@
+     # let's start
+     eval "exec \"\${JAVACMD}\" ${FLAGS} -classpath \"\${CLASSPATH}\" ${OPTIONS} \"\${MAIN_CLASS}\" \"\${@}\""
+ }
++run()
++{
++    jvm_run "${@}"
++}
+ 
+ # Set JVM-related directories
+ set_jvm_dirs()
+--- javapackages/macros.d/macros.jpackage	2018-08-06 18:09:06.000000000 +0300
++++ javapackages/macros.d/macros.jpackage	2021-05-10 19:47:24.332625409 +0300
+@@ -37,7 +37,7 @@
  %jpackage_script() \
  install -d -m 755 %{buildroot}%{_bindir} \
  cat > %{buildroot}%{_bindir}/%5 << EOF \
@@ -11,8 +31,8 @@ index 6b6646c..2f451ec 100644
  #\
  # %{name} script\
  # JPackage Project <http://www.jpackage.org/>\
-@@ -164,8 +164,9 @@ _prefer_jre="%{?6}"\
- . %{_javadir}-utils/java-functions\
+@@ -47,8 +47,9 @@
+ . @{javadir}-utils/java-functions\
  \
  # Source system prefs\
 -if [ -f %{_sysconfdir}/java/%{name}.conf ] ; then\
@@ -23,3 +43,12 @@ index 6b6646c..2f451ec 100644
  fi\
  \
  # Source user prefs\
+@@ -69,7 +70,7 @@
+ set_options \\$BASE_OPTIONS\
+ \
+ # Let's start\
+-run "\\$@"\
++jvm_run "\\$@"\
+ EOF\
+ chmod 755 %{buildroot}%{_bindir}/%5\
+ %{nil}
