@@ -5,7 +5,7 @@ push @SPECHOOKS, \&set_target_18;
 my $build_repo_mode;
 
 sub section_set_target {
-    my ($spec,$secname,$target)=@_;
+    my ($spec,$secname,$target,$release)=@_;
     my $section=$spec->get_section($secname);
     return unless $section;
     $build_repo_mode=0;
@@ -25,8 +25,9 @@ sub section_set_target {
 	    s!\%\{javac\} !%{javac}  -target $target -source $target ! or
 	    s!^javac !javac  -target $target -source $target ! or
 	    #s!^\s*(?:\%\{_bindir\}/)?(maven|mvn|mvn-jpp|mvn-jpp22|mvn-rpmbuild)(?=\s|$)!$1 -Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
-	    s!^(\s*\%mvn_build.*\s--\s)!$1-Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target ! or
-	    s!^(\s*\%mvn_build)(\s*$)!$1 -- -Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target$2! or
+	    s!^(\s*\%mvn_build.*\s--\s)!$1-Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target -Dmaven.compiler.release=$release ! or
+	    s!^(\s*\%mvn_build)(\s*$)!$1 -- -Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target -Dmaven.compiler.release=$release$2! or
+	    s!^(\s*\%mvn_build(?:\s+-\w+)+)(\s*$)!$1 -- -Dmaven.compile.source=$target -Dmaven.compile.target=$target -Dmaven.javadoc.source=$target -Dmaven.compiler.release=$release$2! or
 	    s!^(\s*\%?\{?ant(?:18)?\}?)(?=\s)!$1 -Dant.build.javac.source=$target -Dant.build.javac.target=$target !;
 	})
 }
@@ -35,6 +36,7 @@ sub section_set_target {
 sub set_target_18 {
     my ($spec,) = @_;
     my $target='1.8';
+    my $release='8';
     return if $spec->{__::HOOKS::set_target};
     my $prepsec=$spec->get_section('prep');
     my $buildsec=$spec->get_section('build');
@@ -50,8 +52,8 @@ sub set_target_18 {
     $buildsec->subst_body(qr'^export JAVA_HOME=','#export JAVA_HOME=') if $buildsec;
 #    $spec->get_section('package')->subst_body(qr'jpackage-compat','jpackage-1.7-compat') if $target eq '1.7';
     $spec->clear_applied();
-    &section_set_target($spec,'prep',$target);
-    &section_set_target($spec,'build',$target);
+    &section_set_target($spec,'prep',$target,$release);
+    &section_set_target($spec,'build',$target,$release);
 
 	    });
 };

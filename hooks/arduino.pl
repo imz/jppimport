@@ -12,6 +12,7 @@ else
    echo "ALT-specific group hack is deprecated"
    exit 2
 fi
+sed -i 1s,/usr/bin/bash,/bin/bash, %buildroot{%_bindir/%name,%_libexecdir/arduino-add-groups}
 !."\n");
 };
 
