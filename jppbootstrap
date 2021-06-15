@@ -154,7 +154,8 @@ Release: '.$release."\n\n";
 	my $tagname=ucfirst(lc($tag));
 	$tagname=~s/name/s/;
 	foreach my $val (@tagval) {
-	    print SPEC $tagname.": ".$val."\n" if $val ne $pkgname and not $skip{$tag}->{$val};
+	    my $namepart=$val=~s/\s.*$//r;
+	    print SPEC $tagname.": ",$val,"\n" if ($namepart ne $pkgname) and not $skip{$tag}->{$namepart};
 	}
     }
 
