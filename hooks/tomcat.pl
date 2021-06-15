@@ -8,6 +8,16 @@ sub {
     # tmp hack - remove me
     #$spec->get_section('package','-n tomcat-servlet-4.0-api')->push_body('Provides: tomcat-servlet-3.1-api = %version'."\n");
 
+    $spec->main_section->map_body(sub{
+	s,ASL 2\.0,Apache-2.0, if /^License:/;
+	# tomcat: no static uid gid
+	$_='' if /^\%define tcuid/;
+				  });
+    # tomcat: no static uid gid
+    $spec->main_section->unshift_body('%define tomcat_user tomcat
+%define tomcat_group tomcat
+');$spec->spec_apply_patch(PATCHFILE=>'tomcat-9.0-alt-no-static-uid-gid.patch');
+
     $spec->add_patch('tomcat-8.0.46-alt-tomcat-jasper.pom.patch',STRIP=>0);
     my $filesec=$spec->get_section('files','');
     $spec->get_section('package','')->unshift_body('%define _libexecdir %_prefix/libexec'."\n");
@@ -32,6 +42,13 @@ sub {
     $filesec->push_body('%attr(0755,root,root) %dir %{bindir}'."\n");
 #   $filesec->subst_body(qr'^\%\{bindir\}/','%attr(0644,root,root) %{bindir}/');
     $filesec->subst_body(qr'^\%dir %\{apphomedir\}','%attr(0755,root,root) %dir %{apphomedir}');
+
+    # Don't package files twice
+    $spec->get_section('files','lib')->push_body(q{# Don't package files twice
+    %exclude %_javadir/%name-el-api.jar
+%exclude %_javadir/%name-servlet-api.jar
+%exclude %_javadir/%name-jsp-api.jar
+});
 };
 
 __END__

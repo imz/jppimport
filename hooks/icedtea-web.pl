@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+my $javaws=0;
+
 push @PREHOOKS, sub {
     my ($spec,) = @_;
     # contain alternatives that we add manually;
@@ -22,9 +24,10 @@ push @SPECHOOKS, sub {
 BuildRequires: bc
 '."\n");
 
-    $mainsec->unshift_body(q'%def_enable javaws
+    $mainsec->unshift_body(q'%def_'.($javaws?'enable':'disable').q' javaws
 %def_enable moz_plugin
 ');
+
     $mainsec->push_body('
 %define altname java-%{javaver}-openjdk
 %define origin openjdk
@@ -83,31 +86,37 @@ with %{name} J2SE Runtime Environment.
 %endif # enabled javaws
 !);
 
-    $spec->add_section('files','-n %altname-javaws');
-    #map{$_->describe()} $spec->get_sections();
+    if ($javaws) {
+	$spec->add_section('files','-n %altname-javaws');
+	#map{$_->describe()} $spec->get_sections();
 
-    $spec->get_section('files','-n %altname-javaws')->unshift_body('#
+	$spec->get_section('files','-n %altname-javaws')->unshift_body('#
 %_altdir/%altname-javaws
 %{_desktopdir}/%{altname}-javaws.desktop
 %{_datadir}/pixmaps/javaws.png
 %{_man1dir}/javaws.itweb.1.gz
 %_bindir/javaws.itweb
 ');
+    }
     $spec->get_section('files','')->push_body('# alt linux specific
 %_altdir/%altname-plugin
 %{_desktopdir}/%{altname}-control-panel.desktop
 # replace by local variants
-%exclude %{_desktopdir}/javaws.desktop
 %exclude %{_desktopdir}/itweb-settings.desktop
+%if_enabled javaws
+%exclude %{_desktopdir}/javaws.desktop
 # separate javaws
 %exclude %{_desktopdir}/%{altname}-javaws.desktop
 %exclude %{_datadir}/pixmaps/javaws.png
 %exclude %{_man1dir}/javaws.itweb.1.gz
-%exclude %_bindir/javaws.itweb'."\n");
+%exclude %_bindir/javaws.itweb
+%endif
+'."\n");
 
     $spec->_reset_speclist();
 
-    $spec->get_section('install')->push_body(q!
+    if ($javaws) {
+	$spec->get_section('install')->push_body(q!
 install -d -m 755 %buildroot/etc/icedtea-web
 cat > %buildroot/etc/icedtea-web/javaws.policy << EOF
 // Based on Oracle JDK policy file
@@ -115,15 +124,16 @@ grant codeBase "file:/usr/share/icedtea-web/netx.jar" {
     permission java.security.AllPermission;
 };
 EOF
+!);
+	$spec->get_section('install')->push_body(q!
 sed -e 's,^JAVA_ARGS=,JAVA_ARGS="-Djava.security.policy=/etc/icedtea-web/javaws.policy",' \
 %buildroot%_bindir/javaws.itweb
 !);
-
-    $spec->get_section('files')->push_body(q!# security policy
+	$spec->get_section('files')->push_body(q!# security policy
 %dir /etc/icedtea-web
 /etc/icedtea-web/javaws.policy
 !);
-
+    }
     $spec->get_section('install')->push_body(q!
 
 ##################################################
@@ -204,9 +214,9 @@ push @SPECHOOKS, sub {
     my ($spec,) = @_;
     $spec->add_patch('translation-desktop-files.patch',STRIP=>2);
     my $id=$spec->add_source('Messages_ru.properties');
-    $spec->get_section('prep')->push_body(q!
-cp -f %SOURCE!.$id.q! netx/net/sourceforge/jnlp/resources/Messages_ru.properties
-sed -i 's/en_US.UTF-8/en_US.UTF-8 ru_RU.UTF-8/' Makefile.am
+    $spec->get_section('prep')->push_body(q!# not updated for 2.0 yet
+#cp -f %SOURCE!.$id.q! common/src/main/resources/net/adoptopenjdk/icedteaweb/i18n/Messages_ru.properties
+#sed -i 's/en_US.UTF-8/en_US.UTF-8 ru_RU.UTF-8/' Makefile.am
 !);
 };
 

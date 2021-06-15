@@ -19,6 +19,7 @@ sub {
     $spec->add_section('pre','')->push_body(q'# https://bugzilla.altlinux.org/show_bug.cgi?id=27807 (upgrade from maven1)
 [ -d %_datadir/maven/repository/JPP ] && rm -rf %_datadir/maven/repository/JPP ||:'."\n");
 
+    $spec->spec_apply_patch(PATCHFILE => 'maven.spec.diff');
 warn "==============================================================
 #
 #

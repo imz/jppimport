@@ -1,0 +1,62 @@
+--- maven.spec.orig	2021-05-11 22:32:53.000000000 +0300
++++ maven.spec	2021-05-14 16:47:05.001819356 +0300
+@@ -259,17 +259,17 @@
+ ln -sf %{confdir}/logging %{buildroot}%{apphomedir}/conf
+ 
+ # Ghosts for alternatives
+-install -d -m 755 %{buildroot}%{_bindir}/
+-install -d -m 755 %{buildroot}%{_mandir}/man1/
+-touch %{buildroot}%{_bindir}/{mvn,mvnDebug}
+-touch %{buildroot}%{_mandir}/man1/{mvn,mvnDebug}.1
++#install -d -m 755 %{buildroot}%{_bindir}/
++#install -d -m 755 %{buildroot}%{_mandir}/man1/
++#touch %{buildroot}%{_bindir}/{mvn,mvnDebug}
++#touch %{buildroot}%{_mandir}/man1/{mvn,mvnDebug}.1
+ # maven-filesystem
+ rm -f %buildroot%_datadir/%{name}/repository-jni/JPP
+-for rpm404_ghost in %{_bindir}/mvn %{_bindir}/mvnDebug %{_mandir}/man1/mvn.1.gz %{_mandir}/man1/mvnDebug.1.gz
+-do
+-    mkdir -p %buildroot`dirname "$rpm404_ghost"`
+-    touch %buildroot"$rpm404_ghost"
+-done
++#for rpm404_ghost in %{_bindir}/mvn %{_bindir}/mvnDebug %{_mandir}/man1/mvn.1.gz %{_mandir}/man1/mvnDebug.1.gz
++#do
++#    mkdir -p %buildroot`dirname "$rpm404_ghost"`
++#    touch %buildroot"$rpm404_ghost"
++#done
+ install -d $RPM_BUILD_ROOT/%_altdir; cat >$RPM_BUILD_ROOT/%_altdir/mvn_maven<<EOF
+ %{_bindir}/mvn	%{apphomedir}/bin/mvn	%{?maven_alternatives_priority}0
+ %{_bindir}/mvnDebug	%{apphomedir}/bin/mvnDebug	%{apphomedir}/bin/mvn
+@@ -277,6 +277,11 @@
+ %{_mandir}/man1/mvnDebug.1.gz	%{apphomedir}/bin/mvn.1.gz	%{apphomedir}/bin/mvn
+ EOF
+ 
++mkdir -p %buildroot%{_bindir} %buildroot%{_man1dir}
++ln -s `relative %{apphomedir}/bin/mvn %{_bindir}/` %buildroot%{_bindir}/mvn
++ln -s `relative %{apphomedir}/bin/mvnDebug %{_bindir}/` %buildroot%{_bindir}/mvnDebug
++ln -s `relative %{apphomedir}/bin/mvn.1.gz %{_man1dir}/` %buildroot%{_man1dir}/mvn.1.gz
++
+ mkdir -p $RPM_BUILD_ROOT`dirname /etc/mavenrc`
+ touch $RPM_BUILD_ROOT/etc/mavenrc
+ 
+@@ -284,10 +289,6 @@
+ touch $RPM_BUILD_ROOT/etc/java/maven.conf
+ 
+ 
+-
+-%postun
+-[[ $1 -eq 0 ]] && update-alternatives --remove mvn %{apphomedir}/bin/mvn
+-
+ %pre 
+ # https://bugzilla.altlinux.org/show_bug.cgi?id=27807 (upgrade from maven1)
+ [ -d %_datadir/maven/repository/JPP ] && rm -rf %_datadir/maven/repository/JPP ||:
+@@ -305,7 +306,8 @@
+ %config(noreplace) %{confdir}/logging/simplelogger.properties
+ 
+ %files
+-%_altdir/mvn_maven
++%_bindir/mvn*
++%_man1dir/mvn*
+ %{_datadir}/bash-completion
+ %config(noreplace,missingok) /etc/mavenrc
+ %config(noreplace,missingok) /etc/java/maven.conf

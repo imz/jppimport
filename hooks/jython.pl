@@ -5,13 +5,14 @@ require 'add_missingok_config.pl';
 
 push @SPECHOOKS, sub {
     my ($spec,) = @_;
+    $spec->main_section->exclude_body(qr'global __os_install_post');
 
     $spec->get_section('package','')->set_tag('Summary','Jython is an implementation of Python written in pure Java.');
     #$spec->get_section('package','')->subst_body(qr'cpython_version\s+2.3','cpython_version	2.4');
 
     $spec->get_section('package','')->push_body('BuildArch: noarch'."\n") unless $spec->get_section('package','')->match_body(qr'BuildArch:\s*noarch');
 
-    $spec->get_section('package','')->unshift_body('#BuildRequires(pre): j2se-jdbc = 1.4.2
+    $spec->get_section('package','')->unshift_body('
 BuildRequires: jline
 # recommends
 Requires: jline libreadline-java
@@ -20,7 +21,6 @@ AutoReq: yes, nopython
     $spec->get_section('package','demo')->push_body('AutoReq: yes, nopython
 #AutoProv: yes, nopython
 ');
-    $spec->get_section('package','javadoc')->exclude_body(qr'^(?:Provides|Obsoletes).*manual');
     &add_missingok_config($spec,'/etc/jython.conf');
 
     $spec->get_section('install')->push_body('

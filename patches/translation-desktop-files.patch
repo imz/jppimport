@@ -1,7 +1,5 @@
-diff --git a/icedtea-web/itweb-settings.desktop.in b/icedtea-web/itweb-settings.desktop.in
-index 31d5191..5fadec5 100644
---- a/icedtea-web/itweb-settings.desktop.in
-+++ b/icedtea-web/itweb-settings.desktop.in
+--- a/icedtea-web/launchers/xdesktop.in/itweb-settings.desktop.in
++++ b/icedtea-web/launchers/xdesktop.in/itweb-settings.desktop.in
 @@ -3,11 +3,14 @@ Name=IcedTea-Web Control Panel
  Name[de]=IcedTea-Web Systemsteuerung
  Name[pl]=Panel sterowania IcedTea-Web
@@ -17,10 +15,8 @@ index 31d5191..5fadec5 100644
  Exec=PATH_TO_ITWEB_SETTINGS
  Icon=javaws
  Terminal=false
-diff --git a/icedtea-web/javaws.desktop.in b/icedtea-web/javaws.desktop.in
-index b34f84f..cdf2c6d 100644
---- a/icedtea-web/javaws.desktop.in
-+++ b/icedtea-web/javaws.desktop.in
+--- a/icedtea-web/launchers/xdesktop.in/javaws.desktop.in
++++ b/icedtea-web/launchers/xdesktop.in/javaws.desktop.in
 @@ -2,6 +2,7 @@
  Name=IcedTea Web Start
  GenericName=Java Web Start
@@ -29,10 +25,8 @@ index b34f84f..cdf2c6d 100644
  Exec=PATH_TO_JAVAWS %u
  Icon=javaws
  Terminal=false
-diff --git a/icedtea-web/policyeditor.desktop.in b/icedtea-web/policyeditor.desktop.in
-index 0155da6..85d0914 100644
---- a/icedtea-web/policyeditor.desktop.in
-+++ b/icedtea-web/policyeditor.desktop.in
+--- a/icedtea-web/launchers/xdesktop.in/policyeditor.desktop.in
++++ b/icedtea-web/launchers/xdesktop.in/policyeditor.desktop.in
 @@ -1,7 +1,10 @@
  [Desktop Entry]
  Name=IcedTea-Web Policy Editor

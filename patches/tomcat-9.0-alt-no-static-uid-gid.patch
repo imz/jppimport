@@ -1,0 +1,18 @@
+--- tomcat.spec	2021-06-01 02:27:57.000000000 +0300
++++ tomcat.spec	2021-06-03 21:39:46.586309192 +0300
+@@ -497,12 +497,9 @@
+ 
+ 
+ %pre
+-getent group tomcat >/dev/null || %{_sbindir}/groupadd -f -g %{tcuid} -r tomcat
+-if ! getent passwd tomcat >/dev/null ; then
+-    if ! getent passwd %{tcuid} >/dev/null ; then
+-        %{_sbindir}/useradd -r -u %{tcuid} -g tomcat -d %{apphomedir} -s /sbin/nologin -c "Apache Tomcat" tomcat
+-        # Tomcat uses a reserved ID, so there should never be an else
+-    fi
++getent group %tomcat_group >/dev/null || %{_sbindir}/groupadd -f -r %tomcat_group
++if ! getent passwd %tomcat_user >/dev/null ; then
++    %{_sbindir}/useradd -r -g %tomcat_group -d %{apphomedir} -s /sbin/nologin -c "Apache Tomcat" %tomcat_user
+ fi
+ exit 0
+ 
