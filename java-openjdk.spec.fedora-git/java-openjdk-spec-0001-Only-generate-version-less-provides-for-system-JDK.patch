@@ -1,16 +1,16 @@
-From 745a3e68b2eb9c6b5cae406fdbc3dfd164c896b6 Mon Sep 17 00:00:00 2001
+From 5d49d7aa6c5f919d5aeea0a7a7c7bf22db6954b7 Mon Sep 17 00:00:00 2001
 From: Jiri Vanek <jvanek@redhat.com>
 Date: Fri, 7 Dec 2018 13:18:16 +0100
-Subject: [PATCH] Only generate version-less provides for system JDK
+Subject: [PATCH 1/2] Only generate version-less provides for system JDK
 
 ---
- java-11-openjdk.spec | 85 +++++++++++++++++++++++++++++---------------
+ java-openjdk.spec | 85 +++++++++++++++++++++++++++++++----------------
  1 file changed, 56 insertions(+), 29 deletions(-)
 
-diff --git a/java-11-openjdk.spec b/java-11-openjdk.spec
-index 2cfa67e..b60d987 100644
---- a/java-11-openjdk.spec
-+++ b/java-11-openjdk.spec
+diff --git a/java-openjdk.spec b/java-openjdk.spec
+index 544022a..86bcf73 100644
+--- a/java-openjdk.spec
++++ b/java-openjdk.spec
 @@ -68,6 +68,10 @@
  # similarly for other %%{_jvmdir}/{jre,java} and %%{_javadocdir}/{java,java-zip}
  %define is_release_build() %( if [ "%{?1}" == "%{debug_suffix_unquoted}" ]; then echo "0" ; else echo "1"; fi )
@@ -30,7 +30,7 @@ index 2cfa67e..b60d987 100644
  # fix for https://bugzilla.redhat.com/show_bug.cgi?id=1111349
  %global _privatelibs libsplashscreen[.]so.*|libawt_xawt[.]so.*|libjli[.]so.*|libattach[.]so.*|libawt[.]so.*|libextnet[.]so.*|libawt_headless[.]so.*|libdt_socket[.]so.*|libfontmanager[.]so.*|libinstrument[.]so.*|libj2gss[.]so.*|libj2pcsc[.]so.*|libj2pkcs11[.]so.*|libjaas[.]so.*|libjavajpeg[.]so.*|libjdwp[.]so.*|libjimage[.]so.*|libjsound[.]so.*|liblcms[.]so.*|libmanagement[.]so.*|libmanagement_agent[.]so.*|libmanagement_ext[.]so.*|libmlib_image[.]so.*|libnet[.]so.*|libnio[.]so.*|libprefs[.]so.*|librmi[.]so.*|libsaproc[.]so.*|libsctp[.]so.*|libsunec[.]so.*|libunpack[.]so.*|libzip[.]so.*
  
-@@ -232,9 +235,13 @@
+@@ -234,9 +237,13 @@
  %global top_level_dir_name   %{origin}
  %global minorver        0
  %global buildver        13
@@ -47,7 +47,7 @@ index 2cfa67e..b60d987 100644
  %global newjavaver      %{majorver}.%{minorver}.%{securityver}
  
  %global javaver         %{majorver}
-@@ -637,6 +644,7 @@ exit 0
+@@ -639,6 +646,7 @@ exit 0
  %config(noreplace) %{etcjavadir -- %{?1}}/conf/sound.properties
  %{_jvmdir}/%{sdkdir -- %{?1}}/conf
  %{_jvmdir}/%{sdkdir -- %{?1}}/lib/security
@@ -55,7 +55,7 @@ index 2cfa67e..b60d987 100644
  %if %{is_release_build -- %{?1}}
  %ghost %{_bindir}/java
  %ghost %{_jvmdir}/jre
-@@ -651,6 +659,7 @@ exit 0
+@@ -653,6 +661,7 @@ exit 0
  %ghost %{_jvmdir}/jre-%{javaver}
  %ghost %{_jvmdir}/jre-%{javaver}-%{origin}
  %endif
@@ -63,7 +63,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define files_devel() %{expand:
-@@ -717,6 +726,7 @@ exit 0
+@@ -719,6 +728,7 @@ exit 0
  %dir %{tapsetdir}
  %{tapsetdir}/*%{_arch}%{?1}.stp
  %endif
@@ -71,7 +71,7 @@ index 2cfa67e..b60d987 100644
  %if %{is_release_build -- %{?1}}
  %ghost %{_bindir}/javac
  %ghost %{_jvmdir}/java
-@@ -748,6 +758,7 @@ exit 0
+@@ -750,6 +760,7 @@ exit 0
  %ghost %{_jvmdir}/java-%{javaver}
  %ghost %{_jvmdir}/java-%{javaver}-%{origin}
  %endif
@@ -79,7 +79,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define files_jmods() %{expand:
-@@ -768,17 +779,21 @@ exit 0
+@@ -770,17 +781,21 @@ exit 0
  %define files_javadoc() %{expand:
  %doc %{_javadocdir}/%{uniquejavadocdir -- %{?1}}
  %license %{buildoutputdir -- %{?1}}/images/%{jdkimage}/legal
@@ -101,7 +101,7 @@ index 2cfa67e..b60d987 100644
  }
  
  # not-duplicated requires/provides/obsoletes for normal/debug packages
-@@ -794,13 +809,15 @@ Recommends: gtk3%{?_isa}
+@@ -796,13 +811,15 @@ Recommends: gtk3%{?_isa}
  Provides: java-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}-%{release}
  
  # Standard JPackage base provides
@@ -121,7 +121,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define java_headless_rpo() %{expand:
-@@ -834,14 +851,16 @@ Requires(postun):   chkconfig >= 1.7
+@@ -836,14 +853,16 @@ Requires(postun):   chkconfig >= 1.7
  Suggests: lksctp-tools%{?_isa}, pcsc-lite-devel%{?_isa}
  
  # Standard JPackage base provides
@@ -142,7 +142,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define java_devel_rpo() %{expand:
-@@ -858,15 +877,16 @@ Requires(postun): %{_sbindir}/alternatives
+@@ -860,15 +879,16 @@ Requires(postun): %{_sbindir}/alternatives
  Requires(postun):   chkconfig >= 1.7
  
  # Standard JPackage devel provides
@@ -168,7 +168,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define java_jmods_rpo() %{expand:
-@@ -875,20 +895,22 @@ Provides: java-%{javaver}-%{origin}-devel%{?1} = %{epoch}:%{version}
+@@ -877,20 +897,22 @@ Provides: java-%{javaver}-%{origin}-devel%{?1} = %{epoch}:%{version}
  Requires:         %{name}-devel%{?1} = %{epoch}:%{version}-%{release}
  OrderWithRequires: %{name}-headless%{?1} = %{epoch}:%{version}-%{release}
  
@@ -195,7 +195,7 @@ index 2cfa67e..b60d987 100644
  }
  
  %define java_javadoc_rpo() %{expand:
-@@ -903,18 +925,22 @@ Requires(postun): %{_sbindir}/alternatives
+@@ -905,18 +927,22 @@ Requires(postun): %{_sbindir}/alternatives
  Requires(postun):   chkconfig >= 1.7
  
  # Standard JPackage javadoc provides
@@ -220,7 +220,7 @@ index 2cfa67e..b60d987 100644
  }
  
  # Prevent brp-java-repack-jars from being run
-@@ -1286,8 +1312,8 @@ fi
+@@ -1291,8 +1317,8 @@ fi
  %setup -q -c -n %{uniquesuffix ""} -T -a 0
  # https://bugzilla.redhat.com/show_bug.cgi?id=1189084
  prioritylength=`expr length %{priority}`
@@ -231,13 +231,13 @@ index 2cfa67e..b60d987 100644
   exit 14
  fi
  
-@@ -1861,6 +1887,7 @@ require "copy_jdk_configs.lua"
+@@ -1866,6 +1892,7 @@ require "copy_jdk_configs.lua"
  %changelog
  * Wed Dec 5 2018 Jiri Vanek <jvanek@redhat.com> - 1:11.0.1.13-9
  - for non debug supackages, ghosted all masters and slaves (rhbz1649776)
 +- for tech-preview packages, if-outed versionless provides. Aligned versions to be %%{epoch}:%%{version}-%%{release} instead of chaotic
  
- * Wed Nov 28 2018 Severin Gehwolf <sgehwolf@redhat.com> - 1:11.0.1.13-8
+ * Tue Dec 04 2018 Severin Gehwolf <sgehwolf@redhat.com> - 1:11.0.1.13-9
  - Added %%global _find_debuginfo_opts -g
 -- 
 2.29.2
