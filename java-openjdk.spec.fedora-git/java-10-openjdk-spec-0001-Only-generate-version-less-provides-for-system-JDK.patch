@@ -1,0 +1,180 @@
+From ce28069377a5e8130e16764b908669aeed0b061c Mon Sep 17 00:00:00 2001
+From: Jiri Vanek <jvanek@redhat.com>
+Date: Fri, 7 Dec 2018 13:18:16 +0100
+Subject: [PATCH] Only generate version-less provides for system JDK
+
+---
+ java-openjdk.spec | 72 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 45 insertions(+), 27 deletions(-)
+
+diff --git a/java-openjdk.spec b/java-openjdk.spec
+index 95d7635..dc3abed 100644
+--- a/java-openjdk.spec
++++ b/java-openjdk.spec
+@@ -48,6 +48,10 @@
+ %global build_loop1 %{nil}
+ %endif
+ 
++# while JDK is a techpreview(is_system_jdk=0), some provides are turned off. Once jdk stops to be an techpreview, move it to 1
++# as sytem JDK, we mean any JDK which can run whole system java stack without issues (like bytecode issues, module issues, dependencies...)
++%global is_system_jdk 0
++
+ %global aarch64         aarch64 arm64 armv8
+ # we need to distinguish between big and little endian PPC64
+ %global ppc64le         ppc64le
+@@ -119,7 +123,6 @@
+ %global NSSSOFTOKN_BUILDTIME_VERSION %(if [ "x%{NSSSOFTOKN_BUILDTIME_NUMBER}" == "x" ] ; then echo "" ;else echo ">= %{NSSSOFTOKN_BUILDTIME_NUMBER}" ;fi)
+ %global NSS_BUILDTIME_VERSION %(if [ "x%{NSS_BUILDTIME_NUMBER}" == "x" ] ; then echo "" ;else echo ">= %{NSS_BUILDTIME_NUMBER}" ;fi)
+ 
+-
+ # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=1111349.
+ # See also https://bugzilla.redhat.com/show_bug.cgi?id=1590796
+ # as to why some libraries *cannot* be excluded. In particular,
+@@ -194,9 +197,13 @@
+ %global top_level_dir_name   %{origin}
+ %global minorver        0
+ %global buildver        13
+-# priority must be 7 digits in total
+-# setting to 1, so debug ones can have 0
+-%global priority        00000%{minorver}1
++# priority must be 8 digits in total; untill openjdk 1.8 we were using 18..... so when moving to 11 we had to add another digit
++%if %is_system_jdk
++%global priority %( printf '%02d%02d%02d%02d' %{majorver} {minorver} %{securityver} %{buildver} )
++%else
++# for techpreview, using 1, so slowdebugs can have 0
++%global priority %( printf '%08d' 1 )
++%endif
+ %global newjavaver      %{majorver}.%{minorver}.%{securityver}
+ 
+ %global javaver         %{majorver}
+@@ -731,13 +738,15 @@ Recommends: gtk3%{?_isa}
+ Provides: java-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}-%{release}
+ 
+ # Standard JPackage base provides
+-Provides: jre = %{javaver}%{?1}
+-Provides: jre-%{origin}%{?1} = %{epoch}:%{version}-%{release}
+ Provides: jre-%{javaver}%{?1} = %{epoch}:%{version}-%{release}
+ Provides: jre-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}%{?1} = %{epoch}:%{version}-%{release}
++%if %is_system_jdk
+ Provides: java-%{origin}%{?1} = %{epoch}:%{version}-%{release}
+-Provides: java%{?1} = %{epoch}:%{javaver}
++Provides: jre-%{origin}%{?1} = %{epoch}:%{version}-%{release}
++Provides: java%{?1} = %{epoch}:%{version}-%{release}
++Provides: jre%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ %define java_headless_rpo() %{expand:
+@@ -769,14 +778,16 @@ Requires(postun):   chkconfig >= 1.7
+ Suggests: lksctp-tools%{?_isa}, pcsc-lite-devel%{?_isa}, cups
+ 
+ # Standard JPackage base provides
+-Provides: jre-headless%{?1} = %{epoch}:%{javaver}
+ Provides: jre-%{javaver}-%{origin}-headless%{?1} = %{epoch}:%{version}-%{release}
+-Provides: jre-%{origin}-headless%{?1} = %{epoch}:%{version}-%{release}
+ Provides: jre-%{javaver}-headless%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-%{origin}-headless%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-headless%{?1} = %{epoch}:%{version}-%{release}
++%if %is_system_jdk
+ Provides: java-%{origin}-headless%{?1} = %{epoch}:%{version}-%{release}
+-Provides: java-headless%{?1} = %{epoch}:%{javaver}
++Provides: jre-%{origin}-headless%{?1} = %{epoch}:%{version}-%{release}
++Provides: jre-headless%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-headless%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ 
+ # https://bugzilla.redhat.com/show_bug.cgi?id=1312019
+ Provides: /usr/bin/jjs
+@@ -797,15 +808,16 @@ Requires(postun): %{_sbindir}/alternatives
+ Requires(postun):   chkconfig >= 1.7
+ 
+ # Standard JPackage devel provides
+-Provides: java-sdk-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}
+-Provides: java-sdk-%{javaver}%{?1} = %{epoch}:%{version}
+-#Provides: java-sdk-%%{origin}%%{?1} = %%{epoch}:%%{version}
+-#Provides: java-sdk%%{?1} = %%{epoch}:%%{javaver}
+-Provides: java-%{javaver}-devel%{?1} = %{epoch}:%{version}
+-Provides: java-%{javaver}-%{origin}-devel%{?1} = %{epoch}:%{version}
+-#Provides: java-devel-%%{origin}%%{?1} = %%{epoch}:%%{version}
+-#Provides: java-devel%%{?1} = %%{epoch}:%%{javaver}
+-
++Provides: java-sdk-%{javaver}-%{origin}%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-sdk-%{javaver}%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-%{javaver}-devel%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-%{javaver}-%{origin}-devel%{?1} = %{epoch}:%{version}-%{release}
++%if %is_system_jdk
++Provides: java-devel-%{origin}%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-sdk-%{origin}%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-devel%{?1} = %{epoch}:%{version}-%{release}
++Provides: java-sdk%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ %define java_jmods_rpo() %{expand:
+@@ -814,20 +826,22 @@ Provides: java-%{javaver}-%{origin}-devel%{?1} = %{epoch}:%{version}
+ Requires:         %{name}-devel%{?1} = %{epoch}:%{version}-%{release}
+ OrderWithRequires: %{name}-headless%{?1} = %{epoch}:%{version}-%{release}
+ 
+-Provides: java-jmods%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-jmods%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-%{origin}-jmods%{?1} = %{epoch}:%{version}-%{release}
+-
++%if %is_system_jdk
++Provides: java-jmods%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ %define java_demo_rpo() %{expand:
+ Requires: %{name}%{?1}%{?_isa} = %{epoch}:%{version}-%{release}
+ OrderWithRequires: %{name}-headless%{?1}%{?_isa} = %{epoch}:%{version}-%{release}
+ 
+-Provides: java-demo%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-demo%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-%{origin}-demo%{?1} = %{epoch}:%{version}-%{release}
+-
++%if %is_system_jdk
++Provides: java-demo%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ %define java_javadoc_rpo() %{expand:
+@@ -842,18 +856,22 @@ Requires(postun): %{_sbindir}/alternatives
+ Requires(postun):   chkconfig >= 1.7
+ 
+ # Standard JPackage javadoc provides
+-Provides: java-javadoc%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-javadoc%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-%{origin}-javadoc%{?1} = %{epoch}:%{version}-%{release}
++%if %is_system_jdk
++Provides: java-javadoc%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ %define java_src_rpo() %{expand:
+ Requires: %{name}-headless%{?1}%{?_isa} = %{epoch}:%{version}-%{release}
+ 
+ # Standard JPackage sources provides
+-Provides: java-src%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-src%{?1} = %{epoch}:%{version}-%{release}
+ Provides: java-%{javaver}-%{origin}-src%{?1} = %{epoch}:%{version}-%{release}
++%if %is_system_jdk
++Provides: java-src%{?1} = %{epoch}:%{version}-%{release}
++%endif
+ }
+ 
+ # Prevent brp-java-repack-jars from being run
+@@ -1192,8 +1210,8 @@ fi
+ %setup -q -c -n %{uniquesuffix ""} -T -a 0
+ # https://bugzilla.redhat.com/show_bug.cgi?id=1189084
+ prioritylength=`expr length %{priority}`
+-if [ $prioritylength -ne 7 ] ; then
+- echo "priority must be 7 digits in total, violated"
++if [ $prioritylength -ne 8 ] ; then
++ echo "priority must be 8 digits in total, violated"
+  exit 14
+ fi
+ 
+-- 
+2.29.2
+
